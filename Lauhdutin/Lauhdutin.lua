@@ -36,6 +36,7 @@ function Initialize()
 		end
 		S_PATH_STEAM = Trim(S_PATH_STEAM)
 	end
+	S_PATH_STEAM_LIBRARIES = SKIN:GetVariable('SteamLibraryPaths', nil)
 	S_STEAM_USER_DATA_ID = SKIN:GetVariable('UserDataID', nil)
 	if S_STEAM_USER_DATA_ID ~= nil then
 		S_STEAM_USER_DATA_ID = Trim(S_STEAM_USER_DATA_ID)
@@ -235,6 +236,20 @@ end
 			tNonSteamGames = nil
 		end
 
+		local tSteamLibraryPaths = {}
+		table.insert(tSteamLibraryPaths, S_PATH_STEAM)
+		if S_PATH_STEAM_LIBRARIES ~= nil then
+			for sLibraryPath in S_PATH_STEAM_LIBRARIES:gmatch('([^;]+)') do
+				if sLibraryPath ~= nil then
+					if sLibraryPath ~= '' and EndsWith(sPath, '\\') == false then
+						sLibraryPath = sLibraryPath .. '\\'
+					end
+					sLibraryPath = Trim(sLibraryPath)
+				end
+				table.insert(tSteamLibraryPaths, sLibraryPath)
+			end
+		end
+		
 		-- Steam games and non-Steam games that have been added to the Steam library.
 		if S_PATH_STEAM ~= nil and S_PATH_STEAM ~= '' then
 			if S_STEAM_USER_DATA_ID == nil or S_STEAM_USER_DATA_ID == '' then
@@ -251,36 +266,40 @@ end
 					local tExceptions = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS)
 					if tLocalConfigApps ~= nil and tLocalConfigAppTickets ~= nil and tSharedConfigApps ~= nil then
 
-						-- Steam games.
-						for sAppID, tTable in pairs(tLocalConfigAppTickets) do
-							if tExceptions[sAppID] == nil then
-								local tGame = {}
-								tGame[S_VDF_KEY_STEAM] = 'true'
-								tGame[S_VDF_KEY_APPID] = sAppID
-								if tLocalConfigApps[sAppID] ~= nil and tLocalConfigApps[sAppID][S_VDF_KEY_LAST_PLAYED] ~= nil then
-									tGame[S_VDF_KEY_LAST_PLAYED] = tLocalConfigApps[sAppID][S_VDF_KEY_LAST_PLAYED]
-									local tAppManifest = ParseVDFFile(S_PATH_STEAM .. 'SteamApps\\appmanifest_' .. sAppID .. '.acf')
-									if tAppManifest ~= nil then
-										tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_NAME]
-										if tGame[S_VDF_KEY_NAME] == nil then
-											tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_USER_CONFIG][S_VDF_KEY_NAME]
-										end
-										local tGameSharedConfig = RecursiveTableSearch(tSharedConfigApps, sAppID)
-										if tGameSharedConfig ~= nil then
-											tGame[S_VDF_KEY_TAGS] = RecursiveTableSearch(tGameSharedConfig, S_VDF_KEY_TAGS)
-											tGame[S_VDF_KEY_HIDDEN] = tGameSharedConfig[S_VDF_KEY_HIDDEN]
-										end
-										tGameSharedConfig = nil
-										if tGame[S_VDF_KEY_HIDDEN] == nil or tGame[S_VDF_KEY_HIDDEN] == '0' then
-											table.insert(tGames, tGame)
-											if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
-												table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
+						for i = 1, #tSteamLibraryPaths do
+
+							-- Steam games.
+							for sAppID, tTable in pairs(tLocalConfigAppTickets) do
+								if tExceptions[sAppID] == nil then
+									local tGame = {}
+									tGame[S_VDF_KEY_STEAM] = 'true'
+									tGame[S_VDF_KEY_APPID] = sAppID
+									if tLocalConfigApps[sAppID] ~= nil and tLocalConfigApps[sAppID][S_VDF_KEY_LAST_PLAYED] ~= nil then
+										tGame[S_VDF_KEY_LAST_PLAYED] = tLocalConfigApps[sAppID][S_VDF_KEY_LAST_PLAYED]
+										local tAppManifest = ParseVDFFile(tSteamLibraryPaths[i] .. 'SteamApps\\appmanifest_' .. sAppID .. '.acf')
+										if tAppManifest ~= nil then
+											tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_NAME]
+											if tGame[S_VDF_KEY_NAME] == nil then
+												tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_USER_CONFIG][S_VDF_KEY_NAME]
+											end
+											local tGameSharedConfig = RecursiveTableSearch(tSharedConfigApps, sAppID)
+											if tGameSharedConfig ~= nil then
+												tGame[S_VDF_KEY_TAGS] = RecursiveTableSearch(tGameSharedConfig, S_VDF_KEY_TAGS)
+												tGame[S_VDF_KEY_HIDDEN] = tGameSharedConfig[S_VDF_KEY_HIDDEN]
+											end
+											tGameSharedConfig = nil
+											if tGame[S_VDF_KEY_HIDDEN] == nil or tGame[S_VDF_KEY_HIDDEN] == '0' then
+												table.insert(tGames, tGame)
+												if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
+													table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
+												end
 											end
 										end
 									end
+									tGame = nil
 								end
-								tGame = nil
 							end
+
 						end
 
 						-- Non-Steam games that have been added to the Steam library.

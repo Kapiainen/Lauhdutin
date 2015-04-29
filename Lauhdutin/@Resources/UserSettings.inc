@@ -5,6 +5,9 @@ SteamPath=
 ;UserDataID corresponding to your Steam account.
 UserDataID=
 
+;Paths to Steam libraries that are not located in the same place as your Steam installation. Multiple paths can be separated with a semicolon (;).
+SteamLibraryPaths=
+
 ;Width of a game's banner in pixels. Default value is 274.
 BannerWidth=274
 
