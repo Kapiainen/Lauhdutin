@@ -259,16 +259,14 @@ end
 				if tLocalConfigApps == nil then
 					DisplayMessage('Invalid Steam UserDataID#CRLF#and/or Steam path')
 				else
-					local tLocalConfigAppTickets = tLocalConfigApps[S_VDF_KEY_USER_LOCAL_CONFIG_STORE][S_VDF_KEY_APP_TICKETS]
-					tLocalConfigApps = tLocalConfigApps[S_VDF_KEY_USER_LOCAL_CONFIG_STORE][S_VDF_KEY_SOFTWARE][S_VDF_KEY_VALVE][S_VDF_KEY_STEAM][S_VDF_KEY_APPS]
+					local tLocalConfigAppTickets = RecursiveTableSearch(tLocalConfigApps, S_VDF_KEY_APP_TICKETS)
+					tLocalConfigApps = RecursiveTableSearch(tLocalConfigApps, S_VDF_KEY_STEAM)[S_VDF_KEY_APPS]
 					local tSharedConfigApps = ParseVDFFile(S_PATH_STEAM .. 'userdata\\' .. S_STEAM_USER_DATA_ID .. '\\7\\remote\\sharedconfig.vdf')
-					tSharedConfigApps = tSharedConfigApps[S_VDF_KEY_USER_LOCAL_CONFIG_STORE][S_VDF_KEY_SOFTWARE][S_VDF_KEY_VALVE][S_VDF_KEY_STEAM][S_VDF_KEY_APPS]
+					tSharedConfigApps = RecursiveTableSearch(tSharedConfigApps, S_VDF_KEY_STEAM)[S_VDF_KEY_APPS]
 					local tExceptions = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS)
 					if tLocalConfigApps ~= nil and tLocalConfigAppTickets ~= nil and tSharedConfigApps ~= nil then
-
+						-- Steam games.
 						for i = 1, #tSteamLibraryPaths do
-
-							-- Steam games.
 							for sAppID, tTable in pairs(tLocalConfigAppTickets) do
 								if tExceptions[sAppID] == nil then
 									local tGame = {}
@@ -299,7 +297,6 @@ end
 									tGame = nil
 								end
 							end
-
 						end
 
 						-- Non-Steam games that have been added to the Steam library.
