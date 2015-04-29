@@ -702,20 +702,11 @@ end
 				if T_GAMES[i][S_VDF_KEY_STEAM] == 'true' then
 					local tExceptions = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS)
 					if tExceptions[asAppID] == nil then
-						local sName = 'Unknown'
-						for i = 1, #T_GAMES do
-							if T_GAMES[i][S_VDF_KEY_APPID] == asAppID then
-								if T_GAMES[i][S_VDF_KEY_STEAM] ~= nil and T_GAMES[i][S_VDF_KEY_STEAM] == 'true' then
-									sName = T_GAMES[i][S_VDF_KEY_NAME]
-									break
-								else
-									return
-								end
-							end
-						end
+						local sName = T_GAMES[i][S_VDF_KEY_NAME]
 						tExceptions[asAppID] = sName
 						SerializeTableAsVDFFile(tExceptions, (S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS))
 						Update()
+						break
 					end
 				end
 			end
