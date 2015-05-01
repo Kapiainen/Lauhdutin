@@ -59,8 +59,17 @@ Specify the absolute path to where you have Steam installed on your computer and
 ###From other services or retail copies
 **NOTE: The goal is to automate the process of adding games from services other than Steam so that one only needs to place a shortcut in a folder, but until then one of the methods described below are required.**
 
-There are two ways to add non-Steam games:  
-####1) By manually adding games to **Games.inc**.
+There are three ways to add non-Steam games:  
+####1) Via the *Add game* custom skin action.
+Right-click somewhere on the skin and choose **Add game** from the **Custom skin actions** menu. A menu will open up where you can enter the following information by clicking on the corresponding button:  
+- Name
+- Path
+- Tags
+- Steam AppID
+
+The **Name** and **Path** values are required. Multiple tags are separated by semicolons (**;**). If **Steam AppID** is defined, then the skin will attempt to download a banner for that *AppID*.
+
+####2) By manually adding games to **Games.inc**.
 Open **Games.inc**, which you can find in **\Rainmeter\Skins\Lauhdutin\@Resources**, with a text editor. The game entries should follow the format below:
 
 ```
@@ -106,7 +115,7 @@ Explanation of valid keys:
 **name**: The string that is used when sorting games alphabetically.  
 **tags**: A set of tags associated with the game. (Optional)
 
-####2) As a non-Steam game that is added to your Steam library.
+####3) As a non-Steam game that is added to your Steam library.
 Add a game as a non-Steam game to your Steam library, add it in whatever categories you want, and then refresh the skin. [Here](https://support.steampowered.com/kb_article.php?ref=2219-YDJV-5557) are instructions on how to add a non-Steam game to your Steam library.  
 
 **NOTE: The Steam overlay will not work due to an inability to retrieve (in an automated fashion) the unique identifier that Steam generates for non-Steam games. A workaround is to:**  
@@ -138,7 +147,7 @@ Banners are stored in **\Rainmeter\Skins\Lauhdutin\@Resources\Banners**. Games t
 
 Banners can be placed in the folder mentioned above. The file names of banners should match the value corresponding to the **appid** key. The name can be a valid Steam AppID or the name of the game for non-Steam games, depending on how you've added the game.
 
-##Excluding Steam games, DLC, movies, or applications
+##Hiding Steam games, DLC, movies, or applications
 If you want to stop certain games, DLC, movies, or applications from showing up in the launcher, then you have three options:
 ####1) Set the item in question as hidden in Steam.
 ####2) Double click the middle mouse button on the banner of the item in question in the skin.
@@ -155,7 +164,26 @@ For example:
 
 Remove the line corresponding to the item in order reverse the exclusion.
 
-##Context menus
+##Hiding non-Steam games, applications, etc.
+You have three options:
+####1) Double click the middle mouse button on the banner of the game.
+
+####2) Manually add the following line to a game's entry in *Games.inc*.
+
+```
+"hidden"    "true"
+```
+
+####3) Remove the game's entry in *Games.inc*.
+
+The first two methods have the advantage of retaining the timestamp for when the game was last launched. If you used one of the first two methods and want to make the game visible again, then you can do one of two things:
+
+####1) Open the *Add game* menu, type in the name of the game, and then click on *Add*.
+
+####2) Manually edit *Game.inc* by removing the line containing the *"hidden"* key for the game and then refresh the skin.
+
+
+##Custom skin actions
 ###Games
 Opens **Games.inc** in Notepad.
 
@@ -164,6 +192,9 @@ Opens **SteamShortcuts.inc** in Notepad.
 
 ###Exceptions
 Opens **Exceptions.inc** in Notepad.
+
+###Add game
+Open a menu where games can be added to the skin.
 
 <br>
 
@@ -231,12 +262,32 @@ The color and opacity of the skin's background (red, green, blue, opacity).
 BackgroundColor=0,0,0,128
 ```
 
+##ToolbarLogoTint
+The color and opacity of the logos in the toolbar (red, green, blue, opacity).
+
+```
+ToolbarLogoTint=255,255,255,255
+```
 
 ##ToolbarBackgroundColor
 The color and opacity of the toolbar's background (red, green, blue, opacity).
 
 ```
 ToolbarBackgroundColor=0,0,0,191
+```
+
+##AddGameButtonColor
+Color and opacity of the text on buttons in the menu where games can be added (red, green, blue, opacity).
+
+```
+AddGameButtonColor=0,0,0,255
+```
+
+##AddGameButtonBackgroundColor
+Color and opacity of the buttons in the menu where games can be added.
+
+```
+AddGameButtonBackgroundColor=127,127,127,255
 ```
 
 ##RefreshInterval

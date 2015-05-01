@@ -2,7 +2,7 @@ function Initialize()
 	-- Folder paths to resources
 	S_PATH_DOWNLOADS = SKIN:MakePathAbsolute("DownloadFile\\")
 	S_PATH_RESOURCES = SKIN:GetVariable('@')
-	
+
 	-- State variables
 	N_SORT_STATE = 1 -- 0 = alphabetically, 1 = most recently played
 	B_FORCE_SHOW_TOOLBAR = false
@@ -107,7 +107,7 @@ end
 		local tResult = {}
 		if abOld then
 			tResult[S_USER_SETTING_KEY_WIDTH] = SKIN:GetVariable('OldBannerWidth', nil)
-			tResult[S_USER_SETTING_KEY_HEIGHT] = SKIN:GetVariable('OldBannerHeight', nil)			
+			tResult[S_USER_SETTING_KEY_HEIGHT] = SKIN:GetVariable('OldBannerHeight', nil)
 			tResult[S_USER_SETTING_KEY_SLOTS] = SKIN:GetVariable('OldSlotCount', nil)
 			tResult[S_USER_SETTING_KEY_ORIENTATION] = SKIN:GetVariable('OldOrientation', nil)
 			tResult[S_USER_SETTINGS_KEY_HIDE_MESSAGES] = SKIN:GetVariable('OldHideMessages', nil)
@@ -211,27 +211,29 @@ end
 		local tNonSteamGames = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES)
 		if tNonSteamGames ~= nil then
 			for sKey, sValue in pairs(tNonSteamGames) do
-				local tGame = {}
-				tGame[S_VDF_KEY_APPID] = sValue[S_VDF_KEY_APPID]
-				tGame[S_VDF_KEY_NAME] = sValue[S_VDF_KEY_NAME]
-				tGame[S_VDF_KEY_TAGS] = sValue[S_VDF_KEY_TAGS]
-				tGame[S_VDF_KEY_PATH] = sValue[S_VDF_KEY_PATH]
-				tGame[S_VDF_KEY_LAST_PLAYED] = sValue[S_VDF_KEY_LAST_PLAYED]
-				if tGame[S_VDF_KEY_LAST_PLAYED] == nil then
-					tGame[S_VDF_KEY_LAST_PLAYED] = '0'
-				end
-				if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
-					if tonumber(tGame[S_VDF_KEY_APPID]) ~= nil then
-						DisplayMessage('Missing banner#CRLF#' .. tGame[S_VDF_KEY_APPID] .. '#CRLF#for#CRLF#' .. tGame[S_VDF_KEY_NAME])
-						table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
-						table.insert(tGames, tGame)
-					else
-						DisplayMessage('Missing banner#CRLF#' .. tGame[S_VDF_KEY_APPID] .. '#CRLF#for#CRLF#' .. tGame[S_VDF_KEY_NAME])
+				if sValue[S_VDF_KEY_HIDDEN] ~= 'true' then
+					local tGame = {}
+					tGame[S_VDF_KEY_APPID] = sValue[S_VDF_KEY_APPID]
+					tGame[S_VDF_KEY_NAME] = sValue[S_VDF_KEY_NAME]
+					tGame[S_VDF_KEY_TAGS] = sValue[S_VDF_KEY_TAGS]
+					tGame[S_VDF_KEY_PATH] = sValue[S_VDF_KEY_PATH]
+					tGame[S_VDF_KEY_LAST_PLAYED] = sValue[S_VDF_KEY_LAST_PLAYED]
+					if tGame[S_VDF_KEY_LAST_PLAYED] == nil then
+						tGame[S_VDF_KEY_LAST_PLAYED] = '0'
 					end
-				else
-					table.insert(tGames, tGame)
+					if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
+						if tonumber(tGame[S_VDF_KEY_APPID]) ~= nil then
+							DisplayMessage('Missing banner#CRLF#' .. tGame[S_VDF_KEY_APPID] .. '#CRLF#for#CRLF#' .. tGame[S_VDF_KEY_NAME])
+							table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
+							table.insert(tGames, tGame)
+						else
+							DisplayMessage('Missing banner#CRLF#' .. tGame[S_VDF_KEY_APPID] .. '#CRLF#for#CRLF#' .. tGame[S_VDF_KEY_NAME])
+						end
+					else
+						table.insert(tGames, tGame)
+					end
+					tGame = nil
 				end
-				tGame = nil
 			end
 			tNonSteamGames = nil
 		end
@@ -249,7 +251,7 @@ end
 				table.insert(tSteamLibraryPaths, sLibraryPath)
 			end
 		end
-		
+
 		-- Steam games and non-Steam games that have been added to the Steam library.
 		if S_PATH_STEAM ~= nil and S_PATH_STEAM ~= '' then
 			if S_STEAM_USER_DATA_ID == nil or S_STEAM_USER_DATA_ID == '' then
@@ -658,7 +660,7 @@ end
 					end
 				end
 			else
-				
+
 				for i = 1, #atSelection do
 					if atSelection[i][asKey] ~= nil and string.find(atSelection[i][asKey]:lower(), asValue) then
 						table.insert(tFilteredGames, atSelection[i])
@@ -722,9 +724,20 @@ end
 						tExceptions[asAppID] = sName
 						SerializeTableAsVDFFile(tExceptions, (S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS))
 						Update()
-						break
+					end
+				else
+					local tNonSteamGames = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES)
+					if tNonSteamGames ~= nil then
+						for sKey, Value in pairs(tNonSteamGames) do
+							if asAppID == Value[S_VDF_KEY_APPID] then
+								Value[S_VDF_KEY_HIDDEN] = 'true'
+								SerializeTableAsVDFFile(tNonSteamGames, (S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES))
+								Update()
+							end
+						end
 					end
 				end
+				break
 			end
 		end
 	end
@@ -897,4 +910,67 @@ end
 
 	function HideMessage()
 		SKIN:Bang('[!HideMeterGroup MessageOverlay][!Redraw]')
+	end
+
+-- Adding games
+	function StartAddGame()
+		SKIN:Bang('[!SetOption "SkinFilterInput" "Y" "0"][!ShowMeterGroup "AddGameMenu"][!Redraw]')
+	end
+
+	function AddGame()
+		local sName = SKIN:GetVariable('AddGameName', nil)
+		if sName ~= nil and sName ~= '' then
+			local tNonSteamGames = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES)
+			if tNonSteamGames ~= nil then
+				local nIndex = 0
+				for sKey, Value in pairs(tNonSteamGames) do
+					if Value[S_VDF_KEY_NAME] == sName then
+						if Value[S_VDF_KEY_HIDDEN] == 'true' then
+							tNonSteamGames[sKey][S_VDF_KEY_HIDDEN] = 'false'
+							SerializeTableAsVDFFile(tNonSteamGames, (S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES))
+							Update()
+						end
+						nIndex = -1
+						break
+					else
+						nIndex = nIndex + 1
+					end
+				end
+				if nIndex >= 0 then
+					local sPath = SKIN:GetVariable('AddGamePath', nil)
+					if sPath ~= nil and sPath ~= '' then
+						local tGame = {}
+						local sAppID = SKIN:GetVariable('AddGameSteamAppID', nil)
+						if sAppID ~= nil and sAppID ~= '' then
+							tGame[S_VDF_KEY_APPID] = sAppID
+						else
+							tGame[S_VDF_KEY_APPID] = sName
+						end
+						tGame[S_VDF_KEY_NAME] = sName
+						tGame[S_VDF_KEY_PATH] = sPath
+
+						local sTags = SKIN:GetVariable('AddGameTags', nil)
+						if sTags ~= nil and sTags ~= '' then
+							local tTags = {}
+							for sTag in sTags:gmatch('([^;]+)') do
+								table.insert(tTags, sTag)
+							end
+							if #tTags > 0 then
+								tGame[S_VDF_KEY_TAGS] = tTags
+							end
+						end
+						tGame[S_VDF_KEY_LAST_PLAYED] = '0'
+						tNonSteamGames[tostring(nIndex)] = tGame
+						SerializeTableAsVDFFile(tNonSteamGames, (S_PATH_RESOURCES .. S_INCLUDE_FILE_NON_STEAM_GAMES))
+						Update()
+					end
+				end
+				StopAddGame()
+				return
+			end
+		end
+	end
+
+	function StopAddGame()
+		SKIN:Bang('[!HideMeterGroup "AddGameMenu"][!Redraw][!SetVariable "AddGameName" ""][!SetVariable "AddGamePath" ""][!SetVariable "AddGameSteamAppID" ""][!SetVariable "AddGameTags" ""][!UpdateMeterGroup "AddGameMenu"][!SetOption "SkinFilterInput" "Y" "#ToolbarHeight#"]')
 	end

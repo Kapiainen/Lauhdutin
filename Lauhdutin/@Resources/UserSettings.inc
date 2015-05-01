@@ -29,8 +29,17 @@ ScrollMultiplier=1
 ;Color and opacity of background (red, green, blue, opacity).
 BackgroundColor=0,0,0,128
 
+;Color and opacity of the toolbar icons (red, green, blue, opacity).
+ToolbarLogoTint=255,255,255,255
+
 ;Color and opacity of toolbar background (red, green, blue, opacity).
 ToolbarBackgroundColor=0,0,0,191
+
+;Color of the text on buttons in the menu where games can be added.
+AddGameButtonColor=0,0,0,255
+
+;Color of the background of buttons in the menu where games can be added.
+AddGameButtonBackgroundColor=127,127,127,255
 
 ;The interval between checks for new games. Unit is seconds. -1 = only check upon the skin being initialized/refreshed.
 RefreshInterval=-1
