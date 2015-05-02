@@ -87,6 +87,7 @@ function Update() -- Generates the list of games and, if necessary, the layout o
 			ForceShowToolbar(true)
 			DisplayMessage('No games to show#CRLF#Check readme')
 		else
+			HideMessage()
 			local ScrollStartIndexOld = N_SCROLL_START_INDEX
 			if S_NAME_FILTER ~= '' then
 				T_FILTERED_GAMES = GetFilteredByKey(T_GAMES, S_VDF_KEY_NAME, S_NAME_FILTER)
@@ -402,7 +403,10 @@ end
 
 -- Refresh banners
 	function PopulateMeters(atGames)
-		j = N_SCROLL_START_INDEX
+		for i = 1, tonumber(T_SETTINGS[S_USER_SETTING_KEY_SLOTS]) do
+			SKIN:Bang('!SetVariable ' .. S_BANNER_VARIABLE_PREFIX .. i .. ' "blank.png"')
+		end
+		local j = N_SCROLL_START_INDEX
 		for i = 1, tonumber(T_SETTINGS[S_USER_SETTING_KEY_SLOTS]) do
 			if j > 0 and j <= #atGames then
 				local sExtension = BannerExists(atGames[j][S_VDF_KEY_APPID])
@@ -879,9 +883,7 @@ end
 -- Toolbar
 	function ShowToolbar()
 		B_SHOW_TOOLBAR = true
-		if B_FORCE_SHOW_TOOLBAR == false then
 			SKIN:Bang('[!ShowMeterGroup Toolbar][!Redraw]')
-		end
 	end
 
 	function HideToolbar()
@@ -909,12 +911,21 @@ end
 	end
 
 	function HideMessage()
-		SKIN:Bang('[!HideMeterGroup MessageOverlay][!Redraw]')
+		if B_SHOWING_MESSAGE == true then
+			B_SHOWING_MESSAGE = false
+			SKIN:Bang('[!HideMeterGroup MessageOverlay][!Redraw]')
+		end
 	end
 
 -- Adding games
 	function StartAddGame()
 		SKIN:Bang('[!SetOption "SkinFilterInput" "Y" "0"][!ShowMeterGroup "AddGameMenu"][!Redraw]')
+		if B_SHOW_TOOLBAR == true then
+			HideToolbar()
+			if B_FORCE_SHOW_TOOLBAR == true then
+				ForceShowToolbar(false)
+			end
+		end
 	end
 
 	function AddGame()
@@ -973,4 +984,8 @@ end
 
 	function StopAddGame()
 		SKIN:Bang('[!HideMeterGroup "AddGameMenu"][!Redraw][!SetVariable "AddGameName" ""][!SetVariable "AddGamePath" ""][!SetVariable "AddGameSteamAppID" ""][!SetVariable "AddGameTags" ""][!UpdateMeterGroup "AddGameMenu"][!SetOption "SkinFilterInput" "Y" "#ToolbarHeight#"]')
+		if #T_GAMES <= 0 then
+			ShowToolbar()
+			ForceShowToolbar(true)
+		end
 	end
