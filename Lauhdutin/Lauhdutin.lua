@@ -785,13 +785,13 @@ end
 						tResult[sKey] = sValue
 					end
 				else
-					print('Error! Malformed tables at line ' .. tostring(i) .. '(' .. atTable[i] .. ')')
+					print('Error! Failure to parse table at line ' .. tostring(i) .. '(' .. atTable[i] .. ')')
 					return nil, nil
 				end
 			else
-				sKey = string.match(atTable[i], '^%s*"([^"]+)"%s*"[^"]*"%s*$')
+				sKey = string.match(atTable[i], '^%s*"(.-)"%s*".-"%s*$')
 				if sKey ~= nil then
-					sValue = string.match(atTable[i], '^%s*"[^"]+"%s*"([^"]+)"%s*$')
+					sValue = string.match(atTable[i], '^%s*".-"%s*"(.-)"%s*$')
 					tResult[sKey] = sValue
 				else
 					if string.match(atTable[i], '^%s*}%s*$') then
@@ -799,11 +799,11 @@ end
 					elseif string.match(atTable[i], '^%s*//.*$') then
 						-- Comment - Better support is still needed for comments
 					else
-						sValue = string.match(atTable[i], '^%s*"#base"%s*"([^"]+)"%s*$')
+						sValue = string.match(atTable[i], '^%s*"#base"%s*"(.-)"%s*$')
 						if sValue ~= nil then
 							-- Base - Needs to be implemented
 						else
-							print('Error! Malformed tables at line ' .. tostring(i) .. '(' .. atTable[i] .. ')')
+							print('Error! Failure to parse key-value pair at line ' .. tostring(i) .. '(' .. atTable[i] .. ')')
 							return nil, nil
 						end
 					end
@@ -825,7 +825,11 @@ end
 		else
 			return nil
 		end
-		return ParseVDFTable(tTable)
+		local tResult = ParseVDFTable(tTable)
+		if tResult == nil then
+			print('Error! Failure to parse' .. asFile)
+		end
+		return tResult
 	end
 
 	function SerializeTableAsVDF(atTable)
