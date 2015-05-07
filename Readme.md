@@ -54,7 +54,7 @@ Left-clicking on the **Sort** button switches between the supported types of sor
 
 ##Adding games
 ###From Steam
-Specify the absolute path to where you have Steam installed on your computer and your account's UserDataID in **UserSettings.inc** and refresh the skin. The skin should then automatically detect any games that have been installed via Steam.
+Specify the absolute [path to where you have Steam](#steampath) installed on your computer and your account's [UserDataID](#userdataid) in [**UserSettings.inc**](#user-settings), and then refresh the skin. The skin should then automatically detect any games that have been installed via Steam.
 
 ###From other services or retail copies
 **NOTE: The goal is to automate the process of adding games from services other than Steam so that one only needs to place a shortcut in a folder, but until then one of the methods described below are required.**
@@ -199,6 +199,8 @@ Open a menu where games can be added to the skin.
 <br>
 
 #User settings
+User settings are stored in **UserSettings.inc**, which is stored in **\Rainmeter\Skins\Lauhdutin\@Resources**. This file can be opened by clicking on the gear icon, which is located in the skin's toolbar.
+
 ##SteamPath
 The absolute path to the folder where Steam is installed.
 
