@@ -320,7 +320,7 @@ ScrollMultiplier=1
 ###"Missing banner *NAME OF FILE* for *NAME OF GAME*"
 A game is missing a banner. This issue can be resolved by acquiring a banner for the game and placing it in the **Banner** folder found in the skin's **@Resources** folder. If **NAME OF FILE** is a valid Steam AppID, then the skin will attempt to download a banner. Otherwise you will have to supply the skin with a banner with a filename matching **NAME OF FILE**.
 
-JPG and PNG files are the default supported file types. If you want to use other file types, which are supported by Rainmeter, then you can add their extensions in the **Launcher.lua** file included in this skin. The line you are looking for is:
+JPG and PNG files are the default supported file types. If you want to use other file types, which are supported by Rainmeter, then you can add their extensions in the **Lauhdutin.lua** file included in this skin. The line you are looking for is:
 ```
 T_SUPPORTED_BANNER_EXTENSIONS = {'.jpg', '.png'}
 ```
