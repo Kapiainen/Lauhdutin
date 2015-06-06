@@ -215,13 +215,6 @@ The UserDataID corresponding to your Steam account. This can be found by looking
 UserDataID=123456789
 ```
 
-##SteamLibraryPaths
-One or more absolute paths to folders containing Steam libraries. Multiple paths should be separated by a semicolon (;).
-
-```
-SteamLibraryPaths=D:\Steam Library;E:\Steam Library
-```
-
 ##BannerWidth
 The width of a banner in pixels.
 

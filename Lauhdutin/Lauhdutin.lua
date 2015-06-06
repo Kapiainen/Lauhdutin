@@ -36,7 +36,6 @@ function Initialize()
 		end
 		S_PATH_STEAM = Trim(S_PATH_STEAM)
 	end
-	S_PATH_STEAM_LIBRARIES = SKIN:GetVariable('SteamLibraryPaths', nil)
 	S_STEAM_USER_DATA_ID = SKIN:GetVariable('UserDataID', nil)
 	if S_STEAM_USER_DATA_ID ~= nil then
 		S_STEAM_USER_DATA_ID = Trim(S_STEAM_USER_DATA_ID)
@@ -61,6 +60,7 @@ function Initialize()
 	S_VDF_KEY_APP_TICKETS = 'apptickets'
 	S_VDF_KEY_APP_STATE = 'AppState'
 	S_VDF_KEY_USER_CONFIG = 'UserConfig'
+	S_VDF_KEY_LIBRARY_FOLDERS = 'LibraryFolders'
 
 	-- Miscellaneous
 	T_GAMES = {} -- List of all games.
@@ -239,21 +239,28 @@ end
 			tNonSteamGames = nil
 		end
 
+		-- Steam games and non-Steam games that have been added to the Steam library.
 		local tSteamLibraryPaths = {}
 		table.insert(tSteamLibraryPaths, S_PATH_STEAM)
-		if S_PATH_STEAM_LIBRARIES ~= nil then
-			for sLibraryPath in S_PATH_STEAM_LIBRARIES:gmatch('([^;]+)') do
-				if sLibraryPath ~= nil then
-					if sLibraryPath ~= '' and EndsWith(sPath, '\\') == false then
-						sLibraryPath = sLibraryPath .. '\\'
+		local tSteamLibraryFolders = ParseVDFFile(S_PATH_STEAM .. 'SteamApps\\libraryfolders.vdf')
+		if tSteamLibraryFolders ~= nil then
+			tSteamLibraryFolders = tSteamLibraryFolders[S_VDF_KEY_LIBRARY_FOLDERS]
+			if tSteamLibraryFolders ~= nil then
+				for sKey, sValue in pairs(tSteamLibraryFolders) do
+					if tonumber(sKey) then
+						if sValue ~= '' then
+							if not EndsWith(sValue, '\\') then
+								sValue = sValue .. '\\'
+							end
+							table.insert(tSteamLibraryPaths, sValue)
+						end
 					end
-					sLibraryPath = Trim(sLibraryPath)
 				end
-				table.insert(tSteamLibraryPaths, sLibraryPath)
+			else
+				print('Error: The "LibraryFolders" key-value pair could not be found in "\\Steam\\SteamApps\\libraryfolders.vdf"')
 			end
 		end
 
-		-- Steam games and non-Steam games that have been added to the Steam library.
 		if S_PATH_STEAM ~= nil and S_PATH_STEAM ~= '' then
 			if S_STEAM_USER_DATA_ID == nil or S_STEAM_USER_DATA_ID == '' then
 				DisplayMessage('Missing Steam UserDataID#CRLF#or invalid Steam path')
@@ -395,6 +402,7 @@ end
 				end
 			end
 		end
+
 		if #tGames > 0 then
 			AcquireBanner()
 		end
