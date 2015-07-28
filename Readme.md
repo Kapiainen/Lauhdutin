@@ -205,7 +205,13 @@ User settings are stored in **UserSettings.inc**, which is stored in **\Rainmete
 The absolute path to the folder where Steam is installed.
 
 ```
-SteamPath=C:\Program Files\Steam
+SteamPath=E:\Steam
+```
+
+If the path contains whitespace (e.g. spaces), then the path needs to be enclosed in quotation marks.
+
+```
+SteamPath="C:\Program Files\Steam"
 ```
 
 ##UserDataID
