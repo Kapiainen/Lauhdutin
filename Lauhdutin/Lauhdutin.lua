@@ -272,7 +272,7 @@ end
 					local tLocalConfigAppTickets = RecursiveTableSearch(tLocalConfigApps, S_VDF_KEY_APP_TICKETS)
 					tLocalConfigApps = RecursiveTableSearch(tLocalConfigApps, S_VDF_KEY_STEAM)[S_VDF_KEY_APPS]
 					local tSharedConfigApps = ParseVDFFile(S_PATH_STEAM .. 'userdata\\' .. S_STEAM_USER_DATA_ID .. '\\7\\remote\\sharedconfig.vdf')
-					tSharedConfigApps = RecursiveTableSearch(tSharedConfigApps, S_VDF_KEY_STEAM)[S_VDF_KEY_APPS]
+					tSharedConfigApps = RecursiveTableSearch(tSharedConfigApps, S_VDF_KEY_STEAM)['Apps']
 					local tExceptions = ParseVDFFile(S_PATH_RESOURCES .. S_INCLUDE_FILE_EXCEPTIONS)
 					if tLocalConfigApps ~= nil and tLocalConfigAppTickets ~= nil and tSharedConfigApps ~= nil then
 						-- Steam games.
