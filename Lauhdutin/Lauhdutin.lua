@@ -46,21 +46,21 @@ function Initialize()
 
 	-- Keys of values found in files formatted according to VDF.
 	S_VDF_KEY_APPID = 'appid' -- Steam AppID corresponding to a certain game.
-	S_VDF_KEY_LAST_PLAYED = 'LastPlayed' -- Unix timestamp of when the game was last launched.
+	S_VDF_KEY_LAST_PLAYED = 'lastplayed' -- Unix timestamp of when the game was last launched.
 	S_VDF_KEY_NAME = 'name' -- The name of the game.
 	S_VDF_KEY_TAGS = 'tags' -- Tags, usually categories.
 	S_VDF_KEY_PATH = 'path'
 	S_VDF_KEY_HIDDEN = 'hidden'
-	S_VDF_KEY_STEAM = 'Steam' -- Whether or not a game is via Steam.
-	S_VDF_KEY_STEAM_SHORTCUT = 'SteamShortcut' -- Whether or not this is a non-Steam game that has been added to the Steam library.
-	S_VDF_KEY_USER_LOCAL_CONFIG_STORE = 'UserLocalConfigStore'
-	S_VDF_KEY_SOFTWARE = 'Software'
-	S_VDF_KEY_VALVE = 'Valve'
+	S_VDF_KEY_STEAM = 'steam' -- Whether or not a game is via Steam.
+	S_VDF_KEY_STEAM_SHORTCUT = 'steamshortcut' -- Whether or not this is a non-Steam game that has been added to the Steam library.
+	S_VDF_KEY_USER_LOCAL_CONFIG_STORE = 'userlocalconfigstore'
+	S_VDF_KEY_SOFTWARE = 'software'
+	S_VDF_KEY_VALVE = 'valve'
 	S_VDF_KEY_APPS = 'apps'
 	S_VDF_KEY_APP_TICKETS = 'apptickets'
-	S_VDF_KEY_APP_STATE = 'AppState'
-	S_VDF_KEY_USER_CONFIG = 'UserConfig'
-	S_VDF_KEY_LIBRARY_FOLDERS = 'LibraryFolders'
+	S_VDF_KEY_APP_STATE = 'appstate'
+	S_VDF_KEY_USER_CONFIG = 'userconfig'
+	S_VDF_KEY_LIBRARY_FOLDERS = 'libraryfolders'
 
 	-- Miscellaneous
 	T_GAMES = {} -- List of all games.
@@ -784,6 +784,7 @@ end
 		while i <= #atTable do
 			sKey = string.match(atTable[i], '^%s*"([^"]+)"%s*$')
 			if sKey ~= nil then
+				sKey = sKey:lower()
 				i = i + 1
 				if string.match(atTable[i], '^%s*{%s*$') then
 					sValue, i = ParseVDFTable(atTable, (i + 1))
@@ -799,6 +800,7 @@ end
 			else
 				sKey = string.match(atTable[i], '^%s*"(.-)"%s*".-"%s*$')
 				if sKey ~= nil then
+					sKey = sKey:lower()
 					sValue = string.match(atTable[i], '^%s*".-"%s*"(.-)"%s*$')
 					tResult[sKey] = sValue
 				else
