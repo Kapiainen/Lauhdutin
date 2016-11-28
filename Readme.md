@@ -215,8 +215,10 @@ SteamPath="C:\Program Files\Steam"
 ```
 
 ##UserDataID
-The UserDataID corresponding to your Steam account. This can be found by looking in the **userdata** folder found in the folder where you have Steam installed. There should be at least one folder in the **userdata** folder and the name of that folder is your UserDataID. If you have multiple folders in the **userdata** folder, then open up the **localconfig.vdf** file found in **\Steam\userdata\UserDataID\config\**. There should be a line containing **"PersonaName"** followed by the display name of the associated account. Look for the **localconfig.vdf** file that contains your account's display name.
-
+The UserDataID corresponding to your Steam account. This can be found by looking in the **userdata** folder found in the folder where you have Steam installed. There should be at least one folder in the **userdata** folder and the name of that folder is your UserDataID. If you have multiple folders in the **userdata** folder, then open up the **localconfig.vdf** file found in **\Steam\userdata\UserDataID\config\**. There should be a line containing **"PersonaName"** followed by the display name of the associated account. Look for the **localconfig.vdf** file that contains your account's display name. You can also go to [steamid.io](https://steamid.io/lookup/) and do a profile search. Find steamID3 amoung the listing and should be the last set on numbers after the colon
+```
+steamID3 [U:1:123456789]
+```
 ```
 UserDataID=123456789
 ```
