@@ -286,20 +286,26 @@ end
 										tGame[S_VDF_KEY_LAST_PLAYED] = tLocalConfigApps[sAppID][S_VDF_KEY_LAST_PLAYED]
 										local tAppManifest = ParseVDFFile(tSteamLibraryPaths[i] .. 'SteamApps\\appmanifest_' .. sAppID .. '.acf')
 										if tAppManifest ~= nil then
-											tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_NAME]
-											if tGame[S_VDF_KEY_NAME] == nil then
-												tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_USER_CONFIG][S_VDF_KEY_NAME]
-											end
-											local tGameSharedConfig = RecursiveTableSearch(tSharedConfigApps, sAppID)
-											if tGameSharedConfig ~= nil then
-												tGame[S_VDF_KEY_TAGS] = RecursiveTableSearch(tGameSharedConfig, S_VDF_KEY_TAGS)
-												tGame[S_VDF_KEY_HIDDEN] = tGameSharedConfig[S_VDF_KEY_HIDDEN]
-											end
-											tGameSharedConfig = nil
-											if tGame[S_VDF_KEY_HIDDEN] == nil or tGame[S_VDF_KEY_HIDDEN] == '0' then
-												table.insert(tGames, tGame)
-												if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
-													table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
+											if tAppManifest[S_VDF_KEY_APP_STATE] ~= nil then
+												tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_NAME]
+												if tGame[S_VDF_KEY_NAME] == nil then
+													if tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_USER_CONFIG] ~= nil then
+														tGame[S_VDF_KEY_NAME] = tAppManifest[S_VDF_KEY_APP_STATE][S_VDF_KEY_USER_CONFIG][S_VDF_KEY_NAME]
+													end
+												end
+												if tGame[S_VDF_KEY_NAME] ~= nil then
+													local tGameSharedConfig = RecursiveTableSearch(tSharedConfigApps, sAppID)
+													if tGameSharedConfig ~= nil then
+														tGame[S_VDF_KEY_TAGS] = RecursiveTableSearch(tGameSharedConfig, S_VDF_KEY_TAGS)
+														tGame[S_VDF_KEY_HIDDEN] = tGameSharedConfig[S_VDF_KEY_HIDDEN]
+													end
+													tGameSharedConfig = nil
+													if tGame[S_VDF_KEY_HIDDEN] == nil or tGame[S_VDF_KEY_HIDDEN] == '0' then
+														table.insert(tGames, tGame)
+														if BannerExists(tGame[S_VDF_KEY_APPID]) == nil then
+															table.insert(T_LOGO_QUEUE, tGame[S_VDF_KEY_APPID])
+														end
+													end
 												end
 											end
 										end
@@ -782,8 +788,8 @@ end
 		local sValue = ''
 		local i = anStart
 		while i <= #atTable do
-			sKey = string.match(atTable[i], '^%s*"([^"]+)"%s*$')
-			if sKey ~= nil then
+			sKey = string.match(atTable[i], '^%s*"([^"]+)"%s*$') -- Check for a key prior to a table
+			if sKey ~= nil then -- Beginning of a table
 				sKey = sKey:lower()
 				i = i + 1
 				if string.match(atTable[i], '^%s*{%s*$') then
@@ -797,14 +803,14 @@ end
 					print('Error! Failure to parse table at line ' .. tostring(i) .. '(' .. atTable[i] .. ')')
 					return nil, nil
 				end
-			else
-				sKey = string.match(atTable[i], '^%s*"(.-)"%s*".-"%s*$')
+			else -- Not the beginning of a table
+				sKey = string.match(atTable[i], '^%s*"(.-)"%s*".-"%s*$') -- Check for key and string value pair
 				if sKey ~= nil then
 					sKey = sKey:lower()
 					sValue = string.match(atTable[i], '^%s*".-"%s*"(.-)"%s*$')
 					tResult[sKey] = sValue
 				else
-					if string.match(atTable[i], '^%s*}%s*$') then
+					if string.match(atTable[i], '^%s*}%s*$') then -- Check if end of an open table
 						return tResult, i
 					elseif string.match(atTable[i], '^%s*//.*$') then
 						-- Comment - Better support is still needed for comments
