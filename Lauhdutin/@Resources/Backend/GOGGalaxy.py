@@ -1,0 +1,99 @@
+# Python environment
+import os, sqlite3, json
+# Back-end
+import Utility
+from Enums import GameKeys
+from Enums import Platform
+
+class GOGGalaxy:
+	def __init__(self, asPath):
+		self.indexDB = os.path.join(asPath, "storage", "index.db")
+		self.productdetailsDB = os.path.join(asPath, "storage", "productdetails.db")
+		self.result = {}
+		self.index = {}
+		self.productdetails = {}
+		self.values = []
+
+	def set_result_entry(self, key, value):
+		self.result[key] = value
+
+	def result_has(self, key):
+		if self.result.get(key, None) != None:
+			return True
+		return False
+
+	def set_index_entry(self, key, value):
+		self.index[key] = value
+
+	def set_productdetails_entry(self, key, value):
+		self.productdetails[key] = value
+
+	def get_value(self):
+		if len(self.values) > 0:
+			return self.values.pop(0)
+		return None
+
+	def process_index_database(self):
+		value = self.get_value()
+		while value:
+			self.set_result_entry(value[0], {})
+			game = {}
+			game[GameKeys.PLATFORM] = Platform.GOG_GALAXY
+			game[GameKeys.LASTPLAYED] = 0
+			game[GameKeys.PATH] = value[3]
+			gameInfo = os.path.join(value[3], "goggame-%s.info" % value[0])
+			if os.path.isfile(gameInfo):
+				with open(gameInfo) as f:
+					start = False
+					lines = f.readlines()
+					contents = ""
+					for line in lines:
+						if not start:
+							if line == "{\n":
+								start = True
+						if start:
+							contents = contents + line
+					contents = json.loads(contents)
+					game[GameKeys.PATH] = os.path.join(game[GameKeys.PATH], contents["playTasks"][0]["path"])
+			self.set_index_entry(value[0], game)
+			value = self.get_value()
+
+	def process_productdetails_database(self):
+		value = self.get_value()
+		while value:
+			if self.result_has(value[0]):
+				details = json.loads(value[3])
+				game = {}
+				game[GameKeys.NAME] = details["title"]
+				game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
+				game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
+				game[GameKeys.BANNER_URL] = details["images"]["logo"].replace("\/", "/")[:-8] + "_392" + details["images"]["logo"][-4:] # Omit "_392" to download large image
+				if not "http:" in game[GameKeys.BANNER_URL]:
+					game[GameKeys.BANNER_URL] = "http:" + game[GameKeys.BANNER_URL]
+				game[GameKeys.BANNER_PATH] = "GOG Galaxy\\" + value[0] + ".jpg"
+				self.set_productdetails_entry(value[0], game)
+			value = self.get_value()
+
+	def get_games(self):
+		self.result = {}
+		self.index = {}
+		self.productdetails = {}
+		con = sqlite3.connect(self.indexDB)
+		cur = con.cursor()
+		cur.execute("SELECT * FROM Products")
+		self.values = cur.fetchall()
+		con.close()
+		self.process_index_database()
+		for gameID, gameDict in self.index.items():
+			for key, value in gameDict.items():
+				self.result[gameID][key] = value
+		con = sqlite3.connect(self.productdetailsDB)
+		cur = con.cursor()
+		cur.execute("SELECT * FROM ProductDetails")
+		self.values = cur.fetchall()
+		con.close()
+		self.process_productdetails_database()
+		for gameID, gameDict in self.productdetails.items():
+			for key, value in gameDict.items():
+				self.result[gameID][key] = value
+		return self.result
