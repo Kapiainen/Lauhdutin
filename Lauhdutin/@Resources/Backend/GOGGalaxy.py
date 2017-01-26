@@ -78,6 +78,8 @@ class GOGGalaxy:
 		self.result = {}
 		self.index = {}
 		self.productdetails = {}
+		if not os.path.isfile(self.indexDB) or not os.path.isfile(self.productdetailsDB):
+			return self.result
 		con = sqlite3.connect(self.indexDB)
 		cur = con.cursor()
 		cur.execute("SELECT * FROM Products")

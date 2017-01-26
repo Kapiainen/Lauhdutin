@@ -186,7 +186,10 @@ class Steam():
 		result = {}
 		# Read shortcuts.vdf
 		shortcuts = ""
-		with open(os.path.join(self.steam_path, "userdata", self.userdataid, "config", "shortcuts.vdf"), "rb") as f:
+		shortcuts_path = os.path.join(self.steam_path, "userdata", self.userdataid, "config", "shortcuts.vdf")
+		if not os.path.isfile(shortcuts_path):
+			return result
+		with open(shortcuts_path, "rb") as f:
 			byte = f.read(1)
 			while byte != b"":
 				shortcuts = shortcuts + byte.decode("utf-8", errors="ignore")
