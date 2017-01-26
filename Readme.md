@@ -84,3 +84,5 @@ This skin may work with earlier Rainmeter and/or Python versions, but such confi
 
 # License
 See [**License.md**](License.md) for more information.
+
+This software makes use of [json4lua](https://github.com/craigmj/json4lua) ([license](./Lauhdutin/@Resources/Dependencies/json4lua/LICENCE.txt)).
