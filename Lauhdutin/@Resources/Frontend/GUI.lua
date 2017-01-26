@@ -247,7 +247,7 @@ end
 	end
 
 	function SortAlphabetically(atFirst, atSecond)
-		if atFirst[GAME_KEYS.NAME]:gsub(':', ' ') < atSecond[GAME_KEYS.NAME]:gsub(':', ' ') then
+		if atFirst[GAME_KEYS.NAME]:lower():gsub(':', ' ') < atSecond[GAME_KEYS.NAME]:lower():gsub(':', ' ') then
 			return true
 		else
 			return false
@@ -290,12 +290,10 @@ end
 					else
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					end
-					SKIN:Bang('!SetVariable SlotPlatform' .. i .. ' "#@#Icons\\Platform' .. T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM] .. '.png"')
 				else
 					SKIN:Bang('!SetVariable SlotPath' .. i .. ' ""')
 					SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					SKIN:Bang('!SetVariable SlotName' .. i .. ' ""')
-					SKIN:Bang('!SetVariable SlotPlatform' .. i .. ' ""')
 				end
 				j = j + 1
 			end
