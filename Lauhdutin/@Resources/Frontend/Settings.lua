@@ -2,6 +2,39 @@ function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	SETTINGS = ReadSettings()
+	if SETTINGS == nil then
+		SETTINGS = {}
+	end
+	if SETTINGS['slot_count'] == nil then
+		SETTINGS['slot_count'] = 6
+	end
+	if SETTINGS['slot_width'] == nil then
+		SETTINGS['slot_width'] = 418
+	end
+	if SETTINGS['slot_height'] == nil then
+		SETTINGS['slot_height'] = 195
+	end
+	if SETTINGS['slot_background_color'] == nil then
+		SETTINGS['slot_background_color'] = "0,0,0,196"
+	end
+	if SETTINGS['slot_text_color'] == nil then
+		SETTINGS['slot_text_color'] = "255,255,255,255"
+	end
+	if SETTINGS['steam_path'] == nil then
+		SETTINGS['steam_path'] = ""
+	end
+	if SETTINGS['steam_userdataid'] == nil then
+		SETTINGS['steam_userdataid'] = ""
+	end
+	if SETTINGS['steam_personaname'] == nil then
+		SETTINGS['steam_personaname'] = ""
+	end
+	if SETTINGS['sortstate'] == nil then
+		SETTINGS['sortstate'] = "0"
+	end
+	if SETTINGS['galaxy_path'] == nil then
+		SETTINGS['galaxy_path'] = "C:\/ProgramData\/GOG.com\/Galaxy"
+	end
 	SKIN:Bang('[!HideMeterGroup "Platform"]')
 	UpdateSettings()
 end
@@ -12,11 +45,13 @@ end
 
 function Save()
 	local old_settings = ReadSettings()
-	local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color'}
-	for i=1, #layout_settings do
-		if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
-			SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
-			break
+	if old_settings then
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color'}
+		for i=1, #layout_settings do
+			if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
+				SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
+				break
+			end
 		end
 	end
 	WriteSettings(SETTINGS)

@@ -3,6 +3,10 @@ function Initialize()
 	S_PATH_RESOURCES = SKIN:GetVariable('@')
 	S_VDF_SERIALIZING_INDENTATION = ''
 	T_SETTINGS = ReadSettings()
+	if T_SETTINGS == nil then
+		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		return
+	end
 	N_SORT_STATE = 0 --0 = alphabetically, 1 = most recently played
 	if T_SETTINGS['sortstate'] then
 		N_SORT_STATE = tonumber(T_SETTINGS['sortstate']) - 1
@@ -165,6 +169,9 @@ end
 	end
 
 	function Filter(atTable, asPattern)
+		if atTable == nil then
+			return
+		end
 		tResult = {}
 		if StartsWith(asPattern, 'steam:') then
 			asPattern = asPattern:sub(7)
@@ -256,6 +263,9 @@ end
 	end
 
 	function CycleSort()
+		if N_SORT_STATE == nil then
+			return
+		end
 		N_SORT_STATE = N_SORT_STATE + 1
 		if N_SORT_STATE > 1 then
 			N_SORT_STATE = 0
@@ -315,6 +325,9 @@ end
 	end
 
 	function Launch(asIndex)
+		if T_FILTERED_GAMES == nil then
+			return
+		end
 		local nIndex = tonumber(asIndex)
 		local sTitle = T_FILTERED_GAMES[nIndex][GAME_KEYS.NAME]
 		local sPath = T_FILTERED_GAMES[nIndex][GAME_KEYS.PATH]
@@ -322,8 +335,10 @@ end
 			if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
 				T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
 				WriteGames(T_ALL_GAMES)
-				Sort(T_FILTERED_GAMES)
-				PopulateSlots()
+				if N_SORT_STATE == 1 then
+					Sort(T_FILTERED_GAMES)
+					PopulateSlots()
+				end
 				SKIN:Bang('["' .. sPath .. '"]')
 				break
 			end
