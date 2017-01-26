@@ -13,7 +13,7 @@ def read_json(a_path):
 
 settings = read_json(os.path.join(ResourcePath, "settings.json"))
 
-with open(os.path.join(ResourcePath, "GameSlots.inc"), "w") as f:
+with open(os.path.join(ResourcePath, "Frontend", "GameSlots.inc"), "w") as f:
 	# Variables
 	f.write("""[Variables]
 SlotCount=%s
