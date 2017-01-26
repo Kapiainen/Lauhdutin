@@ -1,5 +1,3 @@
-***Development branch for version 2.0.0 prior to full release, which e.g. involves among other things implementing the back-end in Python.***
-
 Lauhdutin
 ==
 A Rainmeter skin for launching games.
@@ -31,7 +29,7 @@ This skin may work with earlier Rainmeter and/or Python versions, but such confi
 - Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the **\Lauhdutin\@Resources\Banners\Shortcuts** and **\Lauhdutin\@Resources\Banners\Steam shortcuts** folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
 
 # Changelog
-**Version 2.0.0 - YYYY/MM/DD:**
+**Version 2.0.0 - 2017/01/26:**
 - Implemented backend in Python 3:
     - Improved Steam support:
         - Non-Steam game shortcuts added to Steam are now fully supported and are run via the Steam browser protocol.
