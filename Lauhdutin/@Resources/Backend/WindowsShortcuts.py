@@ -7,7 +7,8 @@ from Enums import Platform
 class WindowsShortcuts():
 	def __init__(self, a_path):
 		path = os.path.join(a_path, "Shortcuts")
-		assert os.path.isdir(path)
+		if not os.path.isdir(path):
+			os.makedirs(path)
 		self.shortcuts_path = path
 		self.path_regex = re.compile(r"(\w:[\\\w\s]+\.exe)")
 		self.shortcut_banners = None
