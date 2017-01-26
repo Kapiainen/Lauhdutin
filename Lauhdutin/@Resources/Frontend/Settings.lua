@@ -53,6 +53,8 @@ function Save()
 				break
 			end
 		end
+	else
+		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
 	end
 	WriteSettings(SETTINGS)
 end
