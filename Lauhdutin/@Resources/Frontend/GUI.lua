@@ -111,7 +111,7 @@ end
 	function ReadJSON(asPath)
 		local f = io.open(asPath, 'r')
 		if f ~= nil then
-			json_string = f:read('*a')
+			local json_string = f:read('*a')
 			f:close()
 			return json.decode(json_string)
 		end
@@ -119,7 +119,7 @@ end
 	end
 
 	function WriteJSON(asPath, atTable)
-		json_string = json.encode(atTable)
+		local json_string = json.encode(atTable)
 		if json_string == nil then
 			return false
 		end
