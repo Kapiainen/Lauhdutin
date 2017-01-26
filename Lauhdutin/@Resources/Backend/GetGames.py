@@ -1,20 +1,35 @@
 # Python environment
 import sys, os, subprocess, json
-# Back-end
-from WindowsShortcuts import WindowsShortcuts
-from Steam import Steam
-from GOGGalaxy import GOGGalaxy
-from BannerDownloader import BannerDownloader
-from Enums import GameKeys
+
+RainmeterPath = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
+ResourcePath = sys.argv[2][:-1]
+Config = sys.argv[3][:-1]
+
+try:
+	# Back-end
+	from WindowsShortcuts import WindowsShortcuts
+	from Steam import Steam
+	from GOGGalaxy import GOGGalaxy
+	from BannerDownloader import BannerDownloader
+	from Enums import GameKeys
+except ImportError:
+	try:
+		sys.path.append(os.path.join(ResourcePath, "Backend"))
+		from WindowsShortcuts import WindowsShortcuts
+		from Steam import Steam
+		from GOGGalaxy import GOGGalaxy
+		from BannerDownloader import BannerDownloader
+		from Enums import GameKeys
+	except ImportError:
+		import traceback
+		traceback.print_exc()
+		input()
 
 try:
 	####
 	import time
 	startTime = time.time()
 	####
-	RainmeterPath = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
-	ResourcePath = sys.argv[2][:-1]
-	Config = sys.argv[3][:-1]
 
 	def read_json(a_path):
 		if os.path.isfile(a_path):
