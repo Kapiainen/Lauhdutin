@@ -6,7 +6,7 @@ from Enums import GameKeys
 class BannerDownloader:
 	def __init__(self, a_path):
 		self.banners_path = os.path.join(a_path, "Banners")
-		subDirs = ["Steam", "GOG Galaxy", "Steam Shortcuts", "Shortcuts"]
+		subDirs = ["Steam", "GOG Galaxy", "Steam shortcuts", "Shortcuts"]
 		for subDir in subDirs:
 			dirPath = os.path.join(self.banners_path, subDir)
 			if not os.path.isdir(dirPath):

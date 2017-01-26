@@ -221,7 +221,7 @@ class Steam():
 			game[GameKeys.NAME] = shortcut[start:end]
 			game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
 			game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
-			game[GameKeys.BANNER_PATH] = "Steam Shortcuts\\" + game[GameKeys.NAME] + ".jpg"
+			game[GameKeys.BANNER_PATH] = "Steam shortcuts\\" + game[GameKeys.NAME] + ".jpg"
 			shortcut = shortcut[end:]
 			# Path
 			start = shortcut.find('"') + 1
