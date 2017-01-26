@@ -67,7 +67,16 @@ class GOGGalaxy:
 				game[GameKeys.NAME] = details["title"]
 				game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
 				game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
-				game[GameKeys.BANNER_URL] = details["images"]["logo"].replace("\/", "/")[:-8] + "_392" + details["images"]["logo"][-4:] # Omit "_392" to download large image
+				banner_url = details["images"]["logo"].replace("\/", "/")
+				print("\n\t%s -> %s" % (game[GameKeys.NAME], banner_url))
+				banner_extension = banner_url[-4:]
+				banner_url = banner_url[:-4]
+				if banner_url.endswith("_196"):
+					banner_url = "%s_392%s" % (banner_url[:-4], banner_extension)
+				elif banner_url.endswith("_glx_logo"):
+					banner_url = "%s_392%s" % (banner_url[:-9], banner_extension)
+				print("\t\t", banner_url)
+				game[GameKeys.BANNER_URL] = banner_url
 				if not "http:" in game[GameKeys.BANNER_URL]:
 					game[GameKeys.BANNER_URL] = "http:" + game[GameKeys.BANNER_URL]
 				game[GameKeys.BANNER_PATH] = "GOG Galaxy\\" + value[0] + ".jpg"
