@@ -4,6 +4,8 @@ Lauhdutin
 ==
 A Rainmeter skin for launching games.
 
+![ex](demo.gif)
+
 # Contents
  - [Requirements](#requirements)
  - [Installing](#installing)
