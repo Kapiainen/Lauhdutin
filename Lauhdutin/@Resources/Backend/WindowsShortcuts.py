@@ -16,19 +16,18 @@ class WindowsShortcuts():
 			break
 
 	def get_games(self):
-		if self.shortcut_banners:
-			shortcuts = None
-			for root, directories, files in os.walk(self.shortcuts_path):
-				shortcuts = [f for f in files if f.endswith(".lnk")]
-				break
-			if shortcuts:
-				result = {}
-				for shortcut in shortcuts:
-					game_key, game_dict = self.read_shortcut(shortcut[:-4],
-																os.path.join(self.shortcuts_path, shortcut))
-					if game_key and game_dict:
-						result[game_key] = game_dict
-				return result
+		shortcuts = None
+		for root, directories, files in os.walk(self.shortcuts_path):
+			shortcuts = [f for f in files if f.endswith(".lnk")]
+			break
+		if shortcuts:
+			result = {}
+			for shortcut in shortcuts:
+				game_key, game_dict = self.read_shortcut(shortcut[:-4],
+															os.path.join(self.shortcuts_path, shortcut))
+				if game_key and game_dict:
+					result[game_key] = game_dict
+			return result
 		return None
 
 	def read_shortcut(self, a_name, a_path):
@@ -48,10 +47,11 @@ class WindowsShortcuts():
 				game_dict[GameKeys.NAME] = a_name
 				game_dict[GameKeys.LASTPLAYED] = 0
 				game_dict[GameKeys.PLATFORM] = Platform.WINDOWS_SHORTCUT
-				for banner in self.shortcut_banners:
-					if banner.lower().startswith(a_name.lower()):
-						game_dict[GameKeys.BANNER_PATH] = "Shortcuts\\" + banner
-						break
+				if self.shortcut_banners:
+					for banner in self.shortcut_banners:
+						if banner.lower().startswith(a_name.lower()):
+							game_dict[GameKeys.BANNER_PATH] = "Shortcuts\\" + banner
+							break
 				if not game_dict.get(GameKeys.BANNER_PATH):
 					game_dict[GameKeys.BANNER_PATH] = "Shortcuts\\%s.jpg" % a_name
 				return (a_name, game_dict,)
