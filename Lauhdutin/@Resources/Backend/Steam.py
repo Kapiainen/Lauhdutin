@@ -230,7 +230,7 @@ class Steam():
 			shortcut = shortcut[end:]
 			#SteamID
 			steamID = zlib.crc32(("\"" + game[GameKeys.PATH] + "\"" + game[GameKeys.NAME]).encode())
-			#steamID = steamID | 0x80000000
+			steamID = steamID | 0x80000000
 			steamID = steamID << 32 | 0x02000000
 			game[GameKeys.PATH] = "steam://rungameid/" + str(steamID)
 			# Tags
