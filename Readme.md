@@ -15,7 +15,7 @@ Developed with the following software in mind:
  - [Rainmeter 4.0 or later](https://www.rainmeter.net/)
  - [Python 3.5 or later](https://www.python.org/downloads/windows/) \*
  
- \* The embeddable versions of Python do not include the **tkinter** module. The **Browse** buttons in the settings skin do nothing if the **tkinter** module is not present in the Python 3 environment. The rest of Lauhdutin should work just fine, but you will need to either add the **pythonw** executable to the PATH system variable or modify the **Python** variable found in **Settings.ini** and **Main.ini**.
+ \* Tick the checkbox on the first screen of the Python installer to add Python to the PATH system variable and make sure that **tkinter** is ticked in the section for optional features. The embeddable versions of Python do not include the **tkinter** module. The **Browse** buttons in the settings skin do nothing if the **tkinter** module is not present in the Python 3 environment. The rest of Lauhdutin should work just fine, but you will need to either add the **pythonw** executable to the PATH system variable or modify the **Python** variable found in **Settings.ini** and **Main.ini**.
 
 This skin may work with earlier Rainmeter and/or Python versions, but such configurations are not supported.
 
