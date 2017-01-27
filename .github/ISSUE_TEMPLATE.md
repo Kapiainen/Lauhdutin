@@ -9,25 +9,6 @@ What was the expected behavior?
 -->
 
 
-## Error messages
-<!--
-Which, if any, error messages are displayed by the skin and/or Rainmeter's log?
--->
-
-
-## Steps to reproduce the issue
-<!--
-What triggers the issue? Please provide a step-by-step explanation, if possible.
--->
-
-
-## Python stack traceback
-<!--
-Try setting the Python path to "python" instead of "pythonw" to show the terminal.
-Reproduce the issue and provide a screenshot of any stack tracebacks that may have appeared in the terminal.
--->
-
-
 ## Lauhdutin version
 <!--
 Which version of Lauhdutin are you using?
@@ -54,3 +35,23 @@ Which release flavor did you download (e.g. installer or embeddable zip archive)
 <!--
 Which version of Windows are you using?
 -->
+
+
+## Error messages
+<!--
+Which, if any, error messages are displayed by the skin and/or Rainmeter's log?
+-->
+
+
+## Steps to reproduce the issue
+<!--
+What triggers the issue? Please provide a step-by-step explanation, if possible.
+-->
+
+
+## Python stack traceback
+<!--
+Try setting the Python path to "python" instead of "pythonw" to show the terminal.
+Reproduce the issue and provide a screenshot of any stack tracebacks that may have appeared in the terminal.
+-->
+
