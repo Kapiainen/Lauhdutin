@@ -56,6 +56,7 @@ try:
 
 	settings = read_json(os.path.join(ResourcePath, "settings.json"))
 	if settings:
+		set_skin_status("Processing...")
 		# Windows shortcuts (.lnk) in @Resources\Shortcuts
 		print("Processing Windows shortcuts...")
 		windows_shortcuts = WindowsShortcuts(os.path.join(ResourcePath))
@@ -115,6 +116,7 @@ try:
 							game_new[GameKeys.BANNER_ERROR] = True
 						break
 
+		set_skin_status("Downloading...")
 		print("Downloading banners for games from supported platforms...")
 		banner_downloader = BannerDownloader(ResourcePath)
 		banner_downloader.process(all_games)

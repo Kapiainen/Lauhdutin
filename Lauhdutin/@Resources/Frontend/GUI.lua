@@ -39,7 +39,10 @@ function Initialize()
 end
 
 function Update()
-	SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	if T_SETTINGS ~= nil then
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	end
 end
 
 function Init()
