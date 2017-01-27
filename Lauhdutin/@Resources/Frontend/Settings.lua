@@ -1,6 +1,7 @@
 function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
+	REBUILD_SWITCH = false
 	SETTINGS = ReadSettings()
 	if SETTINGS == nil then
 		SETTINGS = {}
@@ -38,6 +39,9 @@ function Initialize()
 	if SETTINGS['python_path'] == nil then
 		SETTINGS['python_path'] = "pythonw"
 	end
+	if SETTINGS['orientation'] == nil then
+		SETTINGS['orientation'] = "vertical"
+	end
 	SKIN:Bang('[!HideMeterGroup "Platform"]')
 	UpdateSettings()
 end
@@ -49,10 +53,10 @@ end
 function Save()
 	local old_settings = ReadSettings()
 	if old_settings then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color'}
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
 		for i=1, #layout_settings do
 			if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
-				SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
+				REBUILD_SWITCH = true
 				break
 			end
 		end
@@ -64,13 +68,17 @@ function Save()
 			end
 		end
 	else
-		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
+		REBUILD_SWITCH = true
 	end
 	WriteSettings(SETTINGS)
 end
 
 function Exit()
-	SKIN:Bang('[!ActivateConfig #CURRENTCONFIG# "Main.ini"]')
+	if REBUILD_SWITCH then
+		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;" "#CURRENTFILE#;"]')
+	else
+		SKIN:Bang('[!ActivateConfig #CURRENTCONFIG# "Main.ini"]')
+	end	
 end
 
 function SelectTab(aNewTab, aOldTab)
@@ -94,6 +102,11 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS['steam_personaname']) .. '"]')
 		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
+		if SETTINGS['orientation'] == 'vertical' then
+			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
+		else
+			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
+		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
 	end
@@ -237,6 +250,15 @@ function AcceptPythonPath(aPath)
 		SETTINGS['python_path'] = aPath
 		UpdateSettings()
 	end
+end
+
+function ToggleOrientation()
+	if SETTINGS['orientation'] == 'vertical' then
+		SETTINGS['orientation'] = 'horizontal'
+	else
+		SETTINGS['orientation'] = 'vertical'
+	end
+	UpdateSettings()
 end
 
 function ReadJSON(asPath)
