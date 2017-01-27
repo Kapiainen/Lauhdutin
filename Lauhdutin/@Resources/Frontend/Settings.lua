@@ -35,6 +35,9 @@ function Initialize()
 	if SETTINGS['galaxy_path'] == nil then
 		SETTINGS['galaxy_path'] = "C:\/ProgramData\/GOG.com\/Galaxy"
 	end
+	if SETTINGS['python_path'] == nil then
+		SETTINGS['python_path'] = "pythonw"
+	end
 	SKIN:Bang('[!HideMeterGroup "Platform"]')
 	UpdateSettings()
 end
@@ -51,6 +54,13 @@ function Save()
 			if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
 				SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
 				break
+			end
+		end
+		if old_settings['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
+			local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
+			if f ~= nil then
+				f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
+				f:close()
 			end
 		end
 	else
@@ -83,6 +93,7 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "SteamPathStatus" "Text" "' .. tostring(SETTINGS['steam_path']) .. '"]')
 		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS['steam_personaname']) .. '"]')
 		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
+		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
 	end
@@ -152,7 +163,7 @@ end
 
 
 function RequestSteamPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS['steam_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS['steam_path'] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptSteamPath(aPath)
@@ -167,7 +178,7 @@ function RequestSteamUserdataid()
 	if SETTINGS['steam_path'] ~= '' then
 		initialDir = SETTINGS['steam_path'] .. '\\userdata'
 	end
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamUserdataid;" "' .. initialDir .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamUserdataid;" "' .. initialDir .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptSteamUserdataid(aPath)
@@ -207,12 +218,23 @@ function AcceptSteamUserdataid(aPath)
 end
 
 function RequestGalaxyPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS['galaxy_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS['galaxy_path'] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptGalaxyPath(aPath)
 	if aPath ~= nil and aPath ~= '' then
 		SETTINGS['galaxy_path'] = aPath
+		UpdateSettings()
+	end
+end
+
+function RequestPythonPath()
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFilePathDialog.py" "#PROGRAMPATH#;" "AcceptPythonPath;" "' .. SETTINGS['python_path'] .. '"; "#CURRENTCONFIG#;"')
+end
+
+function AcceptPythonPath(aPath)
+	if aPath ~= nil and aPath ~= '' then
+		SETTINGS['python_path'] = aPath
 		UpdateSettings()
 	end
 end
