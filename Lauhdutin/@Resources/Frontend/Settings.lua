@@ -42,7 +42,7 @@ function Initialize()
 	if SETTINGS['orientation'] == nil then
 		SETTINGS['orientation'] = "vertical"
 	end
-	SKIN:Bang('[!HideMeterGroup "Platform"]')
+	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
 
@@ -180,10 +180,10 @@ function RequestSteamPath()
 end
 
 function AcceptSteamPath(aPath)
-	if aPath ~= nil and aPath ~= '' then
-		SETTINGS['steam_path'] = aPath
-		UpdateSettings()
-	end
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['steam_path'] = aPath
+	UpdateSettings()
+--	end
 end
 
 function RequestSteamUserdataid()
@@ -227,6 +227,10 @@ function AcceptSteamUserdataid(aPath)
 			SETTINGS['steam_personaname'] = personaName
 			UpdateSettings()
 		end
+	else
+		SETTINGS['steam_userdataid'] = ''
+		SETTINGS['steam_personaname'] = ''
+		UpdateSettings()
 	end
 end
 
@@ -235,10 +239,10 @@ function RequestGalaxyPath()
 end
 
 function AcceptGalaxyPath(aPath)
-	if aPath ~= nil and aPath ~= '' then
-		SETTINGS['galaxy_path'] = aPath
-		UpdateSettings()
-	end
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['galaxy_path'] = aPath
+	UpdateSettings()
+--	end
 end
 
 function RequestPythonPath()
@@ -246,10 +250,10 @@ function RequestPythonPath()
 end
 
 function AcceptPythonPath(aPath)
-	if aPath ~= nil and aPath ~= '' then
-		SETTINGS['python_path'] = aPath
-		UpdateSettings()
-	end
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['python_path'] = aPath
+	UpdateSettings()
+--	end
 end
 
 function ToggleOrientation()
