@@ -24,12 +24,13 @@ class WindowsShortcuts():
 		if shortcuts:
 			result = {}
 			for shortcut in shortcuts:
+				print("\tFound shortcut '%s'" % shortcut)
 				game_key, game_dict = self.read_shortcut(shortcut[:-4],
 															os.path.join(self.shortcuts_path, shortcut))
 				if game_key and game_dict:
 					result[game_key] = game_dict
 			return result
-		return None
+		return {}
 
 	def read_shortcut(self, a_name, a_path):
 		# Quick and dirty. Should be replaced at some point with a better method.

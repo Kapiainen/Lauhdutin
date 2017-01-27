@@ -1,7 +1,9 @@
 function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
+	REBUILD_SWITCH = false
 	SETTINGS = ReadSettings()
+	OLD_SETTINGS = ReadSettings()
 	if SETTINGS == nil then
 		SETTINGS = {}
 	end
@@ -35,7 +37,13 @@ function Initialize()
 	if SETTINGS['galaxy_path'] == nil then
 		SETTINGS['galaxy_path'] = "C:\/ProgramData\/GOG.com\/Galaxy"
 	end
-	SKIN:Bang('[!HideMeterGroup "Platform"]')
+	if SETTINGS['python_path'] == nil then
+		SETTINGS['python_path'] = "pythonw"
+	end
+	if SETTINGS['orientation'] == nil then
+		SETTINGS['orientation'] = "vertical"
+	end
+	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
 
@@ -44,23 +52,35 @@ function Update()
 end
 
 function Save()
-	local old_settings = ReadSettings()
-	if old_settings then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color'}
-		for i=1, #layout_settings do
-			if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
-				SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
-				break
+	if OLD_SETTINGS then
+		if OLD_SETTINGS['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
+			local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
+			if f ~= nil then
+				f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
+				f:close()
 			end
 		end
 	else
-		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
+		REBUILD_SWITCH = true
 	end
 	WriteSettings(SETTINGS)
 end
 
 function Exit()
-	SKIN:Bang('[!ActivateConfig #CURRENTCONFIG# "Main.ini"]')
+	if OLD_SETTINGS then
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
+		for i=1, #layout_settings do
+			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
+				REBUILD_SWITCH = true
+				break
+			end
+		end
+	end
+	if REBUILD_SWITCH then
+		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;" "#CURRENTFILE#;"]')
+	else
+		SKIN:Bang('[!ActivateConfig #CURRENTCONFIG# "Main.ini"]')
+	end	
 end
 
 function SelectTab(aNewTab, aOldTab)
@@ -83,6 +103,12 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "SteamPathStatus" "Text" "' .. tostring(SETTINGS['steam_path']) .. '"]')
 		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS['steam_personaname']) .. '"]')
 		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
+		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
+		if SETTINGS['orientation'] == 'vertical' then
+			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
+		else
+			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
+		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
 	end
@@ -152,14 +178,14 @@ end
 
 
 function RequestSteamPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS['steam_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS['steam_path'] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptSteamPath(aPath)
-	if aPath ~= nil and aPath ~= '' then
-		SETTINGS['steam_path'] = aPath
-		UpdateSettings()
-	end
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['steam_path'] = aPath
+	UpdateSettings()
+--	end
 end
 
 function RequestSteamUserdataid()
@@ -167,7 +193,7 @@ function RequestSteamUserdataid()
 	if SETTINGS['steam_path'] ~= '' then
 		initialDir = SETTINGS['steam_path'] .. '\\userdata'
 	end
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamUserdataid;" "' .. initialDir .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamUserdataid;" "' .. initialDir .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptSteamUserdataid(aPath)
@@ -203,18 +229,42 @@ function AcceptSteamUserdataid(aPath)
 			SETTINGS['steam_personaname'] = personaName
 			UpdateSettings()
 		end
+	else
+		SETTINGS['steam_userdataid'] = ''
+		SETTINGS['steam_personaname'] = ''
+		UpdateSettings()
 	end
 end
 
 function RequestGalaxyPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS['galaxy_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS['galaxy_path'] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptGalaxyPath(aPath)
-	if aPath ~= nil and aPath ~= '' then
-		SETTINGS['galaxy_path'] = aPath
-		UpdateSettings()
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['galaxy_path'] = aPath
+	UpdateSettings()
+--	end
+end
+
+function RequestPythonPath()
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFilePathDialog.py" "#PROGRAMPATH#;" "AcceptPythonPath;" "' .. SETTINGS['python_path'] .. '"; "#CURRENTCONFIG#;"')
+end
+
+function AcceptPythonPath(aPath)
+--	if aPath ~= nil and aPath ~= '' then
+	SETTINGS['python_path'] = aPath
+	UpdateSettings()
+--	end
+end
+
+function ToggleOrientation()
+	if SETTINGS['orientation'] == 'vertical' then
+		SETTINGS['orientation'] = 'horizontal'
+	else
+		SETTINGS['orientation'] = 'vertical'
 	end
+	UpdateSettings()
 end
 
 function ReadJSON(asPath)

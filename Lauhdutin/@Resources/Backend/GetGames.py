@@ -1,9 +1,22 @@
 # Python environment
 import sys, os, subprocess, json
 
+print("Running on Python %d.%d.%d" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+
 RainmeterPath = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
 ResourcePath = sys.argv[2][:-1]
 Config = sys.argv[3][:-1]
+
+def set_skin_status(a_message = ""):
+	subprocess.call([RainmeterPath, "!SetOption", "StatusMessage", "Text", a_message, Config], shell=True)
+	subprocess.call([RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
+	subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
+
+minimum_major_version = 3
+minimum_minor_version = 5
+if not (sys.version_info.major >= minimum_major_version and sys.version_info.minor >= minimum_minor_version):
+	set_skin_status("Unsupported Python version: %s.%s. Expected %d.%d or later." % (sys.version_info.major, sys.version_info.minor, minimum_major_version, minimum_minor_version))
+	exit()
 
 try:
 	# Back-end
@@ -33,7 +46,7 @@ try:
 
 	def read_json(a_path):
 		if os.path.isfile(a_path):
-			with open(a_path) as f:
+			with open(a_path, encoding="utf-8") as f:
 				return json.load(f)
 		return None
 
@@ -43,6 +56,7 @@ try:
 
 	settings = read_json(os.path.join(ResourcePath, "settings.json"))
 	if settings:
+		set_skin_status("Processing...")
 		# Windows shortcuts (.lnk) in @Resources\Shortcuts
 		print("Processing Windows shortcuts...")
 		windows_shortcuts = WindowsShortcuts(os.path.join(ResourcePath))
@@ -57,8 +71,8 @@ try:
 			print("Processing Steam shortcuts...")
 			steam_shortcuts = steam.get_shortcuts()
 		else:
-			steam_games = None
-			steam_shortcuts = None
+			steam_games = {}
+			steam_shortcuts = {}
 
 		if settings.get("galaxy_path", None):
 			# GOG Galaxy games
@@ -66,7 +80,7 @@ try:
 			galaxy = GOGGalaxy(settings["galaxy_path"])
 			galaxy_games = galaxy.get_games()
 		else:
-			galaxy_games = None
+			galaxy_games = {}
 
 		# Merge game dictionaries into one list
 		print("Generating master list of games...")
@@ -87,6 +101,7 @@ try:
 			for game_key, game_dict in galaxy_games.items():
 				all_games.append(game_dict)
 
+		print("Found %d games..." % len(all_games))
 		print("Comparing new master list of games with old master list of games...")
 		all_games_old = read_json(os.path.join(ResourcePath, "games.json"))
 		if all_games_old:
@@ -102,11 +117,12 @@ try:
 							game_new[GameKeys.BANNER_ERROR] = True
 						break
 
-		print("Downloading banners for games from supported platforms...")
+		set_skin_status("Downloading...")
+		print("Downloading banners for %d games from supported platforms..." % (len(steam_games) + len(galaxy_games)))
 		banner_downloader = BannerDownloader(ResourcePath)
 		banner_downloader.process(all_games)
 
-		print("Writing master list of games to disk...")
+		print("Writing master list of %d games to disk..." % len(all_games))
 		write_json(os.path.join(ResourcePath, "games.json"), all_games)
 
 		print("Initializing frontend...")
@@ -122,7 +138,6 @@ try:
 except:
 	import traceback
 	traceback.print_exc()
-	subprocess.call([RainmeterPath, "!SetOption", "StatusMessage", "Text", "Exception raised in the backend!", Config], shell=True)
-	subprocess.call([RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
-	subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
-	input()
+	exception_type, exception_message, stack_trace = sys.exc_info()
+	set_skin_status("Exception raised in the backend: %s" % exception_message)
+input()

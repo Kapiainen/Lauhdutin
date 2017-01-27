@@ -36,6 +36,7 @@ class GOGGalaxy:
 	def process_index_database(self):
 		value = self.get_value()
 		while value:
+			print("\t\tFound game in '%s'" % value[3])
 			self.set_result_entry(value[0], {})
 			game = {}
 			game[GameKeys.PLATFORM] = Platform.GOG_GALAXY
@@ -43,7 +44,7 @@ class GOGGalaxy:
 			game[GameKeys.PATH] = value[3]
 			gameInfo = os.path.join(value[3], "goggame-%s.info" % value[0])
 			if os.path.isfile(gameInfo):
-				with open(gameInfo) as f:
+				with open(gameInfo, encoding="utf-8") as f:
 					start = False
 					lines = f.readlines()
 					contents = ""
@@ -64,18 +65,15 @@ class GOGGalaxy:
 			if self.result_has(value[0]):
 				details = json.loads(value[3])
 				game = {}
-				game[GameKeys.NAME] = details["title"]
-				game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
-				game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
+				game[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(details["title"]))
+				print("\t\tGetting info about '%s'" % game[GameKeys.NAME])
 				banner_url = details["images"]["logo"].replace("\/", "/")
-				print("\n\t%s -> %s" % (game[GameKeys.NAME], banner_url))
 				banner_extension = banner_url[-4:]
 				banner_url = banner_url[:-4]
 				if banner_url.endswith("_196"):
 					banner_url = "%s_392%s" % (banner_url[:-4], banner_extension)
 				elif banner_url.endswith("_glx_logo"):
 					banner_url = "%s_392%s" % (banner_url[:-9], banner_extension)
-				print("\t\t", banner_url)
 				game[GameKeys.BANNER_URL] = banner_url
 				if not "http:" in game[GameKeys.BANNER_URL]:
 					game[GameKeys.BANNER_URL] = "http:" + game[GameKeys.BANNER_URL]
@@ -89,6 +87,7 @@ class GOGGalaxy:
 		self.productdetails = {}
 		if not os.path.isfile(self.indexDB) or not os.path.isfile(self.productdetailsDB):
 			return self.result
+		print("\tConnecting to index database...")
 		con = sqlite3.connect(self.indexDB)
 		cur = con.cursor()
 		cur.execute("SELECT * FROM Products")
@@ -98,6 +97,7 @@ class GOGGalaxy:
 		for gameID, gameDict in self.index.items():
 			for key, value in gameDict.items():
 				self.result[gameID][key] = value
+		print("\tConnecting to product details database...")
 		con = sqlite3.connect(self.productdetailsDB)
 		cur = con.cursor()
 		cur.execute("SELECT * FROM ProductDetails")

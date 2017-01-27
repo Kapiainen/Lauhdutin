@@ -23,9 +23,10 @@ class BannerDownloader:
 					try:
 						urllib.request.urlretrieve(game_dict[GameKeys.BANNER_URL], file_path)
 						print("\tDownloading banner for '%s'" % game_dict[GameKeys.NAME])
+						del game_dict[GameKeys.BANNER_URL]
 					except:
 						print("\tFailed to download banner for '%s'" % game_dict[GameKeys.NAME])
 						game_dict[GameKeys.BANNER_ERROR] = True
 				else:
 					print("\tBanner already downloaded for '%s'" % game_dict[GameKeys.NAME])
-				del game_dict[GameKeys.BANNER_URL]
+					del game_dict[GameKeys.BANNER_URL]

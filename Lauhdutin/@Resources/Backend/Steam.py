@@ -17,6 +17,7 @@ class VDFKeys():
 	APPS = "apps"
 	LASTPLAYED = "lastplayed"
 	APPNAME = "appname"
+	TAGS = "tags"
 
 class VDF:
 	def __init__(self):
@@ -30,7 +31,7 @@ class VDF:
 
 	def open(self, a_path):
 		if os.path.isfile(a_path):
-			with open(a_path) as f:
+			with open(a_path, encoding="utf-8") as f:
 				source = f.readlines()
 				value, i = self.parse(source, 0)
 				return value
@@ -118,6 +119,7 @@ class Steam():
 					libraries.append(path.replace("\\\\", "\\"))
 		# Read appmanifests
 		for basePath in libraries:
+			print("\tFound library '%s'" % basePath)
 			path = os.path.join(basePath, "steamapps")
 			if not os.path.isdir(path):
 				continue
@@ -144,8 +146,8 @@ class Steam():
 					game[GameKeys.NAME] = manifest[VDFKeys.NAME]
 				elif manifest.get(VDFKeys.USERCONFIG):
 					game[GameKeys.NAME] = manifest[VDFKeys.USERCONFIG][VDFKeys.NAME]
-				game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
-				game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
+				game[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(game[GameKeys.NAME]))
+				print("\t\tFound game '%s'" % game[GameKeys.NAME])
 				game[GameKeys.BANNER_PATH] = "Steam\\" + manifest[VDFKeys.APPID] + ".jpg"
 				game[GameKeys.BANNER_URL] = ("http://cdn.akamai.steamstatic.com/steam/apps/"
 												+ manifest[VDFKeys.APPID]
@@ -153,33 +155,33 @@ class Steam():
 				game[GameKeys.LASTPLAYED] = 0
 				self.result[manifest[VDFKeys.APPID]] = game
 
-		# Read sharedconfig.vdf
+		# Read sharedconfig.vdf to get tags assigned in Steam.
 		shared_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "7", "remote",
 												"sharedconfig.vdf"))
 		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
 		while keys:
 			if not shared_config:
-				return
+				return self.result
 			shared_config = shared_config.get(keys[0])
 			keys.pop(0)
 		for appID, gameDict in shared_config.items():
 			if gameDict.get(GameKeys.TAGS, None) != None:
 				if self.result.get(appID, None) != None:
-					self.result[appID]["tags"] = gameDict[GameKeys.TAGS]
+					self.result[appID][GameKeys.TAGS] = gameDict[VDFKeys.TAGS]
 
-		# Read localconfig.vdf
+		# Read localconfig.vdf to get the timestamp for when the game was last played.
 		local_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "config",
 												"localconfig.vdf"))
 		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
 		while keys:
 			if not local_config:
-				return
+				return self.result
 			local_config = local_config.get(keys[0])
 			keys.pop(0)
 		for appID, gameDict in local_config.items():
 			if gameDict.get(GameKeys.LASTPLAYED):
 				if self.result.get(appID):
-					self.result[appID]["lastplayed"] = gameDict[GameKeys.LASTPLAYED]
+					self.result[appID][GameKeys.LASTPLAYED] = gameDict[VDFKeys.LASTPLAYED]
 		return self.result
 
 	def get_shortcuts(self):
@@ -218,9 +220,8 @@ class Steam():
 			# Title
 			start = shortcut.find("|", 1) + 1
 			end = shortcut.find("|", start)
-			game[GameKeys.NAME] = shortcut[start:end]
-			game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
-			game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
+			game[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(shortcut[start:end]))
+			print("\tFound game '%s'" % game[GameKeys.NAME])
 			game[GameKeys.BANNER_PATH] = "Steam shortcuts\\" + game[GameKeys.NAME] + ".jpg"
 			shortcut = shortcut[end:]
 			# Path
