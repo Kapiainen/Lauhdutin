@@ -118,6 +118,7 @@ class Steam():
 					libraries.append(path.replace("\\\\", "\\"))
 		# Read appmanifests
 		for basePath in libraries:
+			print("\tFound library '%s'" % basePath)
 			path = os.path.join(basePath, "steamapps")
 			if not os.path.isdir(path):
 				continue
@@ -144,6 +145,7 @@ class Steam():
 					game[GameKeys.NAME] = manifest[VDFKeys.NAME]
 				elif manifest.get(VDFKeys.USERCONFIG):
 					game[GameKeys.NAME] = manifest[VDFKeys.USERCONFIG][VDFKeys.NAME]
+				print("\t\tFound game '%s'" % game[GameKeys.NAME])
 				game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
 				game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
 				game[GameKeys.BANNER_PATH] = "Steam\\" + manifest[VDFKeys.APPID] + ".jpg"
@@ -218,9 +220,8 @@ class Steam():
 			# Title
 			start = shortcut.find("|", 1) + 1
 			end = shortcut.find("|", start)
-			game[GameKeys.NAME] = shortcut[start:end]
-			game[GameKeys.NAME] = Utility.title_strip_unicode(game[GameKeys.NAME])
-			game[GameKeys.NAME] = Utility.title_move_the(game[GameKeys.NAME])
+			game[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(shortcut[start:end]))
+			print("\tFound game '%s'" % game[GameKeys.NAME])
 			game[GameKeys.BANNER_PATH] = "Steam shortcuts\\" + game[GameKeys.NAME] + ".jpg"
 			shortcut = shortcut[end:]
 			# Path
