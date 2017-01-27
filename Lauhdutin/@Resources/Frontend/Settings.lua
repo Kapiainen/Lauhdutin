@@ -3,6 +3,7 @@ function Initialize()
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
 	SETTINGS = ReadSettings()
+	OLD_SETTINGS = ReadSettings()
 	if SETTINGS == nil then
 		SETTINGS = {}
 	end
@@ -51,16 +52,8 @@ function Update()
 end
 
 function Save()
-	local old_settings = ReadSettings()
-	if old_settings then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
-		for i=1, #layout_settings do
-			if old_settings[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
-				REBUILD_SWITCH = true
-				break
-			end
-		end
-		if old_settings['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
+	if OLD_SETTINGS then
+		if OLD_SETTINGS['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
 			local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
 			if f ~= nil then
 				f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
@@ -74,6 +67,15 @@ function Save()
 end
 
 function Exit()
+	if OLD_SETTINGS then
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
+		for i=1, #layout_settings do
+			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
+				REBUILD_SWITCH = true
+				break
+			end
+		end
+	end
 	if REBUILD_SWITCH then
 		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;" "#CURRENTFILE#;"]')
 	else
