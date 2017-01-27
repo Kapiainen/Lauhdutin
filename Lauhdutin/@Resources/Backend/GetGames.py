@@ -12,8 +12,10 @@ def set_skin_status(a_message = ""):
 	subprocess.call([RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
 	subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
 
-if not (sys.version_info.major >= 3 and sys.version_info.minor >= 5):
-	set_skin_status("Unsupported Python version: %s.%s" % (sys.version_info.major, sys.version_info.minor))
+minimum_major_version = 3
+minimum_minor_version = 5
+if not (sys.version_info.major >= minimum_major_version and sys.version_info.minor >= minimum_minor_version):
+	set_skin_status("Unsupported Python version: %s.%s. Expected %d.%d or later." % (sys.version_info.major, sys.version_info.minor, minimum_major_version, minimum_minor_version))
 	exit()
 
 try:
