@@ -71,8 +71,8 @@ try:
 			print("Processing Steam shortcuts...")
 			steam_shortcuts = steam.get_shortcuts()
 		else:
-			steam_games = None
-			steam_shortcuts = None
+			steam_games = {}
+			steam_shortcuts = {}
 
 		if settings.get("galaxy_path", None):
 			# GOG Galaxy games
@@ -80,7 +80,7 @@ try:
 			galaxy = GOGGalaxy(settings["galaxy_path"])
 			galaxy_games = galaxy.get_games()
 		else:
-			galaxy_games = None
+			galaxy_games = {}
 
 		# Merge game dictionaries into one list
 		print("Generating master list of games...")
