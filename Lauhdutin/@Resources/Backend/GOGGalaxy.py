@@ -43,7 +43,7 @@ class GOGGalaxy:
 			game[GameKeys.PATH] = value[3]
 			gameInfo = os.path.join(value[3], "goggame-%s.info" % value[0])
 			if os.path.isfile(gameInfo):
-				with open(gameInfo) as f:
+				with open(gameInfo, encoding="utf-8") as f:
 					start = False
 					lines = f.readlines()
 					contents = ""

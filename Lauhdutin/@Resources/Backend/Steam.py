@@ -30,7 +30,7 @@ class VDF:
 
 	def open(self, a_path):
 		if os.path.isfile(a_path):
-			with open(a_path) as f:
+			with open(a_path, encoding="utf-8") as f:
 				source = f.readlines()
 				value, i = self.parse(source, 0)
 				return value
