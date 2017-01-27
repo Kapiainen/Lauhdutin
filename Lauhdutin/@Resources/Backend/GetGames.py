@@ -33,7 +33,7 @@ try:
 
 	def read_json(a_path):
 		if os.path.isfile(a_path):
-			with open(a_path) as f:
+			with open(a_path, encoding="utf-8") as f:
 				return json.load(f)
 		return None
 
