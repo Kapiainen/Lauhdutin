@@ -1,4 +1,5 @@
 [Variables]
+ToolbarWidth=418
 SlotCount=1
 SlotWidth=418
 SlotHeight=195
