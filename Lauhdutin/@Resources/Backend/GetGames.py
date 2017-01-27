@@ -1,9 +1,20 @@
 # Python environment
 import sys, os, subprocess, json
 
+print("Running on Python %d.%d.%d" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+
 RainmeterPath = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
 ResourcePath = sys.argv[2][:-1]
 Config = sys.argv[3][:-1]
+
+def set_skin_status(a_message = ""):
+	subprocess.call([RainmeterPath, "!SetOption", "StatusMessage", "Text", a_message, Config], shell=True)
+	subprocess.call([RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
+	subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
+
+if not (sys.version_info.major >= 3 and sys.version_info.minor >= 5):
+	set_skin_status("Unsupported Python version: %s.%s" % (sys.version_info.major, sys.version_info.minor))
+	exit()
 
 try:
 	# Back-end
@@ -122,7 +133,6 @@ try:
 except:
 	import traceback
 	traceback.print_exc()
-	subprocess.call([RainmeterPath, "!SetOption", "StatusMessage", "Text", "Exception raised in the backend!", Config], shell=True)
-	subprocess.call([RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
-	subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
+	exception_type, exception_message, stack_trace = sys.exc_info()
+	set_skin_status("Exception raised in the backend: %s" % exception_message)
 	input()
