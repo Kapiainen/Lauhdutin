@@ -71,8 +71,8 @@ try:
 			print("Processing Steam shortcuts...")
 			steam_shortcuts = steam.get_shortcuts()
 		else:
-			steam_games = None
-			steam_shortcuts = None
+			steam_games = {}
+			steam_shortcuts = {}
 
 		if settings.get("galaxy_path", None):
 			# GOG Galaxy games
@@ -80,7 +80,7 @@ try:
 			galaxy = GOGGalaxy(settings["galaxy_path"])
 			galaxy_games = galaxy.get_games()
 		else:
-			galaxy_games = None
+			galaxy_games = {}
 
 		# Merge game dictionaries into one list
 		print("Generating master list of games...")
@@ -101,6 +101,7 @@ try:
 			for game_key, game_dict in galaxy_games.items():
 				all_games.append(game_dict)
 
+		print("Found %d games..." % len(all_games))
 		print("Comparing new master list of games with old master list of games...")
 		all_games_old = read_json(os.path.join(ResourcePath, "games.json"))
 		if all_games_old:
@@ -117,11 +118,11 @@ try:
 						break
 
 		set_skin_status("Downloading...")
-		print("Downloading banners for games from supported platforms...")
+		print("Downloading banners for %d games from supported platforms..." % (len(steam_games) + len(galaxy_games)))
 		banner_downloader = BannerDownloader(ResourcePath)
 		banner_downloader.process(all_games)
 
-		print("Writing master list of games to disk...")
+		print("Writing master list of %d games to disk..." % len(all_games))
 		write_json(os.path.join(ResourcePath, "games.json"), all_games)
 
 		print("Initializing frontend...")
@@ -139,4 +140,4 @@ except:
 	traceback.print_exc()
 	exception_type, exception_message, stack_trace = sys.exc_info()
 	set_skin_status("Exception raised in the backend: %s" % exception_message)
-	input()
+input()

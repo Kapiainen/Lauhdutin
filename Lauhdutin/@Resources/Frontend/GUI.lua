@@ -17,6 +17,7 @@ function Initialize()
 	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
 	N_SCROLL_INDEX = 1
 	N_SCROLL_STEP = 1
+	-- If GAME_KEYS values are changed, then they have to be copied to the GameKeys class in Enums.py.
 	GAME_KEYS = {
 		BANNER_ERROR = "bannererror",
 		BANNER_PATH = "banner",
@@ -28,6 +29,7 @@ function Initialize()
 		PLATFORM = "platform",
 		TAGS = "tags"
 	}
+	-- If PLATFORM values are changed, then they have to be copied to the Platform class in Enums.py.
 	PLATFORM = {
 		STEAM = 0,
 		STEAM_SHORTCUT = 1,
@@ -38,6 +40,7 @@ function Initialize()
 	HideToolbar()
 end
 
+-- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
 	if T_SETTINGS ~= nil then
 		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
@@ -45,6 +48,7 @@ function Update()
 	end
 end
 
+-- Called by Backend\GetGames.py when it has successfully completed its task.
 function Init()
 	SKIN:Bang('[!HideMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 	local tGames = ReadGames()
@@ -330,18 +334,23 @@ end
 			return
 		end
 		local nIndex = tonumber(asIndex)
-		local sTitle = T_FILTERED_GAMES[nIndex][GAME_KEYS.NAME]
-		local sPath = T_FILTERED_GAMES[nIndex][GAME_KEYS.PATH]
-		for i = 1, #T_ALL_GAMES do
-			if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
-				T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
-				WriteGames(T_ALL_GAMES)
-				if N_SORT_STATE == 1 then
-					Sort(T_FILTERED_GAMES)
-					PopulateSlots()
+		local tGame = T_FILTERED_GAMES[nIndex]
+		if tGame ~= nil then
+			local sTitle = tGame[GAME_KEYS.NAME]
+			local sPath = tGame[GAME_KEYS.PATH]
+			if sTitle ~= nil and sPath ~= nil then
+				for i = 1, #T_ALL_GAMES do
+					if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
+						T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
+						WriteGames(T_ALL_GAMES)
+						if N_SORT_STATE == 1 then
+							Sort(T_FILTERED_GAMES)
+							PopulateSlots()
+						end
+						SKIN:Bang('["' .. sPath .. '"]')
+						break
+					end
 				end
-				SKIN:Bang('["' .. sPath .. '"]')
-				break
 			end
 		end
 	end

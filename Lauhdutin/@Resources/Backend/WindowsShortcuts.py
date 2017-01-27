@@ -30,7 +30,7 @@ class WindowsShortcuts():
 				if game_key and game_dict:
 					result[game_key] = game_dict
 			return result
-		return None
+		return {}
 
 	def read_shortcut(self, a_name, a_path):
 		# Quick and dirty. Should be replaced at some point with a better method.
