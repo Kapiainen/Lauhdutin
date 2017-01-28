@@ -169,9 +169,12 @@ class Steam():
 							if len(game_def) > 1 and game_def.get(VDFKeys.APPID, None):
 								game_definitions[game_def[VDFKeys.APPID]] = game_def
 					i += 1
-				print("\tSuccessfully parsed community profile...")
-			except:
-				print("\tFailed to access or parse commmunity profile...")
+				if len(game_definitions) > 0:
+					print("\tSuccessfully parsed community profile...")
+				else:
+					print("\tCommunity profile might be set to private...")
+			except: # Possibly no internet connection or server issues
+				print("\tFailed to access commmunity profile...")
 
 		# Read appmanifests
 		for basePath in libraries:
