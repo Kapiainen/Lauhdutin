@@ -4,6 +4,8 @@ class GameKeys():
 	BANNER_PATH = "banner"
 	BANNER_URL = "bannerurl"
 	HIDDEN = "hidden"
+	HOURS_LAST_TWO_WEEKS = "hourslast2weeks"
+	HOURS_TOTAL = "hourstotal"
 	LASTPLAYED = "lastplayed"
 	NAME = "title"
 	PATH = "path"

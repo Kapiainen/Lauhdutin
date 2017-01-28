@@ -65,7 +65,7 @@ try:
 		# Steam games
 		if settings.get("steam_path", None):
 			print("Processing Steam games...")
-			steam = Steam(settings["steam_path"], settings.get("steam_userdataid", ""))
+			steam = Steam(settings["steam_path"], settings.get("steam_userdataid", ""), settings.get("steam_id64", ""))
 			steam_games = steam.get_games()
 			# Non-steam games added to Steam as shortcuts
 			print("Processing Steam shortcuts...")
@@ -115,6 +115,8 @@ try:
 							game_new[GameKeys.HIDDEN] = game_old[GameKeys.HIDDEN]
 						if game_old.get(GameKeys.BANNER_ERROR, False):
 							game_new[GameKeys.BANNER_ERROR] = True
+						if game_old.get(GameKeys.HOURS_TOTAL, None) and not game_new.get(GameKeys.HOURS_TOTAL, None):
+							game_new[GameKeys.HOURS_TOTAL] = game_old[GameKeys.HOURS_TOTAL]
 						break
 
 		set_skin_status("Downloading...")

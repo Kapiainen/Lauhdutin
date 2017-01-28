@@ -23,6 +23,8 @@ function Initialize()
 		BANNER_PATH = "banner",
 		BANNER_URL = "bannerurl",
 		HIDDEN = "hidden",
+		HOURS_LAST_TWO_WEEKS = "hourslast2weeks",
+		HOURS_TOTAL = "hourstotal",
 		LASTPLAYED = "lastplayed",
 		NAME = "title",
 		PATH = "path",
@@ -64,6 +66,14 @@ function Init()
 	if T_ALL_GAMES == nil or #T_ALL_GAMES == 0 then
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 	end
+	for i=1, tonumber(T_SETTINGS['slot_count']) do
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlight.png"]')
+	end
+--	SKIN:Bang('[!UpdateMeterGroup SlotHighlights][!Redraw]')
+	for i=1, tonumber(T_SETTINGS['slot_count']) do
+		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
+	end
+	SKIN:Bang('[!Redraw]')
 end
 
 -- Utility
@@ -290,18 +300,21 @@ end
 			local j = N_SCROLL_INDEX
 			for i = 1, nSlotCount do
 				if j > 0 and j <= #T_FILTERED_GAMES then
-					SKIN:Bang('!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"')
-					SKIN:Bang('!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"')
+					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"][!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]')
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"')
 					else
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					end
+					if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+					else
+						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+					end
 				else
-					SKIN:Bang('!SetVariable SlotPath' .. i .. ' ""')
-					SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
-					SKIN:Bang('!SetVariable SlotName' .. i .. ' ""')
+					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
 				end
+				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
 				j = j + 1
 			end
 		end
@@ -351,6 +364,34 @@ end
 						break
 					end
 				end
+			end
+		end
+	end
+
+	function Highlight(asIndex)
+		--print('Highlight slot number ' .. asIndex)
+		if T_FILTERED_GAMES == nil then
+			return
+		end
+		if not T_SETTINGS['slot_highlight'] then
+			return
+		end
+		local nIndex = tonumber(asIndex)
+		if asIndex == '-1' then
+			for i=1, tonumber(T_SETTINGS['slot_count']) do
+				SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
+			end
+			SKIN:Bang('[!Redraw]')
+		else
+			local tGame = T_FILTERED_GAMES[nIndex]
+			if tGame ~= nil then
+				--local sTitle = tGame[GAME_KEYS.NAME]
+				for i=1, tonumber(T_SETTINGS['slot_count']) do
+					if i ~= nIndex then
+						SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
+					end
+				end
+				SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!UpdateMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
 			end
 		end
 	end
