@@ -115,6 +115,8 @@ try:
 							game_new[GameKeys.HIDDEN] = game_old[GameKeys.HIDDEN]
 						if game_old.get(GameKeys.BANNER_ERROR, False):
 							game_new[GameKeys.BANNER_ERROR] = True
+						if game_old.get(GameKeys.HOURS_TOTAL, None) and not game_new.get(GameKeys.HOURS_TOTAL, None):
+							game_new[GameKeys.HOURS_TOTAL] = game_old[GameKeys.HOURS_TOTAL]
 						break
 
 		set_skin_status("Downloading...")

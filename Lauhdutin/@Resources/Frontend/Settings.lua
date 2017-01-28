@@ -22,6 +22,12 @@ function Initialize()
 	if SETTINGS['slot_text_color'] == nil then
 		SETTINGS['slot_text_color'] = "255,255,255,255"
 	end
+	if SETTINGS['slot_highlight'] == nil then
+		SETTINGS['slot_highlight'] = true
+	end
+	if SETTINGS['show_hours_played'] == nil then
+		SETTINGS['show_hours_played'] = true
+	end
 	if SETTINGS['steam_path'] == nil then
 		SETTINGS['steam_path'] = ""
 	end
@@ -120,6 +126,16 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 		else
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
+		end
+		if SETTINGS['slot_highlight'] == true then
+			SKIN:Bang('[!SetOption "SlotHighlightingStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "SlotHighlightingStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['show_hours_played'] == true then
+			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -289,6 +305,24 @@ function ToggleOrientation()
 		SETTINGS['orientation'] = 'horizontal'
 	else
 		SETTINGS['orientation'] = 'vertical'
+	end
+	UpdateSettings()
+end
+
+function ToggleHighlighting()
+	if SETTINGS['slot_highlight'] == true then
+		SETTINGS['slot_highlight'] = false
+	else
+		SETTINGS['slot_highlight'] = true
+	end
+	UpdateSettings()
+end
+
+function ToggleShowHoursPlayed()
+	if SETTINGS['show_hours_played'] == true then
+		SETTINGS['show_hours_played'] = false
+	else
+		SETTINGS['show_hours_played'] = true
 	end
 	UpdateSettings()
 end

@@ -35,8 +35,10 @@ SlotTextColor=%s
 			f.write("""SlotPath%s=
 SlotImage%s=
 SlotName%s=
-""" % (i, i, i))
+SlotHighlightMessage%s=
+""" % (i, i, i, i))
 			i += 1
+
 		# Slot background
 		f.write("""
 [SlotBackground]
@@ -58,6 +60,7 @@ H=#SlotHeight#
 		# Slots
 		i = 1
 		while i <= int(settings.get("slot_count", 6)):
+			# Text for game title
 			f.write("""
 [SlotText%s]
 Meter=String""" % i)
@@ -86,6 +89,7 @@ DynamicVariables=1
 Group=Slots
 """ % i)
 
+			# Game banner
 			f.write("""
 [SlotBanner%s]
 Meter=Image
@@ -105,9 +109,55 @@ H=#SlotHeight#
 SolidColor=0,0,0,1
 PreserveAspectRatio=2
 DynamicVariables=1
+MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
+MouseLeaveAction=[!CommandMeasure LauhdutinScript "Highlight('-1')"]
 LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('#SlotPath%s#')"]
 Group=Slots
-""" % i)
+""" % (i, i))
+
+			# Game highlight
+			f.write("""
+[SlotHighlightBackground%s]
+Meter=Image
+X=0r
+Y=0r
+W=#SlotWidth#
+H=#SlotHeight#
+SolidColor=0,0,0,160
+PreserveAspectRatio=2
+DynamicVariables=1
+Group=SlotHighlight%s
+
+[SlotHighlight%s]
+Meter=Image
+ImageName=
+X=0r
+Y=0r
+W=#SlotWidth#
+H=#SlotHeight#
+SolidColor=0,0,0,1
+PreserveAspectRatio=2
+DynamicVariables=1
+Group=SlotHighlight%s
+
+[SlotHighlightText%s]
+Meter=String
+X=(#SlotWidth# / 2)r
+Y=(#SlotHeight# / 2)r
+W=#SlotWidth#
+H=#SlotHeight#
+Text=#SlotHighlightMessage%s#
+FontFace=Arial
+FontSize=(#SlotWidth#/25)
+FontColor=#SlotTextColor#
+StringAlign=CenterCenter
+StringEffect=Shadow
+ClipString=1
+AntiAlias=1
+DynamicVariables=1
+Group=SlotHighlight%s
+""" % (i, i, i, i, i, i, i))
+
 			i += 1
 
 	if CurrentFile != "Main.ini":
