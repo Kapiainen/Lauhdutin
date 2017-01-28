@@ -27,6 +27,12 @@ Developed with the following software in mind:
 - Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the **\Lauhdutin\@Resources\Banners\Shortcuts** and **\Lauhdutin\@Resources\Banners\Steam shortcuts** folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
 
 # Changelog
+**Version 2.x.x - YYYY/MM/DD:**
+- Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the *SteamID64* setting blank.
+- Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled with a toggle setting.
+- Added support for showing the total number of hours played when highlighting a Steam game. Feature can be disabled with a toggle setting.
+- Added settings for highlighting, showing hours played, and SteamID64.
+
 **Version 2.1.0 - 2017/01/27:**
 - Added strict minimum Python version check to backend.
 - Added support for horizontal layout and a setting to toggle between vertical/horizontal layout.
