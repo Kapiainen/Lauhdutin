@@ -1,5 +1,5 @@
 # Python environment
-import os, string, zlib, re
+import os, string, zlib, re, urllib.request
 # Back-end
 import Utility
 from Enums import GameKeys
@@ -101,8 +101,9 @@ class VDF:
 		return result
 
 class Steam():
-	def __init__(self, a_path, a_userdataid):
+	def __init__(self, a_path, a_userdataid, a_steamid64):
 		self.steam_path = a_path
+		self.steamid64 = a_steamid64
 		self.result = {}
 		self.userdataid = a_userdataid
 
@@ -117,6 +118,61 @@ class Steam():
 			for key, path in libraryFolders.get("libraryfolders", {}).items():
 				if self.is_int(key):
 					libraries.append(path.replace("\\\\", "\\"))
+		# Read sharedconfig.vdf to get tags assigned in Steam.
+		shared_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "7", "remote",
+												"sharedconfig.vdf"))
+		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
+		while keys:
+			if not shared_config:
+				print("\t\tFailed to process 'sharedconfig.vdf'")
+				return self.result
+			shared_config = shared_config.get(keys[0])
+			keys.pop(0)
+
+		# Read localconfig.vdf to get the timestamp for when the game was last played.
+		local_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "config",
+												"localconfig.vdf"))
+		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
+		while keys:
+			if not local_config:
+				print("\t\tFailed to process 'localconfig.vdf'")
+				return self.result
+			local_config = local_config.get(keys[0])
+			keys.pop(0)
+
+		game_definitions = {}
+		if self.steamid64 and self.steamid64 != "":
+			try:
+				print("\tAttempting to access commmunity profile...")
+				community_profile_page = urllib.request.urlopen("http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1" % self.steamid64)
+				community_profile = community_profile_page.readlines()
+				decoded_lines = []
+				for line in community_profile:
+					try:
+						decoded_lines.append(line.decode("utf-8", errors="ignore").strip().lower())
+					except:
+						pass
+				i = 0
+				while i < len(decoded_lines):
+					if decoded_lines[i] == "<game>":
+						game_def = {}
+						while decoded_lines[i] != "</game>" and i < len(decoded_lines):
+							if decoded_lines[i].startswith("<appid>"):
+								game_def[VDFKeys.APPID] = decoded_lines[i][7:decoded_lines[i].find("</")]
+							#elif decoded_lines[i].startswith("<name>"):
+							#	game_def[GameKeys.NAME] = decoded_lines[i][6+9:decoded_lines[i].find("]]></")]
+							elif decoded_lines[i].startswith("<hourslast2weeks>"):
+								game_def[GameKeys.HOURS_LAST_TWO_WEEKS] = float(decoded_lines[i][17:decoded_lines[i].find("</")])
+							elif decoded_lines[i].startswith("<hoursonrecord>"):
+								game_def[GameKeys.HOURS_TOTAL] = float(decoded_lines[i][15:decoded_lines[i].find("</")])
+							i += 1
+							if len(game_def) > 1 and game_def.get(VDFKeys.APPID, None):
+								game_definitions[game_def[VDFKeys.APPID]] = game_def
+					i += 1
+				print("\tSuccessfully parsed community profile...")
+			except:
+				print("\tFailed to access or parse commmunity profile...")
+
 		# Read appmanifests
 		for basePath in libraries:
 			print("\tFound library '%s'" % basePath)
@@ -140,8 +196,9 @@ class Steam():
 							and manifest[VDFKeys.USERCONFIG].get(VDFKeys.NAME))):
 					continue
 				game = {}
+				app_id = manifest[VDFKeys.APPID]
 				game[GameKeys.PLATFORM] = Platform.STEAM
-				game[GameKeys.PATH] = "steam://rungameid/" + manifest[VDFKeys.APPID]
+				game[GameKeys.PATH] = "steam://rungameid/" + app_id
 				if manifest.get(VDFKeys.NAME):
 					game[GameKeys.NAME] = manifest[VDFKeys.NAME]
 				elif manifest.get(VDFKeys.USERCONFIG):
@@ -150,38 +207,23 @@ class Steam():
 				print("\t\tFound game '%s'" % game[GameKeys.NAME])
 				game[GameKeys.BANNER_PATH] = "Steam\\" + manifest[VDFKeys.APPID] + ".jpg"
 				game[GameKeys.BANNER_URL] = ("http://cdn.akamai.steamstatic.com/steam/apps/"
-												+ manifest[VDFKeys.APPID]
+												+ app_id
 												+ "/header.jpg")
 				game[GameKeys.LASTPLAYED] = 0
-				self.result[manifest[VDFKeys.APPID]] = game
-
-		# Read sharedconfig.vdf to get tags assigned in Steam.
-		shared_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "7", "remote",
-												"sharedconfig.vdf"))
-		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
-		while keys:
-			if not shared_config:
-				return self.result
-			shared_config = shared_config.get(keys[0])
-			keys.pop(0)
-		for appID, gameDict in shared_config.items():
-			if gameDict.get(GameKeys.TAGS, None) != None:
-				if self.result.get(appID, None) != None:
-					self.result[appID][GameKeys.TAGS] = gameDict[VDFKeys.TAGS]
-
-		# Read localconfig.vdf to get the timestamp for when the game was last played.
-		local_config = vdf.open(os.path.join(self.steam_path, "userdata", self.userdataid, "config",
-												"localconfig.vdf"))
-		keys = [VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE, VDFKeys.STEAM, VDFKeys.APPS]
-		while keys:
-			if not local_config:
-				return self.result
-			local_config = local_config.get(keys[0])
-			keys.pop(0)
-		for appID, gameDict in local_config.items():
-			if gameDict.get(GameKeys.LASTPLAYED):
-				if self.result.get(appID):
-					self.result[appID][GameKeys.LASTPLAYED] = gameDict[VDFKeys.LASTPLAYED]
+				if local_config.get(app_id, None):
+					if local_config[app_id].get(VDFKeys.LASTPLAYED, None):
+						game[GameKeys.LASTPLAYED] = local_config[app_id][VDFKeys.LASTPLAYED]
+				if shared_config.get(app_id, None):
+					if shared_config[app_id].get(VDFKeys.TAGS, None):
+						game[GameKeys.TAGS] = shared_config[app_id][VDFKeys.TAGS]
+				if game_definitions.get(app_id, None):
+					game_def = game_definitions[app_id]
+					if game_def.get(GameKeys.HOURS_LAST_TWO_WEEKS, None):
+						game[GameKeys.HOURS_LAST_TWO_WEEKS] = game_def[GameKeys.HOURS_LAST_TWO_WEEKS]
+					if game_def.get(GameKeys.HOURS_TOTAL, None):
+						game[GameKeys.HOURS_TOTAL] = game_def[GameKeys.HOURS_TOTAL]
+				self.result[app_id] = game
+		
 		return self.result
 
 	def get_shortcuts(self):

@@ -65,7 +65,7 @@ try:
 		# Steam games
 		if settings.get("steam_path", None):
 			print("Processing Steam games...")
-			steam = Steam(settings["steam_path"], settings.get("steam_userdataid", ""))
+			steam = Steam(settings["steam_path"], settings.get("steam_userdataid", ""), settings.get("steam_id64", ""))
 			steam_games = steam.get_games()
 			# Non-steam games added to Steam as shortcuts
 			print("Processing Steam shortcuts...")
