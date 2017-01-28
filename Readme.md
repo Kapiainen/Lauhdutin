@@ -32,6 +32,7 @@ Developed with the following software in mind:
 - Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled with a toggle setting.
 - Added support for showing the total number of hours played when highlighting a Steam game. Feature can be disabled with a toggle setting.
 - Added settings for highlighting, showing hours played, and SteamID64.
+- Refactored Settings config to use relative positioning when possible.
 
 **Version 2.1.0 - 2017/01/27:**
 - Added strict minimum Python version check to backend.
