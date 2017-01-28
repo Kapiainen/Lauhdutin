@@ -107,7 +107,7 @@ try:
 		if all_games_old:
 			for game_new in all_games:
 				for game_old in all_games_old:
-					if game_new[GameKeys.NAME] == game_old[GameKeys.NAME]:
+					if game_new[GameKeys.NAME] == game_old[GameKeys.NAME] and game_new[GameKeys.PLATFORM] == game_old[GameKeys.PLATFORM]:
 						if game_new.get(GameKeys.LASTPLAYED, None) != None and game_old.get(GameKeys.LASTPLAYED, None) != None:
 							if int(game_old[GameKeys.LASTPLAYED]) > int(game_new[GameKeys.LASTPLAYED]):
 								game_new[GameKeys.LASTPLAYED] = game_old[GameKeys.LASTPLAYED]

@@ -140,7 +140,7 @@ class Steam():
 			local_config = local_config.get(keys[0])
 			keys.pop(0)
 
-		game_definitions = {}
+		game_definitions = None
 		if self.steamid64 and self.steamid64 != "":
 			try:
 				print("\tAttempting to access commmunity profile...")
@@ -149,32 +149,39 @@ class Steam():
 				decoded_lines = []
 				for line in community_profile:
 					try:
-						decoded_lines.append(line.decode("utf-8", errors="ignore").strip().lower())
+						decoded_lines.append(line.decode("utf-8", errors="ignore").strip())
 					except:
 						pass
+				game_definitions = {}
 				i = 0
 				while i < len(decoded_lines):
 					if decoded_lines[i] == "<game>":
 						game_def = {}
-						while decoded_lines[i] != "</game>" and i < len(decoded_lines):
-							if decoded_lines[i].startswith("<appid>"):
+						while decoded_lines[i].lower() != "</game>" and i < len(decoded_lines):
+							line = decoded_lines[i].lower()
+							if line.startswith("<appid>"):
 								game_def[VDFKeys.APPID] = decoded_lines[i][7:decoded_lines[i].find("</")]
-							#elif decoded_lines[i].startswith("<name>"):
-							#	game_def[GameKeys.NAME] = decoded_lines[i][6+9:decoded_lines[i].find("]]></")]
-							elif decoded_lines[i].startswith("<hourslast2weeks>"):
+							elif line.startswith("<name>"):
+								game_def[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(decoded_lines[i][6+9:decoded_lines[i].find("]]></")]))
+							elif line.startswith("<hourslast2weeks>"):
 								game_def[GameKeys.HOURS_LAST_TWO_WEEKS] = float(decoded_lines[i][17:decoded_lines[i].find("</")])
-							elif decoded_lines[i].startswith("<hoursonrecord>"):
+							elif line.startswith("<hoursonrecord>"):
 								game_def[GameKeys.HOURS_TOTAL] = float(decoded_lines[i][15:decoded_lines[i].find("</")])
 							i += 1
-							if len(game_def) > 1 and game_def.get(VDFKeys.APPID, None):
+							if len(game_def) >= 1 and game_def.get(VDFKeys.APPID, None):
 								game_definitions[game_def[VDFKeys.APPID]] = game_def
 					i += 1
 				if len(game_definitions) > 0:
 					print("\tSuccessfully parsed community profile...")
 				else:
 					print("\tCommunity profile might be set to private...")
+					game_definitions = None
 			except: # Possibly no internet connection or server issues
 				print("\tFailed to access commmunity profile...")
+				game_definitions = None
+
+		banner_url_prefix = "http://cdn.akamai.steamstatic.com/steam/apps/"
+		banner_url_suffix = "/header.jpg"
 
 		# Read appmanifests
 		for basePath in libraries:
@@ -209,9 +216,7 @@ class Steam():
 				game[GameKeys.NAME] = Utility.title_move_the(Utility.title_strip_unicode(game[GameKeys.NAME]))
 				print("\t\tFound game '%s'" % game[GameKeys.NAME])
 				game[GameKeys.BANNER_PATH] = "Steam\\" + manifest[VDFKeys.APPID] + ".jpg"
-				game[GameKeys.BANNER_URL] = ("http://cdn.akamai.steamstatic.com/steam/apps/"
-												+ app_id
-												+ "/header.jpg")
+				game[GameKeys.BANNER_URL] = (banner_url_prefix + app_id + banner_url_suffix)
 				game[GameKeys.LASTPLAYED] = 0
 				if local_config.get(app_id, None):
 					if local_config[app_id].get(VDFKeys.LASTPLAYED, None):
@@ -219,14 +224,41 @@ class Steam():
 				if shared_config.get(app_id, None):
 					if shared_config[app_id].get(VDFKeys.TAGS, None):
 						game[GameKeys.TAGS] = shared_config[app_id][VDFKeys.TAGS]
-				if game_definitions.get(app_id, None):
-					game_def = game_definitions[app_id]
+				if game_definitions:
+					if game_definitions.get(app_id, None):
+						game_def = game_definitions[app_id]
+						if game_def.get(GameKeys.HOURS_LAST_TWO_WEEKS, None):
+							game[GameKeys.HOURS_LAST_TWO_WEEKS] = game_def[GameKeys.HOURS_LAST_TWO_WEEKS]
+						if game_def.get(GameKeys.HOURS_TOTAL, None):
+							game[GameKeys.HOURS_TOTAL] = game_def[GameKeys.HOURS_TOTAL]
+					else:
+						print("\t\t\tAccount does not have '%s'" % game[GameKeys.NAME])
+						continue
+				self.result[app_id] = game
+		if game_definitions:
+			print("\tChecking for games that are not installed...")
+			for app_id, game_def in game_definitions.items():
+				if not self.result.get(app_id, None):
+					#print("\t\tFound game: %s" % app_id)
+					game = {}
+					game[GameKeys.PLATFORM] = Platform.STEAM
+					game[GameKeys.NOT_INSTALLED] = True
+					game[GameKeys.NAME] = game_def.get(GameKeys.NAME, app_id)
+					game[GameKeys.BANNER_URL] = banner_url_prefix + app_id + banner_url_suffix
+					game[GameKeys.BANNER_PATH] = "Steam\\" + app_id + ".jpg"
+					game[GameKeys.LASTPLAYED] = 0
+					game[GameKeys.PATH] = "steam://rungameid/" + app_id
 					if game_def.get(GameKeys.HOURS_LAST_TWO_WEEKS, None):
 						game[GameKeys.HOURS_LAST_TWO_WEEKS] = game_def[GameKeys.HOURS_LAST_TWO_WEEKS]
 					if game_def.get(GameKeys.HOURS_TOTAL, None):
 						game[GameKeys.HOURS_TOTAL] = game_def[GameKeys.HOURS_TOTAL]
-				self.result[app_id] = game
-		
+					if local_config.get(app_id, None):
+						if local_config[app_id].get(VDFKeys.LASTPLAYED, None):
+							game[GameKeys.LASTPLAYED] = local_config[app_id][VDFKeys.LASTPLAYED]
+					if shared_config.get(app_id, None):
+						if shared_config[app_id].get(VDFKeys.TAGS, None):
+							game[GameKeys.TAGS] = shared_config[app_id][VDFKeys.TAGS]
+					self.result[app_id] = game
 		return self.result
 
 	def get_shortcuts(self):

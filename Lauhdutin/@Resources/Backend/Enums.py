@@ -8,6 +8,7 @@ class GameKeys():
 	HOURS_TOTAL = "hourstotal"
 	LASTPLAYED = "lastplayed"
 	NAME = "title"
+	NOT_INSTALLED = "notinstalled"
 	PATH = "path"
 	PLATFORM = "platform"
 	TAGS = "tags"

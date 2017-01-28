@@ -27,6 +27,7 @@ function Initialize()
 		HOURS_TOTAL = "hourstotal",
 		LASTPLAYED = "lastplayed",
 		NAME = "title",
+		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
 		TAGS = "tags"
@@ -37,6 +38,12 @@ function Initialize()
 		STEAM_SHORTCUT = 1,
 		GOG_GALAXY = 2,
 		WINDOWS_SHORTCUT = 3
+	}
+	PLATFORM_DESCRIPTION = {
+		"Steam",
+		"Steam",
+		"GOG Galaxy",
+		""
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
@@ -62,17 +69,16 @@ function Init()
 	end
 	T_FILTERED_GAMES = T_ALL_GAMES
 	Sort()
-	PopulateSlots()
 	if T_ALL_GAMES == nil or #T_ALL_GAMES == 0 then
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlight.png"]')
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
 	end
---	SKIN:Bang('[!UpdateMeterGroup SlotHighlights][!Redraw]')
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
 		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
+	PopulateSlots()
 	SKIN:Bang('[!Redraw]')
 end
 
@@ -236,6 +242,23 @@ end
 					end
 				end
 			end
+		elseif StartsWith(asPattern, 'installed:') then
+			asPattern = asPattern:sub(11)
+			if StartsWith(asPattern, 't') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.NOT_INSTALLED] == true then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			else
+				return tResult
+			end
 		else
 			for i = 1, #atTable do
 				if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
@@ -307,9 +330,26 @@ end
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					end
 					if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
-						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+						else
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
+						end
 					else
-						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+						else
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
+						end
+					end
+					if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+						SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+					else
+						SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
 					end
 				else
 					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
@@ -355,6 +395,9 @@ end
 				for i = 1, #T_ALL_GAMES do
 					if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
 						T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
+						if T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] == true then
+							T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] = nil
+						end
 						WriteGames(T_ALL_GAMES)
 						if N_SORT_STATE == 1 then
 							Sort(T_FILTERED_GAMES)
@@ -369,7 +412,6 @@ end
 	end
 
 	function Highlight(asIndex)
-		--print('Highlight slot number ' .. asIndex)
 		if T_FILTERED_GAMES == nil then
 			return
 		end
@@ -385,7 +427,6 @@ end
 		else
 			local tGame = T_FILTERED_GAMES[nIndex]
 			if tGame ~= nil then
-				--local sTitle = tGame[GAME_KEYS.NAME]
 				for i=1, tonumber(T_SETTINGS['slot_count']) do
 					if i ~= nIndex then
 						SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
