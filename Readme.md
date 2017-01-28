@@ -29,6 +29,9 @@ Developed with the following software in mind:
 # Changelog
 **Version 2.x.x - YYYY/MM/DD:**
 - Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the *SteamID64* setting blank.
+- Added ability to show Steam games that are not installed.
+- Added ability to filter out installed Steam games that the current Steam account does not have a license for.
+- Added special filter for installed games: 'installed:true' or 'installed:false'.
 - Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled with a toggle setting.
 - Added support for showing the total number of hours played when highlighting a Steam game. Feature can be disabled with a toggle setting.
 - Added settings for highlighting, showing hours played, and SteamID64.
