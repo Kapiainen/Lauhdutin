@@ -2,6 +2,7 @@ function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
+	SAVING_SETTINGS = false
 	SETTINGS = ReadSettings()
 	OLD_SETTINGS = ReadSettings()
 	if SETTINGS == nil then
@@ -61,6 +62,7 @@ function Update()
 end
 
 function Save()
+	SAVING_SETTINGS = true
 	if OLD_SETTINGS then
 		if OLD_SETTINGS['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
 			local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
@@ -73,9 +75,13 @@ function Save()
 		REBUILD_SWITCH = true
 	end
 	WriteSettings(SETTINGS)
+	SAVING_SETTINGS = false
 end
 
 function Exit()
+	if SAVING_SETTINGS then
+		return
+	end
 	if OLD_SETTINGS then
 		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
 		for i=1, #layout_settings do
