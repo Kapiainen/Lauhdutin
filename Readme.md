@@ -30,12 +30,13 @@ Developed with the following software in mind:
 **Version 2.x.x - YYYY/MM/DD:**
 - Added support for tracking total amount of time played for most games. Will not work properly e.g. when the Battle.net client is opened instead of launching a game directly.
 - Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the *SteamID64* setting blank.
-- Added ability to show Steam games that are not installed.
+- Added ability to show Steam games that are not installed. Games that are not installed are not shown by default, but they can be browsed via a context menu option or by filtering with `installed:false`. Filtering not-installed games further requires the `+` prefix.
 - Added ability to filter out installed Steam games that the current Steam account does not have a license for.
 - Added special filter for installed games: 'installed:true' or 'installed:false'.
 - Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled with a toggle setting.
 - Added support for showing the total number of hours played when highlighting a Steam game. Feature can be disabled with a toggle setting.
 - Added settings for highlighting, showing hours played, and SteamID64.
+- Added context menu options for hiding and unhiding games. Toggle the corresponding option to start (un)hiding games and toggle the option again to stop. Hidden games are not shown by default, but they can be browsed via a context menu option or by filtering with `hidden:true`. Filtering hidden games further requires the `+` prefix.
 - Refactored Settings config to use relative positioning when possible.
 
 **Version 2.1.0 - 2017/01/27:**
