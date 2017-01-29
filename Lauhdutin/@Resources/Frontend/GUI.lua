@@ -7,6 +7,7 @@ function Initialize()
 		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 		return
 	end
+	T_RECENTLY_LAUNCHED_GAME = nil
 	N_SORT_STATE = 0 --0 = alphabetically, 1 = most recently played
 	if T_SETTINGS['sortstate'] then
 		N_SORT_STATE = tonumber(T_SETTINGS['sortstate']) - 1
@@ -330,11 +331,16 @@ end
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					end
 					if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+						local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
+						local hoursPlayed = math.floor(totalHoursPlayed)
+						local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
 						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+							--SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(math.floor(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL])) .. ' hours played"]')
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
 						else
-							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]) .. ' hours played"]')
+							--SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. tostring(math.floor(T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL])) .. ' hours played"]')
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
 						end
 					else
@@ -394,6 +400,7 @@ end
 			if sTitle ~= nil and sPath ~= nil then
 				for i = 1, #T_ALL_GAMES do
 					if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
+						T_RECENTLY_LAUNCHED_GAME = T_ALL_GAMES[i]
 						T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
 						if T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] == true then
 							T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] = nil
@@ -403,11 +410,29 @@ end
 							Sort(T_FILTERED_GAMES)
 							PopulateSlots()
 						end
+						--SKIN:Bang('[!SetVariable "ProcessMonitoredIndex" "' .. i .. '"]')
+						if StartsWith(sPath, 'steam://') then
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+						else
+							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+							local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+						end
+						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						SKIN:Bang('["' .. sPath .. '"]')
 						break
 					end
 				end
 			end
+		end
+	end
+
+	function UpdateTimePlayed()
+		if T_RECENTLY_LAUNCHED_GAME ~= nil then
+			local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
+			T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
+			WriteGames(T_ALL_GAMES)
+			PopulateSlots()
 		end
 	end
 
