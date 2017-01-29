@@ -7,6 +7,7 @@ A Rainmeter skin for launching games.
 # Contents
  - [Requirements](#requirements)
  - [Installing](#installing)
+ - [Filtering](#filtering)
  - [Changelog](#changelog)
  - [License](#license)
 
@@ -26,17 +27,26 @@ Developed with the following software in mind:
 - Windows shortcuts (.lnk files) can be added to the **\Lauhdutin\@Resources\Shortcuts** folder.
 - Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the **\Lauhdutin\@Resources\Banners\Shortcuts** and **\Lauhdutin\@Resources\Banners\Steam shortcuts** folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
 
+# Filtering
+The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
+
+    - `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
+    - `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+    - `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
+    - `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
+    - `tags:` followed by a value (e.g. `tags:rogue`). Supports tags assigned in *Steam*.
+    - `+` followed by a filter (e.g. `+bin`).
+
+Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
+
 # Changelog
-**Version 2.x.x - YYYY/MM/DD:**
-- Added support for tracking total amount of time played for most games. Will not work properly e.g. when the Battle.net client is opened instead of launching a game directly.
-- Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the *SteamID64* setting blank.
-- Added ability to show Steam games that are not installed. Games that are not installed are not shown by default, but they can be browsed via a context menu option or by filtering with `installed:false`. Filtering not-installed games further requires the `+` prefix.
-- Added ability to filter out installed Steam games that the current Steam account does not have a license for.
-- Added special filter for installed games: 'installed:true' or 'installed:false'.
-- Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled with a toggle setting.
-- Added support for showing the total number of hours played when highlighting a Steam game. Feature can be disabled with a toggle setting.
-- Added settings for highlighting, showing hours played, and SteamID64.
+**Version 2.2.0 - YYYY/MM/DD:**
+- Added support for tracking total amount of time played for most games. Will not work properly e.g. when the Battle.net client is opened instead of launching a game directly. Total time played is stored in `games.json`, which can be transferred from an older version to a newer version when updating. Supports Steam's time tracking, if a valid *SteamID64* value is specified in the settings.
+- Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the new *SteamID64* setting blank.
+- Added ability to show Steam games that are not installed. Games that are not installed are not shown by default, but they can be browsed via a context menu option or by filtering with `installed:false`. Filtering not-installed games further requires the `+` prefix. Clicking on a game that is not installed will start the normal installation process via Steam's browser protocol.
 - Added context menu options for hiding and unhiding games. Toggle the corresponding option to start (un)hiding games and toggle the option again to stop. Hidden games are not shown by default, but they can be browsed via a context menu option or by filtering with `hidden:true`. Filtering hidden games further requires the `+` prefix.
+- Added ability to filter out installed Steam games that the current Steam account does not have a license for. Requires that a non-blank and valid SteamID64 value is specified in the settings.
+- Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled and modified via the settings menu.
 - Refactored Settings config to use relative positioning when possible.
 
 **Version 2.1.0 - 2017/01/27:**
