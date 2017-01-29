@@ -118,6 +118,9 @@ try:
 						if game_old.get(GameKeys.HOURS_TOTAL, None) and not game_new.get(GameKeys.HOURS_TOTAL, None):
 							game_new[GameKeys.HOURS_TOTAL] = game_old[GameKeys.HOURS_TOTAL]
 						break
+		for game_new in all_games:
+			if not game_new.get(GameKeys.HOURS_TOTAL, None):
+				game_new[GameKeys.HOURS_TOTAL] = 0.0
 
 		set_skin_status("Downloading...")
 		print("Downloading banners for %d games from supported platforms..." % (len(steam_games) + len(galaxy_games)))
