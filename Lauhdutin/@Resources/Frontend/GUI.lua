@@ -20,8 +20,6 @@ function Initialize()
 		CycleSort()
 	end
 	S_SETTING_SLOT_COUNT = 'slot_count'
-	T_ALL_GAMES = {} -- all games found in 'games.json'
-	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
 	N_SCROLL_INDEX = 1
 	N_SCROLL_STEP = 1
 	-- If GAME_KEYS values are changed, then they have to be copied to the GameKeys class in Enums.py.
@@ -68,9 +66,16 @@ end
 function Init()
 	SKIN:Bang('[!HideMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 	local tGames = ReadGames()
-	T_ALL_GAMES = {}
+	T_ALL_GAMES = {} -- all games found in 'games.json'
+	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
+	T_HIDDEN_GAMES = {}
+	T_NOT_INSTALLED_GAMES = {}
 	for sKey, tTable in pairs(tGames) do
-		if tTable[GAME_KEYS.HIDDEN] ~= '1' then
+		if tTable[GAME_KEYS.HIDDEN] == true then
+			table.insert(T_HIDDEN_GAMES, tTable)
+		elseif tTable[GAME_KEYS.NOT_INSTALLED] == true then
+			table.insert(T_NOT_INSTALLED_GAMES, tTable)
+		else
 			table.insert(T_ALL_GAMES, tTable)
 		end
 	end
@@ -171,8 +176,18 @@ end
 		return ReadJSON(S_PATH_RESOURCES .. 'games.json')
 	end
 
-	function WriteGames(atTable)
-		return WriteJSON(S_PATH_RESOURCES .. 'games.json', atTable)
+	function WriteGames()
+		tTable = {}
+		for i=1, #T_ALL_GAMES do
+			table.insert(tTable, T_ALL_GAMES[i])
+		end
+		for i=1, #T_HIDDEN_GAMES do
+			table.insert(tTable, T_HIDDEN_GAMES[i])
+		end
+		for i=1, #T_NOT_INSTALLED_GAMES do
+			table.insert(tTable, T_NOT_INSTALLED_GAMES[i])
+		end
+		return WriteJSON(S_PATH_RESOURCES .. 'games.json', tTable)
 	end
 
 	function ReadSettings()
@@ -210,13 +225,13 @@ end
 			asPattern = asPattern:sub(7)
 			if StartsWith(asPattern, 't') then
 				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.STEAM and atTable[i][GAME_KEYS.HIDDEN] ~= true then
+					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, atTable[i])
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then
 				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM and atTable[i][GAME_KEYS.HIDDEN] ~= true  then
+					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM then
 						table.insert(tResult, atTable[i])
 					end
 				end
@@ -227,13 +242,13 @@ end
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
 				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and atTable[i][GAME_KEYS.HIDDEN] ~= true then
+					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
 						table.insert(tResult, atTable[i])
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then
 				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY and atTable[i][GAME_KEYS.HIDDEN] ~= true then
+					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY then
 						table.insert(tResult, atTable[i])
 					end
 				end
@@ -243,7 +258,7 @@ end
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.TAGS] ~= nil and atTable[i][GAME_KEYS.HIDDEN] ~= true then
+				if atTable[i][GAME_KEYS.TAGS] ~= nil then
 					for sKey, sValue in pairs(atTable[i][GAME_KEYS.TAGS]) do
 						if sValue:lower():find(asPattern) then
 							table.insert(tResult, atTable[i])
@@ -255,16 +270,12 @@ end
 		elseif StartsWith(asPattern, 'installed:') then
 			asPattern = asPattern:sub(11)
 			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true and atTable[i][GAME_KEYS.HIDDEN] ~= true then
-						table.insert(tResult, atTable[i])
-					end
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
 				end
 			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.NOT_INSTALLED] == true and atTable[i][GAME_KEYS.HIDDEN] ~= true then
-						table.insert(tResult, atTable[i])
-					end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
 				end
 			else
 				return tResult
@@ -272,23 +283,19 @@ end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.HIDDEN] == true then
-						table.insert(tResult, atTable[i])
-					end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
 				end
 			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.HIDDEN] ~= true then
-						table.insert(tResult, atTable[i])
-					end
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
 				end
 			else
 				return tResult
 			end
 		else
 			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) and atTable[i][GAME_KEYS.HIDDEN] ~= true then
+				if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
 					table.insert(tResult, atTable[i])
 				end
 			end
@@ -302,7 +309,7 @@ end
 		end
 		local tResult = {}
 		for i = 1, #atTable do
-			if atTable[i][GAME_KEYS.HIDDEN] ~= true then
+			if atTable[i][GAME_KEYS.HIDDEN] ~= true and atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true  then
 				table.insert(tResult, atTable[i])
 			end
 		end
@@ -429,64 +436,102 @@ end
 		local tGame = T_FILTERED_GAMES[nIndex]
 		if tGame ~= nil then
 			if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
-				local sTitle = tGame[GAME_KEYS.NAME]
 				local sPath = tGame[GAME_KEYS.PATH]
-				if sTitle ~= nil and sPath ~= nil then
-					for i = 1, #T_ALL_GAMES do
-						if T_ALL_GAMES[i][GAME_KEYS.NAME] == sTitle then
-							T_RECENTLY_LAUNCHED_GAME = T_ALL_GAMES[i]
-							T_ALL_GAMES[i][GAME_KEYS.LASTPLAYED] = os.time()
-							if T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] == true then
-								T_ALL_GAMES[i][GAME_KEYS.NOT_INSTALLED] = nil
+				if sPath ~= nil then
+					tGame[GAME_KEYS.LASTPLAYED] = os.time()
+					if tGame[GAME_KEYS.HIDDEN] == true then
+						tGame[GAME_KEYS.HIDDEN] = nil
+						for i = 1, #T_HIDDEN_GAMES do -- Move game from T_HIDDEN_GAMES to T_ALL_GAMES
+							if T_HIDDEN_GAMES[i] == tGame then
+								table.insert(T_ALL_GAMES, table.remove(T_HIDDEN_GAMES, i))
+								break
 							end
-							WriteGames(T_ALL_GAMES)
-							if N_SORT_STATE == 1 then
-								Sort(T_FILTERED_GAMES)
-								PopulateSlots()
+						end
+						if tGame[GAME_KEYS.NOT_INSTALLED] == true then
+							tGame[GAME_KEYS.NOT_INSTALLED] = nil
+						end
+					elseif tGame[GAME_KEYS.NOT_INSTALLED] == true then
+						tGame[GAME_KEYS.NOT_INSTALLED] = nil
+						for i = 1, #T_NOT_INSTALLED_GAMES do -- Move game from T_NOT_INSTALLED_GAMES to T_ALL_GAMES
+							if T_NOT_INSTALLED_GAMES[i] == tGame then
+								table.insert(T_ALL_GAMES, table.remove(T_NOT_INSTALLED_GAMES, i))
+								break
 							end
-							if StartsWith(sPath, 'steam://') then
-								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
-							else
-								local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-								local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
-								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
-							end
-							SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
-							SKIN:Bang('["' .. sPath .. '"]')
-							break
 						end
 					end
+					WriteGames()
+					FilterBy('')
+					Sort()
+					PopulateSlots()
+					T_RECENTLY_LAUNCHED_GAME = tGame
+					if StartsWith(sPath, 'steam://') then
+						SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+					else
+						local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+						local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
+						SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+					end
+					SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
+					SKIN:Bang('["' .. sPath .. '"]')
 				end
 			elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
 				if tGame[GAME_KEYS.HIDDEN] ~= true then
-					tGame[GAME_KEYS.HIDDEN] = true
-					WriteGames(T_ALL_GAMES)
-					local tResult = {}
-					for i = 1, #T_FILTERED_GAMES do
-						if T_FILTERED_GAMES[i][GAME_KEYS.HIDDEN] ~= true then
-							table.insert(tResult, T_FILTERED_GAMES[i])
+					tGame[GAME_KEYS.HIDDEN] = true -- For (de)serializing purposes
+					local bMoved = false
+					for i = 1, #T_ALL_GAMES do -- Move game from T_ALL_GAMES to T_HIDDEN_GAMES
+						if T_ALL_GAMES[i] == tGame then
+							table.insert(T_HIDDEN_GAMES, table.remove(T_ALL_GAMES, i))
+							bMoved = true
+							break
 						end
 					end
-					T_FILTERED_GAMES = tResult
+					if not bMoved then
+						for i = 1, #T_NOT_INSTALLED_GAMES do -- Move game from T_NOT_INSTALLED_GAMES to T_HIDDEN_GAMES
+							if T_NOT_INSTALLED_GAMES[i] == tGame then
+								table.insert(T_HIDDEN_GAMES, table.remove(T_NOT_INSTALLED_GAMES, i))
+								break
+							end
+						end
+					end
+					WriteGames()
+					for i = 1, #T_FILTERED_GAMES do -- Remove game from T_FILTERED_GAMES
+						if T_FILTERED_GAMES[i] == tGame then
+							table.remove(T_FILTERED_GAMES, i)
+							break
+						end
+					end
 					local scrollIndex = N_SCROLL_INDEX
-					Sort(T_FILTERED_GAMES)
+					Sort()
 					N_SCROLL_INDEX = scrollIndex
 					PopulateSlots()
 				end
 			elseif N_LAUNCH_STATE == T_LAUNCH_STATES.UNHIDE then
 				if tGame[GAME_KEYS.HIDDEN] == true then
-					tGame[GAME_KEYS.HIDDEN] = nil
-					WriteGames(T_ALL_GAMES)
-
-					local tResult = {}
-					for i = 1, #T_FILTERED_GAMES do
-						if T_FILTERED_GAMES[i][GAME_KEYS.HIDDEN] == true then
-							table.insert(tResult, T_FILTERED_GAMES[i])
+					tGame[GAME_KEYS.HIDDEN] = nil -- For (de)serializing purposes
+					if tGame[GAME_KEYS.NOT_INSTALLED] ~= true then
+						for i = 1, #T_HIDDEN_GAMES do -- Move game from T_HIDDEN_GAMES to T_ALL_GAMES
+							if T_HIDDEN_GAMES[i] == tGame then
+								table.insert(T_ALL_GAMES, table.remove(T_HIDDEN_GAMES, i))
+								break
+							end
+						end
+					else
+						for i = 1, #T_HIDDEN_GAMES do -- Move game from T_HIDDEN_GAMES to T_NOT_INSTALLED_GAMES
+							if T_HIDDEN_GAMES[i] == tGame then
+								table.insert(T_NOT_INSTALLED_GAMES, table.remove(T_HIDDEN_GAMES, i))
+								break
+							end
 						end
 					end
-					T_FILTERED_GAMES = tResult
+					WriteGames()
+					for i = 1, #T_FILTERED_GAMES do -- Remove game from T_FILTERED_GAMES
+						if T_FILTERED_GAMES[i] == tGame then
+							table.remove(T_FILTERED_GAMES, i)
+							break
+						end
+					end
 					local scrollIndex = N_SCROLL_INDEX
-					Sort(T_FILTERED_GAMES)
+					Sort()
 					N_SCROLL_INDEX = scrollIndex
 					PopulateSlots()
 				end
@@ -499,8 +544,7 @@ end
 			N_LAUNCH_STATE = T_LAUNCH_STATES.LAUNCH
 			PopulateSlots()
 		else
-			-- Set state where Launch function will instead set GAME_KEYS.HIDDEN to 'true'
-			N_LAUNCH_STATE = T_LAUNCH_STATES.HIDE
+			N_LAUNCH_STATE = T_LAUNCH_STATES.HIDE -- Set state where Launch function will instead set GAME_KEYS.HIDDEN to 'true'
 			PopulateSlots()
 		end
 	end
@@ -510,10 +554,8 @@ end
 			N_LAUNCH_STATE = T_LAUNCH_STATES.LAUNCH
 			FilterBy('')
 		else
-			-- Set state where Launch function will instead set GAME_KEYS.HIDDEN to 'false'
-			N_LAUNCH_STATE = T_LAUNCH_STATES.UNHIDE
-			-- Adjust filtering to show games with GAME_KEYS.HIDDEN == 'true'.
-			FilterBy('hidden:true')
+			N_LAUNCH_STATE = T_LAUNCH_STATES.UNHIDE -- Set state where Launch function will instead set GAME_KEYS.HIDDEN to 'false'
+			FilterBy('hidden:true') -- Adjust filtering to show games with GAME_KEYS.HIDDEN == 'true'.
 		end
 	end
 
@@ -521,7 +563,7 @@ end
 		if T_RECENTLY_LAUNCHED_GAME ~= nil then
 			local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
 			T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
-			WriteGames(T_ALL_GAMES)
+			WriteGames()
 			PopulateSlots()
 		end
 	end
