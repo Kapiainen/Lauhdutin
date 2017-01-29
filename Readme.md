@@ -28,6 +28,7 @@ Developed with the following software in mind:
 
 # Changelog
 **Version 2.x.x - YYYY/MM/DD:**
+- Added support for tracking total amount of time played for most games. Will not work properly e.g. when the Battle.net client is opened instead of launching a game directly.
 - Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the *SteamID64* setting blank.
 - Added ability to show Steam games that are not installed.
 - Added ability to filter out installed Steam games that the current Steam account does not have a license for.
