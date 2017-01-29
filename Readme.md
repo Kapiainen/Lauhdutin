@@ -30,12 +30,17 @@ Developed with the following software in mind:
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
-    - `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
-    - `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
-    - `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
-    - `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
-    - `tags:` followed by a value (e.g. `tags:rogue`). Supports tags assigned in *Steam*.
-    - `+` followed by a filter (e.g. `+bin`).
+- `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
+
+- `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+
+- `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
+
+- `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
+
+- `tags:` followed by a value (e.g. `tags:rogue`). Supports tags assigned in *Steam*.
+
+- `+` followed by a filter (e.g. `+bin`).
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
