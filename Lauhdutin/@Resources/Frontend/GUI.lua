@@ -80,9 +80,13 @@ function Init()
 		end
 	end
 	--T_FILTERED_GAMES = T_ALL_GAMES
-	FilterBy('')
-	Sort()
-	if T_ALL_GAMES == nil or #T_ALL_GAMES == 0 then
+	if T_ALL_GAMES ~= nil and #T_ALL_GAMES > 0 then
+		FilterBy('')
+	elseif T_NOT_INSTALLED_GAMES ~= nil and #T_NOT_INSTALLED_GAMES > 0 then
+		FilterBy('installed:false')
+	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
+		FilterBy('hidden:true')
+	else
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
