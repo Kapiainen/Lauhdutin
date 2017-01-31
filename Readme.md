@@ -52,6 +52,8 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 - Added context menu options for hiding and unhiding games. Toggle the corresponding option to start (un)hiding games and toggle the option again to stop. Hidden games are not shown by default, but they can be browsed via a context menu option or by filtering with `hidden:true`. Filtering hidden games further requires the `+` prefix.
 - Added ability to filter out installed Steam games that the current Steam account does not have a license for. Requires that a non-blank and valid SteamID64 value is specified in the settings.
 - Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled and modified via the settings menu.
+- Added better handling of the scenario where no Steam games are installed, but games are discovered via the Steam community profile.
+- Missing 'sharedconfig.vdf' and 'localconfig.vdf' should no longer cause no Steam games to be returned by the backend.
 - Refactored Settings config to use relative positioning when possible.
 
 **Version 2.1.0 - 2017/01/27:**
