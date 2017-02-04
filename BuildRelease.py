@@ -6,7 +6,7 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 	import os, zipfile
 
 	def parse_gitignore(a_current_working_directory):
-		print("\tParsing .gitignore")
+		print("  Processing .gitignore")
 		gitignore_path = os.path.join(a_current_working_directory, ".gitignore")
 		if os.path.isfile(gitignore_path):
 			gitignore = []
@@ -14,7 +14,7 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 				gitignore = f.readlines()
 			folders_to_ignore = []
 			files_to_ignore = []
-			print("\t\tReading '%s'" % gitignore_path)
+			print("    Reading %s" % os.path.relpath(gitignore_path, a_current_working_directory))
 			for line in gitignore:
 				line = line.strip()
 				path = os.path.join(a_current_working_directory, line)
@@ -23,40 +23,47 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 				else:
 					path = path.replace("\\", "/")
 				if os.path.isdir(path):
-					print("\t\t\tFolder:", line)
+					print("      Folder:", line)
 					folders_to_ignore.append(path)
 				elif os.path.isfile(path):
-					print("\t\t\tFile:", line)
+					print("      File:", line)
 					files_to_ignore.append(path)
 				else:
-					print("\t\t\tUnsupported:", line)
-			print("\t\tFolders to ignore")
+					print("      Unsupported:", line)
+			print("    Folders to ignore")
 			for line in folders_to_ignore:
-				print("\t\t\t%s" % line)
-			print("\t\tFiles to ignore")
+				print("      %s" % os.path.relpath(line, a_current_working_directory))
+			print("    Files to ignore")
 			for line in files_to_ignore:
-				print("\t\t\t%s" % line)
+				print("      %s" % os.path.relpath(line, a_current_working_directory))
 			return folders_to_ignore, files_to_ignore
 		return None, None
 
 	def get_files_to_pack(a_current_working_directory, a_source_folder):
 		files_to_pack = []
 		folders_to_ignore, files_to_ignore = parse_gitignore(a_current_working_directory)
-		print("\tGetting files to pack from: %s and %s" % (a_current_working_directory, os.path.join(a_current_working_directory, a_source_folder)))
+		print("  Getting files to pack from: %s and %s" %
+				(
+					os.path.relpath(a_current_working_directory, a_current_working_directory),
+					os.path.relpath(
+						os.path.join(a_current_working_directory, a_source_folder),
+						a_current_working_directory
+					)
+				)
+			)
 		for root, directories, files in os.walk(os.path.join(a_current_working_directory, a_source_folder)):
 			if root not in folders_to_ignore:
-				print("\t\tProcessing folder: %s" % root)
+				print("    Processing folder: %s" % os.path.relpath(root, a_current_working_directory))
 				for file in files:
 					path = os.path.join(root, file)
 					if path not in files_to_ignore:
-						print("\t\t\tAdding file: %s" % path)
+						print("      Adding file: %s" % os.path.relpath(path, a_current_working_directory))
 						files_to_pack.append(path)
 					else:
-						print("\t\t\tSkipping file: %s" % path)
+						print("      Skipping file: %s" % os.path.relpath(path, a_current_working_directory))
 			else:
-				print("\t\tSkipping folder: %s" % root)
+				print("    Skipping folder: %s" % os.path.relpath(root, a_current_working_directory))
 		if files_to_pack:
-			
 			return files_to_pack
 		else:
 			return None
@@ -70,7 +77,7 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 			return
 		print("Files to add to archive:")
 		for file in files_to_pack:
-			print("\t%s" % file)
+			print("  %s" % os.path.relpath(file, a_current_working_directory))
 		releases_path = os.path.join(a_current_working_directory, "Releases")
 		if not os.path.isdir(releases_path):
 			os.makedirs(releases_path)
@@ -80,7 +87,8 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 			compression_type = zipfile.ZIP_DEFLATED
 		except ImportError:
 			compression_type = zipfile.ZIP_STORED
-		with zipfile.ZipFile(os.path.join(releases_path, "%s - %s.zip" % (a_release_name, a_release_version)), mode="w", compression=compression_type) as release_archive:
+		with zipfile.ZipFile(os.path.join(releases_path, "%s - %s.zip" % (a_release_name, a_release_version)),
+								mode="w", compression=compression_type) as release_archive:
 			readme_path = os.path.join(a_current_working_directory, "Readme.md")
 			release_archive.write(readme_path, os.path.join(skin_path, "Readme.md"))
 			license_path = os.path.join(a_current_working_directory, "License.md")
