@@ -3,6 +3,7 @@ import os, re
 # Back-end
 from Enums import GameKeys
 from Enums import Platform
+import Utility
 
 class WindowsShortcuts():
 	def __init__(self, a_path):
@@ -10,7 +11,7 @@ class WindowsShortcuts():
 		if not os.path.isdir(path):
 			os.makedirs(path)
 		self.shortcuts_path = path
-		self.path_regex = re.compile(r"(\w:[\\\w\s]+\.exe)")
+		self.path_regex = re.compile(r"(\w:(?:\\[^\\\/:\*\?\<\>\|]+(?=\\))*\\[^\\\/:\*\?\<\>\|]+\.exe)")
 		self.shortcut_banners = None
 		for root, directories, files in os.walk(os.path.join(a_path, "Banners", "Shortcuts")):
 			self.shortcut_banners = files
@@ -44,7 +45,7 @@ class WindowsShortcuts():
 		path = None
 		for match in self.path_regex.finditer(shortcut_contents):
 			if os.path.isfile(match.group(1)):
-				path = match.group(1)
+				path = Utility.title_strip_unicode(match.group(1))
 				game_dict[GameKeys.PATH] = path
 				game_dict[GameKeys.NAME] = a_name
 				game_dict[GameKeys.LASTPLAYED] = 0
@@ -56,5 +57,7 @@ class WindowsShortcuts():
 							break
 				if not game_dict.get(GameKeys.BANNER_PATH):
 					game_dict[GameKeys.BANNER_PATH] = "Shortcuts\\%s.jpg" % a_name
+				print("\t\tPath: '%s'" % path)
 				return (a_name, game_dict,)
+		print("\t Failed to find a path from:\n", shortcut_contents)
 		return (None, None,)
