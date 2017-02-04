@@ -1,8 +1,8 @@
 [Variables]
-ToolbarWidth=418
+ToolbarWidth=460
 SlotCount=1
-SlotWidth=418
-SlotHeight=195
+SlotWidth=460
+SlotHeight=215
 SlotBackgroundColor=0,0,0,196
 SlotTextColor=255,255,255,255
 SlotPath1=
@@ -13,9 +13,9 @@ SlotName1=
 Meter=Image
 X=0
 Y=0
-W=#SlotWidth#
-H=195
 SolidColor=#SlotBackgroundColor#
+W=#SlotWidth#
+H=(#SlotCount#*#SlotHeight#)
 
 [SlotText1]
 Meter=String
