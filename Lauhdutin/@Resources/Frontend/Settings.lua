@@ -9,13 +9,13 @@ function Initialize()
 		SETTINGS = {}
 	end
 	if SETTINGS['slot_count'] == nil then
-		SETTINGS['slot_count'] = 6
+		SETTINGS['slot_count'] = 8
 	end
 	if SETTINGS['slot_width'] == nil then
-		SETTINGS['slot_width'] = 418
+		SETTINGS['slot_width'] = 310
 	end
 	if SETTINGS['slot_height'] == nil then
-		SETTINGS['slot_height'] = 195
+		SETTINGS['slot_height'] = 145
 	end
 	if SETTINGS['slot_background_color'] == nil then
 		SETTINGS['slot_background_color'] = "0,0,0,196"
