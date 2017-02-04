@@ -61,17 +61,22 @@ function Update()
 	--SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 end
 
+function WritePythonPath()
+	local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
+	if f ~= nil then
+		f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
+		f:close()
+	end
+end
+
 function Save()
 	SAVING_SETTINGS = true
 	if OLD_SETTINGS then
 		if OLD_SETTINGS['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
-			local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
-			if f ~= nil then
-				f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
-				f:close()
-			end
+			WritePythonPath()
 		end
 	else
+		WritePythonPath()
 		REBUILD_SWITCH = true
 	end
 	WriteSettings(SETTINGS)
