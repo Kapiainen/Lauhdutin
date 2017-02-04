@@ -54,6 +54,8 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 - Added highlighting to slots when the mouse is hovering over a slot. Feature can be disabled and modified via the settings menu.
 - Added better handling of the scenario where no Steam games are installed, but games are discovered via the Steam community profile.
 - Missing 'sharedconfig.vdf' and 'localconfig.vdf' should no longer cause no Steam games to be returned by the backend.
+- Fixed bug that caused the Python path value to not be written to 'PythonPath.inc' during the initial setup.
+- Fixed bug that caused certain Windows shortcuts to not show up due to not accepting valid paths that contained certain characters.
 - Refactored Settings config to use relative positioning when possible.
 
 **Version 2.1.0 - 2017/01/27:**
