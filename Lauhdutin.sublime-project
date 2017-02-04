@@ -4,5 +4,19 @@
 		{
 			"path": "."
 		}
+	],
+	"build_systems":
+	[
+		{
+			"name": "Run YAPF",
+			"selector": "source.python",
+			"cmd":
+			[
+				"yapf",
+				"-i",
+				"--style={based_on_style: pep8, split_arguments_when_comma_terminated: true}",
+				"$file"
+			]
+		}
 	]
 }
