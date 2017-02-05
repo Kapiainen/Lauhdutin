@@ -17,6 +17,15 @@
 				"--style={based_on_style: pep8, split_arguments_when_comma_terminated: true}",
 				"$file"
 			]
+		},
+		{
+			"name": "Run tests",
+			"working_dir": "$project_path//Tests",
+			"cmd":
+			[
+				"python",
+				"$project_path/Tests/RunTests.py"
+			]
 		}
 	]
 }
