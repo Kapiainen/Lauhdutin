@@ -199,8 +199,8 @@ class Steam():
                                     decoded_lines[i][15:decoded_lines[i].find(
                                         "</")])
                             i += 1
-                            if (len(game_def) >= 1 and game_def.get(
-                                    VDFKeys.APPID, None)):
+                            if (len(game_def) >= 1 and
+                                    game_def.get(VDFKeys.APPID, None)):
                                 game_definitions[game_def[
                                     VDFKeys.APPID]] = game_def
                     i += 1
@@ -312,13 +312,33 @@ class Steam():
 
     def get_shortcuts(self):
         result = {}
-        # Read shortcuts.vdf
-        shortcuts = ""
+        output = self.read_shortcuts_file()
+        shortcuts_dict = self.parse_shortcuts_string(output)
+        i = 0
+        for key, shortcut in shortcuts_dict.items():
+            game = {}
+            game[GameKeys.PLATFORM] = Platform.STEAM_SHORTCUT
+            game[GameKeys.LASTPLAYED] = 0
+            game[GameKeys.NAME], shortcut = self.parse_shortcut_title(shortcut)
+            print("\tFound game '%s'" % game[GameKeys.NAME])
+            game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
+                game[GameKeys.NAME])
+            game[GameKeys.PATH], shortcut = self.parse_shortcut_path(shortcut)
+            game[GameKeys.PATH] = "steam://rungameid/%s" % (
+                self.parse_shortcut_app_id(game[GameKeys.PATH],
+                                           game[GameKeys.NAME]))
+            game[GameKeys.TAGS] = self.parse_shortcut_tags(shortcut)
+            result[str(i)] = game
+            i += 1
+        return result
+
+    def read_shortcuts_file(self):
         shortcuts_path = os.path.join(self.steam_path, "userdata",
                                       self.userdataid, "config",
                                       "shortcuts.vdf")
         if not os.path.isfile(shortcuts_path):
             return result
+        shortcuts = ""
         with open(shortcuts_path, "rb") as f:
             byte = f.read(1)
             while byte != b"":
@@ -330,58 +350,52 @@ class Steam():
                 output = output + char
             else:
                 output = output + "|"
+        return output
+
+    def parse_shortcuts_string(self, a_string):
         shortcuts_dict = {}
         i = 0
-        output_copy = output[9:]
-        appnameIndex = output_copy.rfind("appname")
+        a_string = a_string[9:]
+        appnameIndex = a_string.lower().rfind("appname")
         while appnameIndex >= 0:
-            shortcuts_dict[str(i)] = output_copy[appnameIndex - 1:]
-            output_copy = output_copy[:appnameIndex - 1]
-            appnameIndex = output_copy.rfind("appname")
+            shortcuts_dict[str(i)] = a_string[appnameIndex - 1:]
+            a_string = a_string[:appnameIndex - 1]
+            appnameIndex = a_string.lower().rfind("appname")
             i += 1
+        return shortcuts_dict
 
-        i = 0
-        for key, shortcut in shortcuts_dict.items():
-            game = {}
-            game[GameKeys.PLATFORM] = Platform.STEAM_SHORTCUT
-            game[GameKeys.LASTPLAYED] = 0
-            # Title
-            start = shortcut.find("|", 1) + 1
-            end = shortcut.find("|", start)
-            game[GameKeys.NAME] = Utility.title_move_the(
-                Utility.title_strip_unicode(shortcut[start:end]))
-            print("\tFound game '%s'" % game[GameKeys.NAME])
-            game[GameKeys.BANNER_PATH] = "Steam shortcuts\\" + game[
-                GameKeys.NAME] + ".jpg"
-            shortcut = shortcut[end:]
-            # Path
-            start = shortcut.find('"') + 1
-            end = shortcut.find('"', start)
-            game[GameKeys.PATH] = shortcut[start:end]
-            shortcut = shortcut[end:]
-            #SteamID
-            steamID = zlib.crc32(
-                ("\"" + game[GameKeys.PATH] + "\"" + game[GameKeys.NAME]
-                 ).encode())
-            steamID = steamID | 0x80000000
-            steamID = steamID << 32 | 0x02000000
-            game[GameKeys.PATH] = "steam://rungameid/" + str(steamID)
-            # Tags
-            start = shortcut.find("tags||") + 6
-            end = shortcut.find("||||", start)
-            shortcut = shortcut[start:end]
-            tagsList = shortcut.split("||")
-            if len(tagsList) > 0:
-                tags = {}
-                for tag in tagsList:
-                    pair = tag.split("|")
-                    if len(pair) > 1:
-                        tags[pair[0]] = pair[1]
-                if bool(tags) != False:
-                    game[GameKeys.TAGS] = tags
-            result[str(i)] = game
-            i += 1
-        return result
+    def parse_shortcut_title(self, a_string):
+        start = a_string.find("|", 1) + 1
+        end = a_string.find("|", start)
+        name = Utility.title_move_the(
+            Utility.title_strip_unicode(a_string[start:end]))
+        return (name, a_string[end:])
+
+    def parse_shortcut_path(self, a_string):
+        start = a_string.find('"') + 1
+        end = a_string.find('"', start)
+        path = a_string[start:end]
+        return (path, a_string[end:])
+
+    def parse_shortcut_app_id(self, a_path, a_name):
+        app_id = zlib.crc32(("\"" + a_path + "\"" + a_name).encode())
+        app_id = app_id | 0x80000000
+        app_id = app_id << 32 | 0x02000000
+        return app_id
+
+    def parse_shortcut_tags(self, a_string):
+        start = a_string.find("tags||") + 6
+        end = a_string.find("||||", start)
+        a_string = a_string[start:end]
+        tagsList = a_string.split("||")
+        if len(tagsList) > 0:
+            tags = {}
+            for tag in tagsList:
+                pair = tag.split("|")
+                if len(pair) > 1:
+                    tags[pair[0]] = pair[1]
+            if bool(tags) != False:
+                return tags
 
     def is_int(self, a_string):
         try:
