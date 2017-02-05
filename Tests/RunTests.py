@@ -1,7 +1,6 @@
 import unittest, sys, os
 CWD = os.getcwd()
 HEAD, TAIL = os.path.split(CWD)
-RESOURCES_PATH = os.path.join(CWD, "@Resources")
 BACKEND_PATH = os.path.join(HEAD, "Lauhdutin", "@Resources", "Backend")
 sys.path.append(BACKEND_PATH)
 FRONTEND_PATH = os.path.join(HEAD, "Lauhdutin", "@Resources", "Frontend")
@@ -17,12 +16,12 @@ from Enums import Platform
 
 class WindowsShortcutsTests(unittest.TestCase):
     def create_class_instance(self):
-        return WindowsShortcuts(RESOURCES_PATH)
+        return WindowsShortcuts(os.path.join(CWD, "@Resources"))
 
     def test_constructor(self):
         ws = self.create_class_instance()
         self.assertEqual(ws.shortcuts_path,
-                         os.path.join(RESOURCES_PATH, "Shortcuts"))
+                         os.path.join(CWD, "@Resources", "Shortcuts"))
         self.assertEqual(ws.shortcut_banners,
                          ["Office Suite 2015.gif", "Overwatch.png"])
 
