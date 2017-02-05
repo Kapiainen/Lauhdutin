@@ -20,7 +20,7 @@
 		},
 		{
 			"name": "Run tests",
-			"working_dir": "$project_path//Tests",
+			"working_dir": "$project_path/Tests",
 			"cmd":
 			[
 				"python",
