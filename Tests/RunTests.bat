@@ -1,0 +1,2 @@
+@python RunTests.py
+@pause
