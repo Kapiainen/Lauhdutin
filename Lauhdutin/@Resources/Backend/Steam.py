@@ -327,7 +327,9 @@ class Steam():
             game[GameKeys.PATH] = "steam://rungameid/%s" % (
                 self.parse_shortcut_app_id(game[GameKeys.PATH],
                                            game[GameKeys.NAME]))
-            game[GameKeys.TAGS] = self.parse_shortcut_tags(shortcut)
+            tags = self.parse_shortcut_tags(shortcut)
+            if tags:
+                game[GameKeys.TAGS] = tags
             result[str(i)] = game
             i += 1
         return result
