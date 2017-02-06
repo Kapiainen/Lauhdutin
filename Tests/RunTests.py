@@ -150,7 +150,9 @@ class SteamTests(unittest.TestCase):
         self.assertEqual(steam.steam_path, os.path.join(CWD, "Steam"))
         self.assertEqual(steam.userdataid, "0123456789")
         self.assertEqual(steam.steamid64, "12498725934096846")
-        self.assertEqual(type(steam.result), dict)
+        self.assertEqual(steam.banner_url_prefix, "http://cdn.akamai.steamstatic.com/steam/apps/")
+        self.assertEqual(steam.banner_url_suffix, "/header.jpg")
+
 
     def test_read_shortcuts_file(self):
         steam = self.create_class_instance()
