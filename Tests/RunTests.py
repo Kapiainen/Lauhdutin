@@ -921,5 +921,9 @@ class SteamTests(unittest.TestCase):
         self.assertEqual(steam.is_int("This is not a number"), False)
 
 
+# TODO: Write tests for GOGGalaxy.py and create mock data to use when testing.
+# TODO: Write tests for BannerDownloader.py.
+# TODO: Write tests for GetGames.py.
+
 if __name__ == '__main__':
     unittest.main()
