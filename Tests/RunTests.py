@@ -153,6 +153,39 @@ class SteamTests(unittest.TestCase):
         self.assertEqual(steam.banner_url_prefix, "http://cdn.akamai.steamstatic.com/steam/apps/")
         self.assertEqual(steam.banner_url_suffix, "/header.jpg")
 
+    def test_get_shortcuts(self):
+        steam = self.create_class_instance()
+        self.assertEqual(steam.get_shortcuts(), {
+            '0': {
+                'platform': 1,
+                'lastplayed': 0,
+                'title': 'RealTemp',
+                'banner': 'Steam shortcuts\\RealTemp.jpg',
+                'path': 'steam://rungameid/17906321180839641088'
+            },
+            '1': {
+                'platform': 1,
+                'lastplayed': 0,
+                'title': 'GPU-Z',
+                'banner': 'Steam shortcuts\\GPU-Z.jpg',
+                'path': 'steam://rungameid/11616125968489381888',
+                'tags': {
+                    '0': 'GPU',
+                    '1': 'Utility'
+                }
+            },
+            '2': {
+                'platform': 1,
+                'lastplayed': 0,
+                'title': 'CPU-Z',
+                'banner': 'Steam shortcuts\\CPU-Z.jpg',
+                'path': 'steam://rungameid/13161530333453090816',
+                'tags': {
+                    '0': 'CPU',
+                    '1': 'Utility'
+                }
+            }
+        })
 
     def test_read_shortcuts_file(self):
         steam = self.create_class_instance()
