@@ -3,7 +3,7 @@ EXPECTED_PYTHON_MAJOR_VERSION = 3
 EXPECTED_PYTHON_MINOR_VERSION = 0
 if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 		and sys.version_info.minor >= EXPECTED_PYTHON_MINOR_VERSION):
-	import os, zipfile
+	import os, zipfile, subprocess
 
 	def parse_gitignore(a_current_working_directory):
 		print("  Processing .gitignore")
@@ -100,8 +100,12 @@ if (sys.version_info.major >= EXPECTED_PYTHON_MAJOR_VERSION
 				release_archive.write(file, os.path.relpath(file, a_current_working_directory))
 		print("Finished...")
 
-	sys.stdout.write("Enter release version: ")
-	main(os.getcwd(), "Lauhdutin", input())
+	tests_path = os.path.join(os.getcwd(), "Tests")
+	tests = subprocess.Popen([os.path.join(tests_path, "RunTestsRelease.bat")], cwd=tests_path)
+	tests.wait()
+	if tests.returncode == 0:
+		sys.stdout.write("Enter release version: ")
+		main(os.getcwd(), "Lauhdutin", input())
 else:
 	print("Expected Python %s.%s, running on Python %s.%s" % (
 				EXPECTED_PYTHON_MAJOR_VERSION, EXPECTED_PYTHON_MINOR_VERSION,
