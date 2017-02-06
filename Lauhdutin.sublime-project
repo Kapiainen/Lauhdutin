@@ -24,7 +24,8 @@
 			"cmd":
 			[
 				"python",
-				"$project_path/Tests/RunTests.py"
+				"$project_path/Tests/RunTests.py",
+				"-b"
 			]
 		}
 	]

@@ -1,5 +1,5 @@
 @echo ============================= Running Python tests =============================
-@python RunTests.py
+@python RunTests.py -b
 @echo.
 @echo.
 ::@echo ============================= Running Lua tests ================================
