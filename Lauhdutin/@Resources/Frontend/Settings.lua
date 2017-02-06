@@ -58,7 +58,7 @@ function Initialize()
 end
 
 function Update()
-	--SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+
 end
 
 function WritePythonPath()

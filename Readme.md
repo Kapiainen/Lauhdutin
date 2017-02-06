@@ -57,6 +57,9 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 - Fixed bug that caused the Python path value to not be written to 'PythonPath.inc' during the initial setup.
 - Fixed bug that caused certain Windows shortcuts to not show up due to not accepting valid paths that contained certain characters.
 - Refactored Settings config to use relative positioning when possible.
+- Refactored backend Python scripts to facilitate testing.
+- Added tests for most of the Python backend scripts.
+- Integrated running tests into the release process.
 
 **Version 2.1.0 - 2017/01/27:**
 - Added strict minimum Python version check to backend.
