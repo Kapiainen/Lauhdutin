@@ -353,7 +353,7 @@ class Steam():
 
     def get_shortcuts(self):
         result = {}
-        output = self.read_shortcuts_file()
+        output = self.read_shortcuts_file(self.steam_path, self.userdataid)
         shortcuts_dict = self.parse_shortcuts_string(output)
         i = 0
         for key, shortcut in shortcuts_dict.items():
@@ -375,9 +375,9 @@ class Steam():
             i += 1
         return result
 
-    def read_shortcuts_file(self):
-        shortcuts_path = os.path.join(self.steam_path, "userdata",
-                                      self.userdataid, "config",
+    def read_shortcuts_file(self, a_path, a_userdataid):
+        shortcuts_path = os.path.join(a_path, "userdata",
+                                      a_userdataid, "config",
                                       "shortcuts.vdf")
         if not os.path.isfile(shortcuts_path):
             return result
