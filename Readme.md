@@ -21,11 +21,33 @@ Developed with the following software in mind:
 # Installing
 - Install Rainmeter and Python 3 on your system (see [requirements](#requirements) for more info).
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
-- Extract the **Lauhdutin** folder into your **\Rainmeter\Skins** folder.
+- Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
 - Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking, click the **Save** button, and finally click the **Exit** button.
 - **Main.ini** should now load and will gather information on the games that you have installed. The skin will say **Processing...** for a while as it is e.g. downloading banners for games, but should eventually switch over to showing a list of games that it has found.
-- Windows shortcuts (.lnk files) can be added to the **\Lauhdutin\@Resources\Shortcuts** folder.
-- Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the **\Lauhdutin\@Resources\Banners\Shortcuts** and **\Lauhdutin\@Resources\Banners\Steam shortcuts** folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
+- Windows shortcuts (.lnk files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder.
+- Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the `\Lauhdutin\@Resources\Banners\Shortcuts` and `\Lauhdutin\@Resources\Banners\Steam shortcuts` folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
+
+# Updating
+If you are using an older version of Lauhdutin (2.0.0 or newer) and want to update to the latest version, then you have two recommended options:
+
+- Remove the old version completely from `\Rainmeter\Skins` and then proceed with the [normal installation steps](#installing).
+- Caution! You will lose:
+  - All information regarding total time played that was tracked solely by **Lauhdutin**. Steam tracks this information independently for its games.
+  - All settings (e.g. layout, Steam UserDataID, hidden games).
+
+or
+
+- Remove all files from `\Rainmeter\Skins\Lauhdutin` except for the following files and folders:
+```
+\Rainmeter\Skins\Lauhdutin\@Resources\games.json
+\Rainmeter\Skins\Lauhdutin\@Resources\settings.json
+\Rainmeter\Skins\Lauhdutin\@Resources\Banners
+\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts
+```
+- If you are using a Python path that differs from the default value, then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\PythonPath.inc` either!
+- If you are using custom icons, then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\Icons` either!
+- Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders.
+- Load **Main.ini** in Rainmeter, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
@@ -38,9 +60,9 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
 
-- `tags:` followed by a value (e.g. `tags:rogue`). Supports tags assigned in *Steam*.
+- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
 
-- `+` followed by a filter (e.g. `+bin`).
+- `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
@@ -60,6 +82,7 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 - Refactored backend Python scripts to facilitate testing.
 - Added tests for most of the Python backend scripts.
 - Integrated running tests into the release process.
+- Updated overlay for installing games.
 
 **Version 2.1.0 - 2017/01/27:**
 - Added strict minimum Python version check to backend.
