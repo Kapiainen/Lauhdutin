@@ -7,6 +7,7 @@ A Rainmeter skin for launching games.
 # Contents
  - [Requirements](#requirements)
  - [Installing](#installing)
+ - [Updating](#updating)
  - [Filtering](#filtering)
  - [Changelog](#changelog)
  - [License](#license)
