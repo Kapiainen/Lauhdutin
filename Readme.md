@@ -83,7 +83,7 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 - Refactored backend Python scripts to facilitate testing.
 - Added tests for most of the Python backend scripts.
 - Integrated running tests into the release process.
-- Updated overlay for installing games.
+- Updated overlay for installing, hiding, and unhiding games.
 
 **Version 2.1.0 - 2017/01/27:**
 - Added strict minimum Python version check to backend.
