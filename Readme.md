@@ -9,6 +9,7 @@ A Rainmeter skin for launching games.
  - [Installing](#installing)
  - [Updating](#updating)
  - [Filtering](#filtering)
+ - [Bangs](#bangs)
  - [Changelog](#changelog)
  - [License](#license)
 
@@ -67,11 +68,24 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
+# Bangs
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. **Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents `\``!** Multiple bangs can be executed by enclosing each bang in brackets (e.g. `\[!ActivateConfig \`SomeConfigName\`\]\[!Log \`Starting a game\`\]`).
+
+This feature can be used to e.g. load and unload skins.
+
+Currently supported events that can be used to trigger the execution of bangs:
+- A game starts running. Works with any installed game that is listed in Lauhdutin.
+- A game stops running. Works with any:
+  - Steam game, provided that the Steam in-game overlay setting is enabled in Steam.
+  - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
+
 # Changelog
 **Version 2.3.0 - YYYY/MM/DD:**
 - Added overlay art for generic errors.
 - Added overlays for invalid path errors for Steam and Windows shortcuts.
 - Added setting for toggling the visibility of the platform in overlays.
+- Added support for executing bangs when a game starts or stops running.
+- Added settings for Rainmeter bangs that should be executed when a game starts and when a game stops running.
 - Updated tooltips.
 
 **Version 2.2.0 - 2017/02/10:**
