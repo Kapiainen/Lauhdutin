@@ -29,6 +29,9 @@ function Initialize()
 	if SETTINGS['show_hours_played'] == nil then
 		SETTINGS['show_hours_played'] = true
 	end
+	if SETTINGS['show_platform'] == nil then
+		SETTINGS['show_platform'] = true
+	end
 	if SETTINGS['steam_path'] == nil then
 		SETTINGS['steam_path'] = ""
 	end
@@ -147,6 +150,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['show_platform'] == true then
+			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -334,6 +342,15 @@ function ToggleShowHoursPlayed()
 		SETTINGS['show_hours_played'] = false
 	else
 		SETTINGS['show_hours_played'] = true
+	end
+	UpdateSettings()
+end
+
+function ToggleShowPlatform()
+	if SETTINGS['show_platform'] == true then
+		SETTINGS['show_platform'] = false
+	else
+		SETTINGS['show_platform'] = true
 	end
 	UpdateSettings()
 end
