@@ -44,6 +44,12 @@ function Initialize()
 	if SETTINGS['steam_id64'] == nil then
 		SETTINGS['steam_id64'] = ""
 	end
+	if SETTINGS['start_game_bang'] == nil then
+		SETTINGS['start_game_bang'] = ""
+	end
+	if SETTINGS['stop_game_bang'] == nil then
+		SETTINGS['stop_game_bang'] = ""
+	end
 	if SETTINGS['sortstate'] == nil then
 		SETTINGS['sortstate'] = "0"
 	end
@@ -136,6 +142,10 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS['galaxy_path'] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS['python_path'] ..'"]')
+		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS['start_game_bang']) .. '"]')
+		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS['start_game_bang'] ..'"]')
+		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS['stop_game_bang']) .. '"]')
+		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS['stop_game_bang'] ..'"]')
 		if SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 		else
@@ -316,6 +326,16 @@ end
 
 function AcceptPythonPath(aPath)
 	SETTINGS['python_path'] = aPath
+	UpdateSettings()
+end
+
+function AcceptStartGameBang(aPath)
+	SETTINGS['start_game_bang'] = aPath
+	UpdateSettings()
+end
+
+function AcceptStopGameBang(aPath)
+	SETTINGS['stop_game_bang'] = aPath
 	UpdateSettings()
 end
 

@@ -459,6 +459,7 @@ end
 				local sPath = tGame[GAME_KEYS.PATH]
 				if sPath ~= nil then
 					tGame[GAME_KEYS.LASTPLAYED] = os.time()
+					bNotInstalled = tGame[GAME_KEYS.NOT_INSTALLED]
 					if tGame[GAME_KEYS.HIDDEN] == true then
 						tGame[GAME_KEYS.HIDDEN] = nil
 						for i = 1, #T_HIDDEN_GAMES do -- Move game from T_HIDDEN_GAMES to T_ALL_GAMES
@@ -470,7 +471,7 @@ end
 						if tGame[GAME_KEYS.NOT_INSTALLED] == true then
 							tGame[GAME_KEYS.NOT_INSTALLED] = nil
 						end
-					elseif tGame[GAME_KEYS.NOT_INSTALLED] == true then
+					elseif bNotInstalled == true then
 						tGame[GAME_KEYS.NOT_INSTALLED] = nil
 						for i = 1, #T_NOT_INSTALLED_GAMES do -- Move game from T_NOT_INSTALLED_GAMES to T_ALL_GAMES
 							if T_NOT_INSTALLED_GAMES[i] == tGame then
@@ -483,15 +484,24 @@ end
 					FilterBy('')
 					Sort()
 					PopulateSlots()
-					T_RECENTLY_LAUNCHED_GAME = tGame
-					if StartsWith(sPath, 'steam://') then
-						SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
-					else
-						local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-						local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
-						SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+					if tGame[GAME_KEYS.ERROR] == true then
+						SKIN:Bang('[!Log "Error: There is something wrong with ' .. tGame[GAME_KEYS.NAME] .. '"]')
+						return
 					end
-					SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
+					if bNotInstalled ~= true then
+						T_RECENTLY_LAUNCHED_GAME = tGame
+						if StartsWith(sPath, 'steam://') then
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+						else
+							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+							local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+						end
+						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
+						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
+							SKIN:Bang('[' .. (T_SETTINGS['start_game_bang']:gsub('`', '"')) .. ']')
+						end
+					end
 					SKIN:Bang('["' .. sPath .. '"]')
 				end
 			elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
@@ -585,6 +595,9 @@ end
 			T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
 			WriteGames()
 			PopulateSlots()
+			if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
+				SKIN:Bang('[' .. (T_SETTINGS['stop_game_bang']:gsub('`', '"')) .. ']')
+			end
 		end
 	end
 
