@@ -173,46 +173,46 @@ class SteamTests(unittest.TestCase):
         steam = self.create_class_instance()
         self.assertEqual(steam.get_games(), {
             '206190': {
-                'platform': 0,
-                'path': 'steam://rungameid/206190',
-                'title': 'Gunpoint',
-                'banner': 'Steam\\206190.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/206190',
+                GameKeys.NAME: 'Gunpoint',
+                GameKeys.BANNER_PATH: 'Steam\\206190.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/206190/header.jpg',
-                'lastplayed': '1483391006'
+                GameKeys.LASTPLAYED: '1483391006'
             },
             '212680': {
-                'platform': 0,
-                'path': 'steam://rungameid/212680',
-                'title': 'FTL: Faster Than Light',
-                'banner': 'Steam\\212680.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/212680',
+                GameKeys.NAME: 'FTL: Faster Than Light',
+                GameKeys.BANNER_PATH: 'Steam\\212680.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/212680/header.jpg',
-                'lastplayed': '1485649993',
+                GameKeys.LASTPLAYED: '1485649993',
                 'tags': {
                     '0': 'Not completed'
                 }
             },
             '40700': {
-                'platform': 0,
-                'path': 'steam://rungameid/40700',
-                'title': 'Machinarium',
-                'banner': 'Steam\\40700.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/40700',
+                GameKeys.NAME: 'Machinarium',
+                GameKeys.BANNER_PATH: 'Steam\\40700.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/40700/header.jpg',
-                'lastplayed': '1351494000',
+                GameKeys.LASTPLAYED: '1351494000',
                 'tags': {
                     '0': 'Not completed'
                 }
             },
             '26800': {
-                'platform': 0,
-                'path': 'steam://rungameid/26800',
-                'title': 'Braid',
-                'banner': 'Steam\\26800.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/26800',
+                GameKeys.NAME: 'Braid',
+                GameKeys.BANNER_PATH: 'Steam\\26800.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/26800/header.jpg',
-                'lastplayed': 0
+                GameKeys.LASTPLAYED: 0
             }
         })
 
@@ -543,64 +543,64 @@ class SteamTests(unittest.TestCase):
             appmanifest_paths.extend(
                 steam.get_appmanifest_paths(STEAM_LIBRARY_PATH))
             expected_results = [{
-                'platform': 0,
-                'path': 'steam://rungameid/206190',
-                'title': 'Gunpoint',
-                'banner': 'Steam\\206190.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/206190',
+                GameKeys.NAME: 'Gunpoint',
+                GameKeys.BANNER_PATH: 'Steam\\206190.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/206190/header.jpg',
-                'lastplayed': '1483391006',
-                'hourslast2weeks': 0,
-                'hourstotal': 2.0
+                GameKeys.LASTPLAYED: '1483391006',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 2.0
             }, {
-                'platform': 0,
-                'path': 'steam://rungameid/212680',
-                'title': 'FTL: Faster Than Light',
-                'banner': 'Steam\\212680.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/212680',
+                GameKeys.NAME: 'FTL: Faster Than Light',
+                GameKeys.BANNER_PATH: 'Steam\\212680.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/212680/header.jpg',
-                'lastplayed': '1485649993',
-                'tags': {
+                GameKeys.LASTPLAYED: '1485649993',
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 },
-                'hourslast2weeks': 0,
-                'hourstotal': 14.4
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 14.4
             }, {
-                'platform': 0,
-                'path': 'steam://rungameid/40700',
-                'title': 'Machinarium',
-                'banner': 'Steam\\40700.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/40700',
+                GameKeys.NAME: 'Machinarium',
+                GameKeys.BANNER_PATH: 'Steam\\40700.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/40700/header.jpg',
-                'lastplayed': '1351494000',
-                'tags': {
+                GameKeys.LASTPLAYED: '1351494000',
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 },
-                'hourslast2weeks': 0,
-                'hourstotal': 2.5
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 2.5
             }, {
-                'platform': 0,
-                'path': 'steam://rungameid/219150',
-                'title': 'Hotline Miami',
-                'banner': 'Steam\\219150.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/219150',
+                GameKeys.NAME: 'Hotline Miami',
+                GameKeys.BANNER_PATH: 'Steam\\219150.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/219150/header.jpg',
-                'lastplayed': '1483391126',
-                'hourslast2weeks': 0,
-                'hourstotal': 4.6
+                GameKeys.LASTPLAYED: '1483391126',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 4.6
             }, {
-                'platform': 0,
-                'path': 'steam://rungameid/250900',
-                'title': 'Binding of Isaac: Rebirth, The',
-                'banner': 'Steam\\250900.jpg',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/250900',
+                GameKeys.NAME: 'Binding of Isaac: Rebirth, The',
+                GameKeys.BANNER_PATH: 'Steam\\250900.jpg',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/250900/header.jpg',
-                'lastplayed': '1483487840',
-                'tags': {
+                GameKeys.LASTPLAYED: '1483487840',
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 },
-                'hourslast2weeks': 0,
-                'hourstotal': 528.2
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 528.2
             }, None]
             appmanifests = [
                 steam.get_appmanifest(appmanifest_path)
@@ -690,117 +690,117 @@ class SteamTests(unittest.TestCase):
             game_definitions = steam.parse_community_profile(decoded_lines)
             app_ids = [app_id for app_id in game_definitions]
             expected_results = [{
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Machinarium',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Machinarium',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/40700/header.jpg',
-                'banner': 'Steam\\40700.jpg',
-                'lastplayed': '1351494000',
-                'path': 'steam://rungameid/40700',
-                'hourslast2weeks': 0,
-                'hourstotal': 2.5,
-                'tags': {
+                GameKeys.BANNER_PATH: 'Steam\\40700.jpg',
+                GameKeys.LASTPLAYED: '1351494000',
+                GameKeys.PATH: 'steam://rungameid/40700',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 2.5,
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 }
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Gunpoint',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Gunpoint',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/206190/header.jpg',
-                'banner': 'Steam\\206190.jpg',
-                'lastplayed': '1483391006',
-                'path': 'steam://rungameid/206190',
-                'hourslast2weeks': 0,
-                'hourstotal': 2.0
+                GameKeys.BANNER_PATH: 'Steam\\206190.jpg',
+                GameKeys.LASTPLAYED: '1483391006',
+                GameKeys.PATH: 'steam://rungameid/206190',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 2.0
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'FTL: Faster Than Light',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'FTL: Faster Than Light',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/212680/header.jpg',
-                'banner': 'Steam\\212680.jpg',
-                'lastplayed': '1485649993',
-                'path': 'steam://rungameid/212680',
-                'hourslast2weeks': 0,
-                'hourstotal': 14.4,
-                'tags': {
+                GameKeys.BANNER_PATH: 'Steam\\212680.jpg',
+                GameKeys.LASTPLAYED: '1485649993',
+                GameKeys.PATH: 'steam://rungameid/212680',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 14.4,
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 }
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Hotline Miami',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Hotline Miami',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/219150/header.jpg',
-                'banner': 'Steam\\219150.jpg',
-                'lastplayed': '1483391126',
-                'path': 'steam://rungameid/219150',
-                'hourslast2weeks': 0,
-                'hourstotal': 4.6
+                GameKeys.BANNER_PATH: 'Steam\\219150.jpg',
+                GameKeys.LASTPLAYED: '1483391126',
+                GameKeys.PATH: 'steam://rungameid/219150',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 4.6
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Binding of Isaac: Rebirth, The',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Binding of Isaac: Rebirth, The',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/250900/header.jpg',
-                'banner': 'Steam\\250900.jpg',
-                'lastplayed': '1483487840',
-                'path': 'steam://rungameid/250900',
-                'hourslast2weeks': 0,
-                'hourstotal': 528.2,
-                'tags': {
+                GameKeys.BANNER_PATH: 'Steam\\250900.jpg',
+                GameKeys.LASTPLAYED: '1483487840',
+                GameKeys.PATH: 'steam://rungameid/250900',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 528.2,
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 }
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': "Oddworld: Abe's Oddysee",
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: "Oddworld: Abe's Oddysee",
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/15700/header.jpg',
-                'banner': 'Steam\\15700.jpg',
-                'lastplayed': '1462968923',
-                'path': 'steam://rungameid/15700',
-                'hourslast2weeks': 0,
-                'hourstotal': 0,
-                'tags': {
+                GameKeys.BANNER_PATH: 'Steam\\15700.jpg',
+                GameKeys.LASTPLAYED: '1462968923',
+                GameKeys.PATH: 'steam://rungameid/15700',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 0,
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 }
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Dragon Age: Origins',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Dragon Age: Origins',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/17450/header.jpg',
-                'banner': 'Steam\\17450.jpg',
-                'lastplayed': '1417274465',
-                'path': 'steam://rungameid/17450',
-                'hourslast2weeks': 0,
-                'hourstotal': 124.4
+                GameKeys.BANNER_PATH: 'Steam\\17450.jpg',
+                GameKeys.LASTPLAYED: '1417274465',
+                GameKeys.PATH: 'steam://rungameid/17450',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 124.4
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Zombie Panic! Source',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Zombie Panic! Source',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/17500/header.jpg',
-                'banner': 'Steam\\17500.jpg',
-                'lastplayed': '1271009838',
-                'path': 'steam://rungameid/17500',
-                'hourslast2weeks': 0,
-                'hourstotal': 0.2
+                GameKeys.BANNER_PATH: 'Steam\\17500.jpg',
+                GameKeys.LASTPLAYED: '1271009838',
+                GameKeys.PATH: 'steam://rungameid/17500',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 0.2
             }, {
-                'platform': 0,
-                'notinstalled': True,
-                'title': 'Red Faction: Guerrilla Steam Edition',
-                'bannerurl':
+                GameKeys.PLATFORM: 0,
+                GameKeys.NOT_INSTALLED: True,
+                GameKeys.NAME: 'Red Faction: Guerrilla Steam Edition',
+                GameKeys.BANNER_URL:
                 'http://cdn.akamai.steamstatic.com/steam/apps/20500/header.jpg',
-                'banner': 'Steam\\20500.jpg',
-                'lastplayed': '1428684708',
-                'path': 'steam://rungameid/20500',
-                'hourslast2weeks': 0,
-                'hourstotal': 2.6,
-                'tags': {
+                GameKeys.BANNER_PATH: 'Steam\\20500.jpg',
+                GameKeys.LASTPLAYED: '1428684708',
+                GameKeys.PATH: 'steam://rungameid/20500',
+                GameKeys.HOURS_LAST_TWO_WEEKS: 0,
+                GameKeys.HOURS_TOTAL: 2.6,
+                GameKeys.TAGS: {
                     '0': 'Not completed'
                 }
             }]
@@ -817,36 +817,36 @@ class SteamTests(unittest.TestCase):
         steam = self.create_class_instance()
         self.assertEqual(steam.get_shortcuts(), {
             '0': {
-                'platform': 1,
-                'lastplayed': 0,
-                'title': 'RealTemp',
-                'banner': 'Steam shortcuts\\RealTemp.jpg',
-                'path': 'steam://rungameid/10040859602154684416',
+                GameKeys.PLATFORM: 1,
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.NAME: 'RealTemp',
+                GameKeys.BANNER_PATH: 'Steam shortcuts\\RealTemp.jpg',
+                GameKeys.PATH: 'steam://rungameid/10040859602154684416',
                 GameKeys.ERROR: True,
                 GameKeys.INVALID_PATH: True
             },
             '1': {
-                'platform': 1,
-                'lastplayed': 0,
-                'title': 'GPU-Z',
-                'banner': 'Steam shortcuts\\GPU-Z.jpg',
-                'path': 'steam://rungameid/18383980479696076800',
+                GameKeys.PLATFORM: 1,
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.NAME: 'GPU-Z',
+                GameKeys.BANNER_PATH: 'Steam shortcuts\\GPU-Z.jpg',
+                GameKeys.PATH: 'steam://rungameid/18383980479696076800',
                 GameKeys.ERROR: True,
                 GameKeys.INVALID_PATH: True,
-                'tags': {
+                GameKeys.TAGS: {
                     '0': 'GPU',
                     '1': 'Utility'
                 }
             },
             '2': {
-                'platform': 1,
-                'lastplayed': 0,
-                'title': 'CPU-Z',
-                'banner': 'Steam shortcuts\\CPU-Z.jpg',
-                'path': 'steam://rungameid/11463541207985029120',
+                GameKeys.PLATFORM: 1,
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.NAME: 'CPU-Z',
+                GameKeys.BANNER_PATH: 'Steam shortcuts\\CPU-Z.jpg',
+                GameKeys.PATH: 'steam://rungameid/11463541207985029120',
                 GameKeys.ERROR: True,
                 GameKeys.INVALID_PATH: True,
-                'tags': {
+                GameKeys.TAGS: {
                     '0': 'CPU',
                     '1': 'Utility'
                 }
