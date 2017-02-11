@@ -34,6 +34,8 @@ class WindowsShortcutsTests(unittest.TestCase):
         self.assertEqual(ws.get_games(), {
             "Office Suite 2015": {
                 GameKeys.NAME: "Office Suite 2015",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files (x86)\\Office Suite 2015\\vERsion_1_52_8.exe",
                 GameKeys.LASTPLAYED: 0,
@@ -42,6 +44,8 @@ class WindowsShortcutsTests(unittest.TestCase):
             },
             "Office Suite 2017": {
                 GameKeys.NAME: "Office Suite 2017",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files (x86)\\Office Suite 2017\\version 2.4.53.exe",
                 GameKeys.LASTPLAYED: 0,
@@ -50,6 +54,8 @@ class WindowsShortcutsTests(unittest.TestCase):
             },
             "Overwatch": {
                 GameKeys.NAME: "Overwatch",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files\\Battle.net Games\\Overwatch\\Overwatch.exe",
                 GameKeys.LASTPLAYED: 0,
@@ -69,6 +75,8 @@ class WindowsShortcutsTests(unittest.TestCase):
             ws.process_shortcut("Office Suite 2015.lnk"),
             ("Office Suite 2015", {
                 GameKeys.NAME: "Office Suite 2015",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files (x86)\\Office Suite 2015\\vERsion_1_52_8.exe",
                 GameKeys.LASTPLAYED: 0,
@@ -79,6 +87,8 @@ class WindowsShortcutsTests(unittest.TestCase):
             ws.process_shortcut("Office Suite 2017.lnk"),
             ("Office Suite 2017", {
                 GameKeys.NAME: "Office Suite 2017",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files (x86)\\Office Suite 2017\\version 2.4.53.exe",
                 GameKeys.LASTPLAYED: 0,
@@ -88,6 +98,8 @@ class WindowsShortcutsTests(unittest.TestCase):
         self.assertEqual(
             ws.process_shortcut("Overwatch.lnk"), ("Overwatch", {
                 GameKeys.NAME: "Overwatch",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 GameKeys.PATH:
                 "D:\\Program Files\\Battle.net Games\\Overwatch\\Overwatch.exe",
                 GameKeys.LASTPLAYED: 0,
