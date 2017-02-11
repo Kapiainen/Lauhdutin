@@ -71,6 +71,7 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 **Version 2.3.0 - YYYY/MM/DD:**
 - Added overlay art for generic errors.
 - Added overlays for invalid path errors for Steam and Windows shortcuts.
+- Added setting for toggling the visibility of the platform in overlays.
 - Updated tooltips.
 
 **Version 2.2.0 - 2017/02/10:**
