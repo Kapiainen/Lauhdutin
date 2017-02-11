@@ -69,7 +69,7 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
 # Bangs
-There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks) ``` ` ```! Multiple bangs can be executed by enclosing each bang in brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
 
 This feature can be used to e.g. load and unload skins.
 
