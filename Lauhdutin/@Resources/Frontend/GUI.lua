@@ -499,7 +499,7 @@ end
 						end
 						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
-							SKIN:Bang('[' .. (T_SETTINGS['start_game_bang']:gsub('`', '"')) .. ']')
+							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
 					end
 					SKIN:Bang('["' .. sPath .. '"]')
@@ -596,7 +596,7 @@ end
 			WriteGames()
 			PopulateSlots()
 			if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
-				SKIN:Bang('[' .. (T_SETTINGS['stop_game_bang']:gsub('`', '"')) .. ']')
+				SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"')))
 			end
 		end
 	end
