@@ -383,7 +383,7 @@ end
 							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
 							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 							else
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
@@ -391,7 +391,7 @@ end
 						else
 							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 							else
 								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
