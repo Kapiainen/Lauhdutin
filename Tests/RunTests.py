@@ -821,14 +821,18 @@ class SteamTests(unittest.TestCase):
                 'lastplayed': 0,
                 'title': 'RealTemp',
                 'banner': 'Steam shortcuts\\RealTemp.jpg',
-                'path': 'steam://rungameid/17906321180839641088'
+                'path': 'steam://rungameid/10040859602154684416',
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True
             },
             '1': {
                 'platform': 1,
                 'lastplayed': 0,
                 'title': 'GPU-Z',
                 'banner': 'Steam shortcuts\\GPU-Z.jpg',
-                'path': 'steam://rungameid/11616125968489381888',
+                'path': 'steam://rungameid/18383980479696076800',
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 'tags': {
                     '0': 'GPU',
                     '1': 'Utility'
@@ -839,7 +843,9 @@ class SteamTests(unittest.TestCase):
                 'lastplayed': 0,
                 'title': 'CPU-Z',
                 'banner': 'Steam shortcuts\\CPU-Z.jpg',
-                'path': 'steam://rungameid/13161530333453090816',
+                'path': 'steam://rungameid/11463541207985029120',
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
                 'tags': {
                     '0': 'CPU',
                     '1': 'Utility'
@@ -851,7 +857,7 @@ class SteamTests(unittest.TestCase):
         steam = self.create_class_instance()
         self.assertEqual(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID),
-            '|shortcuts||0||AppName|CPU-Z||exe|"D:\\Programs\\CPU-Z\\cpuz_x64.exe"||StartDir|"D:\\Programs\\CPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|CPU||1|Utility||||1||AppName|GPU-Z||exe|"D:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe"||StartDir|"D:\\Programs\\GPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|GPU||1|Utility||||2||AppName|RealTemp||exe|"D:\\Programs\\RealTemp\\RealTemp.exe"||StartDir|"D:\\Programs\\RealTemp\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags|||||'
+            '|shortcuts||0||AppName|CPU-Z||exe|"X:\\Programs\\CPU-Z\\cpuz_x64.exe"||StartDir|"X:\\Programs\\CPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|CPU||1|Utility||||1||AppName|GPU-Z||exe|"X:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe"||StartDir|"X:\\Programs\\GPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|GPU||1|Utility||||2||AppName|RealTemp||exe|"X:\\Programs\\RealTemp\\RealTemp.exe"||StartDir|"X:\\Programs\\RealTemp\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags|||||'
         )
 
     def test_parse_shortcuts_string(self):
@@ -860,11 +866,11 @@ class SteamTests(unittest.TestCase):
         self.assertEqual(
             steam.parse_shortcuts_string(output), {
                 '0':
-                '|AppName|RealTemp||exe|"D:\\Programs\\RealTemp\\RealTemp.exe"||StartDir|"D:\\Programs\\RealTemp\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags|||||',
+                '|AppName|RealTemp||exe|"X:\\Programs\\RealTemp\\RealTemp.exe"||StartDir|"X:\\Programs\\RealTemp\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags|||||',
                 '1':
-                '|AppName|GPU-Z||exe|"D:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe"||StartDir|"D:\\Programs\\GPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|GPU||1|Utility||||2|',
+                '|AppName|GPU-Z||exe|"X:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe"||StartDir|"X:\\Programs\\GPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|GPU||1|Utility||||2|',
                 '2':
-                '|AppName|CPU-Z||exe|"D:\\Programs\\CPU-Z\\cpuz_x64.exe"||StartDir|"D:\\Programs\\CPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|CPU||1|Utility||||1|'
+                '|AppName|CPU-Z||exe|"X:\\Programs\\CPU-Z\\cpuz_x64.exe"||StartDir|"X:\\Programs\\CPU-Z\\"||icon|||ShortcutPath|||IsHidden||||||AllowDesktopConfig||||||OpenVR||||||tags||0|CPU||1|Utility||||1|'
             })
 
     def test_parse_shortcut_title(self):
@@ -884,13 +890,13 @@ class SteamTests(unittest.TestCase):
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
         path, _ = steam.parse_shortcut_path(shortcut)
-        self.assertEqual(path, "D:\\Programs\\RealTemp\\RealTemp.exe")
+        self.assertEqual(path, "X:\\Programs\\RealTemp\\RealTemp.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
         path, _ = steam.parse_shortcut_path(shortcut)
-        self.assertEqual(path, "D:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe")
+        self.assertEqual(path, "X:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
         path, _ = steam.parse_shortcut_path(shortcut)
-        self.assertEqual(path, "D:\\Programs\\CPU-Z\\cpuz_x64.exe")
+        self.assertEqual(path, "X:\\Programs\\CPU-Z\\cpuz_x64.exe")
 
     def test_parse_shortcut_app_id(self):
         steam = self.create_class_instance()
@@ -899,15 +905,15 @@ class SteamTests(unittest.TestCase):
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
         path, shortcut = steam.parse_shortcut_path(shortcut)
         app_id = steam.parse_shortcut_app_id(path, name)
-        self.assertEqual(app_id, 17906321180839641088)
+        self.assertEqual(app_id, 10040859602154684416)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
         path, shortcut = steam.parse_shortcut_path(shortcut)
         app_id = steam.parse_shortcut_app_id(path, name)
-        self.assertEqual(app_id, 11616125968489381888)
+        self.assertEqual(app_id, 18383980479696076800)
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
         path, shortcut = steam.parse_shortcut_path(shortcut)
         app_id = steam.parse_shortcut_app_id(path, name)
-        self.assertEqual(app_id, 13161530333453090816)
+        self.assertEqual(app_id, 11463541207985029120)
 
     def test_parse_shortcut_tags(self):
         steam = self.create_class_instance()
