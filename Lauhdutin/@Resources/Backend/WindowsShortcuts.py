@@ -49,14 +49,8 @@ class WindowsShortcuts():
         game_dict = {}
         game_dict[GameKeys.NAME] = name
         if not os.path.isfile(target_path):
-        # TODO
-        # - Add a field to the dictionary, if target_path is no longer valid
-        # - Create an overlay for Windows shortcuts that are no longer valid
-        # - Implement overlay in GUI.lua
-        # - Update test once implemented
-            if not "://" in target_path:
-                game_dict[GameKeys.ERROR] = True
-                game_dict[GameKeys.INVALID_PATH] = True
+            game_dict[GameKeys.ERROR] = True
+            game_dict[GameKeys.INVALID_PATH] = True
         game_dict[GameKeys.PATH] = target_path
         game_dict[GameKeys.LASTPLAYED] = 0
         game_dict[GameKeys.PLATFORM] = Platform.WINDOWS_SHORTCUT
