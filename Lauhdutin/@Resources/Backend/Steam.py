@@ -365,6 +365,9 @@ class Steam():
             game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
                 game[GameKeys.NAME])
             game[GameKeys.PATH], shortcut = self.parse_shortcut_path(shortcut)
+            if not os.path.isfile(game[GameKeys.PATH]):
+                game[GameKeys.ERROR] = True
+                game[GameKeys.INVALID_PATH] = True
             game[GameKeys.PATH] = "steam://rungameid/%s" % (
                 self.parse_shortcut_app_id(game[GameKeys.PATH],
                                            game[GameKeys.NAME]))
