@@ -204,22 +204,13 @@ class SteamTests(unittest.TestCase):
                 'tags': {
                     '0': 'Not completed'
                 }
-            },
-            '26800': {
-                GameKeys.PLATFORM: 0,
-                GameKeys.PATH: 'steam://rungameid/26800',
-                GameKeys.NAME: 'Braid',
-                GameKeys.BANNER_PATH: 'Steam\\26800.jpg',
-                GameKeys.BANNER_URL:
-                'http://cdn.akamai.steamstatic.com/steam/apps/26800/header.jpg',
-                GameKeys.LASTPLAYED: 0
             }
         })
 
     def test_get_libraries(self):
         steam = self.create_class_instance()
         self.assertEqual(
-            steam.get_libraries(STEAM_PATH), [STEAM_PATH, 'G:\\SteamLibrary'])
+            steam.get_libraries(STEAM_PATH), [STEAM_PATH, 'X:\\SteamLibrary'])
 
     def test_get_shared_config(self):
         steam = self.create_class_instance()
