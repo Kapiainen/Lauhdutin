@@ -368,59 +368,67 @@ end
 		if T_FILTERED_GAMES ~= nil then
 			local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
 			local j = N_SCROLL_INDEX
-			for i = 1, nSlotCount do
-				if j > 0 and j <= #T_FILTERED_GAMES then
+			for i = 1, nSlotCount do -- Iterate through each slot.
+				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
 					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"][!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]')
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"')
 					else
 						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
 					end
-					if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
-						if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
-							local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
-							local hoursPlayed = math.floor(totalHoursPlayed)
-							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
-							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-							else
-								if T_SETTINGS["show_platform"] then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+					if T_SETTINGS['slot_highlight'] then
+						if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
+							if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+								local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
+								local hoursPlayed = math.floor(totalHoursPlayed)
+								local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
+								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 								else
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-								end								
-							end
-						else
-							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+									if T_SETTINGS["show_platform"] then
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+									else
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+									end								
+								end
 							else
-								if T_SETTINGS["show_platform"] then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 								else
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+									if T_SETTINGS["show_platform"] then
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+									else
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+									end
 								end
 							end
+							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+								SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+							elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
+								SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
+							else
+								SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
+							end
+						elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]')
+						elseif N_LAUNCH_STATE == T_LAUNCH_STATES.UNHIDE then
+							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]')
 						end
-						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
-						elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
-						else
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
-						end
-					elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
-						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]')
-					elseif N_LAUNCH_STATE == T_LAUNCH_STATES.UNHIDE then
-						SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]')
 					end
-				else
-					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+				else -- Slot has no game to show.
+					if T_SETTINGS['slot_highlight'] then
+						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+					else
+						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
+					end
 				end
-				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
+				if T_SETTINGS['slot_highlight'] then
+					SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
+				end
 				j = j + 1
 			end
 		end
