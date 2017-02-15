@@ -8,6 +8,7 @@ A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, and regular Wi
  - [Requirements](#requirements)
  - [Installing](#installing)
  - [Updating](#updating)
+ - [Supported platforms](#supported-platforms)
  - [Filtering](#filtering)
  - [Bangs](#bangs)
  - [Changelog](#changelog)
@@ -50,6 +51,24 @@ or
 - If you are using custom icons (not referring to game banners), then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\Icons` either!
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
 - Load **Main.ini** in Rainmeter, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
+
+# Supported platforms
+Lauhdutin currently supports Steam and GOG Galaxy.
+
+Steam support includes:
+- Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
+- Acquire a list of games that have been added to Steam as a 'non-Steam game'.
+- Launch the games that were found by the features described above.
+- Install Steam games that are not currently installed.
+- Automatically download banners for Steam games that were found.
+- Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
+
+GOG Galaxy support includes:
+- Acquire a list of games installed via GOG Galaxy.
+- Launch games that were found.
+- Automatically download banners for games that were found.
+
+Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
