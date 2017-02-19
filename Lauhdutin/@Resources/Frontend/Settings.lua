@@ -29,6 +29,9 @@ function Initialize()
 	if SETTINGS['show_hours_played'] == nil then
 		SETTINGS['show_hours_played'] = true
 	end
+	if SETTINGS['show_platform'] == nil then
+		SETTINGS['show_platform'] = true
+	end
 	if SETTINGS['steam_path'] == nil then
 		SETTINGS['steam_path'] = ""
 	end
@@ -40,6 +43,12 @@ function Initialize()
 	end
 	if SETTINGS['steam_id64'] == nil then
 		SETTINGS['steam_id64'] = ""
+	end
+	if SETTINGS['start_game_bang'] == nil then
+		SETTINGS['start_game_bang'] = ""
+	end
+	if SETTINGS['stop_game_bang'] == nil then
+		SETTINGS['stop_game_bang'] = ""
 	end
 	if SETTINGS['sortstate'] == nil then
 		SETTINGS['sortstate'] = "0"
@@ -133,6 +142,10 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS['galaxy_path'] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS['python_path'] ..'"]')
+		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS['start_game_bang']) .. '"]')
+		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS['start_game_bang'] ..'"]')
+		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS['stop_game_bang']) .. '"]')
+		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS['stop_game_bang'] ..'"]')
 		if SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 		else
@@ -147,6 +160,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['show_platform'] == true then
+			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -311,6 +329,16 @@ function AcceptPythonPath(aPath)
 	UpdateSettings()
 end
 
+function AcceptStartGameBang(aPath)
+	SETTINGS['start_game_bang'] = aPath
+	UpdateSettings()
+end
+
+function AcceptStopGameBang(aPath)
+	SETTINGS['stop_game_bang'] = aPath
+	UpdateSettings()
+end
+
 function ToggleOrientation()
 	if SETTINGS['orientation'] == 'vertical' then
 		SETTINGS['orientation'] = 'horizontal'
@@ -334,6 +362,15 @@ function ToggleShowHoursPlayed()
 		SETTINGS['show_hours_played'] = false
 	else
 		SETTINGS['show_hours_played'] = true
+	end
+	UpdateSettings()
+end
+
+function ToggleShowPlatform()
+	if SETTINGS['show_platform'] == true then
+		SETTINGS['show_platform'] = false
+	else
+		SETTINGS['show_platform'] = true
 	end
 	UpdateSettings()
 end

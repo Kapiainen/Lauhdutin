@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for launching games.
+A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, and regular Windows shortcuts.
 
 ![ex](demo.gif)
 
@@ -8,7 +8,9 @@ A Rainmeter skin for launching games.
  - [Requirements](#requirements)
  - [Installing](#installing)
  - [Updating](#updating)
+ - [Supported platforms](#supported-platforms)
  - [Filtering](#filtering)
+ - [Bangs](#bangs)
  - [Changelog](#changelog)
  - [License](#license)
 
@@ -50,6 +52,24 @@ or
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
 - Load **Main.ini** in Rainmeter, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
+# Supported platforms
+Lauhdutin currently supports Steam and GOG Galaxy.
+
+Steam support includes:
+- Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
+- Acquire a list of games that have been added to Steam as a 'non-Steam game'.
+- Launch the games that were found by the features described above.
+- Install Steam games that are not currently installed.
+- Automatically download banners for Steam games that were found.
+- Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
+
+GOG Galaxy support includes:
+- Acquire a list of games installed via GOG Galaxy.
+- Launch games that were found.
+- Automatically download banners for games that were found.
+
+Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
+
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
@@ -67,7 +87,29 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
+# Bangs
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
+
+This feature can be used to e.g. load and unload skins.
+
+Currently supported events that can be used to trigger the execution of bangs:
+- A game starts running. Works with any installed game that is listed in Lauhdutin.
+- A game stops running. Works with any:
+  - Steam game, provided that the Steam in-game overlay setting is enabled in Steam.
+  - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
+
 # Changelog
+**Version 2.3.0 - 2017/02/19:**
+- Added overlay art for generic errors.
+- Added overlays for invalid path errors for Steam and Windows shortcuts.
+- Added setting for toggling the visibility of the platform in overlays.
+- Added support for executing bangs when a game starts or stops running.
+- Added settings for Rainmeter bangs that should be executed when a game starts and when a game stops running.
+- Updated tooltips.
+- Updated names of tabs in the skin for settings.
+- Minor optimization of the GUI.
+- Fixed layout of input fields in the skin for settings.
+
 **Version 2.2.0 - 2017/02/10:**
 - Added support for tracking total amount of time played for most games. Will not work properly e.g. when the Battle.net client is opened instead of launching a game directly. Total time played is stored in `games.json`, which can be transferred from an older version to a newer version when updating. Supports Steam's time tracking, if a valid *SteamID64* value is specified in the settings.
 - Added support for processing Steam community profiles for additional information on games (e.g. hours played). Feature can be disabled by leaving the new *SteamID64* setting blank.
