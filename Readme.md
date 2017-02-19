@@ -87,6 +87,9 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
+# Sorting
+The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
+
 # Bangs
 There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
 
@@ -101,6 +104,8 @@ Currently supported events that can be used to trigger the execution of bangs:
 # Changelog
 **Version 2.x.x - YYYY/MM/DD:**
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
+- Added sorting by total hours played.
+- Added ability to reverse the order of the list of games.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.

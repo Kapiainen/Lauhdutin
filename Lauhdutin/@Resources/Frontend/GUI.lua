@@ -326,6 +326,8 @@ end
 		if T_FILTERED_GAMES ~= nil then
 			if N_SORT_STATE == 1 then
 				table.sort(T_FILTERED_GAMES, SortLastPlayed)
+			elseif N_SORT_STATE == 2 then
+				table.sort(T_FILTERED_GAMES, SortHoursPlayed)
 			else
 				table.sort(T_FILTERED_GAMES, SortAlphabetically)
 			end
@@ -351,7 +353,18 @@ end
 		else
 			return false
 		end
-		
+	end
+
+	function SortHoursPlayed(atFirst, atSecond)
+		local nFirst = tonumber(atFirst[GAME_KEYS.HOURS_TOTAL])
+		local nSecond = tonumber(atSecond[GAME_KEYS.HOURS_TOTAL])
+		if nFirst > nSecond then
+			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
+		else
+			return false
+		end
 	end
 
 	function CycleSort()
@@ -359,13 +372,22 @@ end
 			return
 		end
 		N_SORT_STATE = N_SORT_STATE + 1
-		if N_SORT_STATE > 1 then
+		if N_SORT_STATE > 2 then
 			N_SORT_STATE = 0
 		end
 		T_SETTINGS['sortstate'] = tostring(N_SORT_STATE)
 		WriteSettings(T_SETTINGS)
 		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar][!Redraw]')
 		Sort()
+		PopulateSlots()
+	end
+
+	function ReverseSort()
+		local tReversedListOfGames = {}
+		for i=1, #T_FILTERED_GAMES do
+			table.insert(tReversedListOfGames, 1, T_FILTERED_GAMES[i])
+		end
+		T_FILTERED_GAMES = tReversedListOfGames
 		PopulateSlots()
 	end
 
