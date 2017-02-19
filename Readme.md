@@ -99,7 +99,7 @@ Currently supported events that can be used to trigger the execution of bangs:
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
 
 # Changelog
-**Version 2.3.0 - YYYY/MM/DD:**
+**Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
 - Added overlays for invalid path errors for Steam and Windows shortcuts.
 - Added setting for toggling the visibility of the platform in overlays.
