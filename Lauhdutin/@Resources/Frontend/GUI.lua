@@ -342,11 +342,16 @@ end
 	end
 
 	function SortLastPlayed(atFirst, atSecond)
-		if tonumber(atFirst[GAME_KEYS.LASTPLAYED]) > tonumber(atSecond[GAME_KEYS.LASTPLAYED]) then
+		local nFirst = tonumber(atFirst[GAME_KEYS.LASTPLAYED])
+		local nSecond = tonumber(atSecond[GAME_KEYS.LASTPLAYED])
+		if nFirst > nSecond then
 			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
 		else
 			return false
 		end
+		
 	end
 
 	function CycleSort()
