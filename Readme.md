@@ -102,7 +102,7 @@ Currently supported events that can be used to trigger the execution of bangs:
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
 
 # Changelog
-**Version 2.x.x - YYYY/MM/DD:**
+**Version 2.4.0 - YYYY/MM/DD:**
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
 - Added sorting by total hours played.
 - Added ability to reverse the order of the list of games.
