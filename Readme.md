@@ -106,7 +106,7 @@ Currently supported events that can be used to trigger the execution of bangs:
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
 - Added sorting by total hours played.
 - Added ability to reverse the order of the list of games.
-- Fixed bug that prevented generation of valid SteamIDs for certain non-Steam game shortcuts.
+- Fixed bugs that prevented generation of valid SteamIDs for certain non-Steam game shortcuts.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
