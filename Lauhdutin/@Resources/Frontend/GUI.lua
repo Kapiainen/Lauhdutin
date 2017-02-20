@@ -4,7 +4,7 @@ function Initialize()
 	S_VDF_SERIALIZING_INDENTATION = ''
 	T_SETTINGS = ReadSettings()
 	if T_SETTINGS == nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status][!Redraw]')
 		return
 	end
 	N_LAUNCH_STATE = 0
@@ -59,14 +59,14 @@ end
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
 	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status][!Redraw]')
 		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 	end
 end
 
 -- Called by Backend\GetGames.py when it has successfully completed its task.
 function Init()
-	SKIN:Bang('[!HideMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+	SKIN:Bang('[!HideMeterGroup Status][!Redraw]')
 	local tGames = ReadGames()
 	T_ALL_GAMES = {} -- all games found in 'games.json'
 	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
@@ -89,7 +89,7 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status][!Redraw]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
 		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
