@@ -364,12 +364,12 @@ class Steam():
             print("\tFound game '%s'" % game[GameKeys.NAME])
             game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
                 game[GameKeys.NAME])
-            game[GameKeys.PATH], shortcut = self.parse_shortcut_path(shortcut)
-            if not os.path.isfile(game[GameKeys.PATH]):
+            path, arguments, shortcut = self.parse_shortcut_path(shortcut)
+            if not os.path.isfile(path):
                 game[GameKeys.ERROR] = True
                 game[GameKeys.INVALID_PATH] = True
             game[GameKeys.PATH] = "steam://rungameid/%s" % (
-                self.parse_shortcut_app_id(game[GameKeys.PATH],
+                self.parse_shortcut_app_id('"%s"%s' % (path, arguments),
                                            game[GameKeys.NAME]))
             game[GameKeys.NAME] = Utility.title_move_the(
                 Utility.title_strip_unicode(game[GameKeys.NAME]))
@@ -421,10 +421,13 @@ class Steam():
         start = a_string.find('"') + 1
         end = a_string.find('"', start)
         path = a_string[start:end]
-        return (path, a_string[end:])
+        start = end + 1
+        end = a_string.find('|', start)
+        arguments = a_string[start:end]
+        return (path, arguments, a_string[end:])
 
     def parse_shortcut_app_id(self, a_path, a_name):
-        app_id = zlib.crc32(("\"" + a_path + "\"" + a_name).encode())
+        app_id = zlib.crc32((a_path + a_name).encode())
         app_id = app_id | 0x80000000
         app_id = app_id << 32 | 0x02000000
         return app_id
