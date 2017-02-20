@@ -21,23 +21,30 @@ class WindowsShortcuts():
             break
 
     def get_games(self):
+        result = {}
         shortcuts = self.get_shortcuts()
         if shortcuts:
-            result = {}
             for shortcut in shortcuts:
                 print("\tFound shortcut '%s'" % shortcut)
                 game_key, game_dict = self.process_shortcut(shortcut)
                 if (game_key and game_dict):
                     result[game_key] = game_dict
-            return result
-        return {}
+        url_shortcuts = self.get_url_shortcuts()
+        if url_shortcuts:
+            for shortcut in url_shortcuts:
+                print("\tFound shortcut '%s'" % shortcut)
+                game_key, game_dict = self.process_url_shortcut(shortcut)
+                print(game_dict)
+                if (game_key and game_dict):
+                    result[game_key] = game_dict
+        return result
 
     def get_shortcuts(self):
         for root, directories, files in os.walk(self.shortcuts_path):
             return [f for f in files if f.endswith(".lnk")]
         return None
 
-    def process_shortcut(self, a_shortcut):# a_name, a_path):
+    def process_shortcut(self, a_shortcut):
         # Quick and dirty. Should be replaced at some point with a better method.
         name = a_shortcut[:-4] # Remove '.lnk' extension
         shortcut_contents = self.read_shortcut(a_shortcut)
@@ -81,3 +88,23 @@ class WindowsShortcuts():
         for match in self.path_regex.finditer(a_string):
             return match.group(1)
         return None
+
+    def get_url_shortcuts(self):
+        for root, directories, files in os.walk(self.shortcuts_path):
+            return [f for f in files if f.endswith(".url")]
+        return None
+
+    def process_url_shortcut(self, a_shortcut):
+        name = a_shortcut[:-4] # Remove '.url' extension
+        with open(os.path.join(self.shortcuts_path, a_shortcut)) as f:
+            contents = f.read()
+            match = re.search("URL=(.*)", contents)
+            if match:
+                game_dict = {}
+            game_dict[GameKeys.NAME] = Utility.title_move_the(name)
+            game_dict[GameKeys.PATH] = match.group(1)
+            game_dict[GameKeys.LASTPLAYED] = 0
+            game_dict[GameKeys.PLATFORM] = Platform.WINDOWS_URL_SHORTCUT
+            game_dict[GameKeys.BANNER_PATH] = self.get_banner_path(name)
+            return (name, game_dict)
+        return (None, None)

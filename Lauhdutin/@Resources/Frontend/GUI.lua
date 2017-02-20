@@ -44,12 +44,14 @@ function Initialize()
 		STEAM = 0,
 		STEAM_SHORTCUT = 1,
 		GOG_GALAXY = 2,
-		WINDOWS_SHORTCUT = 3
+		WINDOWS_SHORTCUT = 3,
+		WINDOWS_URL_SHORTCUT = 4
 	}
 	PLATFORM_DESCRIPTION = {
 		"Steam",
 		"Steam",
 		"GOG Galaxy",
+		"",
 		""
 	}
 	B_FORCE_TOOLBAR = false
@@ -525,8 +527,10 @@ end
 					end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
-						if StartsWith(sPath, 'steam://') then
+						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
+							--
 						else
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
 							local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
@@ -630,9 +634,13 @@ end
 			T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
 			WriteGames()
 			PopulateSlots()
-			if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
-				SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"')))
-			end
+			ExecuteStoppingBang()
+		end
+	end
+
+	function ExecuteStoppingBang()
+		if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
+			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"')))
 		end
 	end
 

@@ -22,3 +22,4 @@ class Platform():
     STEAM_SHORTCUT = 1
     GOG_GALAXY = 2
     WINDOWS_SHORTCUT = 3
+    WINDOWS_URL_SHORTCUT = 4
