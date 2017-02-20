@@ -107,6 +107,8 @@ Currently supported events that can be used to trigger the execution of bangs:
 - Added sorting by total hours played.
 - Added ability to reverse the order of the list of games.
 - Fixed bugs that prevented generation of valid SteamIDs for certain non-Steam game shortcuts.
+- Added support for .url shortcuts.
+- Added context menu option for manually executing the stopping bang that is defined in the settings.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
