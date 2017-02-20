@@ -371,6 +371,8 @@ class Steam():
             game[GameKeys.PATH] = "steam://rungameid/%s" % (
                 self.parse_shortcut_app_id(game[GameKeys.PATH],
                                            game[GameKeys.NAME]))
+            game[GameKeys.NAME] = Utility.title_move_the(
+                Utility.title_strip_unicode(game[GameKeys.NAME]))
             tags = self.parse_shortcut_tags(shortcut)
             if tags:
                 game[GameKeys.TAGS] = tags
@@ -379,9 +381,8 @@ class Steam():
         return result
 
     def read_shortcuts_file(self, a_path, a_userdataid):
-        shortcuts_path = os.path.join(a_path, "userdata",
-                                      a_userdataid, "config",
-                                      "shortcuts.vdf")
+        shortcuts_path = os.path.join(a_path, "userdata", a_userdataid,
+                                      "config", "shortcuts.vdf")
         if not os.path.isfile(shortcuts_path):
             return result
         shortcuts = ""
@@ -413,8 +414,7 @@ class Steam():
     def parse_shortcut_title(self, a_string):
         start = a_string.find("|", 1) + 1
         end = a_string.find("|", start)
-        name = Utility.title_move_the(
-            Utility.title_strip_unicode(a_string[start:end]))
+        name = a_string[start:end]
         return (name, a_string[end:])
 
     def parse_shortcut_path(self, a_string):
