@@ -880,13 +880,13 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\RealTemp\\RealTemp.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\CPU-Z\\cpuz_x64.exe")
 
     def test_parse_shortcut_app_id(self):
@@ -894,16 +894,16 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
         self.assertEqual(app_id, 10040859602154684416)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
         self.assertEqual(app_id, 18383980479696076800)
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
         self.assertEqual(app_id, 11463541207985029120)
 
     def test_parse_shortcut_tags(self):
@@ -911,15 +911,15 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(steam.parse_shortcut_tags(shortcut), None)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(
             steam.parse_shortcut_tags(shortcut), {"0": "GPU",
                                                   "1": "Utility"})
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(
             steam.parse_shortcut_tags(shortcut), {"0": "CPU",
                                                   "1": "Utility"})
