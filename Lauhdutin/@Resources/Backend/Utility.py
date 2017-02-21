@@ -18,7 +18,7 @@ def title_move_the(asTitle):
 
 
 def get_os_bitness():
-    if (os.environ["PROCESSOR_ARCHITECTURE"][-2:] == "86" and os.environ.get(
-            "PROCESSOR_ARCHITEW6432", None) == None):
+    if (os.environ["PROCESSOR_ARCHITECTURE"][-2:] == "86" and
+            os.environ.get("PROCESSOR_ARCHITEW6432", None) == None):
         return 32
     return 64

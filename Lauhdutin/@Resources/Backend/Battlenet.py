@@ -19,7 +19,8 @@ class Battlenet():
         self.store_page_contents = None
         store_page_path = os.path.join(cache_path, "Battle.net store.html")
         if not os.path.isfile(store_page_path):
-            store_page = urllib.request.urlopen("https://eu.battle.net/shop/en/product/category/digital-games")
+            store_page = urllib.request.urlopen(
+                "https://eu.battle.net/shop/en/product/category/digital-games")
             if store_page:
                 store_page_lines = []
                 for line in store_page.readlines():
@@ -87,17 +88,20 @@ class Battlenet():
                         banner_path = self.get_banner_path(directory)
                         banner_url = None
                         if not banner_path:
-                            regex = re.compile(r"<img src=\"(.+?)\" alt=\"" + directory + r"\" />")
+                            regex = re.compile(r"<img src=\"(.+?)\" alt=\"" +
+                                               directory + r"\" />")
                             for line in reversed(self.store_page_contents):
                                 match = regex.match(line)
                                 if match:
                                     banner_url = "https:%s" % match.group(1)
                             if not banner_url:
-                                regex = re.compile(r"<img src=\"(.+?)\" alt=\"" + directory)
+                                regex = re.compile(r"<img src=\"(.+?)\" alt=\""
+                                                   + directory)
                                 for line in reversed(self.store_page_contents):
                                     match = regex.match(line)
                                     if match:
-                                        banner_url = "https:%s" %  match.group(1)
+                                        banner_url = "https:%s" % match.group(
+                                            1)
                             banner_path = "Battle.net\\%s.jpg" % directory
                         game_dict = {
                             GameKeys.NAME: directory,

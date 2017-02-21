@@ -32,9 +32,9 @@ SlotHeight=%s
 SlotBackgroundColor=%s
 SlotTextColor=%s
 """ % (settings.get("slot_count", 6), settings.get("slot_width", 418),
-       settings.get("slot_height", 195), settings.get(
-           "slot_background_color", "0,0,0,196"), settings.get(
-               "slot_text_color", "255,255,255,255")))
+       settings.get("slot_height", 195), settings.get("slot_background_color",
+                                                      "0,0,0,196"),
+       settings.get("slot_text_color", "255,255,255,255")))
         i = 1
         while i <= int(settings.get("slot_count", 6)):
             f.write("""SlotPath%s=

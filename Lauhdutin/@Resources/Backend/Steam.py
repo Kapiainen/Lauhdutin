@@ -361,7 +361,8 @@ class Steam():
                 game = {}
                 game[GameKeys.PLATFORM] = Platform.STEAM_SHORTCUT
                 game[GameKeys.LASTPLAYED] = 0
-                game[GameKeys.NAME], shortcut = self.parse_shortcut_title(shortcut)
+                game[GameKeys.NAME], shortcut = self.parse_shortcut_title(
+                    shortcut)
                 print("\tFound game '%s'" % game[GameKeys.NAME])
                 game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
                     game[GameKeys.NAME])
