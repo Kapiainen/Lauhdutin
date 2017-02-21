@@ -14,6 +14,7 @@ class GameKeys():
     NOT_INSTALLED = "notinstalled"
     PATH = "path"
     PLATFORM = "platform"
+    PROCESS = "process"
     TAGS = "tags"
 
 
@@ -24,3 +25,4 @@ class Platform():
     GOG_GALAXY = 2
     WINDOWS_SHORTCUT = 3
     WINDOWS_URL_SHORTCUT = 4
+    BATTLENET = 5

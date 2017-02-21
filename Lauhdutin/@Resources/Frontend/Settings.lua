@@ -56,6 +56,9 @@ function Initialize()
 	if SETTINGS['galaxy_path'] == nil then
 		SETTINGS['galaxy_path'] = "C:\/ProgramData\/GOG.com\/Galaxy"
 	end
+	if SETTINGS['battlenet_path'] == nil then
+		SETTINGS['battlenet_path'] = ""
+	end
 	if SETTINGS['python_path'] == nil then
 		SETTINGS['python_path'] = "pythonw"
 	end
@@ -140,6 +143,8 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "SteamID64Input" "DefaultValue" "' .. SETTINGS['steam_id64'] ..'"]')
 		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
 		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS['galaxy_path'] ..'"]')
+		SKIN:Bang('[!SetOption "BattlenetPathStatus" "Text" "' .. tostring(SETTINGS['battlenet_path']) .. '"]')
+		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS['battlenet_path'] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS['python_path'] ..'"]')
 		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS['start_game_bang']) .. '"]')
@@ -317,6 +322,15 @@ end
 
 function AcceptGalaxyPath(aPath)
 	SETTINGS['galaxy_path'] = aPath
+	UpdateSettings()
+end
+
+function RequestBattlenetPath()
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptBattlenetPath;" "' .. SETTINGS['battlenet_path'] .. '"; "#CURRENTCONFIG#;"')
+end
+
+function AcceptBattlenetPath(aPath)
+	SETTINGS['battlenet_path'] = aPath
 	UpdateSettings()
 end
 

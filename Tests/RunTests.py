@@ -16,6 +16,7 @@ from WindowsShortcuts import WindowsShortcuts
 import Utility
 from Enums import GameKeys
 from Enums import Platform
+from Battlenet import Battlenet
 
 
 class WindowsShortcutsTests(unittest.TestCase):
@@ -875,18 +876,18 @@ class SteamTests(unittest.TestCase):
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' %
-                                             (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 10040859602154684416)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' %
-                                             (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 18383980479696076800)
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' %
-                                             (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 11463541207985029120)
 
     def test_parse_shortcut_tags(self):
@@ -911,6 +912,107 @@ class SteamTests(unittest.TestCase):
         steam = self.create_class_instance()
         self.assertEqual(steam.is_int("0123456789"), True)
         self.assertEqual(steam.is_int("This is not a number"), False)
+
+
+class BattlenetTests(unittest.TestCase):
+    def create_class_instance(self):
+        return Battlenet("%s|%s" % (os.path.join(CWD, "Battle.net1"),
+                                    os.path.join(CWD, "Battle.net2")),
+                         os.path.join(CWD, "@Resources"))
+
+    def test_constructor(self):
+        battlenet = self.create_class_instance()
+        self.assertEqual(battlenet.games_folders, [
+            os.path.join(CWD, "Battle.net1"), os.path.join(CWD, "Battle.net2")
+        ])
+        self.assertEqual(battlenet.banners, ["Hearthstone.png"])
+        self.assertEqual(battlenet.supported_games, {
+            "Hearthstone": {
+                "path": "battlenet://WTCG",
+                "process": "Hearthstone.exe"
+            },
+            "Heroes of the Storm": {
+                "path": "battlenet://Hero",
+                "process": "HeroesOfTheStorm_x64.exe",
+                "process32": "HeroesOfTheStorm.exe"
+            },
+            "Overwatch": {
+                "path": "battlenet://Pro",
+                "process": "Overwatch.exe"
+            },
+            "StarCraft II": {
+                "path": "battlenet://S2",
+                "process": "SC2_x64.exe",
+                "process32": "SC2.exe"
+            },
+            "Diablo III": {
+                "path": "battlenet://D3",
+                "process": "Diablo III64.exe",
+                "process32": "Diablo III.exe"
+            },
+            "World of Warcraft": {
+                "path": "battlenet://WoW",
+                "process": "Wow-64.exe",
+                "process32": "Wow.exe"
+            }
+        })
+
+    def test_get_games(self):
+        battlenet = self.create_class_instance()
+        if Utility.get_os_bitness() == 32:
+            self.assertEqual(battlenet.get_games(), {
+                'Hearthstone': {
+                    GameKeys.NAME: 'Hearthstone',
+                    GameKeys.PATH: 'battlenet://WTCG',
+                    GameKeys.PROCESS: 'Hearthstone.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Hearthstone.png',
+                    GameKeys.HOURS_TOTAL: 0
+                },
+                'Diablo III': {
+                    GameKeys.NAME: 'Diablo III',
+                    GameKeys.PATH: 'battlenet://D3',
+                    GameKeys.PROCESS: 'Diablo III.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Diablo III.jpg',
+                    GameKeys.HOURS_TOTAL: 0
+                }
+            })
+        else:
+            self.assertEqual(battlenet.get_games(), {
+                'Hearthstone': {
+                    GameKeys.NAME: 'Hearthstone',
+                    GameKeys.PATH: 'battlenet://WTCG',
+                    GameKeys.PROCESS: 'Hearthstone.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Hearthstone.png',
+                    GameKeys.HOURS_TOTAL: 0
+                },
+                'Diablo III': {
+                    GameKeys.NAME: 'Diablo III',
+                    GameKeys.PATH: 'battlenet://D3',
+                    GameKeys.PROCESS: 'Diablo III64.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Diablo III.jpg',
+                    GameKeys.HOURS_TOTAL: 0
+                }
+            })
+
+    def test_get_banner_path(self):
+        battlenet = self.create_class_instance()
+        self.assertEqual(
+            battlenet.get_banner_path("Hearthstone"),
+            "Battle.net\\Hearthstone.png")
+        self.assertEqual(
+            battlenet.get_banner_path("Diablo III"),
+            "Battle.net\\Diablo III.jpg")
+        self.assertEqual(
+            battlenet.get_banner_path("Game that does not exist"),
+            "Battle.net\\Game that does not exist.jpg")
 
 
 # TODO: Write tests for GOGGalaxy.py and create mock data to use when testing.

@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, and regular Windows shortcuts.
+A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts.
 
 ![ex](demo.gif)
 
@@ -53,7 +53,7 @@ or
 - Load **Main.ini** in Rainmeter, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
 # Supported platforms
-Lauhdutin currently supports Steam and GOG Galaxy.
+Lauhdutin currently supports Steam, GOG Galaxy, and Battle.net.
 
 Steam support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
@@ -68,6 +68,16 @@ GOG Galaxy support includes:
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
+Battle.net support includes:
+- Acquire a list of games installed via Battle.net.
+- Launch games that were found.
+
+Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
+- The name of the game's folder.
+- The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
+
+Even better support for the platforms listed above may be implemented in the future, when possible.
+
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
 # Filtering
@@ -76,6 +86,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 - `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
 
 - `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+
+- `battlenet:` followed by `true` or `false`. If `true`, then only show games installed via Battle.net. If `false`, then show all other games that were not installed via Battle.net.
 
 - `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
 
@@ -110,6 +122,9 @@ Currently supported events that can be used to trigger the execution of bangs:
 - Added support for .url shortcuts.
 - Added context menu option for manually executing the stopping bang that is defined in the settings.
 - Added support for command line arguments in Windows shortcuts.
+- Added support for Battle.net games (not for classic games at the moment).
+- Added `battlenet:` filter.
+- Added setting for paths to folders containing Battle.net games.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.

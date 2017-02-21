@@ -38,6 +38,7 @@ function Initialize()
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
+		PROCESS = "process",
 		TAGS = "tags"
 	}
 	-- If PLATFORM values are changed, then they have to be copied to the Platform class in Enums.py.
@@ -46,14 +47,16 @@ function Initialize()
 		STEAM_SHORTCUT = 1,
 		GOG_GALAXY = 2,
 		WINDOWS_SHORTCUT = 3,
-		WINDOWS_URL_SHORTCUT = 4
+		WINDOWS_URL_SHORTCUT = 4,
+		BATTLENET = 5
 	}
 	PLATFORM_DESCRIPTION = {
 		"Steam",
 		"Steam",
 		"GOG Galaxy",
 		"",
-		""
+		"",
+		"Battle.net"
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
@@ -258,6 +261,23 @@ end
 			elseif StartsWith(asPattern, 'f') then
 				for i = 1, #atTable do
 					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			else
+				return tResult
+			end
+		elseif StartsWith(asPattern, 'battlenet:') then
+			asPattern = asPattern:sub(11)
+			if StartsWith(asPattern, 't') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET then
 						table.insert(tResult, atTable[i])
 					end
 				end
@@ -531,6 +551,8 @@ end
 						T_RECENTLY_LAUNCHED_GAME = tGame
 						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. tGame[GAME_KEYS.PROCESS] .. '"]')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
 							--
 						else
