@@ -20,7 +20,11 @@ from Enums import Platform
 
 class WindowsShortcutsTests(unittest.TestCase):
     def create_class_instance(self):
-        return WindowsShortcuts(os.path.join(CWD, "@Resources"))
+        ws = WindowsShortcuts(os.path.join(CWD, "@Resources"))
+        head, tail = os.path.split(CWD)
+        ws.shortcut_parser_script = os.path.join(
+            head, "Lauhdutin", "@Resources", "Backend", "ShortcutParser.vbs")
+        return ws
 
     def test_constructor(self):
         ws = self.create_class_instance()
@@ -119,30 +123,6 @@ class WindowsShortcutsTests(unittest.TestCase):
             "Shortcuts\\Office Suite 2017.jpg")
         self.assertEqual(
             ws.get_banner_path("Overwatch"), "Shortcuts\\Overwatch.png")
-
-    def test_read_shortcut(self):
-        ws = self.create_class_instance()
-        self.assertIsNotNone(ws.read_shortcut("Office Suite 2015.lnk"))
-        self.assertIsNotNone(ws.read_shortcut("Office Suite 2017.lnk"))
-        self.assertIsNotNone(ws.read_shortcut("Overwatch.lnk"))
-        self.assertIsNone(ws.read_shortcut("ImaginaryGame47.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Office Suite 2015.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Office Suite 2017.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Overwatch.lnk"))
-
-    def test_get_shortcut_target_path(self):
-        ws = self.create_class_instance()
-        self.assertEqual(
-            ws.get_shortcut_target_path(
-                ws.read_shortcut("Office Suite 2015.lnk")),
-            "D:\\Program Files (x86)\\Office Suite 2015\\vERsion_1_52_8.exe")
-        self.assertEqual(
-            ws.get_shortcut_target_path(
-                ws.read_shortcut("Office Suite 2017.lnk")),
-            "D:\\Program Files (x86)\\Office Suite 2017\\version 2.4.53.exe")
-        self.assertEqual(
-            ws.get_shortcut_target_path(ws.read_shortcut("Overwatch.lnk")),
-            "D:\\Program Files\\Battle.net Games\\Overwatch\\Overwatch.exe")
 
 
 class UtilityTests(unittest.TestCase):
@@ -895,15 +875,18 @@ class SteamTests(unittest.TestCase):
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' %
+                                             (path, arguments), name)
         self.assertEqual(app_id, 10040859602154684416)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' %
+                                             (path, arguments), name)
         self.assertEqual(app_id, 18383980479696076800)
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
         path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments), name)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' %
+                                             (path, arguments), name)
         self.assertEqual(app_id, 11463541207985029120)
 
     def test_parse_shortcut_tags(self):
