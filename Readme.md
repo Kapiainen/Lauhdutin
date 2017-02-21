@@ -109,6 +109,7 @@ Currently supported events that can be used to trigger the execution of bangs:
 - Fixed bugs that prevented generation of valid SteamIDs for certain non-Steam game shortcuts.
 - Added support for .url shortcuts.
 - Added context menu option for manually executing the stopping bang that is defined in the settings.
+- Added support for command line arguments in Windows shortcuts.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
