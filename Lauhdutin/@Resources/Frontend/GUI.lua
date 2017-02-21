@@ -420,11 +420,11 @@ end
 			local j = N_SCROLL_INDEX
 			for i = 1, nSlotCount do -- Iterate through each slot.
 				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
-					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"][!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]')
+					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"]')
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
-						SKIN:Bang('!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"')
+						SKIN:Bang('[!SetVariable SlotName' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]')
 					else
-						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
+						SKIN:Bang('[!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"][!SetVariable SlotImage' .. i .. ' ""]')
 					end
 					if T_SETTINGS['slot_highlight'] then
 						if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then

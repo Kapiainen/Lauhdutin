@@ -126,6 +126,7 @@ Currently supported events that can be used to trigger the execution of bangs:
 - Added support for Battle.net games (not for classic games at the moment).
 - Added `battlenet:` filter.
 - Added setting for paths to folders containing Battle.net games.
+- Fixed bug that caused the name of a slot's game to show up behind transparent banners.
 
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
