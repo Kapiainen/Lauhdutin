@@ -71,6 +71,7 @@ GOG Galaxy support includes:
 Battle.net support includes:
 - Acquire a list of games installed via Battle.net.
 - Launch games that were found.
+- Automatically download banner for games that were found.
 
 Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
 - The name of the game's folder.

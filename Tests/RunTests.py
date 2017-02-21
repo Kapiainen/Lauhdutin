@@ -987,7 +987,7 @@ class BattlenetTests(unittest.TestCase):
                     GameKeys.PATH: 'battlenet://WTCG',
                     GameKeys.PROCESS: 'Hearthstone.exe',
                     GameKeys.LASTPLAYED: 0,
-                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.PLATFORM: 5,
                     GameKeys.BANNER_PATH: 'Battle.net\\Hearthstone.png',
                     GameKeys.HOURS_TOTAL: 0
                 },
@@ -996,9 +996,11 @@ class BattlenetTests(unittest.TestCase):
                     GameKeys.PATH: 'battlenet://D3',
                     GameKeys.PROCESS: 'Diablo III64.exe',
                     GameKeys.LASTPLAYED: 0,
-                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.PLATFORM: 5,
                     GameKeys.BANNER_PATH: 'Battle.net\\Diablo III.jpg',
-                    GameKeys.HOURS_TOTAL: 0
+                    GameKeys.HOURS_TOTAL: 0,
+                    GameKeys.BANNER_URL:
+                    'https://bnetproduct-a.akamaihd.net//products/11000019581000002391/6208052403552915B4D310EB9173E988462AB335.jpg'
                 }
             })
 
@@ -1007,12 +1009,9 @@ class BattlenetTests(unittest.TestCase):
         self.assertEqual(
             battlenet.get_banner_path("Hearthstone"),
             "Battle.net\\Hearthstone.png")
+        self.assertEqual(battlenet.get_banner_path("Diablo III"), None)
         self.assertEqual(
-            battlenet.get_banner_path("Diablo III"),
-            "Battle.net\\Diablo III.jpg")
-        self.assertEqual(
-            battlenet.get_banner_path("Game that does not exist"),
-            "Battle.net\\Game that does not exist.jpg")
+            battlenet.get_banner_path("Game that does not exist"), None)
 
 
 # TODO: Write tests for GOGGalaxy.py and create mock data to use when testing.
