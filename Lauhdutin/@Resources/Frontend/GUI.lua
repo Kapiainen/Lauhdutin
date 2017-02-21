@@ -24,6 +24,7 @@ function Initialize()
 	N_SCROLL_STEP = 1
 	-- If GAME_KEYS values are changed, then they have to be copied to the GameKeys class in Enums.py.
 	GAME_KEYS = {
+		ARGUMENTS = "arguments",
 		BANNER_ERROR = "bannererror",
 		BANNER_PATH = "banner",
 		BANNER_URL = "bannerurl",
@@ -494,6 +495,7 @@ end
 		if tGame ~= nil then
 			if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
 				local sPath = tGame[GAME_KEYS.PATH]
+				local tArguments = tGame[GAME_KEYS.ARGUMENTS]
 				if sPath ~= nil then
 					tGame[GAME_KEYS.LASTPLAYED] = os.time()
 					bNotInstalled = tGame[GAME_KEYS.NOT_INSTALLED]
@@ -533,15 +535,24 @@ end
 							--
 						else
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-							local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+							local processName = processPath:reverse()
+							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
+							if processName ~= nil then
+								processName = processName:reverse()
+								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+							end
 						end
 						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
 					end
-					SKIN:Bang('["' .. sPath .. '"]')
+					if tArguments ~= nil then
+						sArguments = table.concat(tArguments, '" "')
+						SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
+					else
+						SKIN:Bang('["' .. sPath .. '"]')
+					end
 				end
 			elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
 				if tGame[GAME_KEYS.HIDDEN] ~= true then

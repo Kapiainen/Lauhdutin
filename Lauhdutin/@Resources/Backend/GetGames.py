@@ -74,7 +74,7 @@ try:
         set_skin_status("Processing...")
         # Windows shortcuts (.lnk) in @Resources\Shortcuts
         print("Processing Windows shortcuts...")
-        windows_shortcuts = WindowsShortcuts(os.path.join(ResourcePath))
+        windows_shortcuts = WindowsShortcuts(ResourcePath)
         windows_shortcuts_games = windows_shortcuts.get_games()
 
         # Steam games

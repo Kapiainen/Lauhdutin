@@ -1,5 +1,6 @@
 # If GameKeys values are changed, then the changes have to be copied over to the 'GAME_KEYS' table in GUI.lua.
 class GameKeys():
+    ARGUMENTS = "arguments"
     BANNER_ERROR = "bannererror"
     BANNER_PATH = "banner"
     BANNER_URL = "bannerurl"
