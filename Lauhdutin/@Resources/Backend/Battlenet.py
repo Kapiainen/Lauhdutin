@@ -46,30 +46,36 @@ class Battlenet():
             with open(store_page_path, "r") as f:
                 self.store_page_contents = f.readlines()
         self.supported_games = {
-            "Hearthstone": {
+            "hearthstone": {
+                "title": "Hearthstone",
                 "path": "battlenet://WTCG",
                 "process": "Hearthstone.exe"  # No 64-bit executable
             },
-            "Heroes of the Storm": {
+            "heroes of the storm": {
+                "title": "Heroes of the Storm",
                 "path": "battlenet://Hero",
                 "process": "HeroesOfTheStorm_x64.exe",
                 "process32": "HeroesOfTheStorm.exe"
             },
-            "Overwatch": {
+            "overwatch": {
+                "title": "Overwatch",
                 "path": "battlenet://Pro",
                 "process": "Overwatch.exe"  # No 32-bit executable
             },
-            "StarCraft II": {
+            "starcraft ii": {
+                "title": "StarCraft II",
                 "path": "battlenet://S2",
                 "process": "SC2_x64.exe",
                 "process32": "SC2.exe"
             },
-            "Diablo III": {
+            "diablo iii": {
+                "title": "Diablo III",
                 "path": "battlenet://D3",
                 "process": "Diablo III64.exe",
                 "process32": "Diablo III.exe"
             },
-            "World of Warcraft": {
+            "world of warcraft": {
+                "title": "World of Warcraft",
                 "path": "battlenet://WoW",
                 "process": "Wow-64.exe",
                 "process32": "Wow.exe"
@@ -82,29 +88,33 @@ class Battlenet():
         for folder in self.games_folders:
             for root, dirs, files in os.walk(folder):
                 for directory in dirs:
-                    game_template = self.supported_games.get(directory, None)
+                    game_template = self.supported_games.get(directory.lower(),
+                                                             None)
                     if game_template:
-                        print("\tFound game '%s'" % directory)
-                        banner_path = self.get_banner_path(directory)
+                        print("\tFound game '%s'" % game_template["title"])
+                        banner_path = self.get_banner_path(
+                            game_template["title"])
                         banner_url = None
                         if not banner_path:
                             regex = re.compile(r"<img src=\"(.+?)\" alt=\"" +
-                                               directory + r"\" />")
+                                               game_template[
+                                                   "title"] + r"\" />")
                             for line in reversed(self.store_page_contents):
                                 match = regex.match(line)
                                 if match:
                                     banner_url = "https:%s" % match.group(1)
                             if not banner_url:
                                 regex = re.compile(r"<img src=\"(.+?)\" alt=\""
-                                                   + directory)
+                                                   + game_template["title"])
                                 for line in reversed(self.store_page_contents):
                                     match = regex.match(line)
                                     if match:
                                         banner_url = "https:%s" % match.group(
                                             1)
-                            banner_path = "Battle.net\\%s.jpg" % directory
+                            banner_path = "Battle.net\\%s.jpg" % game_template[
+                                "title"]
                         game_dict = {
-                            GameKeys.NAME: directory,
+                            GameKeys.NAME: game_template["title"],
                             GameKeys.PATH: game_template["path"],
                             GameKeys.PROCESS: game_template["process"],
                             GameKeys.LASTPLAYED: 0,
@@ -118,7 +128,7 @@ class Battlenet():
                                 game_template.get("process32", None)):
                             game_dict[GameKeys.PROCESS] = (
                                 game_template["process32"])
-                        result[directory] = game_dict
+                        result[game_template["title"]] = game_dict
         return result
 
     def get_banner_path(self, a_game_title):

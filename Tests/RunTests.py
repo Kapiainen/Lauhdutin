@@ -927,30 +927,36 @@ class BattlenetTests(unittest.TestCase):
         ])
         self.assertEqual(battlenet.banners, ["Hearthstone.png"])
         self.assertEqual(battlenet.supported_games, {
-            "Hearthstone": {
+            "hearthstone": {
+                "title": "Hearthstone",
                 "path": "battlenet://WTCG",
                 "process": "Hearthstone.exe"
             },
-            "Heroes of the Storm": {
+            "heroes of the storm": {
+                "title": "Heroes of the Storm",
                 "path": "battlenet://Hero",
                 "process": "HeroesOfTheStorm_x64.exe",
                 "process32": "HeroesOfTheStorm.exe"
             },
-            "Overwatch": {
+            "overwatch": {
+                "title": "Overwatch",
                 "path": "battlenet://Pro",
                 "process": "Overwatch.exe"
             },
-            "StarCraft II": {
+            "starcraft ii": {
+                "title": "StarCraft II",
                 "path": "battlenet://S2",
                 "process": "SC2_x64.exe",
                 "process32": "SC2.exe"
             },
-            "Diablo III": {
+            "diablo iii": {
+                "title": "Diablo III",
                 "path": "battlenet://D3",
                 "process": "Diablo III64.exe",
                 "process32": "Diablo III.exe"
             },
-            "World of Warcraft": {
+            "world of warcraft": {
+                "title": "World of Warcraft",
                 "path": "battlenet://WoW",
                 "process": "Wow-64.exe",
                 "process32": "Wow.exe"
