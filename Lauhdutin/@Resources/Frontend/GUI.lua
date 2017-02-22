@@ -485,20 +485,24 @@ end
 	end
 
 	function Scroll(asDirection)
-		if #T_FILTERED_GAMES > tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) then
-			local abUpwards = true
-			if tonumber(asDirection) < 0 then
-				abUpwards = false
-			end
-			if abUpwards then
+		local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+		if #T_FILTERED_GAMES > nSlotCount then
+			if tonumber(asDirection) >= 0 then
+				if N_SCROLL_INDEX == 1 then
+					return
+				end
 				N_SCROLL_INDEX = N_SCROLL_INDEX - N_SCROLL_STEP
 				if N_SCROLL_INDEX < 1 then
 					N_SCROLL_INDEX = 1
 				end
 			else
+				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
+				if N_SCROLL_INDEX == nUpperLimit then
+					return
+				end
 				N_SCROLL_INDEX = N_SCROLL_INDEX + N_SCROLL_STEP
-				if N_SCROLL_INDEX + tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) > #T_FILTERED_GAMES + 1 then
-					N_SCROLL_INDEX = #T_FILTERED_GAMES + 1 - tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+				if N_SCROLL_INDEX > nUpperLimit then
+					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
 			PopulateSlots()
@@ -678,6 +682,9 @@ end
 
 	function Unhighlight(asIndex)
 		if T_FILTERED_GAMES == nil then
+			return
+		end
+		if not T_SETTINGS['slot_highlight'] then
 			return
 		end
 		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
