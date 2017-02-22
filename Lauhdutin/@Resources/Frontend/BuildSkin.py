@@ -115,10 +115,10 @@ SolidColor=0,0,0,1
 PreserveAspectRatio=2
 DynamicVariables=1
 MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
-MouseLeaveAction=[!CommandMeasure LauhdutinScript "Highlight('-1')"]
+MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
 LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('#SlotPath%s#')"]
 Group=Slots
-""" % (i, i))
+""" % (i, i, i))
 
             # Game highlight
             f.write("""

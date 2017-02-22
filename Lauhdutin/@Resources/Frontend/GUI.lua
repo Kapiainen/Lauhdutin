@@ -72,7 +72,7 @@ end
 
 -- Called by Backend\GetGames.py when it has successfully completed its task.
 function Init()
-	SKIN:Bang('[!HideMeterGroup Status][!Redraw]')
+	SKIN:Bang('[!HideMeterGroup Status]')
 	local tGames = ReadGames()
 	T_ALL_GAMES = {} -- all games found in 'games.json'
 	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
@@ -95,7 +95,7 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
 		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
@@ -104,7 +104,6 @@ function Init()
 		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
 	PopulateSlots()
-	SKIN:Bang('[!Redraw]')
 end
 
 -- Utility
@@ -400,7 +399,7 @@ end
 		end
 		T_SETTINGS['sortstate'] = tostring(N_SORT_STATE)
 		WriteSettings(T_SETTINGS)
-		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar][!Redraw]')
+		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar]')
 		Sort()
 		PopulateSlots()
 	end
@@ -677,6 +676,13 @@ end
 		end
 	end
 
+	function Unhighlight(asIndex)
+		if T_FILTERED_GAMES == nil then
+			return
+		end
+		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
+	end
+
 	function Highlight(asIndex)
 		if T_FILTERED_GAMES == nil then
 			return
@@ -684,22 +690,9 @@ end
 		if not T_SETTINGS['slot_highlight'] then
 			return
 		end
-		local nIndex = tonumber(asIndex)
-		if asIndex == '-1' then
-			for i=1, tonumber(T_SETTINGS['slot_count']) do
-				SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
-			end
-			SKIN:Bang('[!Redraw]')
-		else
-			local tGame = T_FILTERED_GAMES[nIndex]
-			if tGame ~= nil then
-				for i=1, tonumber(T_SETTINGS['slot_count']) do
-					if i ~= nIndex then
-						SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
-					end
-				end
-				SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!UpdateMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
-			end
+		local tGame = T_FILTERED_GAMES[tonumber(asIndex)]
+		if tGame ~= nil then
+			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
 		end
 	end
 
