@@ -98,10 +98,7 @@ function Init()
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
-	end
-	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
 	PopulateSlots()
 end
@@ -675,7 +672,7 @@ end
 
 	function ExecuteStoppingBang()
 		if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
-			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"')))
+			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
 		end
 	end
 
