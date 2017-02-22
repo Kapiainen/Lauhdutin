@@ -37,11 +37,10 @@ SlotTextColor=%s
        settings.get("slot_text_color", "255,255,255,255")))
         i = 1
         while i <= int(settings.get("slot_count", 6)):
-            f.write("""SlotPath%s=
-SlotImage%s=
+            f.write("""SlotImage%s=
 SlotName%s=
 SlotHighlightMessage%s=
-""" % (i, i, i, i))
+""" % (i, i, i))
             i += 1
 
         # Slot background
@@ -116,7 +115,7 @@ PreserveAspectRatio=2
 DynamicVariables=1
 MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
 MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
-LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('#SlotPath%s#')"]
+LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('%s')"]
 Group=Slots
 """ % (i, i, i))
 

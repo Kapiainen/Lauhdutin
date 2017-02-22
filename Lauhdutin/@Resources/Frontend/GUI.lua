@@ -419,7 +419,6 @@ end
 			local j = N_SCROLL_INDEX
 			for i = 1, nSlotCount do -- Iterate through each slot.
 				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
-					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"]')
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
 						SKIN:Bang('[!SetVariable SlotName' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]')
 					else
@@ -470,9 +469,9 @@ end
 					end
 				else -- Slot has no game to show.
 					if T_SETTINGS['slot_highlight'] then
-						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
 					else
-						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
+						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
 					end
 				end
 				if T_SETTINGS['slot_highlight'] then
@@ -509,11 +508,11 @@ end
 		end
 	end
 
-	function Launch(asIndex)
+	function Launch(asIndex) -- asIndex is the index of the slot that was clicked
 		if T_FILTERED_GAMES == nil then
 			return
 		end
-		local nIndex = tonumber(asIndex)
+		local nIndex = tonumber(asIndex) + N_SCROLL_INDEX - 1 -- nIndex is the index of the game in the T_FILTERED_GAMES table that is occupying the slot that was clicked
 		local tGame = T_FILTERED_GAMES[nIndex]
 		if tGame ~= nil then
 			if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
