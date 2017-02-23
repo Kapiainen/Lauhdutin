@@ -20,11 +20,15 @@ try:
         # Variables
         if settings.get("orientation", "vertical") == "vertical":
             f.write("""[Variables]
-ToolbarWidth=%s""" % (settings.get("slot_width", 418)))
+ToolbarWidth=%s
+SkinMaxWidth=%s
+SkinMaxHeight=%s""" % (settings.get("slot_width", 418), settings.get("slot_width", 418), int(settings.get("slot_height", 195)) * int(settings.get("slot_count", 6))))
         else:
             f.write("""[Variables]
-ToolbarWidth=%s""" % (int(settings.get("slot_width", 418)) *
-                      int(settings.get("slot_count", 6))))
+ToolbarWidth=%s
+SkinMaxWidth=%s
+SkinMaxHeight=%s""" % (int(settings.get("slot_width", 418)) *
+                      int(settings.get("slot_count", 6)), int(settings.get("slot_width", 418)) * int(settings.get("slot_count", 6)), settings.get("slot_height", 195)))
         f.write("""
 SlotCount=%s
 SlotWidth=%s
@@ -115,16 +119,29 @@ PreserveAspectRatio=2
 DynamicVariables=1
 MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
 MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
-LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('%s')"]
+""" % (i, i))
+            if settings.get("click_animation", 1) > 0:
+                f.write("""LeftMouseUpAction=[!SetVariable "SlotToAnimate" "%s"][!UpdateMeasure "ClickAnimation"][!CommandMeasure "ClickAnimation" "Execute %s"]
 Group=Slots
-""" % (i, i, i))
+""" % (i, settings.get("click_animation", 1)))
+            else:
+                f.write("""LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('%s')"]
+Group=Slots
+""" % i)
 
             # Game highlight
             f.write("""
 [SlotHighlightBackground%s]
-Meter=Image
-X=0r
-Y=0r
+Meter=Image""" % i)
+            if settings.get("orientation", "vertical") == "vertical":
+                f.write("""
+X=0
+Y=(%s*#SlotHeight#)""" % (i - 1))
+            else:
+                f.write("""
+X=(%s*#SlotWidth#)
+Y=0""" % (i - 1))
+            f.write("""
 W=#SlotWidth#
 H=#SlotHeight#
 SolidColor=0,0,0,160
@@ -160,7 +177,7 @@ ClipString=1
 AntiAlias=1
 DynamicVariables=1
 Group=SlotHighlight%s
-""" % (i, i, i, i, i, i, i))
+""" % (i, i, i, i, i, i))
 
             i += 1
 
