@@ -103,6 +103,7 @@ class Battlenet():
                                 match = regex.match(line)
                                 if match:
                                     banner_url = "https:%s" % match.group(1)
+                                    break
                             if not banner_url:
                                 regex = re.compile(r"<img src=\"(.+?)\" alt=\""
                                                    + game_template["title"])
@@ -111,6 +112,7 @@ class Battlenet():
                                     if match:
                                         banner_url = "https:%s" % match.group(
                                             1)
+                                        break
                             banner_path = "Battle.net\\%s.jpg" % game_template[
                                 "title"]
                         game_dict = {
