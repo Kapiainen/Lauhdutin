@@ -139,7 +139,9 @@ try:
         all_games_old = read_json(os.path.join(ResourcePath, "games.json"))
         if all_games_old:
             for game_new in all_games:
-                for game_old in all_games_old:
+                i = 0
+                while i < len(all_games_old):
+                    game_old = all_games_old[i]
                     if (game_new[GameKeys.NAME] == game_old[GameKeys.NAME] and
                             game_new[GameKeys.PLATFORM] == game_old[
                                 GameKeys.PLATFORM]):
@@ -159,7 +161,12 @@ try:
                                 not game_new.get(GameKeys.HOURS_TOTAL, None)):
                             game_new[GameKeys.HOURS_TOTAL] = game_old[
                                 GameKeys.HOURS_TOTAL]
+                        del all_games_old[i]
                         break
+                    i += 1
+            for game_old in all_games_old:
+                game_old[GameKeys.NOT_INSTALLED] = True
+                all_games.append(game_old)
         for game_new in all_games:
             if not game_new.get(GameKeys.HOURS_TOTAL, None):
                 game_new[GameKeys.HOURS_TOTAL] = 0.0
