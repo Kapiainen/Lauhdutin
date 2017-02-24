@@ -680,22 +680,43 @@ end
 		if T_FILTERED_GAMES == nil then
 			return
 		end
-		if not T_SETTINGS['slot_highlight'] then
+		local tGame = T_FILTERED_GAMES[tonumber(asIndex) + N_SCROLL_INDEX - 1]
+		if tGame == nil then
 			return
 		end
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
+		if T_SETTINGS['slot_highlight'] then
+			SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"]')
+		end
+		if T_SETTINGS['hover_animation'] > 0 then
+			if T_SETTINGS['orientation'] == 'vertical' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 1"]')
+			elseif T_SETTINGS['orientation'] == 'horizontal' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 2"]')
+			end
+		else
+			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
+		end
 	end
 
 	function Highlight(asIndex)
 		if T_FILTERED_GAMES == nil then
 			return
 		end
-		if not T_SETTINGS['slot_highlight'] then
+		local tGame = T_FILTERED_GAMES[tonumber(asIndex) + N_SCROLL_INDEX - 1]
+		if tGame == nil then
 			return
 		end
-		local tGame = T_FILTERED_GAMES[tonumber(asIndex)]
-		if tGame ~= nil then
-			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
+		if T_SETTINGS['slot_highlight'] then
+			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"]')
+		end
+		if T_SETTINGS['hover_animation'] > 0 then
+			if T_SETTINGS['orientation'] == 'vertical' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 1"]')
+			elseif T_SETTINGS['orientation'] == 'horizontal' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 2"]')
+			end
+		else
+			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
 	end
 

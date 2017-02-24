@@ -76,6 +76,9 @@ function Initialize()
 		"Shift up",
 		"Shift down"
 	}
+	if SETTINGS['hover_animation'] == nil then
+		SETTINGS['hover_animation'] = 0
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -192,6 +195,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "Disabled"]')
 		else
 			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "' .. CLICK_ANIMATION_DESCRIPTIONS[SETTINGS['click_animation']] .. '"]')
+		end
+		if SETTINGS['hover_animation'] == 0 then
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
+		else
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Zoom in"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -426,6 +434,14 @@ function CycleClickAnimation()
 		else
 			SETTINGS['click_animation'] = SETTINGS['click_animation'] + 1
 		end
+	end
+	UpdateSettings()
+end
+
+function CycleHoverAnimation()
+	SETTINGS['hover_animation'] = SETTINGS['hover_animation'] + 1
+	if SETTINGS['hover_animation'] > 1 then
+		SETTINGS['hover_animation'] = 0
 	end
 	UpdateSettings()
 end
