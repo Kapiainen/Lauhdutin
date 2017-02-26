@@ -55,13 +55,14 @@ SlotHighlightMessage%s=
 [ClickAnimation]
 Measure=Plugin
 Plugin=ActionTimer
-ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | ResetVertical
-ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | ResetVertical
-ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | ResetVertical
-ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | ResetHorizontal
-ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | ResetHorizontal
-ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | ResetHorizontal
-Launch=[!CommandMeasure LauhdutinScript "Launch('#SlotToAnimate#')"]""")
+ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
+ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
+ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
+ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
+ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
+ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
+Launch=[!CommandMeasure LauhdutinScript "Launch('#SlotToAnimate#')"]
+BlankSlot=[!SetVariable "SlotImage#SlotToAnimate#" ""][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""")
 
         f.write("""
 ResetVertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "((#SlotToAnimate# - 1) * #SlotHeight#)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "#SlotWidth#"][!SetOption "SlotBanner#SlotToAnimate#" "H" "#SlotHeight#"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
@@ -72,9 +73,9 @@ Shrink1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "Sl
 Shrink2Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "(((#SlotToAnimate# - 1) * #SlotHeight#) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 Shrink3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "(((#SlotToAnimate# - 1) * #SlotHeight#) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
     (
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 98)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 98)) / 2), int(SLOT_WIDTH / 100 * 98), int(SLOT_HEIGHT / 100 * 98),
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 96)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 96)) / 2), int(SLOT_WIDTH / 100 * 96), int(SLOT_HEIGHT / 100 * 96),
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 94)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 94)) / 2), int(SLOT_WIDTH / 100 * 94), int(SLOT_HEIGHT / 100 * 94)
+        int((SLOT_WIDTH - (SLOT_WIDTH / 1.8)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 1.8)) / 2), int(SLOT_WIDTH / 1.8), int(SLOT_HEIGHT / 1.8),
+        int((SLOT_WIDTH - (SLOT_WIDTH / 4)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 4)) / 2), int(SLOT_WIDTH / 4), int(SLOT_HEIGHT / 4),
+        int((SLOT_WIDTH - (SLOT_WIDTH / 20)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 20)) / 2), int(SLOT_WIDTH / 20), int(SLOT_HEIGHT / 20)
     )
 )
 
@@ -83,25 +84,25 @@ Shrink1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate
 Shrink2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate# - 1) * #SlotWidth#) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 Shrink3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate# - 1) * #SlotWidth#) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
     (
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 98)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 98)) / 2), int(SLOT_WIDTH / 100 * 98), int(SLOT_HEIGHT / 100 * 98),
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 96)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 96)) / 2), int(SLOT_WIDTH / 100 * 96), int(SLOT_HEIGHT / 100 * 96),
-        int((SLOT_WIDTH - (SLOT_WIDTH / 100 * 94)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 100 * 94)) / 2), int(SLOT_WIDTH / 100 * 94), int(SLOT_HEIGHT / 100 * 94)
+        int((SLOT_WIDTH - (SLOT_WIDTH / 1.8)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 1.8)) / 2), int(SLOT_WIDTH / 1.8), int(SLOT_HEIGHT / 1.8),
+        int((SLOT_WIDTH - (SLOT_WIDTH / 4)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 4)) / 2), int(SLOT_WIDTH / 4), int(SLOT_HEIGHT / 4),
+        int((SLOT_WIDTH - (SLOT_WIDTH / 20)) / 2), int((SLOT_HEIGHT - (SLOT_HEIGHT / 20)) / 2), int(SLOT_WIDTH / 20), int(SLOT_HEIGHT / 20)
     )
 )
 
         f.write("""
-ShiftLeft1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftLeft2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "-4"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftLeft3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "-6"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "4"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "6"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "-4"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "-6"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "4"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "6"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftLeft1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - (#SlotWidth# / 20))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftLeft2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - (#SlotWidth# / 4))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftLeft3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - (#SlotWidth# / 1.8))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftRight1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(#SlotWidth# / 20)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftRight2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(#SlotWidth# / 4)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftRight3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(#SlotWidth# / 1.8)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftUp1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - (#SlotWidth# / 20))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftUp2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - (#SlotWidth# / 4))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftUp3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - (#SlotWidth# / 1.8))"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftDown1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(#SlotWidth# / 20)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftDown2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(#SlotWidth# / 4)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+ShiftDown3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(#SlotWidth# / 1.8)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 DynamicVariables=1
 """)
 
