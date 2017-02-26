@@ -25,7 +25,7 @@ Developed with the following software in mind:
 - Install Rainmeter and Python 3 on your system (see [requirements](#requirements) for more info).
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
 - Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
-- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking, click the **Save** button, and finally click the **Exit** button.
+- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Exit** button.
 - **Main.ini** should now load and will gather information on the games that you have installed. The skin will say **Processing...** for a while as it is e.g. downloading banners for games, but should eventually switch over to showing a list of games that it has found.
 - Windows shortcuts (.lnk and .url files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder.
 - Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the `\Lauhdutin\@Resources\Banners\Shortcuts` and `\Lauhdutin\@Resources\Banners\Steam shortcuts` folders, respectively. The name of the banner should match the name of the .lnk or .url file, or the name in Steam, respectively.
@@ -113,6 +113,8 @@ Currently supported events that can be used to trigger the execution of bangs:
 - A game stops running. Works with any:
   - Steam game, provided that the Steam in-game overlay setting is enabled in Steam.
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
+
+The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
 # Changelog
 **Version 2.4.0 - YYYY/MM/DD:**
