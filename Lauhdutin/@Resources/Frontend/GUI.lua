@@ -709,14 +709,18 @@ end
 		if T_SETTINGS['slot_highlight'] then
 			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"]')
 		end
-		if T_SETTINGS['hover_animation'] == 1 then
-			if T_SETTINGS['orientation'] == 'vertical' then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 1"]')
-			elseif T_SETTINGS['orientation'] == 'horizontal' then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 2"]')
+		if T_SETTINGS['hover_animation'] > 0 then
+			if T_SETTINGS['hover_animation'] == 1 then
+				if T_SETTINGS['orientation'] == 'vertical' then
+					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 1"]')
+				elseif T_SETTINGS['orientation'] == 'horizontal' then
+					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 2"]')
+				end
+			elseif T_SETTINGS['hover_animation'] == 2 then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 3"]')
+			elseif T_SETTINGS['hover_animation'] == 3 then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 4"]')
 			end
-		elseif T_SETTINGS['hover_animation'] == 2 then
-			SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 3"]')
 		else
 			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end

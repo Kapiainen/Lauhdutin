@@ -55,12 +55,12 @@ SlotHighlightMessage%s=
 [ClickAnimation]
 Measure=Plugin
 Plugin=ActionTimer
-ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | ResetVertical | Launch
-ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | ResetVertical | Launch
-ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | ResetVertical | Launch
-ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | ResetHorizontal | Launch
-ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | ResetHorizontal | Launch
-ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | ResetHorizontal | Launch
+ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | ResetVertical
+ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | ResetVertical
+ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | ResetVertical
+ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | ResetHorizontal
+ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | ResetHorizontal
+ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | ResetHorizontal
 Launch=[!CommandMeasure LauhdutinScript "Launch('#SlotToAnimate#')"]""")
 
         f.write("""
@@ -109,9 +109,11 @@ DynamicVariables=1
 [HoverOnAnimation]
 Measure=Plugin
 Plugin=ActionTimer
+DynamicVariables=1
 ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical
 ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal
-ActionList3=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2""")
+ActionList3=Twist1 | Wait #FrameInterval# | Twist2 | Wait #FrameInterval# | Twist3 | Wait #FrameInterval# | Twist2
+ActionList4=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2""")
 
         f.write("""
 ZoomIn1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
@@ -128,17 +130,26 @@ ZoomIn3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "Sl
 ZoomIn1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-DynamicVariables=1
-""" %
+Twist1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Twist2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Twist3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
     (
         int(SLOT_HEIGHT / 100 * 102), int(0 - ((SLOT_HEIGHT / 100 * 102) - SLOT_HEIGHT) / 2),
         int(SLOT_HEIGHT / 100 * 104), int(0 - ((SLOT_HEIGHT / 100 * 104) - SLOT_HEIGHT) / 2),
         int(SLOT_HEIGHT / 100 * 106), int(0 - ((SLOT_HEIGHT / 100 * 106) - SLOT_HEIGHT) / 2)
     )
 )
+
+        if ORIENTATION == "vertical":
+            f.write("""
+Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "-5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""")
+        else:
+            f.write("""
+Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "-5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""")
 
         f.write("""
 [HoverOffAnimation]

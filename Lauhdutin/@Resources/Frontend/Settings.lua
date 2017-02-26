@@ -81,6 +81,7 @@ function Initialize()
 	end
 	HOVER_ANIMATION_DESCRIPTIONS = {
 		"Zoom in",
+		"Twist",
 		"Shake"
 	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
@@ -444,7 +445,7 @@ end
 
 function CycleHoverAnimation()
 	SETTINGS['hover_animation'] = SETTINGS['hover_animation'] + 1
-	if SETTINGS['hover_animation'] > 2 then
+	if SETTINGS['hover_animation'] > #HOVER_ANIMATION_DESCRIPTIONS then
 		SETTINGS['hover_animation'] = 0
 	end
 	print(SETTINGS['hover_animation'])
