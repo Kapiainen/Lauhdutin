@@ -79,6 +79,10 @@ function Initialize()
 	if SETTINGS['hover_animation'] == nil then
 		SETTINGS['hover_animation'] = 0
 	end
+	HOVER_ANIMATION_DESCRIPTIONS = {
+		"Zoom in",
+		"Shake"
+	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -114,7 +118,7 @@ function Exit()
 		return
 	end
 	if OLD_SETTINGS then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation'}
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation', 'hover_animation'}
 		for i=1, #layout_settings do
 			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
 				REBUILD_SWITCH = true
@@ -199,7 +203,7 @@ function UpdateSettings()
 		if SETTINGS['hover_animation'] == 0 then
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
 		else
-			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Zoom in"]')
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS['hover_animation']] .. '"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -440,9 +444,10 @@ end
 
 function CycleHoverAnimation()
 	SETTINGS['hover_animation'] = SETTINGS['hover_animation'] + 1
-	if SETTINGS['hover_animation'] > 1 then
+	if SETTINGS['hover_animation'] > 2 then
 		SETTINGS['hover_animation'] = 0
 	end
+	print(SETTINGS['hover_animation'])
 	UpdateSettings()
 end
 

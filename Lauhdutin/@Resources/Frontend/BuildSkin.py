@@ -110,7 +110,8 @@ DynamicVariables=1
 Measure=Plugin
 Plugin=ActionTimer
 ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical
-ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal""")
+ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal
+ActionList3=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2""")
 
         f.write("""
 ZoomIn1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
@@ -127,6 +128,9 @@ ZoomIn3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "Sl
 ZoomIn1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 DynamicVariables=1
 """ %
     (
