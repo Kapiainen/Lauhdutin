@@ -12,6 +12,8 @@ A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, an
  - [Filtering](#filtering)
  - [Bangs](#bangs)
  - [Animations](#animations)
+ - [Reporting issues](#reporting-issues)
+ - [Contributing](#contributing)
  - [Changelog](#changelog)
  - [License](#license)
 
@@ -144,6 +146,35 @@ These animations are played when the mouse cursor hovers over a slot. Can be dis
 - Shake
 
 Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
+
+# Reporting issues
+If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
+
+If the issue persists, then check through the repository's [Issues](https://github.com/Kapiainen/Lauhdutin/issues) section for open or closed issues that might be relevant and post there (or reference that issue when contacting outside of GitHub).
+
+If there is no previously submitted issue that matches your issue, then submit an issue report based on this [template](https://github.com/Kapiainen/Lauhdutin/blob/master/.github/ISSUE_TEMPLATE.md) (check the raw version for comments with more detailed steps).
+
+# Contributing
+
+Fork this repository, make your changes, and submit a pull request with a summary of the changes you've made.
+
+Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
+
+Try to keep the number of dependencies, which cannot be included in the skin or are not a part of a default Windows installation, to a minimum.
+
+## Graphical user interface changes
+Try to keep draw calls to a minimum by for example:
+- Not overriding the skin-wide `DefaultUpdateDivider=-1` option.
+- Execute the `!Redraw` bang only when necessary (e.g. update all meter options prior to a draw call instead of setting a few options, drawing, and then setting the rest of the options).
+
+## Adding support for a platform
+There are a few rules that **must** be followed when adding support for additional platforms:
+- Sensitive account data must never be handled (e.g. accessed, transmitted).
+- All data that is retrieved and/or utilized by the skin must have been intentionally made publicly available by the platform's developers and/or stored locally in an unencrypted state.
+- Local data should be preferred over data that needs to be acquired over the internet.
+- Minimize internet usage by e.g. checking if a banner already exists locally before downloading a banner.
+
+Any deviations from the rules regarding adding platform support will result in a rejected pull request.
 
 # Changelog
 **Version 2.5.0 - YYYY/MM/DD:**
