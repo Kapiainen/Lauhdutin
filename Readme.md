@@ -2,7 +2,7 @@ Lauhdutin
 ==
 A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts.
 
-![ex](Docs/demo.gif)
+![ex](Docs/Demo.gif)
 
 # Contents
  - [Requirements](#requirements)
@@ -103,12 +103,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
-![filtering](Docs/filtering.gif)
-
 # Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
-
-![sorting](Docs/sorting.gif)
 
 # Bangs
 There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
@@ -123,27 +119,31 @@ Currently supported events that can be used to trigger the execution of bangs:
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
+# Highlighting
+
+If highlighting is enabled, then additional contextual information can be shown when the mouse cursor is hovered over a slot ([animated example](Docs/Highlighting.gif)). There are some settings for toggling certain pieces of information (e.g. platform, hours played).
+
 # Animations
 
 ## Clicking
-These animations are played when a slot is left-clicked. Can be disabled.
+These animations are played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
 
-![click animations](Docs/click_animations.gif)
-
-- Shrink
 - Shift left
-- Shift right
 - Shift up
+- Shift right
 - Shift down
+- Shrink
+
+Can be disabled completely.
 
 ## Hovering
-These animations are played when the mouse cursor hovers over a slot. Can be disabled.
-
-![hover animations](Docs/hover_animations.gif)
+These animations are played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
 
 - Zoom in
-- Twist
+- Jiggle
 - Shake
+
+Can be disabled completely.
 
 Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
 
