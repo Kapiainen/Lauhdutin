@@ -2,7 +2,7 @@ Lauhdutin
 ==
 A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts.
 
-![ex](Docs/Demo.gif)
+![ex](Docs/demo.gif)
 
 # Contents
  - [Requirements](#requirements)
