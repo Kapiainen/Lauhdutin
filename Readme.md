@@ -118,7 +118,8 @@ Currently supported events that can be used to trigger the execution of bangs:
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
 # Animations
-## Clicking animations
+
+## Clicking
 These animations are played when a slot is left-clicked. Can be disabled.
 
 ![click animations](Docs/click_animations.gif)
@@ -129,7 +130,7 @@ These animations are played when a slot is left-clicked. Can be disabled.
 - Shift up
 - Shift down
 
-## Hovering animations
+## Hovering
 These animations are played when the mouse cursor hovers over a slot. Can be disabled.
 
 ![hover animations](Docs/hover_animations.gif)
