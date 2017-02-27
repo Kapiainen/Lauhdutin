@@ -38,11 +38,13 @@ SlotCount=%s
 SlotWidth=%s
 SlotHeight=%s
 SlotBackgroundColor=%s
+SlotTextColor=%s
 """ % (
         SLOT_COUNT,
         SLOT_WIDTH,
         SLOT_HEIGHT,
-        settings.get("slot_background_color", "0,0,0,196")
+        settings.get("slot_background_color", "0,0,0,196"),
+        settings.get("slot_text_color", "255,255,255,255")
     )
 )
         i = 1

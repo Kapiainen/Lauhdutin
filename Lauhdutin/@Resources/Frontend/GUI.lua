@@ -676,14 +676,7 @@ end
 		end
 	end
 
-	function Unhighlight(asIndex)
-		if T_FILTERED_GAMES == nil then
-			return
-		end
-		local tGame = T_FILTERED_GAMES[tonumber(asIndex) + N_SCROLL_INDEX - 1]
-		if tGame == nil then
-			return
-		end
+	function Unhighlight(asIndex)		
 		if T_SETTINGS['slot_highlight'] then
 			SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"]')
 		end
