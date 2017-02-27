@@ -95,7 +95,7 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
 		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
