@@ -2,7 +2,7 @@ Lauhdutin
 ==
 A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts.
 
-![ex](demo.gif)
+![ex](Docs/demo.gif)
 
 # Contents
  - [Requirements](#requirements)
@@ -11,6 +11,7 @@ A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, an
  - [Supported platforms](#supported-platforms)
  - [Filtering](#filtering)
  - [Bangs](#bangs)
+ - [Animations](#animations)
  - [Changelog](#changelog)
  - [License](#license)
 
@@ -115,6 +116,29 @@ Currently supported events that can be used to trigger the execution of bangs:
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
+
+# Animations
+## Clicking animations
+These animations are played when a slot is left-clicked. Can be disabled.
+
+![click animations](Docs/click_animations.gif)
+
+- Shrink
+- Shift left
+- Shift right
+- Shift up
+- Shift down
+
+## Hovering animations
+These animations are played when the mouse cursor hovers over a slot. Can be disabled.
+
+![hover animations](Docs/hover_animations.gif)
+
+- Zoom in
+- Twist
+- Shake
+
+Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
 
 # Changelog
 **Version 2.5.0 - YYYY/MM/DD:**
