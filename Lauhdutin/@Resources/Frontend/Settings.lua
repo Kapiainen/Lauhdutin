@@ -81,7 +81,7 @@ function Initialize()
 	end
 	HOVER_ANIMATION_DESCRIPTIONS = {
 		"Zoom in",
-		"Twist",
+		"Jiggle",
 		"Shake"
 	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')

@@ -105,9 +105,12 @@ Shrink3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate
     )
 )
 
-        ShiftLevel1 = (SLOT_WIDTH / 20.0)
-        ShiftLevel2 = (SLOT_WIDTH / 4.0)
-        ShiftLevel3 = (SLOT_WIDTH / 1.8)
+        ShiftLevel1Vertical = (SLOT_WIDTH / 20.0)
+        ShiftLevel2Vertical = (SLOT_WIDTH / 4.0)
+        ShiftLevel3Vertical = (SLOT_WIDTH / 1.8)
+        ShiftLevel1Horizontal = (SLOT_HEIGHT / 20.0)
+        ShiftLevel2Horizontal = (SLOT_HEIGHT / 4.0)
+        ShiftLevel3Horizontal = (SLOT_HEIGHT / 1.8)
         f.write("""
 ShiftLeft1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ShiftLeft2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
@@ -124,18 +127,18 @@ ShiftDown3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotB
 DynamicVariables=1
 """ %
     (
-        ShiftLevel1,
-        ShiftLevel2,
-        ShiftLevel3,
-        ShiftLevel1,
-        ShiftLevel2,
-        ShiftLevel3,
-        ShiftLevel1,
-        ShiftLevel2,
-        ShiftLevel3,
-        ShiftLevel1,
-        ShiftLevel2,
-        ShiftLevel3
+        ShiftLevel1Vertical,
+        ShiftLevel2Vertical,
+        ShiftLevel3Vertical,
+        ShiftLevel1Vertical,
+        ShiftLevel2Vertical,
+        ShiftLevel3Vertical,
+        ShiftLevel1Horizontal,
+        ShiftLevel2Horizontal,
+        ShiftLevel3Horizontal,
+        ShiftLevel1Horizontal,
+        ShiftLevel2Horizontal,
+        ShiftLevel3Horizontal
     )
 )
 
@@ -146,7 +149,7 @@ Plugin=ActionTimer
 DynamicVariables=1
 ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical
 ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal
-ActionList3=Twist1 | Wait #FrameInterval# | Twist2 | Wait #FrameInterval# | Twist3 | Wait #FrameInterval# | Twist2
+ActionList3=Jiggle1 | Wait #FrameInterval# | Jiggle2 | Wait #FrameInterval# | Jiggle3 | Wait #FrameInterval# | Jiggle2
 ActionList4=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2""")
 
         f.write("""
@@ -164,9 +167,9 @@ ZoomIn3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "Sl
 ZoomIn1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ZoomIn3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Twist1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Twist2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Twist3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
+Jiggle1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Jiggle2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
+Jiggle3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
     (
         (SLOT_HEIGHT / 100 * 105), (0 - ((SLOT_HEIGHT / 100 * 105) - SLOT_HEIGHT) / 2),
         (SLOT_HEIGHT / 100 * 110), (0 - ((SLOT_HEIGHT / 100 * 110) - SLOT_HEIGHT) / 2),
