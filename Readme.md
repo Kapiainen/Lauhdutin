@@ -156,7 +156,7 @@ If there is no previously submitted issue that matches your issue, then submit a
 
 # Contributing
 
-Fork this repository, make your changes, and submit a pull request with a summary of the changes you've made.
+Fork [this](https://github.com/Kapiainen/Lauhdutin) repository, make your changes, and submit a pull request with a summary of the changes you've made.
 
 Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
 
