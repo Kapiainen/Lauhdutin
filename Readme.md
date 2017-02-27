@@ -181,6 +181,7 @@ Any deviations from the rules regarding adding platform support will result in a
 - Added optional animations when clicking on a slot.
 - Added optional animations when hovering the mouse over a slot.
 - Added support for retaining information about games, which were previously detected and then uninstalled, for future use.
+- Added button separators to the toolbar.
 
 **Version 2.4.0 - YYYY/MM/DD:**
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
