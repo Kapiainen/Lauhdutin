@@ -448,7 +448,6 @@ function CycleHoverAnimation()
 	if SETTINGS['hover_animation'] > #HOVER_ANIMATION_DESCRIPTIONS then
 		SETTINGS['hover_animation'] = 0
 	end
-	print(SETTINGS['hover_animation'])
 	UpdateSettings()
 end
 

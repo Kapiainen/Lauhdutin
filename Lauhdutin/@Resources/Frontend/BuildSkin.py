@@ -404,9 +404,9 @@ Group=SlotHighlight%s
 
     if CurrentFile != "Main.ini":
         subprocess.call(
-            [RainmeterPath, "!ActivateConfig", Config, "Main.ini"], shell=True)
+            [RainmeterPath, "!ActivateConfig", Config, "Main.ini"], shell=False)
     else:
-        subprocess.call([RainmeterPath, "!Refresh", Config], shell=True)
+        subprocess.call([RainmeterPath, "!Refresh", Config], shell=False)
 except:
     import traceback
     traceback.print_exc()

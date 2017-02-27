@@ -15,10 +15,12 @@ def set_skin_status(a_message=""):
             RainmeterPath, "!SetOption", "StatusMessage", "Text", a_message,
             Config
         ],
-        shell=True)
+        shell=False)
     subprocess.call(
-        [RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=True)
-    subprocess.call([RainmeterPath, "!Redraw", Config], shell=True)
+        [RainmeterPath, "!UpdateMeterGroup", "Status", Config], shell=False)
+    subprocess.call(
+        [RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=False)
+    subprocess.call([RainmeterPath, "!Redraw", Config], shell=False)
 
 
 minimum_major_version = 3
@@ -186,7 +188,7 @@ try:
                 RainmeterPath, "!CommandMeasure", "LauhdutinScript", "Init()",
                 Config
             ],
-            shell=True)
+            shell=False)
 
     ####
     endTime = time.time()

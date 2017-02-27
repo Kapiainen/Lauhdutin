@@ -16,7 +16,7 @@ try:
             RainmeterPath, "!CommandMeasure", "SettingsScript",
             "%s('%s')" % (FunctionName, path), Config
         ],
-        shell=True)
+        shell=False)
 except ImportError:
     import traceback
     traceback.print_exc()
