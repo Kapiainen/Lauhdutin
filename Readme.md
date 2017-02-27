@@ -126,7 +126,7 @@ If highlighting is enabled, then additional contextual information can be shown 
 # Animations
 
 ## Clicking
-These animations are played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
+One of these animations can be played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
 
 - Shift left
 - Shift up
@@ -134,16 +134,16 @@ These animations are played when a slot is left-clicked ([animated example](Docs
 - Shift down
 - Shrink
 
-Can be disabled completely.
+Click animations can be disabled completely.
 
 ## Hovering
-These animations are played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
+One of these animations can be played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
 
 - Zoom in
 - Jiggle
 - Shake
 
-Can be disabled completely.
+Hover animations can be disabled completely.
 
 Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
 
