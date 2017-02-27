@@ -172,7 +172,7 @@ There are a few rules that **must** be followed when adding support for addition
 - Sensitive account data must never be handled (e.g. accessed, transmitted).
 - All data that is retrieved and/or utilized by the skin must have been intentionally made publicly available by the platform's developers and/or stored locally in an unencrypted state.
 - Local data should be preferred over data that needs to be acquired over the internet.
-- Minimize internet usage by e.g. checking if a banner already exists locally before downloading a banner.
+- Minimize internet usage by e.g. downloading a banner only if a local copy does not already exist.
 
 Any deviations from the rules regarding adding platform support will result in a rejected pull request.
 
