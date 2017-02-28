@@ -60,6 +60,8 @@ function Initialize()
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
+	B_REVERSE_SORT = false
+	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
@@ -342,6 +344,8 @@ end
 	end
 
 	function Sort()
+		B_REVERSE_SORT = false
+		SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 		if T_FILTERED_GAMES ~= nil then
 			if N_SORT_STATE == 1 then
 				table.sort(T_FILTERED_GAMES, SortLastPlayed)
@@ -402,6 +406,12 @@ end
 	end
 
 	function ReverseSort()
+		B_REVERSE_SORT = not B_REVERSE_SORT
+		if B_REVERSE_SORT == true then
+			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+		else
+			SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+		end
 		local tReversedListOfGames = {}
 		for i=1, #T_FILTERED_GAMES do
 			table.insert(tReversedListOfGames, 1, T_FILTERED_GAMES[i])
@@ -730,11 +740,17 @@ end
 
 -- Toolbar
 	function ShowToolbar()
+		if B_REVERSE_SORT then
+			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+		end
 		SKIN:Bang('[!ShowMeterGroup Toolbar][!Redraw]')
 	end
 
 	function HideToolbar()
 		if B_FORCE_TOOLBAR == false then
+			if B_REVERSE_SORT then
+				SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+			end
 			SKIN:Bang('[!HideMeterGroup Toolbar][!Redraw]')
 		end
 	end
