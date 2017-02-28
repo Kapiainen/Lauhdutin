@@ -56,9 +56,9 @@ or
 - Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
 # Supported platforms
-Lauhdutin currently supports Steam, GOG Galaxy, and Battle.net.
 
-Steam support includes:
+## Steam
+Support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
 - Launch the games that were found by the features described above.
@@ -66,12 +66,14 @@ Steam support includes:
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
-GOG Galaxy support includes:
+## GOG Galaxy
+Support includes:
 - Acquire a list of games installed via GOG Galaxy.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-Battle.net support includes:
+## Battle.net
+Support includes:
 - Acquire a list of games installed via Battle.net.
 - Launch games that were found.
 - Automatically download banners for games that were found.
@@ -80,7 +82,7 @@ Battle.net support does not include support for classic games (e.g. Diablo II, W
 - The name of the game's folder.
 - The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
 
-Even better support for the platforms listed above may be implemented in the future, when possible.
+## Other platforms
 
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
@@ -169,12 +171,12 @@ Try to keep draw calls to a minimum by, for example:
 
 ## Adding support for a platform
 There are a few rules that **must** be followed when adding support for additional platforms:
-- Sensitive account data must never be handled (e.g. accessed, transmitted).
+- Sensitive account data must never be transmitted from the user's system. Preferably the only transmitted data should be relevant to downloading e.g. banners.
 - All data that is retrieved and/or utilized by the skin must have been intentionally made publicly available by the platform's developers and/or stored locally in an unencrypted state.
 - Local data should be preferred over data that needs to be acquired over the internet.
 - Minimize internet usage by e.g. downloading a banner only if a local copy does not already exist.
 
-Any deviations from the rules regarding adding platform support will result in a rejected pull request.
+Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
 **Version 2.5.0 - YYYY/MM/DD:**
