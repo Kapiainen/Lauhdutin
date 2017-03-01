@@ -354,36 +354,39 @@ class Steam():
     def get_shortcuts(self):
         result = {}
         output = self.read_shortcuts_file(self.steam_path, self.userdataid)
-        shortcuts_dict = self.parse_shortcuts_string(output)
-        i = 0
-        for key, shortcut in shortcuts_dict.items():
-            game = {}
-            game[GameKeys.PLATFORM] = Platform.STEAM_SHORTCUT
-            game[GameKeys.LASTPLAYED] = 0
-            game[GameKeys.NAME], shortcut = self.parse_shortcut_title(shortcut)
-            print("\tFound game '%s'" % game[GameKeys.NAME])
-            game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
-                game[GameKeys.NAME])
-            game[GameKeys.PATH], shortcut = self.parse_shortcut_path(shortcut)
-            if not os.path.isfile(game[GameKeys.PATH]):
-                game[GameKeys.ERROR] = True
-                game[GameKeys.INVALID_PATH] = True
-            game[GameKeys.PATH] = "steam://rungameid/%s" % (
-                self.parse_shortcut_app_id(game[GameKeys.PATH],
-                                           game[GameKeys.NAME]))
-            tags = self.parse_shortcut_tags(shortcut)
-            if tags:
-                game[GameKeys.TAGS] = tags
-            result[str(i)] = game
-            i += 1
+        if output:
+            shortcuts_dict = self.parse_shortcuts_string(output)
+            i = 0
+            for key, shortcut in shortcuts_dict.items():
+                game = {}
+                game[GameKeys.PLATFORM] = Platform.STEAM_SHORTCUT
+                game[GameKeys.LASTPLAYED] = 0
+                game[GameKeys.NAME], shortcut = self.parse_shortcut_title(
+                    shortcut)
+                print("\tFound game '%s'" % game[GameKeys.NAME])
+                game[GameKeys.BANNER_PATH] = "Steam shortcuts\\%s.jpg" % (
+                    game[GameKeys.NAME])
+                path, arguments, shortcut = self.parse_shortcut_path(shortcut)
+                if not os.path.isfile(path):
+                    game[GameKeys.ERROR] = True
+                    game[GameKeys.INVALID_PATH] = True
+                game[GameKeys.PATH] = "steam://rungameid/%s" % (
+                    self.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                               game[GameKeys.NAME]))
+                game[GameKeys.NAME] = Utility.title_move_the(
+                    Utility.title_strip_unicode(game[GameKeys.NAME]))
+                tags = self.parse_shortcut_tags(shortcut)
+                if tags:
+                    game[GameKeys.TAGS] = tags
+                result[str(i)] = game
+                i += 1
         return result
 
     def read_shortcuts_file(self, a_path, a_userdataid):
-        shortcuts_path = os.path.join(a_path, "userdata",
-                                      a_userdataid, "config",
-                                      "shortcuts.vdf")
+        shortcuts_path = os.path.join(a_path, "userdata", a_userdataid,
+                                      "config", "shortcuts.vdf")
         if not os.path.isfile(shortcuts_path):
-            return result
+            return None
         shortcuts = ""
         with open(shortcuts_path, "rb") as f:
             byte = f.read(1)
@@ -413,18 +416,20 @@ class Steam():
     def parse_shortcut_title(self, a_string):
         start = a_string.find("|", 1) + 1
         end = a_string.find("|", start)
-        name = Utility.title_move_the(
-            Utility.title_strip_unicode(a_string[start:end]))
+        name = a_string[start:end]
         return (name, a_string[end:])
 
     def parse_shortcut_path(self, a_string):
         start = a_string.find('"') + 1
         end = a_string.find('"', start)
         path = a_string[start:end]
-        return (path, a_string[end:])
+        start = end + 1
+        end = a_string.find('|', start)
+        arguments = a_string[start:end]
+        return (path, arguments, a_string[end:])
 
     def parse_shortcut_app_id(self, a_path, a_name):
-        app_id = zlib.crc32(("\"" + a_path + "\"" + a_name).encode())
+        app_id = zlib.crc32((a_path + a_name).encode())
         app_id = app_id | 0x80000000
         app_id = app_id << 32 | 0x02000000
         return app_id

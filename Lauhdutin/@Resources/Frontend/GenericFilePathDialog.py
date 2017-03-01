@@ -13,8 +13,8 @@ try:
 
     subprocess.call(
         [
-            RainmeterPath, "!CommandMeasure", "SettingsScript", "%s('%s')" %
-            (FunctionName, path), Config
+            RainmeterPath, "!CommandMeasure", "SettingsScript",
+            "%s('%s')" % (FunctionName, path), Config
         ],
         shell=True)
 except ImportError:

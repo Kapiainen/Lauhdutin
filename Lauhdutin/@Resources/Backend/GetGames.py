@@ -38,6 +38,7 @@ try:
     from GOGGalaxy import GOGGalaxy
     from BannerDownloader import BannerDownloader
     from Enums import GameKeys
+    from Battlenet import Battlenet
 except ImportError:
     try:
         sys.path.append(os.path.join(ResourcePath, "Backend"))
@@ -46,6 +47,7 @@ except ImportError:
         from GOGGalaxy import GOGGalaxy
         from BannerDownloader import BannerDownloader
         from Enums import GameKeys
+        from Battlenet import Battlenet
     except ImportError:
         import traceback
         traceback.print_exc()
@@ -74,8 +76,16 @@ try:
         set_skin_status("Processing...")
         # Windows shortcuts (.lnk) in @Resources\Shortcuts
         print("Processing Windows shortcuts...")
-        windows_shortcuts = WindowsShortcuts(os.path.join(ResourcePath))
+        windows_shortcuts = WindowsShortcuts(ResourcePath)
         windows_shortcuts_games = windows_shortcuts.get_games()
+
+        # Battle.net games (classic games are not supported at the moment)
+        if settings.get("battlenet_path", None):
+            print("Processing Battle.net games...")
+            battlenet = Battlenet(settings["battlenet_path"], ResourcePath)
+            battlenet_games = battlenet.get_games()
+        else:
+            battlenet_games = {}
 
         # Steam games
         if settings.get("steam_path", None):
@@ -104,6 +114,10 @@ try:
         all_games = []
         if windows_shortcuts_games:
             for game_key, game_dict in windows_shortcuts_games.items():
+                all_games.append(game_dict)
+
+        if battlenet_games:
+            for game_key, game_dict in battlenet_games.items():
                 all_games.append(game_dict)
 
         if steam_games:

@@ -16,11 +16,16 @@ from WindowsShortcuts import WindowsShortcuts
 import Utility
 from Enums import GameKeys
 from Enums import Platform
+from Battlenet import Battlenet
 
 
 class WindowsShortcutsTests(unittest.TestCase):
     def create_class_instance(self):
-        return WindowsShortcuts(os.path.join(CWD, "@Resources"))
+        ws = WindowsShortcuts(os.path.join(CWD, "@Resources"))
+        head, tail = os.path.split(CWD)
+        ws.shortcut_parser_script = os.path.join(
+            head, "Lauhdutin", "@Resources", "Backend", "ShortcutParser.vbs")
+        return ws
 
     def test_constructor(self):
         ws = self.create_class_instance()
@@ -119,30 +124,6 @@ class WindowsShortcutsTests(unittest.TestCase):
             "Shortcuts\\Office Suite 2017.jpg")
         self.assertEqual(
             ws.get_banner_path("Overwatch"), "Shortcuts\\Overwatch.png")
-
-    def test_read_shortcut(self):
-        ws = self.create_class_instance()
-        self.assertIsNotNone(ws.read_shortcut("Office Suite 2015.lnk"))
-        self.assertIsNotNone(ws.read_shortcut("Office Suite 2017.lnk"))
-        self.assertIsNotNone(ws.read_shortcut("Overwatch.lnk"))
-        self.assertIsNone(ws.read_shortcut("ImaginaryGame47.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Office Suite 2015.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Office Suite 2017.lnk"))
-        self.assertNotEqual("", ws.read_shortcut("Overwatch.lnk"))
-
-    def test_get_shortcut_target_path(self):
-        ws = self.create_class_instance()
-        self.assertEqual(
-            ws.get_shortcut_target_path(
-                ws.read_shortcut("Office Suite 2015.lnk")),
-            "D:\\Program Files (x86)\\Office Suite 2015\\vERsion_1_52_8.exe")
-        self.assertEqual(
-            ws.get_shortcut_target_path(
-                ws.read_shortcut("Office Suite 2017.lnk")),
-            "D:\\Program Files (x86)\\Office Suite 2017\\version 2.4.53.exe")
-        self.assertEqual(
-            ws.get_shortcut_target_path(ws.read_shortcut("Overwatch.lnk")),
-            "D:\\Program Files\\Battle.net Games\\Overwatch\\Overwatch.exe")
 
 
 class UtilityTests(unittest.TestCase):
@@ -880,13 +861,13 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\RealTemp\\RealTemp.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\GPU-Z\\GPU-Z.1.17.0.exe")
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, _ = steam.parse_shortcut_path(shortcut)
+        path, arguments, _ = steam.parse_shortcut_path(shortcut)
         self.assertEqual(path, "X:\\Programs\\CPU-Z\\cpuz_x64.exe")
 
     def test_parse_shortcut_app_id(self):
@@ -894,16 +875,19 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 10040859602154684416)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 18383980479696076800)
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
-        app_id = steam.parse_shortcut_app_id(path, name)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
+        app_id = steam.parse_shortcut_app_id('"%s"%s' % (path, arguments),
+                                             name)
         self.assertEqual(app_id, 11463541207985029120)
 
     def test_parse_shortcut_tags(self):
@@ -911,15 +895,15 @@ class SteamTests(unittest.TestCase):
         shortcuts = steam.parse_shortcuts_string(
             steam.read_shortcuts_file(STEAM_PATH, STEAM_USERDATAID))
         name, shortcut = steam.parse_shortcut_title(shortcuts["0"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(steam.parse_shortcut_tags(shortcut), None)
         name, shortcut = steam.parse_shortcut_title(shortcuts["1"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(
             steam.parse_shortcut_tags(shortcut), {"0": "GPU",
                                                   "1": "Utility"})
         name, shortcut = steam.parse_shortcut_title(shortcuts["2"])
-        path, shortcut = steam.parse_shortcut_path(shortcut)
+        path, arguments, shortcut = steam.parse_shortcut_path(shortcut)
         self.assertEqual(
             steam.parse_shortcut_tags(shortcut), {"0": "CPU",
                                                   "1": "Utility"})
@@ -928,6 +912,112 @@ class SteamTests(unittest.TestCase):
         steam = self.create_class_instance()
         self.assertEqual(steam.is_int("0123456789"), True)
         self.assertEqual(steam.is_int("This is not a number"), False)
+
+
+class BattlenetTests(unittest.TestCase):
+    def create_class_instance(self):
+        return Battlenet("%s|%s" % (os.path.join(CWD, "Battle.net1"),
+                                    os.path.join(CWD, "Battle.net2")),
+                         os.path.join(CWD, "@Resources"))
+
+    def test_constructor(self):
+        battlenet = self.create_class_instance()
+        self.assertEqual(battlenet.games_folders, [
+            os.path.join(CWD, "Battle.net1"), os.path.join(CWD, "Battle.net2")
+        ])
+        self.assertEqual(battlenet.banners, ["Hearthstone.png"])
+        self.assertEqual(battlenet.supported_games, {
+            "hearthstone": {
+                "title": "Hearthstone",
+                "path": "battlenet://WTCG",
+                "process": "Hearthstone.exe"
+            },
+            "heroes of the storm": {
+                "title": "Heroes of the Storm",
+                "path": "battlenet://Hero",
+                "process": "HeroesOfTheStorm_x64.exe",
+                "process32": "HeroesOfTheStorm.exe"
+            },
+            "overwatch": {
+                "title": "Overwatch",
+                "path": "battlenet://Pro",
+                "process": "Overwatch.exe"
+            },
+            "starcraft ii": {
+                "title": "StarCraft II",
+                "path": "battlenet://S2",
+                "process": "SC2_x64.exe",
+                "process32": "SC2.exe"
+            },
+            "diablo iii": {
+                "title": "Diablo III",
+                "path": "battlenet://D3",
+                "process": "Diablo III64.exe",
+                "process32": "Diablo III.exe"
+            },
+            "world of warcraft": {
+                "title": "World of Warcraft",
+                "path": "battlenet://WoW",
+                "process": "Wow-64.exe",
+                "process32": "Wow.exe"
+            }
+        })
+
+    def test_get_games(self):
+        battlenet = self.create_class_instance()
+        if Utility.get_os_bitness() == 32:
+            self.assertEqual(battlenet.get_games(), {
+                'Hearthstone': {
+                    GameKeys.NAME: 'Hearthstone',
+                    GameKeys.PATH: 'battlenet://WTCG',
+                    GameKeys.PROCESS: 'Hearthstone.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Hearthstone.png',
+                    GameKeys.HOURS_TOTAL: 0
+                },
+                'Diablo III': {
+                    GameKeys.NAME: 'Diablo III',
+                    GameKeys.PATH: 'battlenet://D3',
+                    GameKeys.PROCESS: 'Diablo III.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: Platform.BATTLENET,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Diablo III.jpg',
+                    GameKeys.HOURS_TOTAL: 0
+                }
+            })
+        else:
+            self.assertEqual(battlenet.get_games(), {
+                'Hearthstone': {
+                    GameKeys.NAME: 'Hearthstone',
+                    GameKeys.PATH: 'battlenet://WTCG',
+                    GameKeys.PROCESS: 'Hearthstone.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: 5,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Hearthstone.png',
+                    GameKeys.HOURS_TOTAL: 0
+                },
+                'Diablo III': {
+                    GameKeys.NAME: 'Diablo III',
+                    GameKeys.PATH: 'battlenet://D3',
+                    GameKeys.PROCESS: 'Diablo III64.exe',
+                    GameKeys.LASTPLAYED: 0,
+                    GameKeys.PLATFORM: 5,
+                    GameKeys.BANNER_PATH: 'Battle.net\\Diablo III.jpg',
+                    GameKeys.HOURS_TOTAL: 0,
+                    GameKeys.BANNER_URL:
+                    'https://bnetproduct-a.akamaihd.net//products/11000019581000002391/6208052403552915B4D310EB9173E988462AB335.jpg'
+                }
+            })
+
+    def test_get_banner_path(self):
+        battlenet = self.create_class_instance()
+        self.assertEqual(
+            battlenet.get_banner_path("Hearthstone"),
+            "Battle.net\\Hearthstone.png")
+        self.assertEqual(battlenet.get_banner_path("Diablo III"), None)
+        self.assertEqual(
+            battlenet.get_banner_path("Game that does not exist"), None)
 
 
 # TODO: Write tests for GOGGalaxy.py and create mock data to use when testing.

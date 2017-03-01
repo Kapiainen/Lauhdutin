@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, and regular Windows shortcuts.
+A Rainmeter skin for launching games. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts.
 
 ![ex](demo.gif)
 
@@ -25,10 +25,10 @@ Developed with the following software in mind:
 - Install Rainmeter and Python 3 on your system (see [requirements](#requirements) for more info).
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
 - Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
-- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking, click the **Save** button, and finally click the **Exit** button.
+- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Exit** button.
 - **Main.ini** should now load and will gather information on the games that you have installed. The skin will say **Processing...** for a while as it is e.g. downloading banners for games, but should eventually switch over to showing a list of games that it has found.
-- Windows shortcuts (.lnk files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder.
-- Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the `\Lauhdutin\@Resources\Banners\Shortcuts` and `\Lauhdutin\@Resources\Banners\Steam shortcuts` folders, respectively. The name of the banner should match the name of the .lnk file or the name in Steam, respectively.
+- Windows shortcuts (.lnk and .url files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder.
+- Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the `\Lauhdutin\@Resources\Banners\Shortcuts` and `\Lauhdutin\@Resources\Banners\Steam shortcuts` folders, respectively. The name of the banner should match the name of the .lnk or .url file, or the name in Steam, respectively.
 
 # Updating
 If you are using an older version of Lauhdutin (2.0.0 or newer) and want to update to the latest version, then you have two recommended options:
@@ -50,10 +50,10 @@ or
 - If you are using a Python path that differs from the default value, then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\PythonPath.inc` either!
 - If you are using custom icons (not referring to game banners), then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\Icons` either!
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
-- Load **Main.ini** in Rainmeter, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
+- Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
 # Supported platforms
-Lauhdutin currently supports Steam and GOG Galaxy.
+Lauhdutin currently supports Steam, GOG Galaxy, and Battle.net.
 
 Steam support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
@@ -68,6 +68,17 @@ GOG Galaxy support includes:
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
+Battle.net support includes:
+- Acquire a list of games installed via Battle.net.
+- Launch games that were found.
+- Automatically download banners for games that were found.
+
+Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
+- The name of the game's folder.
+- The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
+
+Even better support for the platforms listed above may be implemented in the future, when possible.
+
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
 # Filtering
@@ -76,6 +87,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 - `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
 
 - `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+
+- `battlenet:` followed by `true` or `false`. If `true`, then only show games installed via Battle.net. If `false`, then show all other games that were not installed via Battle.net.
 
 - `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
 
@@ -86,6 +99,9 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 - `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
+
+# Sorting
+The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
 # Bangs
 There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
@@ -98,7 +114,25 @@ Currently supported events that can be used to trigger the execution of bangs:
   - Steam game, provided that the Steam in-game overlay setting is enabled in Steam.
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
 
+The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
+
 # Changelog
+**Version 2.4.0 - 2017/03/01:**
+- Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
+- Added sorting by total hours played.
+- Added ability to reverse the order of the list of games.
+- Fixed bugs that prevented generation of valid SteamIDs for certain non-Steam game shortcuts.
+- Added support for .url shortcuts.
+- Added context menu option for manually executing the stopping bang that is defined in the settings.
+- Added support for command line arguments in Windows shortcuts.
+- Added support for Battle.net games (not for classic games at the moment).
+- Added `battlenet:` filter.
+- Added setting for paths to folders containing Battle.net games.
+- Fixed bug that caused the name of a slot's game to show up behind transparent banners.
+- Fixed bug that caused an exception to be raised when processing non-Steam game shortcuts.
+- Fixed bug in the parsing process for banner URLs for Battle.net games.
+- GUI optimizations.
+
 **Version 2.3.0 - 2017/02/19:**
 - Added overlay art for generic errors.
 - Added overlays for invalid path errors for Steam and Windows shortcuts.

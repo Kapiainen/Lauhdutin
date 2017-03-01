@@ -4,7 +4,7 @@ function Initialize()
 	S_VDF_SERIALIZING_INDENTATION = ''
 	T_SETTINGS = ReadSettings()
 	if T_SETTINGS == nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status][!Redraw]')
 		return
 	end
 	N_LAUNCH_STATE = 0
@@ -24,6 +24,7 @@ function Initialize()
 	N_SCROLL_STEP = 1
 	-- If GAME_KEYS values are changed, then they have to be copied to the GameKeys class in Enums.py.
 	GAME_KEYS = {
+		ARGUMENTS = "arguments",
 		BANNER_ERROR = "bannererror",
 		BANNER_PATH = "banner",
 		BANNER_URL = "bannerurl",
@@ -37,6 +38,7 @@ function Initialize()
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
+		PROCESS = "process",
 		TAGS = "tags"
 	}
 	-- If PLATFORM values are changed, then they have to be copied to the Platform class in Enums.py.
@@ -44,13 +46,17 @@ function Initialize()
 		STEAM = 0,
 		STEAM_SHORTCUT = 1,
 		GOG_GALAXY = 2,
-		WINDOWS_SHORTCUT = 3
+		WINDOWS_SHORTCUT = 3,
+		WINDOWS_URL_SHORTCUT = 4,
+		BATTLENET = 5
 	}
 	PLATFORM_DESCRIPTION = {
 		"Steam",
 		"Steam",
 		"GOG Galaxy",
-		""
+		"",
+		"",
+		"Battle.net"
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
@@ -59,14 +65,14 @@ end
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
 	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status][!Redraw]')
 		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 	end
 end
 
 -- Called by Backend\GetGames.py when it has successfully completed its task.
 function Init()
-	SKIN:Bang('[!HideMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+	SKIN:Bang('[!HideMeterGroup Status]')
 	local tGames = ReadGames()
 	T_ALL_GAMES = {} -- all games found in 'games.json'
 	T_FILTERED_GAMES = {} -- subset of T_ALL_GAMES
@@ -89,16 +95,12 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status #CURRENTCONFIG#][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
-	end
-	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
 	PopulateSlots()
-	SKIN:Bang('[!Redraw]')
 end
 
 -- Utility
@@ -261,6 +263,23 @@ end
 			else
 				return tResult
 			end
+		elseif StartsWith(asPattern, 'battlenet:') then
+			asPattern = asPattern:sub(11)
+			if StartsWith(asPattern, 't') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET then
+						table.insert(tResult, atTable[i])
+					end
+				end
+			else
+				return tResult
+			end
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i = 1, #atTable do
@@ -326,6 +345,8 @@ end
 		if T_FILTERED_GAMES ~= nil then
 			if N_SORT_STATE == 1 then
 				table.sort(T_FILTERED_GAMES, SortLastPlayed)
+			elseif N_SORT_STATE == 2 then
+				table.sort(T_FILTERED_GAMES, SortHoursPlayed)
 			else
 				table.sort(T_FILTERED_GAMES, SortAlphabetically)
 			end
@@ -342,8 +363,24 @@ end
 	end
 
 	function SortLastPlayed(atFirst, atSecond)
-		if tonumber(atFirst[GAME_KEYS.LASTPLAYED]) > tonumber(atSecond[GAME_KEYS.LASTPLAYED]) then
+		local nFirst = tonumber(atFirst[GAME_KEYS.LASTPLAYED])
+		local nSecond = tonumber(atSecond[GAME_KEYS.LASTPLAYED])
+		if nFirst > nSecond then
 			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
+		else
+			return false
+		end
+	end
+
+	function SortHoursPlayed(atFirst, atSecond)
+		local nFirst = tonumber(atFirst[GAME_KEYS.HOURS_TOTAL])
+		local nSecond = tonumber(atSecond[GAME_KEYS.HOURS_TOTAL])
+		if nFirst > nSecond then
+			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
 		else
 			return false
 		end
@@ -354,13 +391,22 @@ end
 			return
 		end
 		N_SORT_STATE = N_SORT_STATE + 1
-		if N_SORT_STATE > 1 then
+		if N_SORT_STATE > 2 then
 			N_SORT_STATE = 0
 		end
 		T_SETTINGS['sortstate'] = tostring(N_SORT_STATE)
 		WriteSettings(T_SETTINGS)
-		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar][!Redraw]')
+		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar]')
 		Sort()
+		PopulateSlots()
+	end
+
+	function ReverseSort()
+		local tReversedListOfGames = {}
+		for i=1, #T_FILTERED_GAMES do
+			table.insert(tReversedListOfGames, 1, T_FILTERED_GAMES[i])
+		end
+		T_FILTERED_GAMES = tReversedListOfGames
 		PopulateSlots()
 	end
 
@@ -370,11 +416,10 @@ end
 			local j = N_SCROLL_INDEX
 			for i = 1, nSlotCount do -- Iterate through each slot.
 				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
-					SKIN:Bang('[!SetVariable SlotPath' .. i .. ' "' .. tostring(j) .. '"][!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]')
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
-						SKIN:Bang('!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"')
+						SKIN:Bang('[!SetVariable SlotName' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]')
 					else
-						SKIN:Bang('!SetVariable SlotImage' .. i .. ' ""')
+						SKIN:Bang('[!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"][!SetVariable SlotImage' .. i .. ' ""]')
 					end
 					if T_SETTINGS['slot_highlight'] then
 						if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
@@ -421,9 +466,9 @@ end
 					end
 				else -- Slot has no game to show.
 					if T_SETTINGS['slot_highlight'] then
-						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
 					else
-						SKIN:Bang('[!SetVariable SlotPath' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
+						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
 					end
 				end
 				if T_SETTINGS['slot_highlight'] then
@@ -436,35 +481,40 @@ end
 	end
 
 	function Scroll(asDirection)
-		if #T_FILTERED_GAMES > tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) then
-			local abUpwards = true
-			if tonumber(asDirection) < 0 then
-				abUpwards = false
-			end
-			if abUpwards then
+		local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+		if #T_FILTERED_GAMES > nSlotCount then
+			if tonumber(asDirection) >= 0 then
+				if N_SCROLL_INDEX == 1 then
+					return
+				end
 				N_SCROLL_INDEX = N_SCROLL_INDEX - N_SCROLL_STEP
 				if N_SCROLL_INDEX < 1 then
 					N_SCROLL_INDEX = 1
 				end
 			else
+				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
+				if N_SCROLL_INDEX == nUpperLimit then
+					return
+				end
 				N_SCROLL_INDEX = N_SCROLL_INDEX + N_SCROLL_STEP
-				if N_SCROLL_INDEX + tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) > #T_FILTERED_GAMES + 1 then
-					N_SCROLL_INDEX = #T_FILTERED_GAMES + 1 - tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+				if N_SCROLL_INDEX > nUpperLimit then
+					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
 			PopulateSlots()
 		end
 	end
 
-	function Launch(asIndex)
+	function Launch(asIndex) -- asIndex is the index of the slot that was clicked
 		if T_FILTERED_GAMES == nil then
 			return
 		end
-		local nIndex = tonumber(asIndex)
+		local nIndex = tonumber(asIndex) + N_SCROLL_INDEX - 1 -- nIndex is the index of the game in the T_FILTERED_GAMES table that is occupying the slot that was clicked
 		local tGame = T_FILTERED_GAMES[nIndex]
 		if tGame ~= nil then
 			if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
 				local sPath = tGame[GAME_KEYS.PATH]
+				local tArguments = tGame[GAME_KEYS.ARGUMENTS]
 				if sPath ~= nil then
 					tGame[GAME_KEYS.LASTPLAYED] = os.time()
 					bNotInstalled = tGame[GAME_KEYS.NOT_INSTALLED]
@@ -498,19 +548,32 @@ end
 					end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
-						if StartsWith(sPath, 'steam://') then
+						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. tGame[GAME_KEYS.PROCESS] .. '"]')
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
+							--
 						else
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-							local processName = processPath:reverse():match("(exe%p[^\\/:%*?<>|]+)/"):reverse()
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+							local processName = processPath:reverse()
+							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
+							if processName ~= nil then
+								processName = processName:reverse()
+								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+							end
 						end
 						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
 					end
-					SKIN:Bang('["' .. sPath .. '"]')
+					if tArguments ~= nil then
+						sArguments = table.concat(tArguments, '" "')
+						SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
+					else
+						SKIN:Bang('["' .. sPath .. '"]')
+					end
 				end
 			elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
 				if tGame[GAME_KEYS.HIDDEN] ~= true then
@@ -603,10 +666,24 @@ end
 			T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
 			WriteGames()
 			PopulateSlots()
-			if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
-				SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"')))
-			end
+			ExecuteStoppingBang()
 		end
+	end
+
+	function ExecuteStoppingBang()
+		if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
+			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
+		end
+	end
+
+	function Unhighlight(asIndex)
+		if T_FILTERED_GAMES == nil then
+			return
+		end
+		if not T_SETTINGS['slot_highlight'] then
+			return
+		end
+		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
 	end
 
 	function Highlight(asIndex)
@@ -616,22 +693,9 @@ end
 		if not T_SETTINGS['slot_highlight'] then
 			return
 		end
-		local nIndex = tonumber(asIndex)
-		if asIndex == '-1' then
-			for i=1, tonumber(T_SETTINGS['slot_count']) do
-				SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
-			end
-			SKIN:Bang('[!Redraw]')
-		else
-			local tGame = T_FILTERED_GAMES[nIndex]
-			if tGame ~= nil then
-				for i=1, tonumber(T_SETTINGS['slot_count']) do
-					if i ~= nIndex then
-						SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. i .. '"]')
-					end
-				end
-				SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!UpdateMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
-			end
+		local tGame = T_FILTERED_GAMES[tonumber(asIndex)]
+		if tGame ~= nil then
+			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
 		end
 	end
 
