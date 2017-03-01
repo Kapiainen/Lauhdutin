@@ -117,7 +117,7 @@ Currently supported events that can be used to trigger the execution of bangs:
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
 # Changelog
-**Version 2.4.0 - YYYY/MM/DD:**
+**Version 2.4.0 - 2017/03/01:**
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
 - Added sorting by total hours played.
 - Added ability to reverse the order of the list of games.
@@ -130,6 +130,7 @@ The stopping bang can also be executed manually via the context menu, if the ski
 - Added setting for paths to folders containing Battle.net games.
 - Fixed bug that caused the name of a slot's game to show up behind transparent banners.
 - Fixed bug that caused an exception to be raised when processing non-Steam game shortcuts.
+- Fixed bug in the parsing process for banner URLs for Battle.net games.
 - GUI optimizations.
 
 **Version 2.3.0 - 2017/02/19:**
