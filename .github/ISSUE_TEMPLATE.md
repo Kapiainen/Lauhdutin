@@ -1,6 +1,5 @@
 <!--
-Provide a general summary of your changes in the "Title" section above.
-Please fill out the following and answer as many of the questions as you can.
+Please fill out the following sections, follow the described steps, and answer as many of the questions as you can.
 -->
 ## Short description of the issue
 <!--
@@ -52,6 +51,6 @@ What triggers the issue? Please provide a step-by-step explanation, if possible.
 ## Python stack traceback
 <!--
 Try setting the Python path to "python" instead of "pythonw" to show the terminal.
-Reproduce the issue and provide a screenshot of any stack tracebacks that may have appeared in the terminal.
+Reproduce the issue and provide a screenshot or text copy of any stack tracebacks that may have appeared in the terminal.
 -->
 

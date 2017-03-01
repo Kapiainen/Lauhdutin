@@ -65,6 +65,25 @@ function Initialize()
 	if SETTINGS['orientation'] == nil then
 		SETTINGS['orientation'] = "vertical"
 	end
+	if SETTINGS['click_animation'] == nil then
+		SETTINGS['click_animation'] = 0
+	end
+	CLICK_ANIMATION_DESCRIPTIONS = {
+		"Shrink",
+		"Shift left",
+		"Shift right",
+		"Shrink",
+		"Shift up",
+		"Shift down"
+	}
+	if SETTINGS['hover_animation'] == nil then
+		SETTINGS['hover_animation'] = 0
+	end
+	HOVER_ANIMATION_DESCRIPTIONS = {
+		"Zoom in",
+		"Jiggle",
+		"Shake"
+	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -100,7 +119,7 @@ function Exit()
 		return
 	end
 	if OLD_SETTINGS then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation'}
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation', 'hover_animation'}
 		for i=1, #layout_settings do
 			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
 				REBUILD_SWITCH = true
@@ -153,8 +172,14 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS['stop_game_bang'] ..'"]')
 		if SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
+			if SETTINGS['click_animation'] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+				SETTINGS['click_animation'] = 0
+			end
 		else
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
+			if SETTINGS['click_animation'] <= #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+				SETTINGS['click_animation'] = 0
+			end
 		end
 		if SETTINGS['slot_highlight'] == true then
 			SKIN:Bang('[!SetOption "SlotHighlightingStatus" "Text" "Enabled"]')
@@ -170,6 +195,16 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['click_animation'] == 0 then
+			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "Disabled"]')
+		else
+			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "' .. CLICK_ANIMATION_DESCRIPTIONS[SETTINGS['click_animation']] .. '"]')
+		end
+		if SETTINGS['hover_animation'] == 0 then
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
+		else
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS['hover_animation']] .. '"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -385,6 +420,33 @@ function ToggleShowPlatform()
 		SETTINGS['show_platform'] = false
 	else
 		SETTINGS['show_platform'] = true
+	end
+	UpdateSettings()
+end
+
+function CycleClickAnimation()
+	if SETTINGS['orientation'] == 'vertical' then
+		if SETTINGS['click_animation'] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+			SETTINGS['click_animation'] = 0
+		else
+			SETTINGS['click_animation'] = SETTINGS['click_animation'] + 1
+		end
+	elseif SETTINGS['orientation'] == 'horizontal' then
+		if SETTINGS['click_animation'] < #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+			SETTINGS['click_animation'] = #CLICK_ANIMATION_DESCRIPTIONS / 2 + 1
+		elseif SETTINGS['click_animation'] >= #CLICK_ANIMATION_DESCRIPTIONS then
+			SETTINGS['click_animation'] = 0
+		else
+			SETTINGS['click_animation'] = SETTINGS['click_animation'] + 1
+		end
+	end
+	UpdateSettings()
+end
+
+function CycleHoverAnimation()
+	SETTINGS['hover_animation'] = SETTINGS['hover_animation'] + 1
+	if SETTINGS['hover_animation'] > #HOVER_ANIMATION_DESCRIPTIONS then
+		SETTINGS['hover_animation'] = 0
 	end
 	UpdateSettings()
 end

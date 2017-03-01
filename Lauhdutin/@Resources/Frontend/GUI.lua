@@ -4,7 +4,7 @@ function Initialize()
 	S_VDF_SERIALIZING_INDENTATION = ''
 	T_SETTINGS = ReadSettings()
 	if T_SETTINGS == nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
 		return
 	end
 	N_LAUNCH_STATE = 0
@@ -60,12 +60,14 @@ function Initialize()
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
+	B_REVERSE_SORT = false
+	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
 	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
 		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 	end
 end
@@ -95,7 +97,7 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!ShowMeterGroup Status]')
+		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status]')
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
 		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
@@ -342,6 +344,8 @@ end
 	end
 
 	function Sort()
+		B_REVERSE_SORT = false
+		SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 		if T_FILTERED_GAMES ~= nil then
 			if N_SORT_STATE == 1 then
 				table.sort(T_FILTERED_GAMES, SortLastPlayed)
@@ -402,6 +406,12 @@ end
 	end
 
 	function ReverseSort()
+		B_REVERSE_SORT = not B_REVERSE_SORT
+		if B_REVERSE_SORT == true then
+			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+		else
+			SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+		end
 		local tReversedListOfGames = {}
 		for i=1, #T_FILTERED_GAMES do
 			table.insert(tReversedListOfGames, 1, T_FILTERED_GAMES[i])
@@ -676,26 +686,46 @@ end
 		end
 	end
 
-	function Unhighlight(asIndex)
-		if T_FILTERED_GAMES == nil then
-			return
+	function Unhighlight(asIndex)		
+		if T_SETTINGS['slot_highlight'] then
+			SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"]')
 		end
-		if not T_SETTINGS['slot_highlight'] then
-			return
+		if T_SETTINGS['hover_animation'] > 0 then
+			if T_SETTINGS['orientation'] == 'vertical' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 1"]')
+			elseif T_SETTINGS['orientation'] == 'horizontal' then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 2"]')
+			end
+		else
+			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
 	end
 
 	function Highlight(asIndex)
 		if T_FILTERED_GAMES == nil then
 			return
 		end
-		if not T_SETTINGS['slot_highlight'] then
+		local tGame = T_FILTERED_GAMES[tonumber(asIndex) + N_SCROLL_INDEX - 1]
+		if tGame == nil then
 			return
 		end
-		local tGame = T_FILTERED_GAMES[tonumber(asIndex)]
-		if tGame ~= nil then
-			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"][!Redraw]')
+		if T_SETTINGS['slot_highlight'] then
+			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"]')
+		end
+		if T_SETTINGS['hover_animation'] > 0 then
+			if T_SETTINGS['hover_animation'] == 1 then
+				if T_SETTINGS['orientation'] == 'vertical' then
+					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 1"]')
+				elseif T_SETTINGS['orientation'] == 'horizontal' then
+					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 2"]')
+				end
+			elseif T_SETTINGS['hover_animation'] == 2 then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 3"]')
+			elseif T_SETTINGS['hover_animation'] == 3 then
+				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 4"]')
+			end
+		else
+			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
 	end
 
@@ -710,11 +740,17 @@ end
 
 -- Toolbar
 	function ShowToolbar()
+		if B_REVERSE_SORT then
+			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+		end
 		SKIN:Bang('[!ShowMeterGroup Toolbar][!Redraw]')
 	end
 
 	function HideToolbar()
 		if B_FORCE_TOOLBAR == false then
+			if B_REVERSE_SORT then
+				SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+			end
 			SKIN:Bang('[!HideMeterGroup Toolbar][!Redraw]')
 		end
 	end
