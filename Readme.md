@@ -4,6 +4,8 @@ A Rainmeter skin for aggregating games from different platforms and then launchi
 
 ![ex](Docs/demo.gif)
 
+[Higher resolution version of the animated GIF](Docs/Demo-original.gif)
+
 # Contents
  - [Requirements](#requirements)
  - [Installing](#installing)
