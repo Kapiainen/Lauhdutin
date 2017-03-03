@@ -189,7 +189,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added button separators to the toolbar.
 - Added 'R' next to the sorting icon when the sorting order is reversed.
 - Updated toolbar icons.
-- Fixed bug that caused the toolbar to be hidden after hovering the mouse cursor on the button separators.
+- Updated settings skin.
 
 **Version 2.4.0 - 2017/03/01:**
 - Updated sorting of most recently played games to sort them alphabetically when timestamps are equal.
