@@ -226,62 +226,38 @@ end
 		PopulateSlots()
 	end
 
+	function FilterByTag(atTable, asPattern, asTag, asKey, abTrue)
+		local tResult = {}
+		asPattern = asPattern:sub(#asTag + 2)
+		if StartsWith(asPattern, 't') then
+			for i = 1, #atTable do
+				if atTable[i][asKey] == abTrue then
+					table.insert(tResult, atTable[i])
+				end
+			end
+		elseif StartsWith(asPattern, 'f') then
+			for i = 1, #atTable do
+				if atTable[i][asKey] ~= abTrue then
+					table.insert(tResult, atTable[i])
+				end
+			end
+		else
+			return tResult
+		end
+		return tResult
+	end
+
 	function Filter(atTable, asPattern)
 		if atTable == nil then
 			return
 		end
-		tResult = {}
+		local tResult = {}
 		if StartsWith(asPattern, 'steam:') then
-			asPattern = asPattern:sub(7)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM)
 		elseif StartsWith(asPattern, 'galaxy:') then
-			asPattern = asPattern:sub(8)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY)
 		elseif StartsWith(asPattern, 'battlenet:') then
-			asPattern = asPattern:sub(11)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET)
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i = 1, #atTable do
