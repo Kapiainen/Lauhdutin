@@ -216,13 +216,18 @@ end
 			PopulateSlots()
 			return
 		end
+		local sort = true
 		asPattern = asPattern:lower()
 		if StartsWith(asPattern, '+') then
-			T_FILTERED_GAMES = Filter(T_FILTERED_GAMES, asPattern:sub(2))
+			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
-			T_FILTERED_GAMES = Filter(T_ALL_GAMES, asPattern)
+			T_FILTERED_GAMES, sort = Filter(T_ALL_GAMES, asPattern)
 		end
-		Sort()
+		if sort then
+			Sort()
+		else
+			N_SCROLL_INDEX = 1
+		end
 		PopulateSlots()
 	end
 
@@ -253,11 +258,11 @@ end
 		end
 		local tResult = {}
 		if StartsWith(asPattern, 'steam:') then
-			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM)
+			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM), true
 		elseif StartsWith(asPattern, 'galaxy:') then
-			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY)
+			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY), true
 		elseif StartsWith(asPattern, 'battlenet:') then
-			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET)
+			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET), true
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i = 1, #atTable do
@@ -281,7 +286,7 @@ end
 					table.insert(tResult, game)
 				end
 			else
-				return tResult
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
@@ -294,16 +299,169 @@ end
 					table.insert(tResult, game)
 				end
 			else
-				return tResult
+				return tResult, true
 			end
 		else
-			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
-					table.insert(tResult, atTable[i])
+			if T_SETTINGS['fuzzy_search'] == true then
+				local rankings = {}
+				local perfectMatches = {}
+				for i = 1, #atTable do
+					score = FuzzySearch(asPattern, atTable[i][GAME_KEYS.NAME])
+					if score > 0 then
+						table.insert(rankings, {["score"]=score, ["game"]=atTable[i]})
+					end
+				end
+				table.sort(rankings, SortRanking)
+				for i, entry in ipairs(rankings) do
+					--print(entry.score, entry.game[GAME_KEYS.NAME]) -- Debug
+					table.insert(tResult, entry.game)
+				end
+				return tResult, false
+			else
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
+						table.insert(tResult, atTable[i])
+					end
 				end
 			end
 		end
-		return tResult
+		return tResult, true
+	end
+
+	function SortRanking(aFirst, aSecond)
+		--if aFirst.ranking == -1 or aFirst.ranking > aSecond.ranking then
+		if aFirst.score > aSecond.score then
+			return true
+		elseif aFirst.score == aSecond.score then
+			return SortAlphabetically(aFirst.game, aSecond.game)
+		else
+			return false
+		end
+	end
+
+	function SplitStringIntoChars(aString)
+		local characters = {}
+		for char in aString:gmatch(".") do
+			table.insert(characters, char)
+		end
+		return characters
+	end
+
+	function SplitStringIntoWords(aString)
+		local words = {}
+		for word in aString:gmatch("[^%s%p]*") do
+			if word ~= nil and word ~= "" then
+				table.insert(words, word)
+			end
+		end
+		return words
+	end
+
+	function FuzzySearch(aPattern, aString)
+		-- Case-insensitive fuzzy match
+		if aPattern == "" or aString == "" then
+			return 0
+		end
+		-- Bonuses
+		bonusPerfectMatch = 50
+		bonusFirstMatch = 10
+		bonusMatch = 10
+		bonusMatchDistance = 5
+		bonusConsecutiveMatches = 10
+		bonusFirstWordMatch = 15
+		-- Penalties
+		penaltyWordMatching = 2
+		--
+		local score = 0
+		aPattern = aPattern:lower()
+		aString = aString:lower()
+		-- Pattern matches perfectly
+		if aPattern == aString then
+			score = score + bonusPerfectMatch
+		end
+		local patternCharacters = SplitStringIntoChars(aPattern)
+		local stringChars = SplitStringIntoChars(aString)
+		local stringWords = SplitStringIntoWords(aString)
+		-- Distance of first match from start of string
+		local matchIndex = aString:find(patternCharacters[1])
+		if matchIndex ~= nil then
+			score = score + bonusFirstMatch / matchIndex
+			-- Number of matches in order
+			-- Number of consecutive matches
+			-- Distance between matches
+			local matchIndices = {}
+			table.insert(matchIndices, matchIndex)
+			local consecutiveMatches = 0
+			for i, char in ipairs(patternCharacters) do
+				if i > 1 and matchIndices[i - 1] ~= nil then
+					matchIndex = aString:find(char, matchIndices[i - 1] + 1)
+					if matchIndex ~= nil then
+						table.insert(matchIndices, matchIndex)
+						score = score + bonusMatch
+						local distance = matchIndex - matchIndices[i - 1]
+						if distance == 1 then
+							consecutiveMatches = consecutiveMatches + 1
+						else
+							score = score + consecutiveMatches * bonusConsecutiveMatches
+							consecutiveMatches = 0
+						end
+						score = score + bonusMatchDistance / distance
+					else
+						score = score + consecutiveMatches * bonusConsecutiveMatches
+						consecutiveMatches = 0
+					end
+				end
+			end
+		end
+		if #stringWords > 0 then
+			-- Matches at beginning of words
+			local j = 1
+			for i, char in ipairs(patternCharacters) do
+				if j <= #stringWords then
+					if stringWords[j]:find(char) == 1 then
+						score = score + bonusFirstWordMatch
+						j = j + 1
+					end
+				end
+			end
+			-- Matches in words
+			for i, word in ipairs(stringWords) do
+				local matchIndex = word:find(patternCharacters[1])
+				if matchIndex ~= nil then
+					score = score + bonusFirstMatch / matchIndex / penaltyWordMatching
+					-- Number of matches in order
+					-- Number of consecutive matches
+					-- Distance between matches
+					local matchIndices = {}
+					table.insert(matchIndices, matchIndex)
+					local consecutiveMatches = 0
+					for i, char in ipairs(patternCharacters) do
+						if i > 1 and matchIndices[i - 1] ~= nil then
+							matchIndex = word:find(char, matchIndices[i - 1] + 1)
+							if matchIndex ~= nil then
+								table.insert(matchIndices, matchIndex)
+								score = score + bonusMatch / penaltyWordMatching
+								local distance = matchIndex - matchIndices[i - 1]
+								if distance == 1 then
+									consecutiveMatches = consecutiveMatches + 1
+								else
+									score = score + consecutiveMatches * bonusConsecutiveMatches / penaltyWordMatching
+									consecutiveMatches = 0
+								end
+								score = score + bonusMatchDistance / distance / penaltyWordMatching
+							else
+								score = score + consecutiveMatches * bonusConsecutiveMatches / penaltyWordMatching
+								consecutiveMatches = 0
+							end
+						end
+					end
+				end
+			end
+		end
+		if score < 0 then
+			return 0
+		end
+		return score
 	end
 
 	function ClearFilter(atTable)

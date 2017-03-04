@@ -84,6 +84,9 @@ function Initialize()
 		"Jiggle",
 		"Shake"
 	}
+	if SETTINGS['fuzzy_search'] == nil then
+		SETTINGS['fuzzy_search'] = true
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -205,6 +208,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
 		else
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS['hover_animation']] .. '"]')
+		end
+		if SETTINGS['fuzzy_search'] == true then
+			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -448,6 +456,11 @@ function CycleHoverAnimation()
 	if SETTINGS['hover_animation'] > #HOVER_ANIMATION_DESCRIPTIONS then
 		SETTINGS['hover_animation'] = 0
 	end
+	UpdateSettings()
+end
+
+function ToggleFuzzySearch()
+	SETTINGS['fuzzy_search'] = not SETTINGS['fuzzy_search']
 	UpdateSettings()
 end
 

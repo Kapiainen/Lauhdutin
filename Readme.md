@@ -181,6 +181,11 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
+**Version 2.6.0 - YYYY/MM/DD:**
+- Added fuzzy search.
+- Added setting for toggling fuzzy search.
+- Refactored parts of the GUI script.
+- Fixed a bug that caused a small portion of the toolbar to ignore left-clicks and pass them to the slot below.
 
 **Version 2.5.0 - YYYY/MM/DD:**
 - Added optional animations when clicking on a slot.
