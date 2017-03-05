@@ -191,6 +191,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added setting for toggling fuzzy search.
 - Refactored parts of the GUI script.
 - Fixed a bug that caused a small portion of the toolbar to ignore left-clicks and pass them to the slot below.
+- Fixed a bug, which kept the state from being automatically exited, when unhiding games so that no games remain hidden.
 
 **Version 2.5.0 - YYYY/MM/DD:**
 - Added optional animations when clicking on a slot.

@@ -758,10 +758,16 @@ end
 							break
 						end
 					end
-					local scrollIndex = N_SCROLL_INDEX
-					Sort()
-					N_SCROLL_INDEX = scrollIndex
-					PopulateSlots()
+					if #T_FILTERED_GAMES > 0 then
+						local scrollIndex = N_SCROLL_INDEX
+						Sort()
+						N_SCROLL_INDEX = scrollIndex
+						PopulateSlots()
+					else
+						UnhideGame()
+						Sort()
+						PopulateSlots()
+					end
 				end
 			end
 		end
