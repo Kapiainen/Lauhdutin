@@ -359,7 +359,7 @@ end
 	end
 
 	function FuzzySearch(aPattern, aString)
-		-- Case-insensitive fuzzy match
+		-- Case-insensitive fuzzy match that returns a score
 		if aPattern == "" or aString == "" then
 			return 0
 		end
@@ -424,7 +424,19 @@ end
 			return false
 		end
 		-- Matches in entire string
-		match_string(patternCharacters, aString)
+		if not match_string(patternCharacters, aString) then
+			function slice(t, s, e)
+				local r = {}
+				for i = s or 1, e or #t do
+					table.insert(r, t[i])
+				end
+				return r
+			end
+			local min = 1
+			while not match_string(slice(patternCharacters, min), aString) and min < #patternCharacters do
+				min = min + 1
+			end
+		end
 		if #stringWords > 0 then
 			-- Matches at beginning of words
 			local j = 1
