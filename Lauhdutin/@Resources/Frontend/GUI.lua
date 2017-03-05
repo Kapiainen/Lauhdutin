@@ -382,37 +382,44 @@ end
 		local patternCharacters = SplitStringIntoChars(aPattern)
 		local stringChars = SplitStringIntoChars(aString)
 		local stringWords = SplitStringIntoWords(aString)
-		-- Distance of first match from start of string
-		local matchIndex = aString:find(patternCharacters[1])
-		if matchIndex ~= nil then
-			score = score + bonusFirstMatch / matchIndex
-			-- Number of matches in order
-			-- Number of consecutive matches
-			-- Distance between matches
-			local matchIndices = {}
-			table.insert(matchIndices, matchIndex)
-			local consecutiveMatches = 0
-			for i, char in ipairs(patternCharacters) do
-				if i > 1 and matchIndices[i - 1] ~= nil then
-					matchIndex = aString:find(char, matchIndices[i - 1] + 1)
-					if matchIndex ~= nil then
-						table.insert(matchIndices, matchIndex)
-						score = score + bonusMatch
-						local distance = matchIndex - matchIndices[i - 1]
-						if distance == 1 then
-							consecutiveMatches = consecutiveMatches + 1
+
+		function match_string(aPatternCharacters, aStringToMatch)
+			local matchIndex = aStringToMatch:find(aPatternCharacters[1])
+			if matchIndex ~= nil then
+				-- Distance of first match from start of a string
+				score = score + bonusFirstMatch / matchIndex
+				-- Number of matches in order
+				-- Number of consecutive matches
+				-- Distance between matches
+				local matchIndices = {}
+				table.insert(matchIndices, matchIndex)
+				local consecutiveMatches = 0
+				for i, char in ipairs(aPatternCharacters) do
+					if i > 1 and matchIndices[i - 1] ~= nil then
+						matchIndex = aStringToMatch:find(char, matchIndices[i - 1] + 1)
+						if matchIndex ~= nil then
+							table.insert(matchIndices, matchIndex)
+							score = score + bonusMatch
+							local distance = matchIndex - matchIndices[i - 1]
+							if distance == 1 then
+								consecutiveMatches = consecutiveMatches + 1
+							else
+								score = score + consecutiveMatches * bonusConsecutiveMatches
+								consecutiveMatches = 0
+							end
+							score = score + bonusMatchDistance / distance
 						else
 							score = score + consecutiveMatches * bonusConsecutiveMatches
 							consecutiveMatches = 0
 						end
-						score = score + bonusMatchDistance / distance
-					else
-						score = score + consecutiveMatches * bonusConsecutiveMatches
-						consecutiveMatches = 0
 					end
 				end
+				return true
 			end
+			return false
 		end
+		-- Matches in entire string
+		match_string(patternCharacters, aString)
 		if #stringWords > 0 then
 			-- Matches at beginning of words
 			local j = 1
@@ -426,36 +433,7 @@ end
 			end
 			-- Matches in words
 			for i, word in ipairs(stringWords) do
-				local matchIndex = word:find(patternCharacters[1])
-				if matchIndex ~= nil then
-					score = score + bonusFirstMatch / matchIndex / penaltyWordMatching
-					-- Number of matches in order
-					-- Number of consecutive matches
-					-- Distance between matches
-					local matchIndices = {}
-					table.insert(matchIndices, matchIndex)
-					local consecutiveMatches = 0
-					for i, char in ipairs(patternCharacters) do
-						if i > 1 and matchIndices[i - 1] ~= nil then
-							matchIndex = word:find(char, matchIndices[i - 1] + 1)
-							if matchIndex ~= nil then
-								table.insert(matchIndices, matchIndex)
-								score = score + bonusMatch / penaltyWordMatching
-								local distance = matchIndex - matchIndices[i - 1]
-								if distance == 1 then
-									consecutiveMatches = consecutiveMatches + 1
-								else
-									score = score + consecutiveMatches * bonusConsecutiveMatches / penaltyWordMatching
-									consecutiveMatches = 0
-								end
-								score = score + bonusMatchDistance / distance / penaltyWordMatching
-							else
-								score = score + consecutiveMatches * bonusConsecutiveMatches / penaltyWordMatching
-								consecutiveMatches = 0
-							end
-						end
-					end
-				end
+				match_string(patternCharacters, word)
 			end
 		end
 		if score < 0 then
