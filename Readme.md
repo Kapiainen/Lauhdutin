@@ -28,6 +28,9 @@ Developed with the following software in mind:
 
 # Installing
 - Install Rainmeter and Python 3 on your system (see [requirements](#requirements) for more info).
+  - [Add Python to the PATH system variable](Docs/PythonStep1.jpg).
+  - [Customize the installation](Docs/PythonStep1.jpg).
+  - [Install the `tcl/tk and IDLE` optional feature.](Docs/PythonStep2.jpg)
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
 - Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
 - Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Exit** button.
