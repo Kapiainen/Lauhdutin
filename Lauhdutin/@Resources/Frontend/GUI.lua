@@ -312,6 +312,7 @@ end
 					end
 				end
 				table.sort(rankings, SortRanking)
+				--print("== " .. asPattern .. " ==") -- Debug
 				for i, entry in ipairs(rankings) do
 					--print(entry.score, entry.game[GAME_KEYS.NAME]) -- Debug
 					table.insert(tResult, entry.game)
@@ -363,14 +364,14 @@ end
 			return 0
 		end
 		-- Bonuses
-		bonusPerfectMatch = 50
-		bonusFirstMatch = 10
-		bonusMatch = 10
-		bonusMatchDistance = 5
-		bonusConsecutiveMatches = 10
-		bonusFirstWordMatch = 15
+		local bonusPerfectMatch = 50
+		local bonusFirstMatch = 25
+		local bonusMatch = 10
+		local bonusMatchDistance = 10
+		local bonusConsecutiveMatches = 10
+		local bonusFirstWordMatch = 20
 		-- Penalties
-		penaltyWordMatching = 2
+		local penaltyNotMatch = -5
 		--
 		local score = 0
 		aPattern = aPattern:lower()
@@ -410,9 +411,13 @@ end
 							score = score + bonusMatchDistance / distance
 						else
 							score = score + consecutiveMatches * bonusConsecutiveMatches
+							score = score + penaltyNotMatch
 							consecutiveMatches = 0
 						end
 					end
+				end
+				if consecutiveMatches > 0 then
+					score = score + consecutiveMatches * bonusConsecutiveMatches
 				end
 				return true
 			end
