@@ -836,16 +836,6 @@ end
 		end
 	end
 
-	function Unhighlight(asIndex)
-		if T_FILTERED_GAMES == nil then
-			return
-		end
-		if not T_SETTINGS['slot_highlight'] then
-			return
-		end
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"][!Redraw]')
-	end
-
 	function Highlight(asIndex)
 		if T_FILTERED_GAMES == nil then
 			return
