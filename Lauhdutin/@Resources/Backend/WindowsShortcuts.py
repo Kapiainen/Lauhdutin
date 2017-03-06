@@ -58,7 +58,7 @@ class WindowsShortcuts():
                 name = a_shortcut[:-4]
                 game_dict[GameKeys.NAME] = Utility.title_move_the(name)
                 target_path = target_match.group(1)
-                if not os.path.isfile(target_path):
+                if not os.path.isfile(target_path) and not os.path.isdir(target_path):
                     game_dict[GameKeys.ERROR] = True
                     game_dict[GameKeys.INVALID_PATH] = True
                 game_dict[GameKeys.PATH] = target_path
