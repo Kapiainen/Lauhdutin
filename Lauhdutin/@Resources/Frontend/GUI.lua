@@ -62,13 +62,20 @@ function Initialize()
 	HideToolbar()
 	B_REVERSE_SORT = false
 	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+	if T_SETTINGS ~= nil then
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	else
+		SKIN:Bang('[!SetOption StatusMessage Text "Failed to load settings..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+	end
+	N_LAST_DRAWN_SCROLL_INDEX = -1
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
-	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
-		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	if N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
+		PopulateSlots()
+		N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 	end
 end
 
@@ -640,7 +647,6 @@ end
 					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
-			PopulateSlots()
 		end
 	end
 

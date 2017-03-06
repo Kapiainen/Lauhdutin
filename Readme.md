@@ -193,6 +193,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Fixed a bug that caused a small portion of the toolbar to ignore left-clicks and pass them to the slot below.
 - Fixed a bug, which kept the state from being automatically exited, when unhiding games so that no games remain hidden.
 - Fixed a bug that prevented shortcuts to folders from working.
+- GUI optimizations.
 
 **Version 2.5.1 - 2017/03/06:**
 - Fixed a bug that caused hover animations to not reset properly.
