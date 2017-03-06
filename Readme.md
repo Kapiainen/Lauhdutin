@@ -182,6 +182,9 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 
+**Version 2.5.1 - 2017/03/06:**
+- Fixed a bug that caused hover animations to not reset properly.
+
 **Version 2.5.0 - 2017/03/06:**
 - Added optional animations when clicking on a slot.
 - Added optional animations when hovering the mouse over a slot.
