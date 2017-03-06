@@ -182,7 +182,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 
-**Version 2.5.0 - YYYY/MM/DD:**
+**Version 2.5.0 - 2017/03/06:**
 - Added optional animations when clicking on a slot.
 - Added optional animations when hovering the mouse over a slot.
 - Added support for retaining information about games, which were previously detected and then uninstalled, for future use.
