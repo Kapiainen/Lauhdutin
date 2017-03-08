@@ -694,9 +694,9 @@ end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
 						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+							StartMonitoringProcess('GameOverlayUI.exe')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. tGame[GAME_KEYS.PROCESS] .. '"]')
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
 							--
 						else
@@ -705,10 +705,9 @@ end
 							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
 							if processName ~= nil then
 								processName = processName:reverse()
-								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+								StartMonitoringProcess(processName)
 							end
 						end
-						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
@@ -811,6 +810,10 @@ end
 		end
 	end
 
+	function StartMonitoringProcess(asString)
+		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "160"][!SetOption "ProcessMonitor" "ProcessName" "' .. asString .. '"][!UpdateMeasure "ProcessMonitor"]')
+	end
+
 	function UpdateTimePlayed()
 		if T_RECENTLY_LAUNCHED_GAME ~= nil then
 			local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
@@ -819,6 +822,7 @@ end
 			PopulateSlots()
 			ExecuteStoppingBang()
 		end
+		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "-1"][!UpdateMeasure "ProcessMonitor"]')
 	end
 
 	function ExecuteStoppingBang()
