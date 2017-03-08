@@ -178,7 +178,7 @@ Try to keep draw calls to a minimum by, for example:
 
 ## Adding support for a platform
 There are a few rules that **must** be followed when adding support for additional platforms:
-- Sensitive account data must never be transmitted from the user's system. Preferably the only transmitted data should be relevant to downloading e.g. banners.
+- Sensitive account data must never be transmitted from the user's system.
 - All data that is retrieved and/or utilized by the skin must have been intentionally made publicly available by the platform's developers and/or stored locally in an unencrypted state.
 - Local data should be preferred over data that needs to be acquired over the internet.
 - Minimize internet usage by e.g. downloading a banner only if a local copy does not already exist.
