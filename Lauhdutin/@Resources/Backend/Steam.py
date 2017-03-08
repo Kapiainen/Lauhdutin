@@ -135,7 +135,9 @@ class Steam():
                     print("\tCommunity profile might be set to private...")
                     game_definitions = None
             except:  # Possibly no internet connection or server issues
-                print("\tFailed to access commmunity profile...")
+                print("\tFailed to either access or parse commmunity profile...")
+                import traceback
+                traceback.print_exc()
                 game_definitions = None
         for basePath in libraries:
             print("\tFound library '%s'" % basePath)
@@ -248,8 +250,10 @@ class Steam():
                             a_decoded_lines[i][17:a_decoded_lines[i]
                                                .find("</")])
                     elif line.startswith("<hoursonrecord>"):
-                        game_def[GameKeys.HOURS_TOTAL] = float(a_decoded_lines[
-                            i][15:a_decoded_lines[i].find("</")])
+                        hours_total_string = a_decoded_lines[i][15:a_decoded_lines[i].find("</")]
+                        if "," in hours_total_string:
+                            hours_total_string = hours_total_string.replace(",", "")
+                        game_def[GameKeys.HOURS_TOTAL] = float(hours_total_string)
                     i += 1
                     if (len(game_def) >= 1 and
                             game_def.get(VDFKeys.APPID, None)):
