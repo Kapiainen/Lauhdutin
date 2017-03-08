@@ -44,6 +44,9 @@ function Initialize()
 	if SETTINGS['steam_id64'] == nil then
 		SETTINGS['steam_id64'] = ""
 	end
+	if SETTINGS['parse_steam_community_profile'] == nil then
+		SETTINGS['parse_steam_community_profile'] = true
+	end
 	if SETTINGS['start_game_bang'] == nil then
 		SETTINGS['start_game_bang'] = ""
 	end
@@ -161,8 +164,6 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "SteamPathInput" "DefaultValue" "' .. SETTINGS['steam_path'] ..'"]')
 		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS['steam_personaname']) .. '"]')
 		SKIN:Bang('[!SetOption "SteamUserdataidInput" "DefaultValue" "' .. SETTINGS['steam_userdataid'] ..'"]')
-		SKIN:Bang('[!SetOption "SteamID64Status" "Text" "' .. tostring(SETTINGS['steam_id64']) .. '"]')
-		SKIN:Bang('[!SetOption "SteamID64Input" "DefaultValue" "' .. SETTINGS['steam_id64'] ..'"]')
 		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
 		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS['galaxy_path'] ..'"]')
 		SKIN:Bang('[!SetOption "BattlenetPathStatus" "Text" "' .. tostring(SETTINGS['battlenet_path']) .. '"]')
@@ -213,6 +214,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['parse_steam_community_profile'] == true then
+			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
+		else
+			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Ignore"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -345,6 +351,9 @@ function AcceptSteamUserdataid(aPath)
 					end
 				end
 			end
+			if SETTINGS['steam_id64'] == '' then
+				print('Lauhdutin: Failed to figure out SteamID64 for ' .. personaName)
+			end
 			UpdateSettings()
 		end
 	else
@@ -354,8 +363,8 @@ function AcceptSteamUserdataid(aPath)
 	end
 end
 
-function SetSteamID64(aValue)
-	SETTINGS['steam_id64'] = aValue
+function ToggleSteamProfile()
+	SETTINGS['parse_steam_community_profile'] = not SETTINGS['parse_steam_community_profile']
 	UpdateSettings()
 end
 

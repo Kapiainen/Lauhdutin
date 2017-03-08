@@ -196,6 +196,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - GUI optimizations.
 - Added more info to the terminal when there is a failure to parse a Steam community profile.
 - Fixed bug that caused total hours played to fail to parse when the value was 1000+ hours.
+- Simplified a setting related to Steam integration.
 
 **Version 2.5.1 - 2017/03/06:**
 - Fixed a bug that caused hover animations to not reset properly.
