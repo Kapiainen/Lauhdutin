@@ -7,6 +7,9 @@ function Initialize()
 		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
 		return
 	end
+	for i=1, tonumber(T_SETTINGS['slot_count']) do
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
+	end
 	N_LAUNCH_STATE = 0
 	T_LAUNCH_STATES = {
 		LAUNCH = 0,
@@ -105,9 +108,6 @@ function Init()
 		FilterBy('hidden:true')
 	else
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status]')
-	end
-	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
 	PopulateSlots()
 end
