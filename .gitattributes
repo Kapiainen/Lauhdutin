@@ -15,3 +15,8 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+Docs/* linguist-documentation
+Tests/* linguist-documentation
+Lauhdutin/@Resources/Dependencies/* linguist-vendored
+*.inc linguist-vendored
