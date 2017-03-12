@@ -292,6 +292,13 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
 			else
 				return tResult, true
 			end
@@ -302,6 +309,13 @@ end
 					table.insert(tResult, game)
 				end
 			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
