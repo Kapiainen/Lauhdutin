@@ -443,10 +443,12 @@ end
 				TotalGames = TotalGames + 1
 				end
 			end
-			for i, game in ipairs(T_HIDDEN_GAMES) do
-				if game["hourstotal"] > 0 then
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
+			if HiddenFilter == "Enabled" then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game["hourstotal"] > 0 then
+					table.insert(tResultR, game)
+					TotalGames = TotalGames + 1
+					end
 				end
 			end
 			local RandomGame = math.random(1,TotalGames)
@@ -471,9 +473,11 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					if game["hourstotal"] > 0 then
-						table.insert(tResult, game)
+				if HiddenFilter == "Enabled" then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game["hourstotal"] > 0 then
+							table.insert(tResult, game)
+						end
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then	
@@ -487,9 +491,11 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					if game["hourstotal"] == 0 then
-						table.insert(tResult, game)
+				if HiddenFilter == "Enabled" then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game["hourstotal"] == 0 then
+							table.insert(tResult, game)
+						end
 					end
 				end
             		else
