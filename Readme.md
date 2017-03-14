@@ -110,6 +110,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
 
+- `random:` followed by `all`, `steam` or `played`. If `all`, then show one random game from games installed or not. If `steam`, then show one random game from Steam games installed or not. If  `played`, then show one random game from all games (hidden, instaled or not) with a total played time above 0 hours.
+
 - `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
