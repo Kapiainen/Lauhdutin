@@ -265,7 +265,54 @@ end
 		end
 		local tResult = {}
 		if StartsWith(asPattern, 'steam:') then
-			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM), true
+			asPattern = asPattern:sub(7)
+			if StartsWith(asPattern, 'i') then
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResult, game)
+				end
+			end
+			elseif StartsWith(asPattern, 'u') then
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResult, game)
+				end
+			end
+			elseif StartsWith(asPattern, 'a') then
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResult, game)
+				end
+			end
+				for i, game in ipairs(T_ALL_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResult, game)
+				end
+			end
+			elseif StartsWith(asPattern, 'p') then
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["platform"] == 0 then
+					if game["hourstotal"] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game["platform"] == 0 then
+					if game["hourstotal"] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+			elseif StartsWith(asPattern, 'f') then
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["platform"] ~= 0 then
+				table.insert(tResult, game)
+				end
+			end
+			else
+			return tResult, true
+			end
 		elseif StartsWith(asPattern, 'galaxy:') then
 			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY), true
 		elseif StartsWith(asPattern, 'battlenet:') then
