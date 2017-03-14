@@ -136,7 +136,7 @@ function Exit()
 	if REBUILD_SWITCH then
 		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;" "#CURRENTFILE#;"]')
 	else
-		SKIN:Bang('[!ActivateConfig #CURRENTCONFIG# "Main.ini"]')
+		SKIN:Bang('[!ActivateConfig "#CURRENTCONFIG#" "Main.ini"]')
 	end	
 end
 
