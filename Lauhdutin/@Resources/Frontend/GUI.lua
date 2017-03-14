@@ -384,6 +384,77 @@ end
 			else
 				return tResult, true
 			end	
+		elseif StartsWith(asPattern, 'random:') then
+		asPattern = asPattern:sub(8)
+		local tResultR = {}
+		if StartsWith(asPattern, 'a') then
+			local RandomGame = 0
+			local TotalGames = 0
+			for i, game in ipairs(T_ALL_GAMES) do
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+			end
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+			end
+			RandomGame = math.random(1,TotalGames)
+			for i, game in ipairs(tResultR) do
+				if i == RandomGame then
+				table.insert(tResult, game)
+				end
+			end	
+		elseif StartsWith(asPattern, 's') then	
+			local RandomGame = 0
+			local TotalGames = 0
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+				end
+			end
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["platform"] == 0 then
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+				end
+			end
+			local RandomGame = math.random(1,TotalGames)
+			for i, game in ipairs(tResultR) do
+				if i == RandomGame then
+				table.insert(tResult, game)
+				end
+			end	
+		elseif StartsWith(asPattern, 'p') then	
+			local RandomGame = 0
+			local TotalGames = 0	
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game["hourstotal"] > 0 then
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+				end
+			end
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game["hourstotal"] > 0 then
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+				end
+			end
+			for i, game in ipairs(T_HIDDEN_GAMES) do
+				if game["hourstotal"] > 0 then
+				table.insert(tResultR, game)
+				TotalGames = TotalGames + 1
+				end
+			end
+			local RandomGame = math.random(1,TotalGames)
+			for i, game in ipairs(tResultR) do
+				if i == RandomGame then
+				table.insert(tResult, game)
+				end
+			end	
+			else
+				return tResult, true
+			end		
 		elseif StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
