@@ -264,6 +264,9 @@ end
 			return
 		end
 		local tResult = {}
+		local HiddenFilter = SKIN:GetVariable('HiddenFilters')
+		--HiddenFilter = Enabled or Disabled
+		--if HiddenFilter == "Enabled" then
 		if StartsWith(asPattern, 'steam:') then
 			asPattern = asPattern:sub(7)
 			if StartsWith(asPattern, 'i') then
