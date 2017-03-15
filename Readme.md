@@ -108,6 +108,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `played:` followed by `true` or `false`. If `true`, then all games with a total played time above 0 hours are shown. If `false`, then all games with a total played time of 0 hours are shown.
 
+- `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
+
 - `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
 
 - `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
@@ -191,7 +193,8 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
-- Added `installed:all`, `hidden:all`, `games:all`, `played:true`, and `played:false` filter tags.
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.
 
 **Version 2.6.0 - YYYY/MM/DD:**
 - Added fuzzy search.

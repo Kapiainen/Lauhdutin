@@ -41,6 +41,7 @@ function Initialize()
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
+		PLATFORM_OVERRIDE = "platformoverride",
 		PROCESS = "process",
 		TAGS = "tags"
 	}
@@ -601,6 +602,18 @@ end
 		PopulateSlots()
 	end
 
+	function GetPlatformDescription(atGame)
+		if atGame ~= nil then
+			if atGame[GAME_KEYS.PLATFORM] == 3 or atGame[GAME_KEYS.PLATFORM] == 4 then
+				if atGame[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil then
+					return atGame[GAME_KEYS.PLATFORM_OVERRIDE]
+				end
+			end
+			return PLATFORM_DESCRIPTION[atGame[GAME_KEYS.PLATFORM]+1]
+		end
+		return ''
+	end
+
 	function PopulateSlots()
 		if T_FILTERED_GAMES ~= nil then
 			local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
@@ -619,24 +632,24 @@ end
 								local hoursPlayed = math.floor(totalHoursPlayed)
 								local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
 								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 								else
 									if T_SETTINGS["show_platform"] then
-										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 									else
 										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 									end								
 								end
 							else
 								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 								else
 									if T_SETTINGS["show_platform"] then
-										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 									else
 										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
 									end
