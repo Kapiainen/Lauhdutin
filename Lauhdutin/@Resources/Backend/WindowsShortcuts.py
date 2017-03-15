@@ -22,32 +22,57 @@ class WindowsShortcuts():
 
     def get_games(self):
         result = {}
-        shortcuts = self.get_shortcuts()
+        shortcuts = self.get_shortcuts(self.shortcuts_path)
         if shortcuts:
             for shortcut in shortcuts:
                 print("\tFound shortcut '%s'" % shortcut)
-                game_key, game_dict = self.process_shortcut(shortcut)
+                game_key, game_dict = self.process_shortcut(self.shortcuts_path, shortcut)
                 if (game_key and game_dict):
                     result[game_key] = game_dict
-        url_shortcuts = self.get_url_shortcuts()
+        url_shortcuts = self.get_url_shortcuts(self.shortcuts_path)
         if url_shortcuts:
             for shortcut in url_shortcuts:
                 print("\tFound shortcut '%s'" % shortcut)
-                game_key, game_dict = self.process_url_shortcut(shortcut)
+                game_key, game_dict = self.process_url_shortcut(self.shortcuts_path, shortcut)
                 print(game_dict)
                 if (game_key and game_dict):
                     result[game_key] = game_dict
+        subfolders = self.get_subfolders(self.shortcuts_path)
+        for subfolder in subfolders:
+            subfolder_path = os.path.join(self.shortcuts_path, subfolder)
+            subfolder_shortcuts = self.get_shortcuts(subfolder_path)
+            if subfolder_shortcuts:
+                for shortcut in subfolder_shortcuts:
+                    print("\tFound shortcut '%s\%s'" % (subfolder, shortcut))
+                    game_key, game_dict = self.process_shortcut(subfolder_path, shortcut)
+                    if (game_key and game_dict):
+                        game_dict[GameKeys.PLATFORM_OVERRIDE] = subfolder
+                        result[game_key] = game_dict
+            subfolder_url_shortcuts = self.get_url_shortcuts(subfolder_path)
+            if subfolder_url_shortcuts:
+                for shortcut in subfolder_url_shortcuts:
+                    print("\tFound shortcut '%s\%s'" % (subfolder, shortcut))
+                    game_key, game_dict = self.process_url_shortcut(subfolder_path, shortcut)
+                    print(game_dict)
+                    if (game_key and game_dict):
+                        game_dict[GameKeys.PLATFORM_OVERRIDE] = subfolder
+                        result[game_key] = game_dict
         return result
 
-    def get_shortcuts(self):
-        for root, directories, files in os.walk(self.shortcuts_path):
+    def get_shortcuts(self, a_path):
+        for root, directories, files in os.walk(a_path):
             return [f for f in files if f.endswith(".lnk")]
         return []
 
-    def process_shortcut(self, a_shortcut):
+    def get_subfolders(self, a_path):
+        for root, directories, files in os.walk(a_path):
+            return directories
+        return []
+
+    def process_shortcut(self, a_path, a_shortcut):
         args = [
             "wscript", self.shortcut_parser_script,
-            os.path.join(self.shortcuts_path, a_shortcut)
+            os.path.join(a_path, a_shortcut)
         ]
         output = subprocess.check_output(args)
         if output:
@@ -81,15 +106,15 @@ class WindowsShortcuts():
                     return "Shortcuts\\%s" % banner
         return "Shortcuts\\%s.jpg" % a_name
 
-    def get_url_shortcuts(self):
-        for root, directories, files in os.walk(self.shortcuts_path):
+    def get_url_shortcuts(self, a_path):
+        for root, directories, files in os.walk(a_path):
             return [f for f in files if f.endswith(".url")]
         return []
 
-    def process_url_shortcut(self, a_shortcut):
+    def process_url_shortcut(self, a_path, a_shortcut):
         args = [
             "wscript", self.shortcut_parser_script,
-            os.path.join(self.shortcuts_path, a_shortcut)
+            os.path.join(a_path, a_shortcut)
         ]
         output = subprocess.check_output(args)
         if output:

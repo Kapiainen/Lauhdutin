@@ -100,9 +100,15 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `battlenet:` followed by `true` or `false`. If `true`, then only show games installed via Battle.net. If `false`, then show all other games that were not installed via Battle.net.
 
-- `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
+- `installed:` followed by `true`, `false`, or `all`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment). If `all`, then all games (excluding hidden ones) are shown.
 
 - `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
+
+- `games:` followed by `all` shows all games regardless of if it is installed or not, or hidden.
+
+- `played:` followed by `true` or `false`. If `true`, then all games with a total played time above 0 hours are shown. If `false`, then all games with a total played time of 0 hours are shown.
+
+- `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
 
 - `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
 
@@ -186,6 +192,10 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
+**Version 2.7.0 - YYYY/MM/DD:**
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.
+
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
 - Added setting for toggling fuzzy search.

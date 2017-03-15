@@ -41,6 +41,7 @@ function Initialize()
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
+		PLATFORM_OVERRIDE = "platformoverride",
 		PROCESS = "process",
 		TAGS = "tags"
 	}
@@ -238,18 +239,18 @@ end
 		PopulateSlots()
 	end
 
-	function FilterByTag(atTable, asPattern, asTag, asKey, abTrue)
+	function FilterByTag(atTable, asPattern, asTag, asKey, aTrue)
 		local tResult = {}
 		asPattern = asPattern:sub(#asTag + 2)
 		if StartsWith(asPattern, 't') then
 			for i = 1, #atTable do
-				if atTable[i][asKey] == abTrue then
+				if atTable[i][asKey] == aTrue then
 					table.insert(tResult, atTable[i])
 				end
 			end
 		elseif StartsWith(asPattern, 'f') then
 			for i = 1, #atTable do
-				if atTable[i][asKey] ~= abTrue then
+				if atTable[i][asKey] ~= aTrue then
 					table.insert(tResult, atTable[i])
 				end
 			end
@@ -272,11 +273,11 @@ end
 			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET), true
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
-			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.TAGS] ~= nil then
-					for sKey, sValue in pairs(atTable[i][GAME_KEYS.TAGS]) do
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.TAGS] ~= nil then
+					for sKey, sValue in pairs(game[GAME_KEYS.TAGS]) do
 						if sValue:lower():find(asPattern) then
-							table.insert(tResult, atTable[i])
+							table.insert(tResult, game)
 							break
 						end
 					end
@@ -292,8 +293,13 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
-			else
-				return tResult, true
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
 			end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
@@ -305,17 +311,57 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
-			else
-				return tResult, true
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+			end
+		elseif StartsWith(asPattern, 'games:') then
+			asPattern = asPattern:sub(7)
+			if StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
+			end	
+		elseif StartsWith(asPattern, 'played:') then
+			asPattern = asPattern:sub(8)
+			if StartsWith(asPattern, 't') then
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'shortcuts:') then
+			asPattern = asPattern:sub(11)
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil and game[GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
+					table.insert(tResult, game)
+				end
 			end
 		else
 			if T_SETTINGS['fuzzy_search'] == true then
 				local rankings = {}
 				local perfectMatches = {}
-				for i = 1, #atTable do
-					score = FuzzySearch(asPattern, atTable[i][GAME_KEYS.NAME])
+				for i, game in ipairs(atTable) do
+					score = FuzzySearch(asPattern, game[GAME_KEYS.NAME])
 					if score > 0 then
-						table.insert(rankings, {["score"]=score, ["game"]=atTable[i]})
+						table.insert(rankings, {["score"]=score, ["game"]=game})
 					end
 				end
 				table.sort(rankings, SortRanking)
@@ -326,9 +372,9 @@ end
 				end
 				return tResult, false
 			else
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
-						table.insert(tResult, atTable[i])
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.NAME]:lower():find(asPattern) then
+						table.insert(tResult, game)
 					end
 				end
 			end
@@ -556,6 +602,18 @@ end
 		PopulateSlots()
 	end
 
+	function GetPlatformDescription(atGame)
+		if atGame ~= nil then
+			if atGame[GAME_KEYS.PLATFORM] == 3 or atGame[GAME_KEYS.PLATFORM] == 4 then
+				if atGame[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil then
+					return atGame[GAME_KEYS.PLATFORM_OVERRIDE]
+				end
+			end
+			return PLATFORM_DESCRIPTION[atGame[GAME_KEYS.PLATFORM]+1]
+		end
+		return ''
+	end
+
 	function PopulateSlots()
 		if T_FILTERED_GAMES ~= nil then
 			local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
@@ -574,24 +632,24 @@ end
 								local hoursPlayed = math.floor(totalHoursPlayed)
 								local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
 								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 								else
 									if T_SETTINGS["show_platform"] then
-										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 									else
 										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
 									end								
 								end
 							else
 								if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 								elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
 									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 								else
 									if T_SETTINGS["show_platform"] then
-										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. PLATFORM_DESCRIPTION[T_FILTERED_GAMES[j][GAME_KEYS.PLATFORM]+1] .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
 									else
 										SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
 									end
