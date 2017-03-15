@@ -425,7 +425,7 @@ end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
 			else
-				return tResult, true
+				table.insert(tResult, atTable[math.random(1, #atTable)])
 			end		
 		elseif StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
