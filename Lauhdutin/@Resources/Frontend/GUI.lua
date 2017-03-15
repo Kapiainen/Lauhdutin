@@ -264,9 +264,6 @@ end
 			return
 		end
 		local tResult = {}
-		local HiddenFilter = SKIN:GetVariable('HiddenFilters')
-		--HiddenFilter = Enabled or Disabled
-		--if HiddenFilter == "Enabled" then
 		if StartsWith(asPattern, 'steam:') then
 			asPattern = asPattern:sub(7)
 			if StartsWith(asPattern, 'i') then
@@ -443,12 +440,10 @@ end
 				TotalGames = TotalGames + 1
 				end
 			end
-			if HiddenFilter == "Enabled" then
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					if game["hourstotal"] > 0 then
-					table.insert(tResultR, game)
-					TotalGames = TotalGames + 1
-					end
+			for i, game in ipairs(T_HIDDEN_GAMES) do
+ -				if game["hourstotal"] > 0 then
+ -				table.insert(tResultR, game)
+ -				TotalGames = TotalGames + 1
 				end
 			end
 			local RandomGame = math.random(1,TotalGames)
@@ -473,11 +468,9 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				if HiddenFilter == "Enabled" then
-					for i, game in ipairs(T_HIDDEN_GAMES) do
-						if game["hourstotal"] > 0 then
-							table.insert(tResult, game)
-						end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+ -					if game["hourstotal"] > 0 then
+ -						table.insert(tResult, game)
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then	
@@ -491,11 +484,9 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				if HiddenFilter == "Enabled" then
-					for i, game in ipairs(T_HIDDEN_GAMES) do
-						if game["hourstotal"] == 0 then
-							table.insert(tResult, game)
-						end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+ -					if game["hourstotal"] == 0 then
+ -						table.insert(tResult, game)
 					end
 				end
             		else
