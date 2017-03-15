@@ -385,73 +385,45 @@ end
 				return tResult, true
 			end	
 		elseif StartsWith(asPattern, 'random:') then
-		asPattern = asPattern:sub(8)
-		local tResultR = {}
-		if StartsWith(asPattern, 'a') then
-			local RandomGame = 0
-			local TotalGames = 0
-			for i, game in ipairs(T_ALL_GAMES) do
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
-			end
-			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
-			end
-			RandomGame = math.random(1,TotalGames)
-			for i, game in ipairs(tResultR) do
-				if i == RandomGame then
-				table.insert(tResult, game)
+			asPattern = asPattern:sub(8)
+			local tResultR = {}
+			if StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResultR, game)
 				end
-			end	
-		elseif StartsWith(asPattern, 's') then	
-			local RandomGame = 0
-			local TotalGames = 0
-			for i, game in ipairs(T_ALL_GAMES) do
-				if game["platform"] == 0 then
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResultR, game)
 				end
-			end
-			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-				if game["platform"] == 0 then
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			elseif StartsWith(asPattern, 's') then	
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
 				end
-			end
-			local RandomGame = math.random(1,TotalGames)
-			for i, game in ipairs(tResultR) do
-				if i == RandomGame then
-				table.insert(tResult, game)
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
 				end
-			end	
-		elseif StartsWith(asPattern, 'p') then	
-			local RandomGame = 0
-			local TotalGames = 0	
-			for i, game in ipairs(T_ALL_GAMES) do
-				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			elseif StartsWith(asPattern, 'p') then	
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
 				end
-			end
-			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
-				table.insert(tResultR, game)
-				TotalGames = TotalGames + 1
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
 				end
-			end
-			for i, game in ipairs(T_HIDDEN_GAMES) do
- -				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- -				table.insert(tResultR, game)
- -				TotalGames = TotalGames + 1
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+ -					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ -						table.insert(tResultR, game)
+					end
 				end
-			end
-			local RandomGame = math.random(1,TotalGames)
-			for i, game in ipairs(tResultR) do
-				if i == RandomGame then
-				table.insert(tResult, game)
-				end
-			end	
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
 			else
 				return tResult, true
 			end		
