@@ -196,7 +196,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.
 
-**Version 2.6.0 - YYYY/MM/DD:**
+**Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
 - Added setting for toggling fuzzy search.
 - Refactored parts of the GUI script.
