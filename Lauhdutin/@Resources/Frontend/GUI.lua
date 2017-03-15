@@ -7,6 +7,9 @@ function Initialize()
 		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
 		return
 	end
+	for i=1, tonumber(T_SETTINGS['slot_count']) do
+		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
+	end
 	N_LAUNCH_STATE = 0
 	T_LAUNCH_STATES = {
 		LAUNCH = 0,
@@ -62,13 +65,20 @@ function Initialize()
 	HideToolbar()
 	B_REVERSE_SORT = false
 	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+	if T_SETTINGS ~= nil then
+		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	else
+		SKIN:Bang('[!SetOption StatusMessage Text "Failed to load settings..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+	end
+	N_LAST_DRAWN_SCROLL_INDEX = -1
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
-	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
-		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+	if N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
+		PopulateSlots()
+		N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 	end
 end
 
@@ -98,9 +108,6 @@ function Init()
 		FilterBy('hidden:true')
 	else
 		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status]')
-	end
-	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
 	end
 	PopulateSlots()
 end
@@ -216,72 +223,53 @@ end
 			PopulateSlots()
 			return
 		end
+		local sort = true
 		asPattern = asPattern:lower()
 		if StartsWith(asPattern, '+') then
-			T_FILTERED_GAMES = Filter(T_FILTERED_GAMES, asPattern:sub(2))
+			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
-			T_FILTERED_GAMES = Filter(T_ALL_GAMES, asPattern)
+			T_FILTERED_GAMES, sort = Filter(T_ALL_GAMES, asPattern)
 		end
-		Sort()
+		if sort then
+			Sort()
+		else
+			N_SCROLL_INDEX = 1
+		end
 		PopulateSlots()
+	end
+
+	function FilterByTag(atTable, asPattern, asTag, asKey, abTrue)
+		local tResult = {}
+		asPattern = asPattern:sub(#asTag + 2)
+		if StartsWith(asPattern, 't') then
+			for i = 1, #atTable do
+				if atTable[i][asKey] == abTrue then
+					table.insert(tResult, atTable[i])
+				end
+			end
+		elseif StartsWith(asPattern, 'f') then
+			for i = 1, #atTable do
+				if atTable[i][asKey] ~= abTrue then
+					table.insert(tResult, atTable[i])
+				end
+			end
+		else
+			return tResult
+		end
+		return tResult
 	end
 
 	function Filter(atTable, asPattern)
 		if atTable == nil then
 			return
 		end
-		tResult = {}
+		local tResult = {}
 		if StartsWith(asPattern, 'steam:') then
-			asPattern = asPattern:sub(7)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM), true
 		elseif StartsWith(asPattern, 'galaxy:') then
-			asPattern = asPattern:sub(8)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY), true
 		elseif StartsWith(asPattern, 'battlenet:') then
-			asPattern = asPattern:sub(11)
-			if StartsWith(asPattern, 't') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			elseif StartsWith(asPattern, 'f') then
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET then
-						table.insert(tResult, atTable[i])
-					end
-				end
-			else
-				return tResult
-			end
+			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET), true
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i = 1, #atTable do
@@ -305,7 +293,7 @@ end
 					table.insert(tResult, game)
 				end
 			else
-				return tResult
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
@@ -318,16 +306,164 @@ end
 					table.insert(tResult, game)
 				end
 			else
-				return tResult
+				return tResult, true
 			end
 		else
-			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
-					table.insert(tResult, atTable[i])
+			if T_SETTINGS['fuzzy_search'] == true then
+				local rankings = {}
+				local perfectMatches = {}
+				for i = 1, #atTable do
+					score = FuzzySearch(asPattern, atTable[i][GAME_KEYS.NAME])
+					if score > 0 then
+						table.insert(rankings, {["score"]=score, ["game"]=atTable[i]})
+					end
+				end
+				table.sort(rankings, SortRanking)
+				--print("== " .. asPattern .. " ==") -- Debug
+				for i, entry in ipairs(rankings) do
+					--print(entry.score, entry.game[GAME_KEYS.NAME]) -- Debug
+					table.insert(tResult, entry.game)
+				end
+				return tResult, false
+			else
+				for i = 1, #atTable do
+					if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
+						table.insert(tResult, atTable[i])
+					end
 				end
 			end
 		end
-		return tResult
+		return tResult, true
+	end
+
+	function SortRanking(aFirst, aSecond)
+		--if aFirst.ranking == -1 or aFirst.ranking > aSecond.ranking then
+		if aFirst.score > aSecond.score then
+			return true
+		elseif aFirst.score == aSecond.score then
+			return SortAlphabetically(aFirst.game, aSecond.game)
+		else
+			return false
+		end
+	end
+
+	function SplitStringIntoChars(aString)
+		local characters = {}
+		for char in aString:gmatch(".") do
+			table.insert(characters, char)
+		end
+		return characters
+	end
+
+	function SplitStringIntoWords(aString)
+		local words = {}
+		for word in aString:gmatch("[^%s%p]*") do
+			if word ~= nil and word ~= "" then
+				table.insert(words, word)
+			end
+		end
+		return words
+	end
+
+	function FuzzySearch(aPattern, aString)
+		-- Case-insensitive fuzzy match that returns a score
+		if aPattern == "" or aString == "" then
+			return 0
+		end
+		-- Bonuses
+		local bonusPerfectMatch = 50
+		local bonusFirstMatch = 25
+		local bonusMatch = 10
+		local bonusMatchDistance = 10
+		local bonusConsecutiveMatches = 10
+		local bonusFirstWordMatch = 20
+		-- Penalties
+		local penaltyNotMatch = -5
+		--
+		local score = 0
+		aPattern = aPattern:lower()
+		aString = aString:lower()
+		-- Pattern matches perfectly
+		if aPattern == aString then
+			score = score + bonusPerfectMatch
+		end
+		local patternCharacters = SplitStringIntoChars(aPattern)
+		local stringChars = SplitStringIntoChars(aString)
+		local stringWords = SplitStringIntoWords(aString)
+
+		function match_string(aPatternCharacters, aStringToMatch)
+			local matchIndex = aStringToMatch:find(aPatternCharacters[1])
+			if matchIndex ~= nil then
+				-- Distance of first match from start of a string
+				score = score + bonusFirstMatch / matchIndex
+				-- Number of matches in order
+				-- Number of consecutive matches
+				-- Distance between matches
+				local matchIndices = {}
+				table.insert(matchIndices, matchIndex)
+				local consecutiveMatches = 0
+				for i, char in ipairs(aPatternCharacters) do
+					if i > 1 and matchIndices[i - 1] ~= nil then
+						matchIndex = aStringToMatch:find(char, matchIndices[i - 1] + 1)
+						if matchIndex ~= nil then
+							table.insert(matchIndices, matchIndex)
+							score = score + bonusMatch
+							local distance = matchIndex - matchIndices[i - 1]
+							if distance == 1 then
+								consecutiveMatches = consecutiveMatches + 1
+							else
+								score = score + consecutiveMatches * bonusConsecutiveMatches
+								consecutiveMatches = 0
+							end
+							score = score + bonusMatchDistance / distance
+						else
+							score = score + consecutiveMatches * bonusConsecutiveMatches
+							score = score + penaltyNotMatch
+							consecutiveMatches = 0
+						end
+					end
+				end
+				if consecutiveMatches > 0 then
+					score = score + consecutiveMatches * bonusConsecutiveMatches
+				end
+				return true
+			end
+			return false
+		end
+		-- Matches in entire string
+		if not match_string(patternCharacters, aString) then
+			function slice(t, s, e)
+				local r = {}
+				for i = s or 1, e or #t do
+					table.insert(r, t[i])
+				end
+				return r
+			end
+			local min = 1
+			while not match_string(slice(patternCharacters, min), aString) and min < #patternCharacters do
+				min = min + 1
+			end
+		end
+		if #stringWords > 0 then
+			-- Matches at beginning of words
+			local j = 1
+			for i, char in ipairs(patternCharacters) do
+				if j <= #stringWords then
+					if stringWords[j]:find(char) == 1 then
+						score = score + bonusFirstWordMatch
+						j = j + 1
+					end
+				end
+			end
+			-- Matches in words
+			for i, word in ipairs(stringWords) do
+				match_string(patternCharacters, word)
+			end
+		end
+		if score < 0 then
+			return 0
+		end
+		return score
 	end
 
 	function ClearFilter(atTable)
@@ -511,7 +647,6 @@ end
 					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
-			PopulateSlots()
 		end
 	end
 
@@ -559,9 +694,9 @@ end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
 						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "GameOverlayUI.exe"]')
+							StartMonitoringProcess('GameOverlayUI.exe')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-							SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. tGame[GAME_KEYS.PROCESS] .. '"]')
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
 							--
 						else
@@ -570,10 +705,9 @@ end
 							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
 							if processName ~= nil then
 								processName = processName:reverse()
-								SKIN:Bang('[!SetOption "ProcessMonitor" "ProcessName" "' .. processName .. '"]')
+								StartMonitoringProcess(processName)
 							end
 						end
-						SKIN:Bang('[!UpdateMeasure "ProcessMonitor"]')
 						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
@@ -641,10 +775,16 @@ end
 							break
 						end
 					end
-					local scrollIndex = N_SCROLL_INDEX
-					Sort()
-					N_SCROLL_INDEX = scrollIndex
-					PopulateSlots()
+					if #T_FILTERED_GAMES > 0 then
+						local scrollIndex = N_SCROLL_INDEX
+						Sort()
+						N_SCROLL_INDEX = scrollIndex
+						PopulateSlots()
+					else
+						UnhideGame()
+						Sort()
+						PopulateSlots()
+					end
 				end
 			end
 		end
@@ -670,6 +810,10 @@ end
 		end
 	end
 
+	function StartMonitoringProcess(asString)
+		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "160"][!SetOption "ProcessMonitor" "ProcessName" "' .. asString .. '"][!UpdateMeasure "ProcessMonitor"]')
+	end
+
 	function UpdateTimePlayed()
 		if T_RECENTLY_LAUNCHED_GAME ~= nil then
 			local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
@@ -678,6 +822,7 @@ end
 			PopulateSlots()
 			ExecuteStoppingBang()
 		end
+		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "-1"][!UpdateMeasure "ProcessMonitor"]')
 	end
 
 	function ExecuteStoppingBang()

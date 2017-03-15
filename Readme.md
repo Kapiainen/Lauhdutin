@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of setting that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations).
+A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations).
 
 ![ex](Docs/demo.gif)
 
@@ -28,10 +28,13 @@ Developed with the following software in mind:
 
 # Installing
 - Install Rainmeter and Python 3 on your system (see [requirements](#requirements) for more info).
+  - [Add Python to the PATH system variable](Docs/PythonStep1.jpg).
+  - [Customize the installation](Docs/PythonStep1.jpg).
+  - [Install the `tcl/tk and IDLE` optional feature.](Docs/PythonStep2.jpg)
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
 - Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
 - Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Exit** button.
-- **Main.ini** should now load and will gather information on the games that you have installed. The skin will say **Processing...** for a while as it is e.g. downloading banners for games, but should eventually switch over to showing a list of games that it has found.
+- **Main.ini** should now load and will gather information on the games that you have installed. The skin will say `Processing...` for a while. At some point the skin should say `Downloading...` as it is e.g. downloading banners for games, but should eventually switch over to showing a list of games that have been found.
 - Windows shortcuts (.lnk and .url files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder.
 - Banners for Windows shortcuts and Steam's Non-Steam game shortcuts can be added to the `\Lauhdutin\@Resources\Banners\Shortcuts` and `\Lauhdutin\@Resources\Banners\Steam shortcuts` folders, respectively. The name of the banner should match the name of the .lnk or .url file, or the name in Steam, respectively.
 
@@ -107,6 +110,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
+A fuzzy search algorithm is used by default, but can be disabled so that the filtering works like in versions up to 2.5.0. Fuzzy search scores each possible result based on several factors (e.g. the distance of the first matching character from the beginning of the string or a word in that string). This algorithm allows e.g. searching for `boi` and getting `The Binding Of Isaac` as one of the top results since all three letters in the search pattern are present in the result as the first letters of words and thus are likely to form a common abbreviation.
+
 # Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
@@ -173,7 +178,7 @@ Try to keep draw calls to a minimum by, for example:
 
 ## Adding support for a platform
 There are a few rules that **must** be followed when adding support for additional platforms:
-- Sensitive account data must never be transmitted from the user's system. Preferably the only transmitted data should be relevant to downloading e.g. banners.
+- Sensitive account data must never be transmitted from the user's system.
 - All data that is retrieved and/or utilized by the skin must have been intentionally made publicly available by the platform's developers and/or stored locally in an unencrypted state.
 - Local data should be preferred over data that needs to be acquired over the internet.
 - Minimize internet usage by e.g. downloading a banner only if a local copy does not already exist.
@@ -181,6 +186,17 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
+**Version 2.6.0 - 2017/03/15:**
+- Added fuzzy search.
+- Added setting for toggling fuzzy search.
+- Refactored parts of the GUI script.
+- Fixed a bug that caused a small portion of the toolbar to ignore left-clicks and pass them to the slot below.
+- Fixed a bug, which kept the state from being automatically exited, when unhiding games so that no games remain hidden.
+- Fixed a bug that prevented shortcuts to folders from working.
+- GUI optimizations.
+- Added more info to the terminal when there is a failure to parse a Steam community profile.
+- Fixed bug that caused total hours played to fail to parse when the value was 1000+ hours.
+- Simplified a setting related to Steam integration.
 
 **Version 2.5.1 - 2017/03/06:**
 - Fixed a bug that caused hover animations to not reset properly.
