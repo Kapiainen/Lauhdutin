@@ -1,2 +1,0 @@
-[Variables]
-HiddenFilters=Enabled
