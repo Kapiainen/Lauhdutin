@@ -66,18 +66,44 @@ class WindowsShortcutsTests(unittest.TestCase):
                 GameKeys.LASTPLAYED: 0,
                 GameKeys.PLATFORM: Platform.WINDOWS_SHORTCUT,
                 GameKeys.BANNER_PATH: "Shortcuts\\Overwatch.png"
+            },
+            "OverwatchBattleNetProtocol": {
+                GameKeys.NAME: "OverwatchBattleNetProtocol",
+                GameKeys.PATH: "battlenet://Pro/",
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.PLATFORM: Platform.WINDOWS_URL_SHORTCUT,
+                GameKeys.BANNER_PATH: "Shortcuts\\OverwatchBattleNetProtocol.jpg"
+            },
+            "SubfolderOverwatch": {
+                GameKeys.NAME: "SubfolderOverwatch",
+                GameKeys.ERROR: True,
+                GameKeys.INVALID_PATH: True,
+                GameKeys.PATH:
+                "D:\\Program Files\\Battle.net Games\\Overwatch\\Overwatch.exe",
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.PLATFORM: Platform.WINDOWS_SHORTCUT,
+                GameKeys.BANNER_PATH: "Shortcuts\\SubfolderOverwatch.jpg",
+                GameKeys.PLATFORM_OVERRIDE: "Some platform"
+            },
+            "SubfolderOverwatchBattleNetProtocol": {
+                GameKeys.NAME: "SubfolderOverwatchBattleNetProtocol",
+                GameKeys.PATH: "battlenet://Pro/",
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.PLATFORM: Platform.WINDOWS_URL_SHORTCUT,
+                GameKeys.BANNER_PATH: "Shortcuts\\SubfolderOverwatchBattleNetProtocol.jpg",
+                GameKeys.PLATFORM_OVERRIDE: "Some platform"
             }
         })
 
     def test_get_shortcuts(self):
         ws = self.create_class_instance()
-        self.assertEqual(ws.get_shortcuts(
+        self.assertEqual(ws.get_shortcuts(ws.shortcuts_path
         ), ["Office Suite 2015.lnk", "Office Suite 2017.lnk", "Overwatch.lnk"])
 
     def test_process_shortcut(self):
         ws = self.create_class_instance()
         self.assertEqual(
-            ws.process_shortcut("Office Suite 2015.lnk"),
+            ws.process_shortcut(ws.shortcuts_path, "Office Suite 2015.lnk"),
             ("Office Suite 2015", {
                 GameKeys.NAME: "Office Suite 2015",
                 GameKeys.ERROR: True,
@@ -89,7 +115,7 @@ class WindowsShortcutsTests(unittest.TestCase):
                 GameKeys.BANNER_PATH: "Shortcuts\\Office Suite 2015.gif"
             }))
         self.assertEqual(
-            ws.process_shortcut("Office Suite 2017.lnk"),
+            ws.process_shortcut(ws.shortcuts_path, "Office Suite 2017.lnk"),
             ("Office Suite 2017", {
                 GameKeys.NAME: "Office Suite 2017",
                 GameKeys.ERROR: True,
@@ -101,7 +127,7 @@ class WindowsShortcutsTests(unittest.TestCase):
                 GameKeys.BANNER_PATH: "Shortcuts\\Office Suite 2017.jpg"
             }))
         self.assertEqual(
-            ws.process_shortcut("Overwatch.lnk"), ("Overwatch", {
+            ws.process_shortcut(ws.shortcuts_path, "Overwatch.lnk"), ("Overwatch", {
                 GameKeys.NAME: "Overwatch",
                 GameKeys.ERROR: True,
                 GameKeys.INVALID_PATH: True,
@@ -112,7 +138,7 @@ class WindowsShortcutsTests(unittest.TestCase):
                 GameKeys.BANNER_PATH: "Shortcuts\\Overwatch.png"
             }))
         self.assertEqual(
-            ws.process_shortcut("ImaginaryGame47.lnk"), (None, None))
+            ws.process_shortcut(ws.shortcuts_path, "ImaginaryGame47.lnk"), (None, None))
 
     def test_get_banner_path(self):
         ws = self.create_class_instance()
