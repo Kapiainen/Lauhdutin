@@ -419,8 +419,8 @@ end
 					end
 				end
 				for i, game in ipairs(T_HIDDEN_GAMES) do
- -					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- -						table.insert(tResultR, game)
+ 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 						table.insert(tResultR, game)
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
