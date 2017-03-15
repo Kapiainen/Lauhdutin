@@ -292,14 +292,14 @@ end
 			elseif StartsWith(asPattern, 'p') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						if game["hourstotal"] > 0 then
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
 						end
 					end
 				end
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						if game["hourstotal"] > 0 then
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 							table.insert(tResult, game)
 						end
 					end
@@ -429,19 +429,19 @@ end
 			local RandomGame = 0
 			local TotalGames = 0	
 			for i, game in ipairs(T_ALL_GAMES) do
-				if game["hourstotal"] > 0 then
+				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 				table.insert(tResultR, game)
 				TotalGames = TotalGames + 1
 				end
 			end
 			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-				if game["hourstotal"] > 0 then
+				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 				table.insert(tResultR, game)
 				TotalGames = TotalGames + 1
 				end
 			end
 			for i, game in ipairs(T_HIDDEN_GAMES) do
- -				if game["hourstotal"] > 0 then
+ -				if game[GAME_KEYS.HOURS_TOTAL] > 0 then
  -				table.insert(tResultR, game)
  -				TotalGames = TotalGames + 1
 				end
@@ -459,33 +459,33 @@ end
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
 				for i, game in ipairs(T_ALL_GAMES) do
-					if game["hourstotal"] > 0 then
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
 					end
 				end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game["hourstotal"] > 0 then
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
 					end
 				end
 				for i, game in ipairs(T_HIDDEN_GAMES) do
- -					if game["hourstotal"] > 0 then
+ -					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
  -						table.insert(tResult, game)
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then	
 				for i, game in ipairs(T_ALL_GAMES) do
-					if game["hourstotal"] == 0 then
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
 						table.insert(tResult, game)
 					end
 				end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game["hourstotal"] == 0 then
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
 						table.insert(tResult, game)
 					end
 				end
 				for i, game in ipairs(T_HIDDEN_GAMES) do
- -					if game["hourstotal"] == 0 then
+ -					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
  -						table.insert(tResult, game)
 					end
 				end
