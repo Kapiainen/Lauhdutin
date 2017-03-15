@@ -186,7 +186,7 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
-**Version 2.6.0 - YYYY/MM/DD:**
+**Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
 - Added setting for toggling fuzzy search.
 - Refactored parts of the GUI script.
