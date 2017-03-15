@@ -238,18 +238,18 @@ end
 		PopulateSlots()
 	end
 
-	function FilterByTag(atTable, asPattern, asTag, asKey, abTrue)
+	function FilterByTag(atTable, asPattern, asTag, asKey, aTrue)
 		local tResult = {}
 		asPattern = asPattern:sub(#asTag + 2)
 		if StartsWith(asPattern, 't') then
 			for i = 1, #atTable do
-				if atTable[i][asKey] == abTrue then
+				if atTable[i][asKey] == aTrue then
 					table.insert(tResult, atTable[i])
 				end
 			end
 		elseif StartsWith(asPattern, 'f') then
 			for i = 1, #atTable do
-				if atTable[i][asKey] ~= abTrue then
+				if atTable[i][asKey] ~= aTrue then
 					table.insert(tResult, atTable[i])
 				end
 			end
@@ -272,11 +272,11 @@ end
 			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET), true
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
-			for i = 1, #atTable do
-				if atTable[i][GAME_KEYS.TAGS] ~= nil then
-					for sKey, sValue in pairs(atTable[i][GAME_KEYS.TAGS]) do
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.TAGS] ~= nil then
+					for sKey, sValue in pairs(game[GAME_KEYS.TAGS]) do
 						if sValue:lower():find(asPattern) then
-							table.insert(tResult, atTable[i])
+							table.insert(tResult, game)
 							break
 						end
 					end
@@ -299,8 +299,6 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
-			else
-				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
@@ -319,8 +317,6 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
-			else
-				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'games:') then
 			asPattern = asPattern:sub(7)
@@ -334,54 +330,37 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
-			else
-				return tResult, true
 			end	
 		elseif StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
-				for i, game in ipairs(T_ALL_GAMES) do
-					if game["hourstotal"] > 0 then
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game["hourstotal"] > 0 then
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					if game["hourstotal"] > 0 then
-						table.insert(tResult, game)
-					end
+			end
+		elseif StartsWith(asPattern, 'shortcuts:') then
+			asPattern = asPattern:sub(11)
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil and game[GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
+					table.insert(tResult, game)
 				end
-			elseif StartsWith(asPattern, 'f') then	
-				for i, game in ipairs(T_ALL_GAMES) do
-					if game["hourstotal"] == 0 then
-						table.insert(tResult, game)
-					end
-				end
-				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game["hourstotal"] == 0 then
-						table.insert(tResult, game)
-					end
-				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					if game["hourstotal"] == 0 then
-						table.insert(tResult, game)
-					end
-				end
-            		else
-				return tResult, true
-			end	
+			end
 		else
 			if T_SETTINGS['fuzzy_search'] == true then
 				local rankings = {}
 				local perfectMatches = {}
-				for i = 1, #atTable do
-					score = FuzzySearch(asPattern, atTable[i][GAME_KEYS.NAME])
+				for i, game in ipairs(atTable) do
+					score = FuzzySearch(asPattern, game[GAME_KEYS.NAME])
 					if score > 0 then
-						table.insert(rankings, {["score"]=score, ["game"]=atTable[i]})
+						table.insert(rankings, {["score"]=score, ["game"]=game})
 					end
 				end
 				table.sort(rankings, SortRanking)
@@ -392,9 +371,9 @@ end
 				end
 				return tResult, false
 			else
-				for i = 1, #atTable do
-					if atTable[i][GAME_KEYS.NAME]:lower():find(asPattern) then
-						table.insert(tResult, atTable[i])
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.NAME]:lower():find(asPattern) then
+						table.insert(tResult, game)
 					end
 				end
 			end
