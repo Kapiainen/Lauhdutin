@@ -267,28 +267,35 @@ end
 		if StartsWith(asPattern, 'steam:') then
 			asPattern = asPattern:sub(7)
 			if StartsWith(asPattern, 'i') then
-			for i, game in ipairs(T_ALL_GAMES) do
-					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						table.insert(tResult, game)
-					end
-			end
-			elseif StartsWith(asPattern, 'u') then
-			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						table.insert(tResult, game)
-					end
-			end
-			elseif StartsWith(asPattern, 'a') then
-			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						table.insert(tResult, game)
-					end
-			end
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, game)
 					end
 			end
+			elseif StartsWith(asPattern, 'u') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+			end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							table.insert(tResult, game)
+						end
+					end
+				end
 			elseif StartsWith(asPattern, 'p') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
