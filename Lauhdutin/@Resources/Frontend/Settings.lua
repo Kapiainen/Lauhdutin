@@ -481,6 +481,11 @@ function ToggleFuzzySearch()
 	UpdateSettings()
 end
 
+function ToggleHiddenGames()
+	SETTINGS['hidden_games'] = not SETTINGS['hidden_games']
+	UpdateSettings()
+end
+
 function ReadJSON(asPath)
 	local f = io.open(asPath, 'r')
 	if f ~= nil then
