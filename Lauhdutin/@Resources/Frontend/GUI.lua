@@ -4,11 +4,19 @@ function Initialize()
 	S_VDF_SERIALIZING_INDENTATION = ''
 	T_SETTINGS = ReadSettings()
 	if T_SETTINGS == nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Load Settings.ini and save settings."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang(
+			'[!SetOption StatusMessage Text "Load Settings.ini and save settings."]'
+			.. '[!UpdateMeterGroup Status]'
+			.. '[!ShowMeterGroup Status]'
+			.. '[!Redraw]'
+		)
 		return
 	end
 	for i=1, tonumber(T_SETTINGS['slot_count']) do
-		SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"][!HideMeterGroup "SlotHighlight' .. i .. '"]')
+		SKIN:Bang(
+			'[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]'
+			.. '[!HideMeterGroup "SlotHighlight' .. i .. '"]'
+		)
 	end
 	N_LAUNCH_STATE = 0
 	T_LAUNCH_STATES = {
@@ -67,10 +75,20 @@ function Initialize()
 	B_REVERSE_SORT = false
 	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 	if T_SETTINGS ~= nil then
-		SKIN:Bang('[!SetOption StatusMessage Text "Initializing backend..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang(
+			'[!SetOption StatusMessage Text "Initializing backend..."]'
+			.. '[!UpdateMeterGroup Status]'
+			.. '[!ShowMeterGroup Status]'
+			.. '[!Redraw]'
+		)
 		SKIN:Bang('"#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "Failed to load settings..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
+		SKIN:Bang(
+			'[!SetOption StatusMessage Text "Failed to load settings..."]'
+			.. '[!UpdateMeterGroup Status]'
+			.. '[!ShowMeterGroup Status]'
+			.. '[!Redraw]'
+		)
 	end
 	N_LAST_DRAWN_SCROLL_INDEX = -1
 end
@@ -108,7 +126,11 @@ function Init()
 	elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 		FilterBy('hidden:true')
 	else
-		SKIN:Bang('[!SetOption StatusMessage Text "No games to display"][!UpdateMeterGroup Status][!ShowMeterGroup Status]')
+		SKIN:Bang(
+			'[!SetOption StatusMessage Text "No games to display"]'
+			.. '[!UpdateMeterGroup Status]'
+			.. '[!ShowMeterGroup Status]'
+		)
 	end
 	PopulateSlots()
 end
@@ -582,7 +604,9 @@ end
 		end
 		T_SETTINGS['sortstate'] = tostring(N_SORT_STATE)
 		WriteSettings(T_SETTINGS)
-		SKIN:Bang('[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"][!UpdateMeterGroup Toolbar]')
+		SKIN:Bang(
+			'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"]'
+			.. '[!UpdateMeterGroup Toolbar]')
 		Sort()
 		PopulateSlots()
 	end
@@ -621,9 +645,15 @@ end
 			for i = 1, nSlotCount do -- Iterate through each slot.
 				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
 					if BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
-						SKIN:Bang('[!SetVariable SlotName' .. i .. ' ""][!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]')
+						SKIN:Bang(
+							'[!SetVariable SlotName' .. i .. ' ""]'
+							.. '[!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]'
+						)
 					else
-						SKIN:Bang('[!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"][!SetVariable SlotImage' .. i .. ' ""]')
+						SKIN:Bang(
+							'[!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]'
+							.. '[!SetVariable SlotImage' .. i .. ' ""]'
+						)
 					end
 					if T_SETTINGS['slot_highlight'] then
 						if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
@@ -663,16 +693,29 @@ end
 								SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
 							end
 						elseif N_LAUNCH_STATE == T_LAUNCH_STATES.HIDE then
-							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]')
+							SKIN:Bang(
+								'[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"]'
+								.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]'
+							)
 						elseif N_LAUNCH_STATE == T_LAUNCH_STATES.UNHIDE then
-							SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"][!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]')
+							SKIN:Bang(
+								'[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"]'
+								.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]'
+							)
 						end
 					end
 				else -- Slot has no game to show.
 					if T_SETTINGS['slot_highlight'] then
-						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""][!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+						SKIN:Bang(
+							'[!SetVariable SlotImage' .. i .. ' ""]'
+							.. '[!SetVariable SlotName' .. i .. ' ""]'
+							.. '[!SetVariable "SlotHighlightMessage' .. i .. '" ""]'
+						)
 					else
-						SKIN:Bang('[!SetVariable SlotImage' .. i .. ' ""][!SetVariable SlotName' .. i .. ' ""]')
+						SKIN:Bang(
+							'[!SetVariable SlotImage' .. i .. ' ""]'
+							.. '[!SetVariable SlotName' .. i .. ' ""]'
+						)
 					end
 				end
 				if T_SETTINGS['slot_highlight'] then
@@ -681,7 +724,10 @@ end
 				j = j + 1
 			end
 		end
-		SKIN:Bang('[!UpdateMeterGroup Slots][!Redraw]')
+		SKIN:Bang(
+			'[!UpdateMeterGroup Slots]'
+			.. '[!Redraw]'
+		)
 	end
 
 	function Scroll(asDirection)
@@ -869,7 +915,11 @@ end
 	end
 
 	function StartMonitoringProcess(asString)
-		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "160"][!SetOption "ProcessMonitor" "ProcessName" "' .. asString .. '"][!UpdateMeasure "ProcessMonitor"]')
+		SKIN:Bang(
+			'[!SetOption "ProcessMonitor" "UpdateDivider" "160"]'
+			.. '[!SetOption "ProcessMonitor" "ProcessName" "' .. asString .. '"]'
+			.. '[!UpdateMeasure "ProcessMonitor"]'
+		)
 	end
 
 	function UpdateTimePlayed()
@@ -880,7 +930,10 @@ end
 			PopulateSlots()
 			ExecuteStoppingBang()
 		end
-		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "-1"][!UpdateMeasure "ProcessMonitor"]')
+		SKIN:Bang(
+			'[!SetOption "ProcessMonitor" "UpdateDivider" "-1"]'
+			.. '[!UpdateMeasure "ProcessMonitor"]'
+		)
 	end
 
 	function ExecuteStoppingBang()
@@ -895,9 +948,17 @@ end
 		end
 		if T_SETTINGS['hover_animation'] > 0 then
 			if T_SETTINGS['orientation'] == 'vertical' then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 1"]')
+				SKIN:Bang(
+					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+					.. '[!UpdateMeasure "HoverOffAnimation"]'
+					.. '[!CommandMeasure "HoverOffAnimation" "Execute 1"]'
+				)
 			elseif T_SETTINGS['orientation'] == 'horizontal' then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOffAnimation"][!CommandMeasure "HoverOffAnimation" "Execute 2"]')
+				SKIN:Bang(
+					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+					.. '[!UpdateMeasure "HoverOffAnimation"]'
+					.. '[!CommandMeasure "HoverOffAnimation" "Execute 2"]'
+				)
 			end
 		else
 			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
@@ -918,14 +979,30 @@ end
 		if T_SETTINGS['hover_animation'] > 0 then
 			if T_SETTINGS['hover_animation'] == 1 then
 				if T_SETTINGS['orientation'] == 'vertical' then
-					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 1"]')
+					SKIN:Bang(
+						'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+						.. '[!UpdateMeasure "HoverOnAnimation"]'
+						.. '[!CommandMeasure "HoverOnAnimation" "Execute 1"]'
+					)
 				elseif T_SETTINGS['orientation'] == 'horizontal' then
-					SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 2"]')
+					SKIN:Bang(
+						'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+						.. '[!UpdateMeasure "HoverOnAnimation"]'
+						.. '[!CommandMeasure "HoverOnAnimation" "Execute 2"]'
+					)
 				end
 			elseif T_SETTINGS['hover_animation'] == 2 then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 3"]')
+				SKIN:Bang(
+					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+					.. '[!UpdateMeasure "HoverOnAnimation"]'
+					.. '[!CommandMeasure "HoverOnAnimation" "Execute 3"]'
+				)
 			elseif T_SETTINGS['hover_animation'] == 3 then
-				SKIN:Bang('[!SetVariable "SlotToAnimate" "' .. asIndex .. '"][!UpdateMeasure "HoverOnAnimation"][!CommandMeasure "HoverOnAnimation" "Execute 4"]')
+				SKIN:Bang(
+					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
+					.. '[!UpdateMeasure "HoverOnAnimation"]'
+					.. '[!CommandMeasure "HoverOnAnimation" "Execute 4"]'
+				)
 			end
 		else
 			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
@@ -934,11 +1011,18 @@ end
 
 -- Error messages
 	function ShowMessage(asMessage)
-		SKIN:Bang('[!SetVariable Message ' .. asMessage .. '][!ShowMeterGroup Message][!Redraw]')
+		SKIN:Bang(
+			'[!SetVariable Message ' .. asMessage .. ']'
+			.. '[!ShowMeterGroup Message]'
+			.. '[!Redraw]'
+		)
 	end
 
 	function HideMessage()
-		SKIN:Bang('[!HideMeterGroup Message][!Redraw]')
+		SKIN:Bang(
+			'[!HideMeterGroup Message]'
+			.. '[!Redraw]'
+		)
 	end
 
 -- Toolbar
@@ -946,7 +1030,10 @@ end
 		if B_REVERSE_SORT then
 			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
 		end
-		SKIN:Bang('[!ShowMeterGroup Toolbar][!Redraw]')
+		SKIN:Bang(
+			'[!ShowMeterGroup Toolbar]'
+			.. '[!Redraw]'
+		)
 	end
 
 	function HideToolbar()
@@ -954,7 +1041,10 @@ end
 			if B_REVERSE_SORT then
 				SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 			end
-			SKIN:Bang('[!HideMeterGroup Toolbar][!Redraw]')
+			SKIN:Bang(
+				'[!HideMeterGroup Toolbar]'
+				.. '[!Redraw]'
+			)
 		end
 	end
 
