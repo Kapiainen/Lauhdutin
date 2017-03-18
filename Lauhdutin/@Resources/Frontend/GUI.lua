@@ -267,12 +267,26 @@ end
 		if StartsWith(asPattern, 'steam:') then
 			asPattern = asPattern:sub(7)
 			if StartsWith(asPattern, 'i') then
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, game)
 					end
 			end
 			elseif StartsWith(asPattern, 'u') then
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, game)
@@ -297,22 +311,32 @@ end
 					end
 				end
 			elseif StartsWith(asPattern, 'p') then
-				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
-					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
-						table.insert(tResult, game)
-						end
-					end
-				end
-				for i, game in ipairs(T_ALL_GAMES) do
-					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
-						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
 							table.insert(tResult, game)
 						end
 					end
 				end
-			elseif StartsWith(asPattern, 'f') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM then
 						table.insert(tResult, game)
 					end
