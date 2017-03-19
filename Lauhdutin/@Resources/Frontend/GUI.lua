@@ -1,4 +1,6 @@
 function Initialize()
+	B_INITIALIZED = false
+	B_SKIN_VISIBLE = true
 	json = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	S_PATH_RESOURCES = SKIN:GetVariable('@')
 	S_VDF_SERIALIZING_INDENTATION = ''
@@ -133,6 +135,83 @@ function Init()
 		)
 	end
 	PopulateSlots()
+	B_INITIALIZED = true
+end
+
+function SlideSkinIn()
+	if B_SKIN_VISIBLE then
+		return
+	end
+	B_SKIN_VISIBLE = true
+	SKIN:Bang('[!CommandMeasure "SkinAnimation" "Execute 1"]')
+end
+--not B_INITIALIZED or B_FORCE_TOOLBAR
+function SlideSkinOut()
+	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE then
+		return
+	end
+	B_SKIN_VISIBLE = false
+	SKIN:Bang('[!CommandMeasure "SkinAnimation" "Execute 2"]')
+end
+
+function AnimateSkin(anFrame)
+	--print(anFrame)
+	if anFrame < 1 or anFrame > 8 then
+		return
+	end
+	local nFactor = nil
+	if anFrame == 8 then
+		nFactor = 0
+	elseif anFrame == 3 or anFrame == 5 then
+		nFactor = -1 / 1.8
+	elseif anFrame == 2 or anFrame == 6 then
+		nFactor = -1 / 4
+	elseif anFrame == 1 or anFrame == 7 then
+		nFactor = -1 / 20
+	elseif anFrame == 4 then
+		nFactor = -1
+	end
+	if nFactor == nil then
+		return
+	end
+	if T_SETTINGS['orientation'] == 'vertical' then
+		SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor)
+	else --horizontal
+		SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor)
+	end
+	SKIN:Bang('[!Redraw]')
+end
+
+function SetSlotsXPosition(anValue)
+	for i = 1, tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) do
+		SKIN:Bang(
+			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS['slot_width'] / 2 .. '"]'
+			.. '[!SetOption "SlotBanner' .. i .. '" "X" "' .. anValue .. '"]'
+		)
+	end
+	SKIN:Bang(
+		'[!UpdateMeterGroup "Slots"]'
+		.. '[!SetOption "SlotBackground" "X" "' .. anValue .. '"]'
+		.. '[!UpdateMeter "SlotBackground"]'
+		.. '[!SetOption "ToolbarEnabler" "X" "' .. anValue .. '"]'
+		.. '[!UpdateMeter "ToolbarEnabler"]'
+	)
+end
+
+function SetSlotsYPosition(anValue)
+	for i = 1, tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) do
+		SKIN:Bang(
+			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue + T_SETTINGS['slot_height'] / 2 .. '"]'
+			.. '[!SetOption "SlotBanner' .. i .. '" "Y" "' .. anValue .. '"]'
+		)
+	end
+	SKIN:Bang(
+		'[!UpdateMeterGroup "Slots"]'
+		.. '[!SetOption "SlotBackground" "Y" "' .. anValue .. '"]'
+		.. '[!UpdateMeter "SlotBackground"]'
+		.. '[!SetOption "ToolbarEnabler" "Y" "' .. anValue .. '"]'
+		.. '[!UpdateMeter "ToolbarEnabler"]'
+	)
 end
 
 -- Utility
@@ -1027,6 +1106,9 @@ end
 
 -- Toolbar
 	function ShowToolbar()
+		if not B_SKIN_VISIBLE then
+			return
+		end
 		if B_REVERSE_SORT then
 			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
 		end

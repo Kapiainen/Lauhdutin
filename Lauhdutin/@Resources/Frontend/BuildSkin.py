@@ -205,6 +205,36 @@ DynamicVariables=1
     )
 )
 
+        # Skin showing sliver
+        if ORIENTATION == "vertical":
+            f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=0
+W=1
+H=%s
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_HEIGHT * SLOT_COUNT
+    )
+)
+        else:
+            f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=0
+W=%s
+H=1
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_WIDTH * SLOT_COUNT
+    )
+)
+
         # Slot background
         f.write("""
 [SlotBackground]
