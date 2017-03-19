@@ -278,7 +278,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'u') then
 				if T_SETTINGS['hidden_games'] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
@@ -291,7 +291,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
@@ -342,7 +342,7 @@ end
 					end
 				end
 			else
-			return tResult, true
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'galaxy:') then
 			asPattern = asPattern:sub(8)
@@ -358,7 +358,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'u') then
 				if T_SETTINGS['hidden_games'] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
@@ -371,7 +371,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
@@ -422,7 +422,7 @@ end
 					end
 				end
 			else
-			return tResult, true
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'battlenet:') then
 			asPattern = asPattern:sub(11)
@@ -438,7 +438,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'u') then
 				if T_SETTINGS['hidden_games'] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
@@ -451,7 +451,7 @@ end
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
 						table.insert(tResult, game)
 					end
-			end
+				end
 			elseif StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
@@ -502,7 +502,7 @@ end
 					end
 				end
 			else
-			return tResult, true
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
