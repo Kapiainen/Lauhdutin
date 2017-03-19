@@ -366,10 +366,24 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end				
 			elseif StartsWith(asPattern, 'f') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end	
 			elseif StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
@@ -377,6 +391,11 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						table.insert(tResult, game)
+					end
+				end	
 			else
 				return tResult, true
 			end
