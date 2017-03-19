@@ -504,9 +504,11 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
- 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- 						table.insert(tResult, game)
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 							table.insert(tResult, game)
+						end
 					end
 				end
 			elseif StartsWith(asPattern, 'f') then	
@@ -520,9 +522,11 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
- 					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
- 						table.insert(tResult, game)
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+ 							table.insert(tResult, game)
+						end
 					end
 				end
             		else
