@@ -14,6 +14,7 @@ class GameKeys():
     NOT_INSTALLED = "notinstalled"
     PATH = "path"
     PLATFORM = "platform"
+    PLATFORM_OVERRIDE = "platformoverride"
     PROCESS = "process"
     TAGS = "tags"
 

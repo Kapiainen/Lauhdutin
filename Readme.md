@@ -94,7 +94,7 @@ Additional platforms may receive similar support in the future, if possible. In 
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
-- `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
+- `steam:` followed by `installed`, `uninstalled`, `all`,  `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
 
 - `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
 
@@ -108,7 +108,11 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `played:` followed by `true` or `false`. If `true`, then all games with a total played time above 0 hours are shown. If `false`, then all games with a total played time of 0 hours are shown.
 
+- `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
+
 - `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
+
+- `random:` followed by `all`, `steam` or `played`. If `all`, then show one random game from games installed or not. If `steam`, then show one random game from Steam games installed or not. If  `played`, then show one random game from all games (hidden, instaled or not) with a total played time above 0 hours.
 
 - `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
 
@@ -191,9 +195,10 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
-- Added `installed:all`, `hidden:all`, `games:all`, `played:true`, and `played:false` filter tags.
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.
 
-**Version 2.6.0 - YYYY/MM/DD:**
+**Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
 - Added setting for toggling fuzzy search.
 - Refactored parts of the GUI script.
