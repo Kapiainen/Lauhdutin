@@ -94,11 +94,11 @@ Additional platforms may receive similar support in the future, if possible. In 
 # Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
-- `steam:` followed by `installed`, `uninstalled`, `all`,  `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
+- `steam:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
 
-- `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+- `galaxy:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via GOG Galaxy. If `uninstalled`, then only show games that are uninstalled on GOG Galaxy. If `all`, then show both installed and uninstalled games on GOG Galaxy. If `played`, then show both installed and uninstalled games on GOG Galaxy with a total played time above 0 hours. If `false`, then show all other games that were not installed via GOG Galaxy.
 
-- `battlenet:` followed by `true` or `false`. If `true`, then only show games installed via Battle.net. If `false`, then show all other games that were not installed via Battle.net.
+- `battlenet:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Battle.net. If `uninstalled`, then only show games that are uninstalled on Battle.net. If `all`, then show both installed and uninstalled games on Battle.net. If `played`, then show both installed and uninstalled games on Battle.net with a total played time above 0 hours. If `false`, then show all other games that were not installed via Battle.net.
 
 - `installed:` followed by `true`, `false`, or `all`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment). If `all`, then all games (excluding hidden ones) are shown.
 
@@ -119,6 +119,8 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
 A fuzzy search algorithm is used by default, but can be disabled so that the filtering works like in versions up to 2.5.0. Fuzzy search scores each possible result based on several factors (e.g. the distance of the first matching character from the beginning of the string or a word in that string). This algorithm allows e.g. searching for `boi` and getting `The Binding Of Isaac` as one of the top results since all three letters in the search pattern are present in the result as the first letters of words and thus are likely to form a common abbreviation.
+
+Hidden games are not showed by default on filtering (except on games:all and hidden: filters, that will show hidden games always), but can be enabled so that the filtering shows also those games.
 
 # Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
