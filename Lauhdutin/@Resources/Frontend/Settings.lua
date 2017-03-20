@@ -90,6 +90,9 @@ function Initialize()
 	if SETTINGS['fuzzy_search'] == nil then
 		SETTINGS['fuzzy_search'] = true
 	end
+	if SETTINGS['hidden_games'] == nil then
+		SETTINGS['hidden_games'] = false
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -214,6 +217,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS['hidden_games'] == true then
+			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Disabled"]')
 		end
 		if SETTINGS['parse_steam_community_profile'] == true then
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
@@ -470,6 +478,11 @@ end
 
 function ToggleFuzzySearch()
 	SETTINGS['fuzzy_search'] = not SETTINGS['fuzzy_search']
+	UpdateSettings()
+end
+
+function ToggleHiddenGames()
+	SETTINGS['hidden_games'] = not SETTINGS['hidden_games']
 	UpdateSettings()
 end
 

@@ -267,11 +267,245 @@ end
 		end
 		local tResult = {}
 		if StartsWith(asPattern, 'steam:') then
-			return FilterByTag(atTable, asPattern, 'steam', GAME_KEYS.PLATFORM, PLATFORM.STEAM), true
+			asPattern = asPattern:sub(7)
+			if StartsWith(asPattern, 'i') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'u') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'p') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] ~= PLATFORM.STEAM and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			else
+				return tResult, true
+			end
 		elseif StartsWith(asPattern, 'galaxy:') then
-			return FilterByTag(atTable, asPattern, 'galaxy', GAME_KEYS.PLATFORM, PLATFORM.GOG_GALAXY), true
+			asPattern = asPattern:sub(8)
+			if StartsWith(asPattern, 'i') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'u') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'p') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] ~= PLATFORM.GOG_GALAXY and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			else
+				return tResult, true
+			end
 		elseif StartsWith(asPattern, 'battlenet:') then
-			return FilterByTag(atTable, asPattern, 'battlenet', GAME_KEYS.PLATFORM, PLATFORM.BATTLENET), true
+			asPattern = asPattern:sub(11)
+			if StartsWith(asPattern, 'i') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'u') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET and game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'p') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] ~= PLATFORM.BATTLENET and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end
+			else
+				return tResult, true
+			end
 		elseif StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i, game in ipairs(atTable) do
@@ -290,10 +524,24 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end				
 			elseif StartsWith(asPattern, 'f') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end	
 			elseif StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
@@ -301,6 +549,13 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						table.insert(tResult, game)
+					end
+				end	
+			else
+				return tResult, true
 			end
 		elseif StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
@@ -326,28 +581,107 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
-				for i, game in ipairs(T_HIDDEN_GAMES) do
-					table.insert(tResult, game)
-				end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
 			end	
+		elseif StartsWith(asPattern, 'random:') then
+			asPattern = asPattern:sub(8)
+			local tResultR = {}
+			if StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResultR, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResultR, game)
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						table.insert(tResultR, game)
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			elseif StartsWith(asPattern, 's') then	
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			elseif StartsWith(asPattern, 'p') then	
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			else
+				table.insert(tResult, atTable[math.random(1, #atTable)])
+			end		
 		elseif StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
 			if StartsWith(asPattern, 't') then
-				for i, game in ipairs(atTable) do
+				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
 					end
 				end
-			elseif StartsWith(asPattern, 'f') then
-				for i, game in ipairs(atTable) do
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then	
+				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
 						table.insert(tResult, game)
 					end
 				end
-			end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS['hidden_games'] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+ 							table.insert(tResult, game)
+						end
+					end
 		elseif StartsWith(asPattern, 'shortcuts:') then
 			asPattern = asPattern:sub(11)
 			for i, game in ipairs(atTable) do
