@@ -681,6 +681,8 @@ end
  							table.insert(tResult, game)
 						end
 					end
+				end
+			end
 		elseif StartsWith(asPattern, 'shortcuts:') then
 			asPattern = asPattern:sub(11)
 			for i, game in ipairs(atTable) do
