@@ -73,6 +73,7 @@ function Initialize()
 		SKIN:Bang('[!SetOption StatusMessage Text "Failed to load settings..."][!UpdateMeterGroup Status][!ShowMeterGroup Status][!Redraw]')
 	end
 	N_LAST_DRAWN_SCROLL_INDEX = -1
+	HideSlotSubmenu()
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
@@ -705,6 +706,7 @@ end
 					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
+			HideSlotSubmenu()
 		end
 	end
 
@@ -929,6 +931,46 @@ end
 			end
 		else
 			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
+		end
+	end
+
+	function ShowSlotSubmenu(asIndex)
+		if T_SETTINGS['orientation'] == 'vertical' then
+			SKIN:Bang(
+				'[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+				.. '[!UpdateMeterGroup "SlotSubmenu"]'
+				.. '[!ShowMeterGroup "SlotSubmenu"]'
+				.. '[!Redraw]'
+			)
+		else
+
+		end
+	end
+
+	function HideSlotSubmenu()
+		SKIN:Bang(
+			'[!HideMeterGroup "SlotSubmenu"]'
+			.. '[!Redraw]'
+		)
+	end
+
+	function SlotSubmenuButton(anIndex)
+		if anIndex == 1 then --Edit notes
+			--Use a Python script to open 'Notes.txt' in a new Notepad process and wait for the process to finish
+			local sPath = S_PATH_RESOURCES .. 'Notes.txt'
+			print(sPath)
+			local f = io.open(sPath, 'w')
+			if f ~= nil then
+				f:close()
+				SKIN:Bang('notepad "' .. sPath .. '"')
+			end
+		elseif anIndex == 2 then --Edit tags/categories
+			--Use a Python script to open 'Tags.txt' in a new Notepad process and wait for the process to finish
+		elseif anIndex == 3 then --Toggle bangs
+
+		elseif anIndex == 4 then --Toggle hide
+
 		end
 	end
 

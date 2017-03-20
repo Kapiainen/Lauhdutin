@@ -304,11 +304,13 @@ H=%s
 SolidColor=0,0,0,1
 PreserveAspectRatio=2
 DynamicVariables=1
+MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "ShowSlotSubmenu('%s')"]
 MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
 MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
 """ % (
         SLOT_WIDTH,
         SLOT_HEIGHT,
+        i,
         i,
         i
     )
