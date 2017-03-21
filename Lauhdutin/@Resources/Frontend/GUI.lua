@@ -38,6 +38,7 @@ function Initialize()
 		INVALID_PATH = "invalidpatherror",
 		LASTPLAYED = "lastplayed",
 		NAME = "title",
+		NOTES = "notes",
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
@@ -1271,9 +1272,13 @@ end
 	end
 
 	function ShowSlotSubmenu(asIndex)
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
+			return
+		end
 		if T_SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang(
-				'[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
+				'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
 				.. '[!UpdateMeterGroup "SlotSubmenu"]'
 				.. '[!ShowMeterGroup "SlotSubmenu"]'
@@ -1291,22 +1296,55 @@ end
 		)
 	end
 
-	function SlotSubmenuButton(anIndex)
-		if anIndex == 1 then --Edit notes
-			--Use a Python script to open 'Notes.txt' in a new Notepad process and wait for the process to finish
-			local sPath = S_PATH_RESOURCES .. 'Notes.txt'
-			print(sPath)
-			local f = io.open(sPath, 'w')
-			if f ~= nil then
-				f:close()
-				SKIN:Bang('notepad "' .. sPath .. '"')
+	function SlotSubmenuButton(anSlotIndex, anActionID)
+		print("Slot: " .. anSlotIndex .. ", ActionID: " .. anActionID)
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
+			return
+		end
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + anSlotIndex - 1]
+		if game == nil then
+			return
+		end
+		print("Game: " .. game[GAME_KEYS.NAME])
+		if anActionID == 1 then --Edit notes
+			WriteJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json', game)
+			SKIN:Bang('"#Python#" "#@#Backend\\EditNotes.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+		elseif anActionID == 2 then --Edit tags/categories
+			--Run Python script
+		elseif anActionID == 3 then --Toggle bangs
+			--Toggle flag
+		elseif anActionID == 4 then --Manual override of process to monitor
+			--Open InputText field
+			--Get process name
+			--Set game's 'process' key-value pair to the new process value
+			--If empty, then remove 'process' key-value pair
+		elseif anActionID == 5 then --Toggle hide
+			--Toggle flag
+			--Move game
+		end
+		--Write updated 'games.json' to disk
+	end
+
+	function OnFinishedEditingNotes()
+		local editedGame = ReadJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json')
+		if editedGame ~= nil then
+			function update_game(aEditedGame, aTableOfGames)
+				for i, game in ipairs(aTableOfGames) do
+					if game[GAME_KEYS.NAME] == aEditedGame[GAME_KEYS.NAME] then
+						game[GAME_KEYS.NOTES] = aEditedGame[GAME_KEYS.NOTES]
+						WriteGames()
+						return true
+					end
+				end
+				return false
 			end
-		elseif anIndex == 2 then --Edit tags/categories
-			--Use a Python script to open 'Tags.txt' in a new Notepad process and wait for the process to finish
-		elseif anIndex == 3 then --Toggle bangs
-
-		elseif anIndex == 4 then --Toggle hide
-
+			if update_game(editedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(editedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(editedGame, T_HIDDEN_GAMES) then
+				return
+			end
 		end
 	end
 

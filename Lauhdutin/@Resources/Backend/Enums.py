@@ -11,6 +11,7 @@ class GameKeys():
     INVALID_PATH = "invalidpatherror"
     LASTPLAYED = "lastplayed"
     NAME = "title"
+    NOTES = "notes"
     NOT_INSTALLED = "notinstalled"
     PATH = "path"
     PLATFORM = "platform"
