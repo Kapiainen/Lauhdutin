@@ -45,9 +45,11 @@ function Initialize()
 		HIDDEN = "hidden",
 		HOURS_LAST_TWO_WEEKS = "hourslast2weeks",
 		HOURS_TOTAL = "hourstotal",
+		IGNORES_BANGS = "ignoresbangs",
 		INVALID_PATH = "invalidpatherror",
 		LASTPLAYED = "lastplayed",
 		NAME = "title",
+		NOTES = "notes",
 		NOT_INSTALLED = "notinstalled",
 		PATH = "path",
 		PLATFORM = "platform",
@@ -93,6 +95,7 @@ function Initialize()
 		)
 	end
 	N_LAST_DRAWN_SCROLL_INDEX = -1
+	HideSlotSubmenu()
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
@@ -1166,6 +1169,7 @@ end
 					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
+			HideSlotSubmenu()
 		end
 	end
 
@@ -1212,13 +1216,16 @@ end
 					end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
-						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						if tGame[GAME_KEYS.PROCESS] ~= nil then
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							--Monitor Steam Overlay process by default
 							StartMonitoringProcess('GameOverlayUI.exe')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
+							--Always use the value of GAME_KEYS.PROCESS
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
-							--
-						else
+							--Use the value of GAME_KEYS.PROCESS or don't monitor at all
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_SHORTCUT then
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
 							local processName = processPath:reverse()
 							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
@@ -1227,7 +1234,7 @@ end
 								StartMonitoringProcess(processName)
 							end
 						end
-						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
+						if tGame[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
 					end
@@ -1344,6 +1351,7 @@ end
 			WriteGames()
 			PopulateSlots()
 			ExecuteStoppingBang()
+			T_RECENTLY_LAUNCHED_GAME = nil
 		end
 		SKIN:Bang(
 			'[!SetOption "ProcessMonitor" "UpdateDivider" "-1"]'
@@ -1352,7 +1360,7 @@ end
 	end
 
 	function ExecuteStoppingBang()
-		if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
+		if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
 			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
 		end
 	end
@@ -1422,6 +1430,184 @@ end
 		else
 			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
+	end
+
+	function ShowSlotSubmenu(asIndex)
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
+			return
+		end
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + tonumber(asIndex) - 1]
+		if game == nil then
+			return
+		end
+		local visibilityIcon = "SlotSubmenuVisible.png"
+		if game[GAME_KEYS.HIDDEN] == true then
+			visibilityIcon = "SlotSubmenuHidden.png"
+		end
+		local bangExecutionIcon = "SlotSubmenuExecutesBangs.png"
+		if game[GAME_KEYS.IGNORES_BANGS] == true then
+			bangExecutionIcon = "SlotSubmenuIgnoresBangs.png"
+		end
+		if T_SETTINGS['orientation'] == 'vertical' then
+			SKIN:Bang(
+				'[!SetOption "SlotSubmenuIcon1" "X" "(#SlotWidth# / 6 - 15)"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+			)
+		else --horizontal
+			SKIN:Bang(
+				'[!SetOption "SlotSubmenuIcon1" "X" "(' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) .. '+ #SlotWidth# / 6 - 15)"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+			)
+		end
+		SKIN:Bang(
+			'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
+			.. '[!SetOption "SlotSubmenuIcon3" "ImageName" "#@#Icons\\' .. bangExecutionIcon ..  '"]'
+			.. '[!SetOption "SlotSubmenuIcon5" "ImageName" "#@#Icons\\' .. visibilityIcon ..  '"]'
+			.. '[!UpdateMeterGroup "SlotSubmenu"]'
+			.. '[!ShowMeterGroup "SlotSubmenu"]'
+			.. '[!Redraw]'
+		)
+	end
+
+	function HideSlotSubmenu()
+		SKIN:Bang(
+			'[!HideMeterGroup "SlotSubmenu"]'
+			.. '[!Redraw]'
+		)
+	end
+
+	function SlotSubmenuButton(anSlotIndex, anActionID)
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
+			return
+		end
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + anSlotIndex - 1]
+		if game == nil then
+			return
+		end
+		if anActionID == 1 then --Edit notes
+			WriteJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json', game)
+			SKIN:Bang('"#Python#" "#@#Backend\\EditNotes.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+		elseif anActionID == 2 then --Edit tags/categories
+			WriteJSON(S_PATH_RESOURCES .. 'Temp\\tags_temp.json', game)
+			SKIN:Bang('"#Python#" "#@#Backend\\EditTags.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
+		elseif anActionID == 3 then --Toggle bangs
+			--Toggle flag
+			if game[GAME_KEYS.IGNORES_BANGS] ~= true then
+				game[GAME_KEYS.IGNORES_BANGS] = true
+			else
+				game[GAME_KEYS.IGNORES_BANGS] = nil
+			end
+			WriteGames()
+		elseif anActionID == 4 then --Manual override of process to monitor
+			--Open InputText field
+			local defaultProcess = ''
+			if game[GAME_KEYS.PROCESS] ~= nil then
+				defaultProcess = game[GAME_KEYS.PROCESS]
+			end
+			SKIN:Bang(
+				'[!SetOption "ProcessOverrideInput" "DefaultValue" "' .. defaultProcess .. '"]'
+				.. '[!UpdateMeasure "ProcessOverrideInput"]'
+				.. '[!CommandMeasure "ProcessOverrideInput" "ExecuteBatch 1"]'
+			)
+		elseif anActionID == 5 then --Toggle hide
+			function move_game_from_to(aGame, aFrom, aTo)
+				for i = 1, #aFrom do
+					if aFrom[i] == aGame then
+						table.insert(aTo, table.remove(aFrom, i))
+						return true
+					end
+				end
+				return false
+			end
+			--Toggle flag
+			--Move game
+			if game[GAME_KEYS.HIDDEN] == true then
+				--Unhide game
+				game[GAME_KEYS.HIDDEN] = nil
+				if not move_game_from_to(game, T_HIDDEN_GAMES, T_ALL_GAMES) then
+					move_game_from_to(game, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+				end
+			else
+				--Hide game
+				game[GAME_KEYS.HIDDEN] = true
+				if not move_game_from_to(game, T_ALL_GAMES, T_HIDDEN_GAMES) then
+					move_game_from_to(game, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES)
+				end
+			end
+			--Remove from filtered games
+			for i = 1, #T_FILTERED_GAMES do
+				if T_FILTERED_GAMES[i] == game then
+					table.remove(T_FILTERED_GAMES, i)
+					break
+				end
+			end
+			--Write updated 'games.json' to disk
+			WriteGames()
+			PopulateSlots()
+		end
+		--Write updated 'games.json' to disk
+		HideSlotSubmenu()
+	end
+
+	function OnFinishedEditingNotes()
+		local editedGame = ReadJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json')
+		if editedGame ~= nil then
+			function update_game(aEditedGame, aTableOfGames)
+				for i, game in ipairs(aTableOfGames) do
+					if game[GAME_KEYS.NAME] == aEditedGame[GAME_KEYS.NAME] then
+						game[GAME_KEYS.NOTES] = aEditedGame[GAME_KEYS.NOTES]
+						WriteGames()
+						return true
+					end
+				end
+				return false
+			end
+			if update_game(editedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(editedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(editedGame, T_HIDDEN_GAMES) then
+				return
+			end
+		end
+	end
+
+	function OnFinishedEditingTags()
+		local editedGame = ReadJSON(S_PATH_RESOURCES .. 'Temp\\tags_temp.json')
+		if editedGame ~= nil then
+			function update_game(aEditedGame, aTableOfGames)
+				for i, game in ipairs(aTableOfGames) do
+					if game[GAME_KEYS.NAME] == aEditedGame[GAME_KEYS.NAME] then
+						game[GAME_KEYS.TAGS] = aEditedGame[GAME_KEYS.TAGS]
+						WriteGames()
+						return true
+					end
+				end
+				return false
+			end
+			if update_game(editedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(editedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(editedGame, T_HIDDEN_GAMES) then
+				return
+			end
+		end
+	end
+
+	function OnFinishedManualProcessOverride(asIndex, asProcessName)
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + tonumber(asIndex) - 1]
+		if game == nil then
+			return
+		end
+		if asProcessName == nil or asProcessName == '' then
+			game[GAME_KEYS.PROCESS] = nil
+		else
+			game[GAME_KEYS.PROCESS] = asProcessName
+		end
+		WriteGames()
 	end
 
 -- Error messages
