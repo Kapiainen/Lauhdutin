@@ -10,10 +10,15 @@ A Rainmeter skin for aggregating games from different platforms and then launchi
  - [Requirements](#requirements)
  - [Installing](#installing)
  - [Updating](#updating)
- - [Supported platforms](#supported-platforms)
- - [Filtering](#filtering)
- - [Bangs](#bangs)
- - [Animations](#animations)
+ - [Features](#features)
+   - [Supported platforms](#supported-platforms)
+   - [Filtering](#filtering)
+   - [Sorting](#sorting)
+   - [Bangs](#bangs)
+   - [Notes](#notes)
+   - [Manual process override](#manual-process-override)
+   - [Highlighting](#highlighting)
+   - [Animations](#animations)
  - [Reporting issues](#reporting-issues)
  - [Contributing](#contributing)
  - [Changelog](#changelog)
@@ -60,9 +65,11 @@ or
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
 - Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
-# Supported platforms
+# Features
 
-## Steam
+## Supported platforms
+
+### Steam
 Support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
@@ -72,13 +79,13 @@ Support includes:
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
-## GOG Galaxy
+### GOG Galaxy
 Support includes:
 - Acquire a list of games installed via GOG Galaxy.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-## Battle.net
+### Battle.net
 Support includes:
 - Acquire a list of games installed via Battle.net.
 - Launch games that were found.
@@ -86,11 +93,11 @@ Support includes:
 
 Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
-## Other platforms
+### Other platforms
 
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
-# Filtering
+## Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
 - `steam:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
@@ -121,16 +128,10 @@ A fuzzy search algorithm is used by default, but can be disabled so that the fil
 
 Hidden games are not showed by default on filtering (except on games:all and hidden: filters, that will show hidden games always), but can be enabled so that the filtering shows also those games.
 
-# Notes
-Notes can be added to a game by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Notes*, and editing the text file that is opened in Notepad.
-
-# Manual process override
-In some circumstances it may be necessary or desirable to monitor a process other than the default one (e.g. Steam Overlay in the case of Steam games). This can be done by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Process*, and typing in the name of the process in the input field that is opened at the top of the skin. Inputting a blank value will remove the override. Process names can be found in the Windows Task Manager (<kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>ESC</kbd>).
-
-# Sorting
+## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
-# Bangs
+## Bangs
 There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
 
 This feature can be used to e.g. load and unload skins.
@@ -145,13 +146,19 @@ The stopping bang can also be executed manually via the context menu, if the ski
 
 Games can be excempted from executing bangs by middle-mouse clicking on the slot that contains the game and then clicking on the button labeled *Bangs*.
 
-# Highlighting
+## Notes
+Notes can be added to a game by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Notes*, and editing the text file that is opened in Notepad.
+
+## Manual process override
+In some circumstances it may be necessary or desirable to monitor a process other than the default one (e.g. Steam Overlay in the case of Steam games). This can be done by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Process*, and typing in the name of the process in the input field that is opened at the top of the skin. Inputting a blank value will remove the override. Process names can be found in the Windows Task Manager (<kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>ESC</kbd>).
+
+## Highlighting
 
 If highlighting is enabled, then additional contextual information can be shown when the mouse cursor is hovered over a slot ([animated example](Docs/Highlighting.gif)). There are some settings for toggling certain pieces of information (e.g. platform, hours played).
 
-# Animations
+## Animations
 
-## Clicking
+### Clicking
 One of these animations can be played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
 
 - Shift left
@@ -162,7 +169,7 @@ One of these animations can be played when a slot is left-clicked ([animated exa
 
 Click animations can be disabled completely.
 
-## Hovering
+### Hovering
 One of these animations can be played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
 
 - Zoom in
