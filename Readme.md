@@ -68,6 +68,7 @@ Support includes:
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
 - Launch the games that were found by the features described above.
 - Install Steam games that are not currently installed.
+- Automatically copy custom grid images assigned in Steam as banners.
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
@@ -197,6 +198,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
+- Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.

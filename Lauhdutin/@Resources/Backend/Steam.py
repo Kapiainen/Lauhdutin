@@ -295,8 +295,21 @@ class Steam():
         print("\t\tFound game '%s'" % game[GameKeys.NAME])
         game[GameKeys.BANNER_PATH] = (
             "Steam\\" + a_appmanifest[VDFKeys.APPID] + ".jpg")
-        game[GameKeys.BANNER_URL] = (
-            self.banner_url_prefix + app_id + self.banner_url_suffix)
+        custom_grid_image_path = os.path.join(self.steam_path, "userdata", self.userdataid, "config", "grid", str(app_id))
+        if os.path.isfile(custom_grid_image_path + ".jpg"):
+            custom_grid_image_path += ".jpg"
+        elif os.path.isfile(custom_grid_image_path + ".png"):
+            custom_grid_image_path += ".png"
+        else:
+            custom_grid_image_path = None
+        if custom_grid_image_path:
+            game[GameKeys.BANNER_URL] = custom_grid_image_path
+        else:
+            game[GameKeys.BANNER_URL] = (
+                self.banner_url_prefix
+                + app_id
+                + self.banner_url_suffix
+            )
         game[GameKeys.LASTPLAYED] = self.get_last_played_stamp(app_id,
                                                                a_local_config)
         tags = self.get_tags(app_id, a_shared_config)
@@ -374,9 +387,17 @@ class Steam():
                 if not os.path.isfile(path):
                     game[GameKeys.ERROR] = True
                     game[GameKeys.INVALID_PATH] = True
-                game[GameKeys.PATH] = "steam://rungameid/%s" % (
-                    self.parse_shortcut_app_id('"%s"%s' % (path, arguments),
-                                               game[GameKeys.NAME]))
+                app_id = self.parse_shortcut_app_id('"%s"%s' % (path, arguments), game[GameKeys.NAME])
+                custom_grid_image_path = os.path.join(self.steam_path, "userdata", self.userdataid, "config", "grid", str(app_id))
+                if os.path.isfile(custom_grid_image_path + ".jpg"):
+                    custom_grid_image_path += ".jpg"
+                elif os.path.isfile(custom_grid_image_path + ".png"):
+                    custom_grid_image_path += ".png"
+                else:
+                    custom_grid_image_path = None
+                if custom_grid_image_path:
+                    game[GameKeys.BANNER_URL] = custom_grid_image_path
+                game[GameKeys.PATH] = "steam://rungameid/%s" % (app_id)
                 game[GameKeys.NAME] = Utility.title_move_the(
                     Utility.title_strip_unicode(game[GameKeys.NAME]))
                 tags = self.parse_shortcut_tags(shortcut)
