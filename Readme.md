@@ -68,6 +68,7 @@ Support includes:
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
 - Launch the games that were found by the features described above.
 - Install Steam games that are not currently installed.
+- Automatically copy custom grid images assigned in Steam as banners.
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
@@ -83,9 +84,7 @@ Support includes:
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
-- The name of the game's folder.
-- The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
+Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
 ## Other platforms
 
@@ -197,6 +196,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
+- Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added `installed:all`, `hidden:all`, `games:all`, `played:true`, `played:false`, `shortcuts:<subfolder name>` filter tags.
