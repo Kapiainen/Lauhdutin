@@ -1275,11 +1275,20 @@ end
 		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
 			return
 		end
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + tonumber(asIndex) - 1]
+		if game == nil then
+			return
+		end
+		local visibilityIcon = "SlotSubmenuVisible.png"
+		if game[GAME_KEYS.HIDDEN] == true then
+			visibilityIcon = "SlotSubmenuHidden.png"
+		end
 		if T_SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang(
 				'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuIcon5" "ImageName" "#@#Icons\\' .. visibilityIcon ..  '"]'
 				.. '[!UpdateMeterGroup "SlotSubmenu"]'
 				.. '[!ShowMeterGroup "SlotSubmenu"]'
 				.. '[!Redraw]'
@@ -1320,10 +1329,44 @@ end
 			--Set game's 'process' key-value pair to the new process value
 			--If empty, then remove 'process' key-value pair
 		elseif anActionID == 5 then --Toggle hide
+			function move_game_from_to(aGame, aFrom, aTo)
+				for i = 1, #aFrom do
+					if aFrom[i] == aGame then
+						table.insert(aTo, table.remove(aFrom, i))
+						return true
+					end
+				end
+				return false
+			end
 			--Toggle flag
 			--Move game
+			local moved = false
+			if game[GAME_KEYS.HIDDEN] == true then
+				--Unhide game
+				game[GAME_KEYS.HIDDEN] = nil
+				if not move_game_from_to(game, T_HIDDEN_GAMES, T_ALL_GAMES) then
+					move_game_from_to(game, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+				end
+			else
+				--Hide game
+				game[GAME_KEYS.HIDDEN] = true
+				if not move_game_from_to(game, T_ALL_GAMES, T_HIDDEN_GAMES) then
+					move_game_from_to(game, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES)
+				end
+			end
+			--Remove from filtered games
+			for i = 1, #T_FILTERED_GAMES do
+				if T_FILTERED_GAMES[i] == game then
+					table.remove(T_FILTERED_GAMES, i)
+					break
+				end
+			end
+			--Write updated 'games.json' to disk
+			WriteGames()
+			PopulateSlots()
 		end
 		--Write updated 'games.json' to disk
+		HideSlotSubmenu()
 	end
 
 	function OnFinishedEditingNotes()
