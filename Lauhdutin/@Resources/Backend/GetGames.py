@@ -182,8 +182,8 @@ try:
                                 game_new[GameKeys.TAGS] = combined_tags
                         if game_old.get(GameKeys.IGNORES_BANGS, None):
                             game_new[GameKeys.IGNORES_BANGS] = game_old[GameKeys.IGNORES_BANGS]
-                        if game_old.get(GameKeys.PROCESS, None):
-                            game_new[GameKeys.PROCESS] = game_old[GameKeys.PROCESS]
+                        if game_old.get(GameKeys.PROCESS_OVERRIDE, None):
+                            game_new[GameKeys.PROCESS_OVERRIDE] = game_old[GameKeys.PROCESS_OVERRIDE]
                         del all_games_old[i]
                         break
                     i += 1

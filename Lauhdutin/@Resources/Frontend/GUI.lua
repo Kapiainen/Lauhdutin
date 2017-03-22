@@ -55,6 +55,7 @@ function Initialize()
 		PLATFORM = "platform",
 		PLATFORM_OVERRIDE = "platformoverride",
 		PROCESS = "process",
+		PROCESS_OVERRIDE = "processoverride",
 		TAGS = "tags"
 	}
 	-- If PLATFORM values are changed, then they have to be copied to the Platform class in Enums.py.
@@ -1216,13 +1217,14 @@ end
 					end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
-						if tGame[GAME_KEYS.PROCESS] ~= nil then
-							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
+						if tGame[GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS_OVERRIDE])
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 							--Monitor Steam Overlay process by default
 							StartMonitoringProcess('GameOverlayUI.exe')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
 							--Always use the value of GAME_KEYS.PROCESS
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
 							--Use the value of GAME_KEYS.PROCESS or don't monitor at all
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_SHORTCUT then
@@ -1503,8 +1505,8 @@ end
 		elseif anActionID == 4 then --Manual override of process to monitor
 			--Open InputText field
 			local defaultProcess = ''
-			if game[GAME_KEYS.PROCESS] ~= nil then
-				defaultProcess = game[GAME_KEYS.PROCESS]
+			if game[GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+				defaultProcess = game[GAME_KEYS.PROCESS_OVERRIDE]
 			end
 			SKIN:Bang(
 				'[!SetOption "ProcessOverrideInput" "DefaultValue" "' .. defaultProcess .. '"]'
@@ -1603,9 +1605,9 @@ end
 			return
 		end
 		if asProcessName == nil or asProcessName == '' then
-			game[GAME_KEYS.PROCESS] = nil
+			game[GAME_KEYS.PROCESS_OVERRIDE] = nil
 		else
-			game[GAME_KEYS.PROCESS] = asProcessName
+			game[GAME_KEYS.PROCESS_OVERRIDE] = asProcessName
 		end
 		WriteGames()
 	end
