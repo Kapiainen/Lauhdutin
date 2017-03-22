@@ -207,7 +207,8 @@ DynamicVariables=1
 
         # Skin showing sliver
         if ORIENTATION == "vertical":
-            f.write("""
+            if settings.get("skin_slide_animation_direction", 0) == 1: # From the right
+                f.write("""
 [SkinEnabler]
 Meter=Image
 X=0
@@ -220,8 +221,24 @@ MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
         SLOT_HEIGHT * SLOT_COUNT
     )
 )
+            elif settings.get("skin_slide_animation_direction", 0) == 2: # From the right
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=%s
+Y=0
+W=1
+H=%s
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_WIDTH - 1,
+        SLOT_HEIGHT * SLOT_COUNT
+    )
+)
         else:
-            f.write("""
+            if settings.get("skin_slide_animation_direction", 0) == 3: # From above
+                f.write("""
 [SkinEnabler]
 Meter=Image
 X=0
@@ -231,6 +248,21 @@ H=1
 SolidColor=0,0,0,1
 MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
 """ % (
+        SLOT_WIDTH * SLOT_COUNT
+    )
+)
+            elif settings.get("skin_slide_animation_direction", 0) == 4: # From below
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=%s
+W=%s
+H=1
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_HEIGHT - 1,
         SLOT_WIDTH * SLOT_COUNT
     )
 )

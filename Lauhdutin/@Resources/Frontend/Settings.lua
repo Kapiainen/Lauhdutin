@@ -93,6 +93,20 @@ function Initialize()
 	if SETTINGS['hidden_games'] == nil then
 		SETTINGS['hidden_games'] = false
 	end
+	if SETTINGS['skin_slide_animation_direction'] == nil then
+		--0 = disabled
+		--1 = from the left
+		--2 = from the right
+		--3 = from above
+		--4 = from below
+		SETTINGS['skin_slide_animation_direction'] = 0
+	end
+	SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS = {
+		"From the left",
+		"From the right",
+		"From above",
+		"From below"
+	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -128,7 +142,7 @@ function Exit()
 		return
 	end
 	if OLD_SETTINGS then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation', 'hover_animation'}
+		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation', 'hover_animation', 'skin_slide_animation_direction'}
 		for i=1, #layout_settings do
 			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
 				REBUILD_SWITCH = true
@@ -182,10 +196,16 @@ function UpdateSettings()
 			if SETTINGS['click_animation'] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
 				SETTINGS['click_animation'] = 0
 			end
+			if SETTINGS['skin_slide_animation_direction'] > 2 then
+				SETTINGS['skin_slide_animation_direction'] = 0
+			end
 		else
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
 			if SETTINGS['click_animation'] <= #CLICK_ANIMATION_DESCRIPTIONS / 2 then
 				SETTINGS['click_animation'] = 0
+			end
+			if SETTINGS['skin_slide_animation_direction'] < 3 then
+				SETTINGS['skin_slide_animation_direction'] = 0
 			end
 		end
 		if SETTINGS['slot_highlight'] == true then
@@ -227,6 +247,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
 		else
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Ignore"]')
+		end
+		if SETTINGS['skin_slide_animation_direction'] == 0 then
+			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "Disabled"]')
+		else
+			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "' .. SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS[SETTINGS['skin_slide_animation_direction']] .. '"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -483,6 +508,25 @@ end
 
 function ToggleHiddenGames()
 	SETTINGS['hidden_games'] = not SETTINGS['hidden_games']
+	UpdateSettings()
+end
+
+function CycleSkinSlideAnimationDirection()
+	if SETTINGS['orientation'] == 'vertical' then
+		if SETTINGS['skin_slide_animation_direction'] < 2 then
+			SETTINGS['skin_slide_animation_direction'] = SETTINGS['skin_slide_animation_direction'] + 1
+		else
+			SETTINGS['skin_slide_animation_direction'] = 0
+		end
+	else
+		if SETTINGS['skin_slide_animation_direction'] == 3 then
+			SETTINGS['skin_slide_animation_direction'] = 4
+		elseif SETTINGS['skin_slide_animation_direction'] == 0 then
+			SETTINGS['skin_slide_animation_direction'] = 3
+		else
+			SETTINGS['skin_slide_animation_direction'] = 0
+		end
+	end
 	UpdateSettings()
 end
 

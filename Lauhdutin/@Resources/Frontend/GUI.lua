@@ -151,7 +151,7 @@ function SlideSkinIn()
 end
 --not B_INITIALIZED or B_FORCE_TOOLBAR
 function SlideSkinOut()
-	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE then
+	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS['skin_slide_animation_direction'] == 0 then
 		return
 	end
 	B_SKIN_VISIBLE = false
@@ -179,9 +179,17 @@ function AnimateSkin(anFrame)
 		return
 	end
 	if T_SETTINGS['orientation'] == 'vertical' then
-		SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor)
+		if T_SETTINGS['skin_slide_animation_direction'] == 1 then
+			SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor)
+		elseif T_SETTINGS['skin_slide_animation_direction'] == 2 then
+			SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor * -1)
+		end
 	else --horizontal
-		SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor)
+		if T_SETTINGS['skin_slide_animation_direction'] == 3 then
+			SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor)
+		elseif T_SETTINGS['skin_slide_animation_direction'] == 4 then
+			SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor * -1)
+		end
 	end
 	SKIN:Bang('[!Redraw]')
 end
