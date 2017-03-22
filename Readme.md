@@ -195,6 +195,8 @@ Try to include tests and mock data for those tests. These tests should preferrab
 
 Try to keep the number of dependencies, which cannot be included in the skin or are not a part of a default Windows installation, to a minimum.
 
+[List of contributors](Contributors.md)
+
 ## Graphical user interface changes
 Try to keep draw calls to a minimum by, for example:
 - Not overriding the skin-wide `DefaultUpdateDivider=-1` option.
