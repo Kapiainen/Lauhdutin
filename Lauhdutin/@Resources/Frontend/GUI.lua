@@ -1294,18 +1294,25 @@ end
 		end
 		if T_SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang(
-				'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
+				'[!SetOption "SlotSubmenuIcon1" "X" "(#SlotWidth# / 6 - 15)"]'
 				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
-				.. '[!SetOption "SlotSubmenuIcon3" "ImageName" "#@#Icons\\' .. bangExecutionIcon ..  '"]'
-				.. '[!SetOption "SlotSubmenuIcon5" "ImageName" "#@#Icons\\' .. visibilityIcon ..  '"]'
-				.. '[!UpdateMeterGroup "SlotSubmenu"]'
-				.. '[!ShowMeterGroup "SlotSubmenu"]'
-				.. '[!Redraw]'
 			)
-		else
-
+		else --horizontal
+			SKIN:Bang(
+				'[!SetOption "SlotSubmenuIcon1" "X" "(' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) .. '+ #SlotWidth# / 6 - 15)"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+			)
 		end
+		SKIN:Bang(
+			'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
+			.. '[!SetOption "SlotSubmenuIcon3" "ImageName" "#@#Icons\\' .. bangExecutionIcon ..  '"]'
+			.. '[!SetOption "SlotSubmenuIcon5" "ImageName" "#@#Icons\\' .. visibilityIcon ..  '"]'
+			.. '[!UpdateMeterGroup "SlotSubmenu"]'
+			.. '[!ShowMeterGroup "SlotSubmenu"]'
+			.. '[!Redraw]'
+		)
 	end
 
 	function HideSlotSubmenu()
