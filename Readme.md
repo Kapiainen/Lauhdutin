@@ -84,9 +84,7 @@ Support includes:
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
-- The name of the game's folder.
-- The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
+Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
 ## Other platforms
 
