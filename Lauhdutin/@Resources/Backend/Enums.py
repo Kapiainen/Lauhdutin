@@ -8,6 +8,7 @@ class GameKeys():
     HIDDEN = "hidden"
     HOURS_LAST_TWO_WEEKS = "hourslast2weeks"
     HOURS_TOTAL = "hourstotal"
+    IGNORES_BANGS = "ignoresbangs"
     INVALID_PATH = "invalidpatherror"
     LASTPLAYED = "lastplayed"
     NAME = "title"

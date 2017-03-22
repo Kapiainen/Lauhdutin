@@ -180,6 +180,8 @@ try:
                                     combined_tags[str(j)] = tag
                                     j += 1
                                 game_new[GameKeys.TAGS] = combined_tags
+                        if game_old.get(GameKeys.IGNORES_BANGS, None):
+                            game_new[GameKeys.IGNORES_BANGS] = game_old[GameKeys.IGNORES_BANGS]
                         del all_games_old[i]
                         break
                     i += 1

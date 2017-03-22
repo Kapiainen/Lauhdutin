@@ -35,6 +35,7 @@ function Initialize()
 		HIDDEN = "hidden",
 		HOURS_LAST_TWO_WEEKS = "hourslast2weeks",
 		HOURS_TOTAL = "hourstotal",
+		IGNORES_BANGS = "ignoresbangs",
 		INVALID_PATH = "invalidpatherror",
 		LASTPLAYED = "lastplayed",
 		NAME = "title",
@@ -1105,7 +1106,7 @@ end
 								StartMonitoringProcess(processName)
 							end
 						end
-						if T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
+						if tGame[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
 							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
 						end
 					end
@@ -1218,12 +1219,13 @@ end
 			WriteGames()
 			PopulateSlots()
 			ExecuteStoppingBang()
+			T_RECENTLY_LAUNCHED_GAME = nil
 		end
 		SKIN:Bang('[!SetOption "ProcessMonitor" "UpdateDivider" "-1"][!UpdateMeasure "ProcessMonitor"]')
 	end
 
 	function ExecuteStoppingBang()
-		if T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
+		if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
 			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
 		end
 	end
@@ -1283,11 +1285,16 @@ end
 		if game[GAME_KEYS.HIDDEN] == true then
 			visibilityIcon = "SlotSubmenuHidden.png"
 		end
+		local bangExecutionIcon = "SlotSubmenuExecutesBangs.png"
+		if game[GAME_KEYS.IGNORES_BANGS] == true then
+			bangExecutionIcon = "SlotSubmenuIgnoresBangs.png"
+		end
 		if T_SETTINGS['orientation'] == 'vertical' then
 			SKIN:Bang(
 				'[!SetVariable "SlotSubmenuIndex" "' .. asIndex .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
 				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuIcon3" "ImageName" "#@#Icons\\' .. bangExecutionIcon ..  '"]'
 				.. '[!SetOption "SlotSubmenuIcon5" "ImageName" "#@#Icons\\' .. visibilityIcon ..  '"]'
 				.. '[!UpdateMeterGroup "SlotSubmenu"]'
 				.. '[!ShowMeterGroup "SlotSubmenu"]'
@@ -1323,6 +1330,12 @@ end
 			SKIN:Bang('"#Python#" "#@#Backend\\EditTags.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 		elseif anActionID == 3 then --Toggle bangs
 			--Toggle flag
+			if game[GAME_KEYS.IGNORES_BANGS] ~= true then
+				game[GAME_KEYS.IGNORES_BANGS] = true
+			else
+				game[GAME_KEYS.IGNORES_BANGS] = nil
+			end
+			WriteGames()
 		elseif anActionID == 4 then --Manual override of process to monitor
 			--Open InputText field
 			--Get process name
