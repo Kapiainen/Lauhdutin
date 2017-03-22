@@ -1340,7 +1340,6 @@ end
 			end
 			--Toggle flag
 			--Move game
-			local moved = false
 			if game[GAME_KEYS.HIDDEN] == true then
 				--Unhide game
 				game[GAME_KEYS.HIDDEN] = nil
