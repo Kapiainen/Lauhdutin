@@ -168,6 +168,18 @@ try:
                                 GameKeys.HOURS_TOTAL]
                         if game_old.get(GameKeys.NOTES, None):
                             game_new[GameKeys.NOTES] = game_old[GameKeys.NOTES]
+                        if game_old.get(GameKeys.TAGS, None):
+                            sorted_unique_tags = []
+                            sorted_unique_tags.extend([value for key, value in game_old.get(GameKeys.TAGS, {}).items()])
+                            sorted_unique_tags.extend([value for key, value in game_new.get(GameKeys.TAGS, {}).items()])
+                            if sorted_unique_tags:
+                                sorted_unique_tags = sorted(set(sorted_unique_tags))
+                                combined_tags = {}
+                                j = 0
+                                for tag in sorted_unique_tags:
+                                    combined_tags[str(j)] = tag
+                                    j += 1
+                                game_new[GameKeys.TAGS] = combined_tags
                         del all_games_old[i]
                         break
                     i += 1

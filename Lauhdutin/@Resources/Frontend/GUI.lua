@@ -1310,7 +1310,8 @@ end
 			WriteJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json', game)
 			SKIN:Bang('"#Python#" "#@#Backend\\EditNotes.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 		elseif anActionID == 2 then --Edit tags/categories
-			--Run Python script
+			WriteJSON(S_PATH_RESOURCES .. 'Temp\\tags_temp.json', game)
+			SKIN:Bang('"#Python#" "#@#Backend\\EditTags.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
 		elseif anActionID == 3 then --Toggle bangs
 			--Toggle flag
 		elseif anActionID == 4 then --Manual override of process to monitor
@@ -1332,6 +1333,29 @@ end
 				for i, game in ipairs(aTableOfGames) do
 					if game[GAME_KEYS.NAME] == aEditedGame[GAME_KEYS.NAME] then
 						game[GAME_KEYS.NOTES] = aEditedGame[GAME_KEYS.NOTES]
+						WriteGames()
+						return true
+					end
+				end
+				return false
+			end
+			if update_game(editedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(editedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(editedGame, T_HIDDEN_GAMES) then
+				return
+			end
+		end
+	end
+
+	function OnFinishedEditingTags()
+		local editedGame = ReadJSON(S_PATH_RESOURCES .. 'Temp\\tags_temp.json')
+		if editedGame ~= nil then
+			function update_game(aEditedGame, aTableOfGames)
+				for i, game in ipairs(aTableOfGames) do
+					if game[GAME_KEYS.NAME] == aEditedGame[GAME_KEYS.NAME] then
+						game[GAME_KEYS.TAGS] = aEditedGame[GAME_KEYS.TAGS]
 						WriteGames()
 						return true
 					end
