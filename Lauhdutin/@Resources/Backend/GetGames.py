@@ -166,6 +166,24 @@ try:
                                 not game_new.get(GameKeys.HOURS_TOTAL, None)):
                             game_new[GameKeys.HOURS_TOTAL] = game_old[
                                 GameKeys.HOURS_TOTAL]
+                        if game_old.get(GameKeys.NOTES, None):
+                            game_new[GameKeys.NOTES] = game_old[GameKeys.NOTES]
+                        if game_old.get(GameKeys.TAGS, None):
+                            sorted_unique_tags = []
+                            sorted_unique_tags.extend([value for key, value in game_old.get(GameKeys.TAGS, {}).items()])
+                            sorted_unique_tags.extend([value for key, value in game_new.get(GameKeys.TAGS, {}).items()])
+                            if sorted_unique_tags:
+                                sorted_unique_tags = sorted(set(sorted_unique_tags))
+                                combined_tags = {}
+                                j = 0
+                                for tag in sorted_unique_tags:
+                                    combined_tags[str(j)] = tag
+                                    j += 1
+                                game_new[GameKeys.TAGS] = combined_tags
+                        if game_old.get(GameKeys.IGNORES_BANGS, None):
+                            game_new[GameKeys.IGNORES_BANGS] = game_old[GameKeys.IGNORES_BANGS]
+                        if game_old.get(GameKeys.PROCESS, None):
+                            game_new[GameKeys.PROCESS] = game_old[GameKeys.PROCESS]
                         del all_games_old[i]
                         break
                     i += 1
@@ -184,6 +202,10 @@ try:
 
         print("Writing master list of %d games to disk..." % len(all_games))
         write_json(os.path.join(ResourcePath, "games.json"), all_games)
+
+        temp_dir_path = os.path.join(ResourcePath, "Temp")
+        if not os.path.isdir(temp_dir_path):
+            os.makedirs(temp_dir_path)
 
         print("Initializing frontend...")
         subprocess.call(
