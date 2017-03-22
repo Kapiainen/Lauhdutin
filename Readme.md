@@ -109,7 +109,7 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
 
-- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
+- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*. Tags can also be assigned by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Tags*, and editing the text file that is opened in Notepad (one tag per line).
 
 - `random:` followed by `all`, `steam` or `played`. If `all`, then show one random game from games installed or not. If `steam`, then show one random game from Steam games installed or not. If  `played`, then show one random game from all games (hidden, instaled or not) with a total played time above 0 hours.
 
@@ -120,6 +120,12 @@ Filters can be applied by left-clicking on the magnifying glass in the toolbar, 
 A fuzzy search algorithm is used by default, but can be disabled so that the filtering works like in versions up to 2.5.0. Fuzzy search scores each possible result based on several factors (e.g. the distance of the first matching character from the beginning of the string or a word in that string). This algorithm allows e.g. searching for `boi` and getting `The Binding Of Isaac` as one of the top results since all three letters in the search pattern are present in the result as the first letters of words and thus are likely to form a common abbreviation.
 
 Hidden games are not showed by default on filtering (except on games:all and hidden: filters, that will show hidden games always), but can be enabled so that the filtering shows also those games.
+
+# Notes
+Notes can be added to a game by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Notes*, and editing the text file that is opened in Notepad.
+
+# Manual process override
+In some circumstances it may be necessary or desirable to monitor a process other than the default one (e.g. Steam Overlay in the case of Steam games). This can be done by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Process*, and typing in the name of the process in the input field that is opened at the top of the skin. Inputting a blank value will remove the override. Process names can be found in the Windows Task Manager (<kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>ESC</kbd>).
 
 # Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
@@ -136,6 +142,8 @@ Currently supported events that can be used to trigger the execution of bangs:
   - non-Steam game that has a process that can be tracked (i.e. Lauhdutin is capable of keeping track of how many hours have been spent playing the game).
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
+
+Games can be excempted from executing bangs by middle-mouse clicking on the slot that contains the game and then clicking on the button labeled *Bangs*.
 
 # Highlighting
 
