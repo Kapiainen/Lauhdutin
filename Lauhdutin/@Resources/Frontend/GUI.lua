@@ -1091,13 +1091,16 @@ end
 					end
 					if bNotInstalled ~= true then
 						T_RECENTLY_LAUNCHED_GAME = tGame
-						if tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						if tGame[GAME_KEYS.PROCESS] ~= nil then
+							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							--Monitor Steam Overlay process by default
 							StartMonitoringProcess('GameOverlayUI.exe')
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
-							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
+							--Always use the value of GAME_KEYS.PROCESS
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
-							--
-						else
+							--Use the value of GAME_KEYS.PROCESS or don't monitor at all
+						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_SHORTCUT then
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
 							local processName = processPath:reverse()
 							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
@@ -1313,7 +1316,6 @@ end
 	end
 
 	function SlotSubmenuButton(anSlotIndex, anActionID)
-		print("Slot: " .. anSlotIndex .. ", ActionID: " .. anActionID)
 		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
 			return
 		end
@@ -1321,7 +1323,6 @@ end
 		if game == nil then
 			return
 		end
-		print("Game: " .. game[GAME_KEYS.NAME])
 		if anActionID == 1 then --Edit notes
 			WriteJSON(S_PATH_RESOURCES .. 'Temp\\notes_temp.json', game)
 			SKIN:Bang('"#Python#" "#@#Backend\\EditNotes.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"')
@@ -1338,9 +1339,15 @@ end
 			WriteGames()
 		elseif anActionID == 4 then --Manual override of process to monitor
 			--Open InputText field
-			--Get process name
-			--Set game's 'process' key-value pair to the new process value
-			--If empty, then remove 'process' key-value pair
+			local defaultProcess = ''
+			if game[GAME_KEYS.PROCESS] ~= nil then
+				defaultProcess = game[GAME_KEYS.PROCESS]
+			end
+			SKIN:Bang(
+				'[!SetOption "ProcessOverrideInput" "DefaultValue" "' .. defaultProcess .. '"]'
+				.. '[!UpdateMeasure "ProcessOverrideInput"]'
+				.. '[!CommandMeasure "ProcessOverrideInput" "ExecuteBatch 1"]'
+			)
 		elseif anActionID == 5 then --Toggle hide
 			function move_game_from_to(aGame, aFrom, aTo)
 				for i = 1, #aFrom do
@@ -1425,6 +1432,19 @@ end
 				return
 			end
 		end
+	end
+
+	function OnFinishedManualProcessOverride(asIndex, asProcessName)
+		local game = T_FILTERED_GAMES[N_SCROLL_INDEX + tonumber(asIndex) - 1]
+		if game == nil then
+			return
+		end
+		if asProcessName == nil or asProcessName == '' then
+			game[GAME_KEYS.PROCESS] = nil
+		else
+			game[GAME_KEYS.PROCESS] = asProcessName
+		end
+		WriteGames()
 	end
 
 -- Error messages
