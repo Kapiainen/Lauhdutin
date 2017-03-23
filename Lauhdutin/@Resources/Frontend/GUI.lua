@@ -1,4 +1,5 @@
 function Initialize()
+	B_ANIMATING = false
 	B_INITIALIZED = false
 	B_SKIN_VISIBLE = true
 	json = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
@@ -142,18 +143,32 @@ function Init()
 	B_INITIALIZED = true
 end
 
-function SlideSkinIn()
-	if B_SKIN_VISIBLE then
+function StartClickAnimation(asType)
+	if B_ANIMATING then
 		return
 	end
+	B_ANIMATING = true
+	SKIN:Bang('[!CommandMeasure "ClickAnimation" "Execute ' .. asType .. '"]')
+end
+
+function StopAnimating()
+	B_ANIMATING = false
+end
+
+function SlideSkinIn()
+	if B_SKIN_VISIBLE or B_ANIMATING then
+		return
+	end
+	B_ANIMATING = true
 	B_SKIN_VISIBLE = true
 	SKIN:Bang('[!CommandMeasure "SkinAnimation" "Execute 1"]')
 end
 --not B_INITIALIZED or B_FORCE_TOOLBAR
 function SlideSkinOut()
-	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 then
+	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 or B_ANIMATING then
 		return
 	end
+	B_ANIMATING = true
 	B_SKIN_VISIBLE = false
 	SKIN:Bang('[!CommandMeasure "SkinAnimation" "Execute 2"]')
 end
@@ -199,10 +214,14 @@ function SetSlotsXPosition(anValue)
 		SKIN:Bang(
 			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "X" "' .. anValue .. '"]'
+			.. '[!SetOption "SlotHighlightBackground' .. i .. '" "X" "' .. anValue .. '"]'
+--			.. '[!SetOption "SlotHighlight' .. i .. '" "X" "' .. anValue .. '"]'
+--			.. '[!SetOption "SlotHighlightText' .. i .. '" "X" "' .. anValue .. '"]'
 		)
 	end
 	SKIN:Bang(
 		'[!UpdateMeterGroup "Slots"]'
+		.. '[!UpdateMeterGroup "SlotHighlights"]'
 		.. '[!SetOption "SlotBackground" "X" "' .. anValue .. '"]'
 		.. '[!UpdateMeter "SlotBackground"]'
 		.. '[!SetOption "ToolbarEnabler" "X" "' .. anValue .. '"]'
@@ -215,10 +234,12 @@ function SetSlotsYPosition(anValue)
 		SKIN:Bang(
 			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "Y" "' .. anValue .. '"]'
+			.. '[!SetOption "SlotHighlightBackground' .. i .. '" "Y" "' .. anValue .. '"]'
 		)
 	end
 	SKIN:Bang(
 		'[!UpdateMeterGroup "Slots"]'
+		.. '[!UpdateMeterGroup "SlotHighlights"]'
 		.. '[!SetOption "SlotBackground" "Y" "' .. anValue .. '"]'
 		.. '[!UpdateMeter "SlotBackground"]'
 		.. '[!SetOption "ToolbarEnabler" "Y" "' .. anValue .. '"]'
@@ -1084,7 +1105,7 @@ end
 							StartMonitoringProcess(tGame[GAME_KEYS.PROCESS])
 						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_URL_SHORTCUT then
 							--Use the value of GAME_KEYS.PROCESS or don't monitor at all
-						elseif tGame[GAME_KEYS.PLATFORM] == PLATFORM.WINDOWS_SHORTCUT then
+						else
 							local processPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
 							local processName = processPath:reverse()
 							processName = processName:match("(exe%p[^\\/:%*?<>|]+)/")
@@ -1224,7 +1245,7 @@ end
 		end
 	end
 
-	function Unhighlight(asIndex)		
+	function Unhighlight(asIndex)
 		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 			SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"]')
 		end
@@ -1258,7 +1279,7 @@ end
 		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"]')
 		end
-		if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > 0 then
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > 0 and not B_ANIMATING and B_SKIN_VISIBLE then
 			if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == 1 then
 				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 					SKIN:Bang(
