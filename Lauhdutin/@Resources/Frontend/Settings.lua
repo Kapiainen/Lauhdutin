@@ -1,5 +1,6 @@
 function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
+	SETTING_KEYS = dofile(SKIN:GetVariable('@') .. 'Frontend\\SettingsEnum.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
 	SAVING_SETTINGS = false
@@ -8,68 +9,68 @@ function Initialize()
 	if SETTINGS == nil then
 		SETTINGS = {}
 	end
-	if SETTINGS['slot_count'] == nil then
-		SETTINGS['slot_count'] = 8
+	if SETTINGS[SETTING_KEYS.SLOT_COUNT] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_COUNT] = 8
 	end
-	if SETTINGS['slot_width'] == nil then
-		SETTINGS['slot_width'] = 310
+	if SETTINGS[SETTING_KEYS.SLOT_WIDTH] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_WIDTH] = 310
 	end
-	if SETTINGS['slot_height'] == nil then
-		SETTINGS['slot_height'] = 145
+	if SETTINGS[SETTING_KEYS.SLOT_HEIGHT] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = 145
 	end
-	if SETTINGS['slot_background_color'] == nil then
-		SETTINGS['slot_background_color'] = "0,0,0,196"
+	if SETTINGS[SETTING_KEYS.SLOT_BACKGROUND_COLOR] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_BACKGROUND_COLOR] = "0,0,0,196"
 	end
-	if SETTINGS['slot_text_color'] == nil then
-		SETTINGS['slot_text_color'] = "255,255,255,255"
+	if SETTINGS[SETTING_KEYS.SLOT_TEXT_COLOR] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_TEXT_COLOR] = "255,255,255,255"
 	end
-	if SETTINGS['slot_highlight'] == nil then
-		SETTINGS['slot_highlight'] = true
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = true
 	end
-	if SETTINGS['show_hours_played'] == nil then
-		SETTINGS['show_hours_played'] = true
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = true
 	end
-	if SETTINGS['show_platform'] == nil then
-		SETTINGS['show_platform'] = true
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = true
 	end
-	if SETTINGS['steam_path'] == nil then
-		SETTINGS['steam_path'] = ""
+	if SETTINGS[SETTING_KEYS.STEAM_PATH] == nil then
+		SETTINGS[SETTING_KEYS.STEAM_PATH] = ""
 	end
-	if SETTINGS['steam_userdataid'] == nil then
-		SETTINGS['steam_userdataid'] = ""
+	if SETTINGS[SETTING_KEYS.STEAM_USERDATAID] == nil then
+		SETTINGS[SETTING_KEYS.STEAM_USERDATAID] = ""
 	end
-	if SETTINGS['steam_personaname'] == nil then
-		SETTINGS['steam_personaname'] = "" -- Just used for visuals in the Settings menu
+	if SETTINGS[SETTING_KEYS.STEAM_PERSONANAME] == nil then
+		SETTINGS[SETTING_KEYS.STEAM_PERSONANAME] = "" -- Just used for visuals in the Settings menu
 	end
-	if SETTINGS['steam_id64'] == nil then
-		SETTINGS['steam_id64'] = ""
+	if SETTINGS[SETTING_KEYS.STEAM_ID64] == nil then
+		SETTINGS[SETTING_KEYS.STEAM_ID64] = ""
 	end
-	if SETTINGS['parse_steam_community_profile'] == nil then
-		SETTINGS['parse_steam_community_profile'] = true
+	if SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] == nil then
+		SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] = true
 	end
-	if SETTINGS['start_game_bang'] == nil then
-		SETTINGS['start_game_bang'] = ""
+	if SETTINGS[SETTING_KEYS.BANGS_STARTING] == nil then
+		SETTINGS[SETTING_KEYS.BANGS_STARTING] = ""
 	end
-	if SETTINGS['stop_game_bang'] == nil then
-		SETTINGS['stop_game_bang'] = ""
+	if SETTINGS[SETTING_KEYS.BANGS_STOPPING] == nil then
+		SETTINGS[SETTING_KEYS.BANGS_STOPPING] = ""
 	end
-	if SETTINGS['sortstate'] == nil then
-		SETTINGS['sortstate'] = "0"
+	if SETTINGS[SETTING_KEYS.SORT_STATE] == nil then
+		SETTINGS[SETTING_KEYS.SORT_STATE] = "0"
 	end
-	if SETTINGS['galaxy_path'] == nil then
-		SETTINGS['galaxy_path'] = "C:\/ProgramData\/GOG.com\/Galaxy"
+	if SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH] == nil then
+		SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH] = "C:\/ProgramData\/GOG.com\/Galaxy"
 	end
-	if SETTINGS['battlenet_path'] == nil then
-		SETTINGS['battlenet_path'] = ""
+	if SETTINGS[SETTING_KEYS.BATTLENET_PATH] == nil then
+		SETTINGS[SETTING_KEYS.BATTLENET_PATH] = ""
 	end
-	if SETTINGS['python_path'] == nil then
-		SETTINGS['python_path'] = "pythonw"
+	if SETTINGS[SETTING_KEYS.PYTHON_PATH] == nil then
+		SETTINGS[SETTING_KEYS.PYTHON_PATH] = "pythonw"
 	end
-	if SETTINGS['orientation'] == nil then
-		SETTINGS['orientation'] = "vertical"
+	if SETTINGS[SETTING_KEYS.ORIENTATION] == nil then
+		SETTINGS[SETTING_KEYS.ORIENTATION] = "vertical"
 	end
-	if SETTINGS['click_animation'] == nil then
-		SETTINGS['click_animation'] = 0
+	if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] == nil then
+		SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = 0
 	end
 	CLICK_ANIMATION_DESCRIPTIONS = {
 		"Shrink",
@@ -79,27 +80,27 @@ function Initialize()
 		"Shift up",
 		"Shift down"
 	}
-	if SETTINGS['hover_animation'] == nil then
-		SETTINGS['hover_animation'] = 0
+	if SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == nil then
+		SETTINGS[SETTING_KEYS.ANIMATION_HOVER] = 0
 	end
 	HOVER_ANIMATION_DESCRIPTIONS = {
 		"Zoom in",
 		"Jiggle",
 		"Shake"
 	}
-	if SETTINGS['fuzzy_search'] == nil then
-		SETTINGS['fuzzy_search'] = true
+	if SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == nil then
+		SETTINGS[SETTING_KEYS.FUZZY_SEARCH] = true
 	end
-	if SETTINGS['hidden_games'] == nil then
-		SETTINGS['hidden_games'] = false
+	if SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == nil then
+		SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] = false
 	end
-	if SETTINGS['skin_slide_animation_direction'] == nil then
+	if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == nil then
 		--0 = disabled
 		--1 = from the left
 		--2 = from the right
 		--3 = from above
 		--4 = from below
-		SETTINGS['skin_slide_animation_direction'] = 0
+		SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 	end
 	SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS = {
 		"From the left",
@@ -118,7 +119,7 @@ end
 function WritePythonPath()
 	local f = io.open(RESOURCES_PATH .. 'PythonPath.inc', 'w')
 	if f ~= nil then
-		f:write('[Variables]\nPython="' .. SETTINGS['python_path'] .. '"')
+		f:write('[Variables]\nPython="' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] .. '"')
 		f:close()
 	end
 end
@@ -126,7 +127,7 @@ end
 function Save()
 	SAVING_SETTINGS = true
 	if OLD_SETTINGS then
-		if OLD_SETTINGS['python_path'] ~= SETTINGS['python_path'] and SETTINGS['python_path'] ~= '' then
+		if OLD_SETTINGS[SETTING_KEYS.PYTHON_PATH] ~= SETTINGS[SETTING_KEYS.PYTHON_PATH] and SETTINGS[SETTING_KEYS.PYTHON_PATH] ~= '' then
 			WritePythonPath()
 		end
 	else
@@ -142,7 +143,7 @@ function Exit()
 		return
 	end
 	if OLD_SETTINGS then
-		local layout_settings = {'slot_count', 'slot_width', 'slot_height', 'slot_background_color', 'slot_text_color', 'orientation', 'click_animation', 'hover_animation', 'skin_slide_animation_direction'}
+		local layout_settings = {SETTING_KEYS.SLOT_COUNT, SETTING_KEYS.SLOT_WIDTH, SETTING_KEYS.SLOT_HEIGHT, SETTING_KEYS.SLOT_BACKGROUND_COLOR, SETTING_KEYS.SLOT_TEXT_COLOR, SETTING_KEYS.ORIENTATION, SETTING_KEYS.ANIMATION_CLICK, SETTING_KEYS.ANIMATION_HOVER, SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION}
 		for i=1, #layout_settings do
 			if OLD_SETTINGS[layout_settings[i]] ~= SETTINGS[layout_settings[i]] then
 				REBUILD_SWITCH = true
@@ -171,87 +172,87 @@ end
 
 function UpdateSettings()
 	if SETTINGS then
-		SKIN:Bang('[!SetOption "SlotCountStatus" "Text" "' .. tostring(SETTINGS['slot_count']) .. '"]')
-		SKIN:Bang('[!SetOption "SlotCountInput" "DefaultValue" "' .. SETTINGS['slot_count'] ..'"]')
-		SKIN:Bang('[!SetOption "SlotWidthStatus" "Text" "' .. tostring(SETTINGS['slot_width']) .. '"]')
-		SKIN:Bang('[!SetOption "SlotWidthInput" "DefaultValue" "' .. SETTINGS['slot_width'] ..'"]')
-		SKIN:Bang('[!SetOption "SlotHeightStatus" "Text" "' .. tostring(SETTINGS['slot_height']) .. '"]')
-		SKIN:Bang('[!SetOption "SlotHeightInput" "DefaultValue" "' .. SETTINGS['slot_height'] ..'"]')
-		SKIN:Bang('[!SetOption "SteamPathStatus" "Text" "' .. tostring(SETTINGS['steam_path']) .. '"]')
-		SKIN:Bang('[!SetOption "SteamPathInput" "DefaultValue" "' .. SETTINGS['steam_path'] ..'"]')
-		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS['steam_personaname']) .. '"]')
-		SKIN:Bang('[!SetOption "SteamUserdataidInput" "DefaultValue" "' .. SETTINGS['steam_userdataid'] ..'"]')
-		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS['galaxy_path']) .. '"]')
-		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS['galaxy_path'] ..'"]')
-		SKIN:Bang('[!SetOption "BattlenetPathStatus" "Text" "' .. tostring(SETTINGS['battlenet_path']) .. '"]')
-		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS['battlenet_path'] ..'"]')
-		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS['python_path']) .. '"]')
-		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS['python_path'] ..'"]')
-		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS['start_game_bang']) .. '"]')
-		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS['start_game_bang'] ..'"]')
-		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS['stop_game_bang']) .. '"]')
-		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS['stop_game_bang'] ..'"]')
-		if SETTINGS['orientation'] == 'vertical' then
+		SKIN:Bang('[!SetOption "SlotCountStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_COUNT]) .. '"]')
+		SKIN:Bang('[!SetOption "SlotCountInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_COUNT] ..'"]')
+		SKIN:Bang('[!SetOption "SlotWidthStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_WIDTH]) .. '"]')
+		SKIN:Bang('[!SetOption "SlotWidthInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_WIDTH] ..'"]')
+		SKIN:Bang('[!SetOption "SlotHeightStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_HEIGHT]) .. '"]')
+		SKIN:Bang('[!SetOption "SlotHeightInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_HEIGHT] ..'"]')
+		SKIN:Bang('[!SetOption "SteamPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.STEAM_PATH]) .. '"]')
+		SKIN:Bang('[!SetOption "SteamPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.STEAM_PATH] ..'"]')
+		SKIN:Bang('[!SetOption "SteamUserdataidStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.STEAM_PERSONANAME]) .. '"]')
+		SKIN:Bang('[!SetOption "SteamUserdataidInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.STEAM_USERDATAID] ..'"]')
+		SKIN:Bang('[!SetOption "GalaxyPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH]) .. '"]')
+		SKIN:Bang('[!SetOption "GalaxyPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH] ..'"]')
+		SKIN:Bang('[!SetOption "BattlenetPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BATTLENET_PATH]) .. '"]')
+		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BATTLENET_PATH] ..'"]')
+		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.PYTHON_PATH]) .. '"]')
+		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] ..'"]')
+		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STARTING]) .. '"]')
+		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STARTING] ..'"]')
+		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STOPPING]) .. '"]')
+		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STOPPING] ..'"]')
+		if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
-			if SETTINGS['click_animation'] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
-				SETTINGS['click_animation'] = 0
+			if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+				SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = 0
 			end
-			if SETTINGS['skin_slide_animation_direction'] > 2 then
-				SETTINGS['skin_slide_animation_direction'] = 0
+			if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 2 then
+				SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 			end
 		else
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Horizontal"]')
-			if SETTINGS['click_animation'] <= #CLICK_ANIMATION_DESCRIPTIONS / 2 then
-				SETTINGS['click_animation'] = 0
+			if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] <= #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+				SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = 0
 			end
-			if SETTINGS['skin_slide_animation_direction'] < 3 then
-				SETTINGS['skin_slide_animation_direction'] = 0
+			if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] < 3 then
+				SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 			end
 		end
-		if SETTINGS['slot_highlight'] == true then
+		if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] == true then
 			SKIN:Bang('[!SetOption "SlotHighlightingStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "SlotHighlightingStatus" "Text" "Disabled"]')
 		end
-		if SETTINGS['show_hours_played'] == true then
+		if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] == true then
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowHoursPlayedStatus" "Text" "Disabled"]')
 		end
-		if SETTINGS['show_platform'] == true then
+		if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] == true then
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Disabled"]')
 		end
-		if SETTINGS['click_animation'] == 0 then
+		if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] == 0 then
 			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "Disabled"]')
 		else
-			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "' .. CLICK_ANIMATION_DESCRIPTIONS[SETTINGS['click_animation']] .. '"]')
+			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "' .. CLICK_ANIMATION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.ANIMATION_CLICK]] .. '"]')
 		end
-		if SETTINGS['hover_animation'] == 0 then
+		if SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == 0 then
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
 		else
-			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS['hover_animation']] .. '"]')
+			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.ANIMATION_HOVER]] .. '"]')
 		end
-		if SETTINGS['fuzzy_search'] == true then
+		if SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == true then
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Disabled"]')
 		end
-		if SETTINGS['hidden_games'] == true then
+		if SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Disabled"]')
 		end
-		if SETTINGS['parse_steam_community_profile'] == true then
+		if SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] == true then
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
 		else
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Ignore"]')
 		end
-		if SETTINGS['skin_slide_animation_direction'] == 0 then
+		if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 then
 			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "Disabled"]')
 		else
-			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "' .. SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS[SETTINGS['skin_slide_animation_direction']] .. '"]')
+			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "' .. SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]] .. '"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -259,13 +260,13 @@ function UpdateSettings()
 end
 
 function IncrementSlotCount()
-	SETTINGS['slot_count'] = SETTINGS['slot_count'] + 1
+	SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_COUNT] + 1
 	UpdateSettings()
 end
 
 function DecrementSlotCount()
-	if SETTINGS['slot_count'] > 1 then
-		SETTINGS['slot_count'] = SETTINGS['slot_count'] - 1
+	if SETTINGS[SETTING_KEYS.SLOT_COUNT] > 1 then
+		SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_COUNT] - 1
 		UpdateSettings()
 	end
 end
@@ -273,20 +274,20 @@ end
 function SetSlotCount(aValue)
 	local numVal = tonumber(aValue)
 	if numVal and numVal > 0 then
-		SETTINGS['slot_count'] = numVal
+		SETTINGS[SETTING_KEYS.SLOT_COUNT] = numVal
 		UpdateSettings()
 	end
 end
 
 
 function IncrementSlotWidth()
-	SETTINGS['slot_width'] = SETTINGS['slot_width'] + 1
+	SETTINGS[SETTING_KEYS.SLOT_WIDTH] = SETTINGS[SETTING_KEYS.SLOT_WIDTH] + 1
 	UpdateSettings()
 end
 
 function DecrementSlotWidth()
-	if SETTINGS['slot_width'] > 1 then
-		SETTINGS['slot_width'] = SETTINGS['slot_width'] - 1
+	if SETTINGS[SETTING_KEYS.SLOT_WIDTH] > 1 then
+		SETTINGS[SETTING_KEYS.SLOT_WIDTH] = SETTINGS[SETTING_KEYS.SLOT_WIDTH] - 1
 		UpdateSettings()
 	end
 end
@@ -294,20 +295,20 @@ end
 function SetSlotWidth(aValue)
 	local numVal = tonumber(aValue)
 	if numVal and numVal > 0 then
-		SETTINGS['slot_width'] = numVal
+		SETTINGS[SETTING_KEYS.SLOT_WIDTH] = numVal
 		UpdateSettings()
 	end
 end
 
 
 function IncrementSlotHeight()
-	SETTINGS['slot_height'] = SETTINGS['slot_height'] + 1
+	SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = SETTINGS[SETTING_KEYS.SLOT_HEIGHT] + 1
 	UpdateSettings()
 end
 
 function DecrementSlotHeight()
-	if SETTINGS['slot_height'] > 1 then
-		SETTINGS['slot_height'] = SETTINGS['slot_height'] - 1
+	if SETTINGS[SETTING_KEYS.SLOT_HEIGHT] > 1 then
+		SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = SETTINGS[SETTING_KEYS.SLOT_HEIGHT] - 1
 		UpdateSettings()
 	end
 end
@@ -315,25 +316,25 @@ end
 function SetSlotHeight(aValue)
 	local numVal = tonumber(aValue)
 	if numVal and numVal > 0 then
-		SETTINGS['slot_height'] = numVal
+		SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = numVal
 		UpdateSettings()
 	end
 end
 
 
 function RequestSteamPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS['steam_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamPath;" "' .. SETTINGS[SETTING_KEYS.STEAM_PATH] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptSteamPath(aPath)
-	SETTINGS['steam_path'] = aPath
+	SETTINGS[SETTING_KEYS.STEAM_PATH] = aPath
 	UpdateSettings()
 end
 
 function RequestSteamUserdataid()
 	local initialDir = ''
-	if SETTINGS['steam_path'] ~= '' then
-		initialDir = SETTINGS['steam_path'] .. '\\userdata'
+	if SETTINGS[SETTING_KEYS.STEAM_PATH] ~= '' then
+		initialDir = SETTINGS[SETTING_KEYS.STEAM_PATH] .. '\\userdata'
 	end
 	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptSteamUserdataid;" "' .. initialDir .. '"; "#CURRENTCONFIG#;"')
 end
@@ -345,7 +346,7 @@ function AcceptSteamUserdataid(aPath)
 			udid = element
 		end
 		if udid ~= '' then
-			SETTINGS['steam_userdataid'] = udid
+			SETTINGS[SETTING_KEYS.STEAM_USERDATAID] = udid
 			local personaName = ''
 			local configPath = aPath .. '/config/localconfig.vdf'
 			local f = io.open(configPath, 'r')
@@ -357,7 +358,7 @@ function AcceptSteamUserdataid(aPath)
 				end
 				f:close()
 			else -- User inputs UserDataID manually in skin
-				configPath = SETTINGS['steam_path'] .. '/userdata/' .. udid .. '/config/localconfig.vdf'
+				configPath = SETTINGS[SETTING_KEYS.STEAM_PATH] .. '/userdata/' .. udid .. '/config/localconfig.vdf'
 				local f = io.open(configPath, 'r')
 				if f ~= nil then
 					local contents = f:read('*a')
@@ -368,163 +369,163 @@ function AcceptSteamUserdataid(aPath)
 					f:close()
 				end
 			end
-			SETTINGS['steam_personaname'] = personaName
-			SETTINGS['steam_id64'] = ''
-			if personaName ~= '' and SETTINGS['steam_path'] ~= nil then
-				local loginusers = ParseVDFFile(SETTINGS['steam_path'] .. '/config/loginusers.vdf')
+			SETTINGS[SETTING_KEYS.STEAM_PERSONANAME] = personaName
+			SETTINGS[SETTING_KEYS.STEAM_ID64] = ''
+			if personaName ~= '' and SETTINGS[SETTING_KEYS.STEAM_PATH] ~= nil then
+				local loginusers = ParseVDFFile(SETTINGS[SETTING_KEYS.STEAM_PATH] .. '/config/loginusers.vdf')
 				if loginusers ~= nil then
 					local users = loginusers['users']
 					if users ~= nil then
 						for steamID64, accountTable in pairs(users) do
 							if accountTable['personaname'] == personaName then
-								SETTINGS['steam_id64'] = steamID64
+								SETTINGS[SETTING_KEYS.STEAM_ID64] = steamID64
 								break
 							end
 						end
 					end
 				end
 			end
-			if SETTINGS['steam_id64'] == '' then
+			if SETTINGS[SETTING_KEYS.STEAM_ID64] == '' then
 				print('Lauhdutin: Failed to figure out SteamID64 for ' .. personaName)
 			end
 			UpdateSettings()
 		end
 	else
-		SETTINGS['steam_userdataid'] = ''
-		SETTINGS['steam_personaname'] = ''
+		SETTINGS[SETTING_KEYS.STEAM_USERDATAID] = ''
+		SETTINGS[SETTING_KEYS.STEAM_PERSONANAME] = ''
 		UpdateSettings()
 	end
 end
 
 function ToggleSteamProfile()
-	SETTINGS['parse_steam_community_profile'] = not SETTINGS['parse_steam_community_profile']
+	SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] = not SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE]
 	UpdateSettings()
 end
 
 function RequestGalaxyPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS['galaxy_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptGalaxyPath;" "' .. SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptGalaxyPath(aPath)
-	SETTINGS['galaxy_path'] = aPath
+	SETTINGS[SETTING_KEYS.GOG_GALAXY_PATH] = aPath
 	UpdateSettings()
 end
 
 function RequestBattlenetPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptBattlenetPath;" "' .. SETTINGS['battlenet_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFolderPathDialog.py" "#PROGRAMPATH#;" "AcceptBattlenetPath;" "' .. SETTINGS[SETTING_KEYS.BATTLENET_PATH] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptBattlenetPath(aPath)
-	SETTINGS['battlenet_path'] = aPath
+	SETTINGS[SETTING_KEYS.BATTLENET_PATH] = aPath
 	UpdateSettings()
 end
 
 function RequestPythonPath()
-	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFilePathDialog.py" "#PROGRAMPATH#;" "AcceptPythonPath;" "' .. SETTINGS['python_path'] .. '"; "#CURRENTCONFIG#;"')
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFilePathDialog.py" "#PROGRAMPATH#;" "AcceptPythonPath;" "' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] .. '"; "#CURRENTCONFIG#;"')
 end
 
 function AcceptPythonPath(aPath)
-	SETTINGS['python_path'] = aPath
+	SETTINGS[SETTING_KEYS.PYTHON_PATH] = aPath
 	UpdateSettings()
 end
 
 function AcceptStartGameBang(aPath)
-	SETTINGS['start_game_bang'] = aPath
+	SETTINGS[SETTING_KEYS.BANGS_STARTING] = aPath
 	UpdateSettings()
 end
 
 function AcceptStopGameBang(aPath)
-	SETTINGS['stop_game_bang'] = aPath
+	SETTINGS[SETTING_KEYS.BANGS_STOPPING] = aPath
 	UpdateSettings()
 end
 
 function ToggleOrientation()
-	if SETTINGS['orientation'] == 'vertical' then
-		SETTINGS['orientation'] = 'horizontal'
+	if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+		SETTINGS[SETTING_KEYS.ORIENTATION] = 'horizontal'
 	else
-		SETTINGS['orientation'] = 'vertical'
+		SETTINGS[SETTING_KEYS.ORIENTATION] = 'vertical'
 	end
 	UpdateSettings()
 end
 
 function ToggleHighlighting()
-	if SETTINGS['slot_highlight'] == true then
-		SETTINGS['slot_highlight'] = false
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] == true then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = false
 	else
-		SETTINGS['slot_highlight'] = true
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = true
 	end
 	UpdateSettings()
 end
 
 function ToggleShowHoursPlayed()
-	if SETTINGS['show_hours_played'] == true then
-		SETTINGS['show_hours_played'] = false
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] == true then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = false
 	else
-		SETTINGS['show_hours_played'] = true
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = true
 	end
 	UpdateSettings()
 end
 
 function ToggleShowPlatform()
-	if SETTINGS['show_platform'] == true then
-		SETTINGS['show_platform'] = false
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] == true then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = false
 	else
-		SETTINGS['show_platform'] = true
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = true
 	end
 	UpdateSettings()
 end
 
 function CycleClickAnimation()
-	if SETTINGS['orientation'] == 'vertical' then
-		if SETTINGS['click_animation'] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
-			SETTINGS['click_animation'] = 0
+	if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+		if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+			SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = 0
 		else
-			SETTINGS['click_animation'] = SETTINGS['click_animation'] + 1
+			SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = SETTINGS[SETTING_KEYS.ANIMATION_CLICK] + 1
 		end
-	elseif SETTINGS['orientation'] == 'horizontal' then
-		if SETTINGS['click_animation'] < #CLICK_ANIMATION_DESCRIPTIONS / 2 then
-			SETTINGS['click_animation'] = #CLICK_ANIMATION_DESCRIPTIONS / 2 + 1
-		elseif SETTINGS['click_animation'] >= #CLICK_ANIMATION_DESCRIPTIONS then
-			SETTINGS['click_animation'] = 0
+	elseif SETTINGS[SETTING_KEYS.ORIENTATION] == 'horizontal' then
+		if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] < #CLICK_ANIMATION_DESCRIPTIONS / 2 then
+			SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = #CLICK_ANIMATION_DESCRIPTIONS / 2 + 1
+		elseif SETTINGS[SETTING_KEYS.ANIMATION_CLICK] >= #CLICK_ANIMATION_DESCRIPTIONS then
+			SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = 0
 		else
-			SETTINGS['click_animation'] = SETTINGS['click_animation'] + 1
+			SETTINGS[SETTING_KEYS.ANIMATION_CLICK] = SETTINGS[SETTING_KEYS.ANIMATION_CLICK] + 1
 		end
 	end
 	UpdateSettings()
 end
 
 function CycleHoverAnimation()
-	SETTINGS['hover_animation'] = SETTINGS['hover_animation'] + 1
-	if SETTINGS['hover_animation'] > #HOVER_ANIMATION_DESCRIPTIONS then
-		SETTINGS['hover_animation'] = 0
+	SETTINGS[SETTING_KEYS.ANIMATION_HOVER] = SETTINGS[SETTING_KEYS.ANIMATION_HOVER] + 1
+	if SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > #HOVER_ANIMATION_DESCRIPTIONS then
+		SETTINGS[SETTING_KEYS.ANIMATION_HOVER] = 0
 	end
 	UpdateSettings()
 end
 
 function ToggleFuzzySearch()
-	SETTINGS['fuzzy_search'] = not SETTINGS['fuzzy_search']
+	SETTINGS[SETTING_KEYS.FUZZY_SEARCH] = not SETTINGS[SETTING_KEYS.FUZZY_SEARCH]
 	UpdateSettings()
 end
 
 function ToggleHiddenGames()
-	SETTINGS['hidden_games'] = not SETTINGS['hidden_games']
+	SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] = not SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES]
 	UpdateSettings()
 end
 
 function CycleSkinSlideAnimationDirection()
-	if SETTINGS['orientation'] == 'vertical' then
-		if SETTINGS['skin_slide_animation_direction'] < 2 then
-			SETTINGS['skin_slide_animation_direction'] = SETTINGS['skin_slide_animation_direction'] + 1
+	if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+		if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] < 2 then
+			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] + 1
 		else
-			SETTINGS['skin_slide_animation_direction'] = 0
+			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 		end
 	else
-		if SETTINGS['skin_slide_animation_direction'] == 3 then
-			SETTINGS['skin_slide_animation_direction'] = 4
-		elseif SETTINGS['skin_slide_animation_direction'] == 0 then
-			SETTINGS['skin_slide_animation_direction'] = 3
+		if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 3 then
+			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 4
+		elseif SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 then
+			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 3
 		else
-			SETTINGS['skin_slide_animation_direction'] = 0
+			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 		end
 	end
 	UpdateSettings()

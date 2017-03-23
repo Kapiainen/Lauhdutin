@@ -14,7 +14,8 @@ function Initialize()
 		)
 		return
 	end
-	for i=1, tonumber(T_SETTINGS['slot_count']) do
+	SETTING_KEYS = dofile(SKIN:GetVariable('@') .. 'Frontend\\SettingsEnum.lua')
+	for i=1, tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT]) do
 		SKIN:Bang(
 			'[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]'
 			.. '[!HideMeterGroup "SlotHighlight' .. i .. '"]'
@@ -28,11 +29,10 @@ function Initialize()
 	}
 	T_RECENTLY_LAUNCHED_GAME = nil
 	N_SORT_STATE = 0 --0 = alphabetically, 1 = most recently played
-	if T_SETTINGS['sortstate'] then
-		N_SORT_STATE = tonumber(T_SETTINGS['sortstate']) - 1
+	if T_SETTINGS[SETTING_KEYS.SORT_STATE] then
+		N_SORT_STATE = tonumber(T_SETTINGS[SETTING_KEYS.SORT_STATE]) - 1
 		CycleSort()
 	end
-	S_SETTING_SLOT_COUNT = 'slot_count'
 	N_SCROLL_INDEX = 1
 	N_SCROLL_STEP = 1
 	-- If GAME_KEYS values are changed, then they have to be copied to the GameKeys class in Enums.py.
@@ -151,7 +151,7 @@ function SlideSkinIn()
 end
 --not B_INITIALIZED or B_FORCE_TOOLBAR
 function SlideSkinOut()
-	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS['skin_slide_animation_direction'] == 0 then
+	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 then
 		return
 	end
 	B_SKIN_VISIBLE = false
@@ -178,26 +178,26 @@ function AnimateSkin(anFrame)
 	if nFactor == nil then
 		return
 	end
-	if T_SETTINGS['orientation'] == 'vertical' then
-		if T_SETTINGS['skin_slide_animation_direction'] == 1 then
-			SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor)
-		elseif T_SETTINGS['skin_slide_animation_direction'] == 2 then
-			SetSlotsXPosition(T_SETTINGS['slot_width'] * nFactor * -1)
+	if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 1 then
+			SetSlotsXPosition(T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] * nFactor)
+		elseif T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 2 then
+			SetSlotsXPosition(T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] * nFactor * -1)
 		end
 	else --horizontal
-		if T_SETTINGS['skin_slide_animation_direction'] == 3 then
-			SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor)
-		elseif T_SETTINGS['skin_slide_animation_direction'] == 4 then
-			SetSlotsYPosition(T_SETTINGS['slot_height'] * nFactor * -1)
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 3 then
+			SetSlotsYPosition(T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] * nFactor)
+		elseif T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 4 then
+			SetSlotsYPosition(T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] * nFactor * -1)
 		end
 	end
 	SKIN:Bang('[!Redraw]')
 end
 
 function SetSlotsXPosition(anValue)
-	for i = 1, tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) do
+	for i = 1, tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT]) do
 		SKIN:Bang(
-			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS['slot_width'] / 2 .. '"]'
+			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "X" "' .. anValue .. '"]'
 		)
 	end
@@ -211,9 +211,9 @@ function SetSlotsXPosition(anValue)
 end
 
 function SetSlotsYPosition(anValue)
-	for i = 1, tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT]) do
+	for i = 1, tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT]) do
 		SKIN:Bang(
-			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue + T_SETTINGS['slot_height'] / 2 .. '"]'
+			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "Y" "' .. anValue .. '"]'
 		)
 	end
@@ -361,7 +361,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.NOT_INSTALLED] ~= true then
 						table.insert(tResult, game)
@@ -374,7 +374,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.NOT_INSTALLED] == true then
 						table.insert(tResult, game)
@@ -392,7 +392,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == anPlatform then
 						table.insert(tResult, game)
@@ -410,7 +410,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
@@ -428,7 +428,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] <= 0 then
 						table.insert(tResult, game)
@@ -441,7 +441,7 @@ end
 					table.insert(tResult, game)
 				end
 			end
-			if T_SETTINGS['hidden_games'] == true then
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					if game[GAME_KEYS.PLATFORM] ~= anPlatform and game[GAME_KEYS.NOT_INSTALLED] ~= true then
 						table.insert(tResult, game)
@@ -481,7 +481,7 @@ end
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
 						if game[GAME_KEYS.NOT_INSTALLED] ~= true then
 							table.insert(tResult, game)
@@ -492,7 +492,7 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
 						if game[GAME_KEYS.NOT_INSTALLED] == true then
 							table.insert(tResult, game)
@@ -506,7 +506,7 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
 						table.insert(tResult, game)
 					end
@@ -553,7 +553,7 @@ end
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResultR, game)
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
 						table.insert(tResultR, game)
 					end
@@ -570,7 +570,7 @@ end
 						table.insert(tResultR, game)
 					end
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
 						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 							table.insert(tResultR, game)
@@ -589,7 +589,7 @@ end
 						table.insert(tResultR, game)
 					end
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
  						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
  							table.insert(tResultR, game)
@@ -613,7 +613,7 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
  						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
  							table.insert(tResult, game)
@@ -631,7 +631,7 @@ end
 						table.insert(tResult, game)
 					end
 				end
-				if T_SETTINGS['hidden_games'] == true then
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
  						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
  							table.insert(tResult, game)
@@ -653,7 +653,7 @@ end
 				end
 			end
 		else
-			if T_SETTINGS['fuzzy_search'] == true then
+			if T_SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == true then
 				local rankings = {}
 				local perfectMatches = {}
 				for i, game in ipairs(atTable) do
@@ -878,7 +878,7 @@ end
 		if N_SORT_STATE > 2 then
 			N_SORT_STATE = 0
 		end
-		T_SETTINGS['sortstate'] = tostring(N_SORT_STATE)
+		T_SETTINGS[SETTING_KEYS.SORT_STATE] = tostring(N_SORT_STATE)
 		WriteSettings(T_SETTINGS)
 		SKIN:Bang(
 			'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort' .. N_SORT_STATE .. '.png"]'
@@ -916,7 +916,7 @@ end
 
 	function PopulateSlots()
 		if T_FILTERED_GAMES ~= nil then
-			local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+			local nSlotCount = tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT])
 			local j = N_SCROLL_INDEX
 			for i = 1, nSlotCount do -- Iterate through each slot.
 				if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
@@ -931,9 +931,9 @@ end
 							.. '[!SetVariable SlotImage' .. i .. ' ""]'
 						)
 					end
-					if T_SETTINGS['slot_highlight'] then
+					if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 						if N_LAUNCH_STATE == T_LAUNCH_STATES.LAUNCH then
-							if T_SETTINGS['show_hours_played'] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+							if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
 								local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
 								local hoursPlayed = math.floor(totalHoursPlayed)
 								local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
@@ -981,7 +981,7 @@ end
 						end
 					end
 				else -- Slot has no game to show.
-					if T_SETTINGS['slot_highlight'] then
+					if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 						SKIN:Bang(
 							'[!SetVariable SlotImage' .. i .. ' ""]'
 							.. '[!SetVariable SlotName' .. i .. ' ""]'
@@ -994,7 +994,7 @@ end
 						)
 					end
 				end
-				if T_SETTINGS['slot_highlight'] then
+				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 					SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
 				end
 				j = j + 1
@@ -1007,7 +1007,7 @@ end
 	end
 
 	function Scroll(asDirection)
-		local nSlotCount = tonumber(T_SETTINGS[S_SETTING_SLOT_COUNT])
+		local nSlotCount = tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT])
 		if #T_FILTERED_GAMES > nSlotCount then
 			if tonumber(asDirection) >= 0 then
 				if N_SCROLL_INDEX == 1 then
@@ -1093,8 +1093,8 @@ end
 								StartMonitoringProcess(processName)
 							end
 						end
-						if tGame[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['start_game_bang'] ~= nil and T_SETTINGS['start_game_bang'] ~= '' then
-							SKIN:Bang((T_SETTINGS['start_game_bang']:gsub('`', '"')))
+						if tGame[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= nil and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= '' then
+							SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STARTING]:gsub('`', '"')))
 						end
 					end
 					if tArguments ~= nil then
@@ -1219,23 +1219,23 @@ end
 	end
 
 	function ExecuteStoppingBang()
-		if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS['stop_game_bang'] ~= nil and T_SETTINGS['stop_game_bang'] ~= '' then
-			SKIN:Bang((T_SETTINGS['stop_game_bang']:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
+		if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= nil and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= '' then
+			SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
 		end
 	end
 
 	function Unhighlight(asIndex)		
-		if T_SETTINGS['slot_highlight'] then
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 			SKIN:Bang('[!HideMeterGroup "SlotHighlight' .. asIndex .. '"]')
 		end
-		if T_SETTINGS['hover_animation'] > 0 then
-			if T_SETTINGS['orientation'] == 'vertical' then
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 				SKIN:Bang(
 					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 					.. '[!UpdateMeasure "HoverOffAnimation"]'
 					.. '[!CommandMeasure "HoverOffAnimation" "Execute 1"]'
 				)
-			elseif T_SETTINGS['orientation'] == 'horizontal' then
+			elseif T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'horizontal' then
 				SKIN:Bang(
 					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 					.. '[!UpdateMeasure "HoverOffAnimation"]'
@@ -1255,31 +1255,31 @@ end
 		if tGame == nil then
 			return
 		end
-		if T_SETTINGS['slot_highlight'] then
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 			SKIN:Bang('[!ShowMeterGroup "SlotHighlight' .. asIndex ..'"]')
 		end
-		if T_SETTINGS['hover_animation'] > 0 then
-			if T_SETTINGS['hover_animation'] == 1 then
-				if T_SETTINGS['orientation'] == 'vertical' then
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			if T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == 1 then
+				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 					SKIN:Bang(
 						'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 						.. '[!UpdateMeasure "HoverOnAnimation"]'
 						.. '[!CommandMeasure "HoverOnAnimation" "Execute 1"]'
 					)
-				elseif T_SETTINGS['orientation'] == 'horizontal' then
+				elseif T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'horizontal' then
 					SKIN:Bang(
 						'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 						.. '[!UpdateMeasure "HoverOnAnimation"]'
 						.. '[!CommandMeasure "HoverOnAnimation" "Execute 2"]'
 					)
 				end
-			elseif T_SETTINGS['hover_animation'] == 2 then
+			elseif T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == 2 then
 				SKIN:Bang(
 					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 					.. '[!UpdateMeasure "HoverOnAnimation"]'
 					.. '[!CommandMeasure "HoverOnAnimation" "Execute 3"]'
 				)
-			elseif T_SETTINGS['hover_animation'] == 3 then
+			elseif T_SETTINGS[SETTING_KEYS.ANIMATION_HOVER] == 3 then
 				SKIN:Bang(
 					'[!SetVariable "SlotToAnimate" "' .. asIndex .. '"]'
 					.. '[!UpdateMeasure "HoverOnAnimation"]'
@@ -1307,17 +1307,17 @@ end
 		if game[GAME_KEYS.IGNORES_BANGS] == true then
 			bangExecutionIcon = "SlotSubmenuIgnoresBangs.png"
 		end
-		if T_SETTINGS['orientation'] == 'vertical' then
+		if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 			SKIN:Bang(
 				'[!SetOption "SlotSubmenuIcon1" "X" "(#SlotWidth# / 6 - 15)"]'
-				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
-				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS['slot_height'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] - T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] * (tonumber(asIndex) - 1) + (T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] - T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 1.1) / 2 .. '"]'
 			)
 		else --horizontal
 			SKIN:Bang(
-				'[!SetOption "SlotSubmenuIcon1" "X" "(' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) .. '+ #SlotWidth# / 6 - 15)"]'
-				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. T_SETTINGS['slot_width'] * (tonumber(asIndex) - 1) + (T_SETTINGS['slot_width'] - T_SETTINGS['slot_width'] / 1.1) / 2 .. '"]'
-				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. (T_SETTINGS['slot_height'] - T_SETTINGS['slot_height'] / 1.1) / 2 .. '"]'
+				'[!SetOption "SlotSubmenuIcon1" "X" "(' .. T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] * (tonumber(asIndex) - 1) .. '+ #SlotWidth# / 6 - 15)"]'
+				.. '[!SetOption "SlotSubmenuBackground" "X" "' .. T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] * (tonumber(asIndex) - 1) + (T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] - T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 1.1) / 2 .. '"]'
+				.. '[!SetOption "SlotSubmenuBackground" "Y"' .. (T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] - T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 1.1) / 2 .. '"]'
 			)
 		end
 		SKIN:Bang(
