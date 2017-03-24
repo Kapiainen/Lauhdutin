@@ -578,7 +578,7 @@ end
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
-			elseif StartsWith(asPattern, 's') then	
+			elseif StartsWith(asPattern, 's') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResultR, game)
@@ -596,8 +596,46 @@ end
 						end
 					end
 				end
-				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
-			elseif StartsWith(asPattern, 'p') then	
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'g') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'b') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'p') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResultR, game)
@@ -615,7 +653,26 @@ end
 						end
 					end
 				end
-				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'n') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+ 							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
 			else
 				table.insert(tResult, atTable[math.random(1, #atTable)])
 			end		

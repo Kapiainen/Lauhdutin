@@ -100,27 +100,77 @@ Additional platforms may receive similar support in the future, if possible. In 
 ## Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
-- `steam:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
+- `<search string>`
 
-- `galaxy:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via GOG Galaxy. If `uninstalled`, then only show games that are uninstalled on GOG Galaxy. If `all`, then show both installed and uninstalled games on GOG Galaxy. If `played`, then show both installed and uninstalled games on GOG Galaxy with a total played time above 0 hours. If `false`, then show all other games that were not installed via GOG Galaxy.
+  Replace `<search string>` with whatever would be a (partial) match with a game's name. If fuzzy search is enabled, then games will be ranked based on multiple factors (e.g. how many characters in `<search string>` match characters in a game's name, if characters in `<search string>` match the first letter of words in a game's name).
 
-- `battlenet:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Battle.net. If `uninstalled`, then only show games that are uninstalled on Battle.net. If `all`, then show both installed and uninstalled games on Battle.net. If `played`, then show both installed and uninstalled games on Battle.net with a total played time above 0 hours. If `false`, then show all other games that were not installed via Battle.net.
+- `<platform>:<argument>`
 
-- `installed:` followed by `true`, `false`, or `all`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment). If `all`, then all games (excluding hidden ones) are shown.
+  Replace `<platform>` with one of the supported platforms:
 
-- `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
+  - `steam` = [Steam](http://store.steampowered.com/)
+  - `galaxy` = [GOG Galaxy](https://www.gog.com/galaxy)
+  - `battlenet` = [Battle.net](http://eu.battle.net/en/)
 
-- `games:` followed by `all` shows all games regardless of if it is installed or not, or hidden.
+  Replace `<argument>` with one of the supported arguments:
 
-- `played:` followed by `true` or `false`. If `true`, then all games with a total played time above 0 hours are shown. If `false`, then all games with a total played time of 0 hours are shown.
+  - `all` = Show both installed and uninstalled games that are available via the platform.
+  - `false` = Show all other games that were not installed via the platform.
+  - `installed` = Show games installed via the platform.
+  - `uninstalled` = Show games that are available via the platform, but not installed.
+  - `played` = Show both installed and uninstalled games that are available via the platform and have a total played time above 0 hours.
+  - `not played` = Show both installed and uninstalled games that are available via the platform and have a total played time equal to 0 hours.
 
-- `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
+  All arguments might not work with all platforms.
 
-- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*. Tags can also be assigned by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Tags*, and editing the text file that is opened in Notepad (one tag per line).
+- `installed:<argument>`
 
-- `random:` followed by `all`, `steam` or `played`. If `all`, then show one random game from games installed or not. If `steam`, then show one random game from Steam games installed or not. If  `played`, then show one random game from all games (hidden, instaled or not) with a total played time above 0 hours.
+  Replace `<argument>` with one of the supported arguments:
 
-- `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
+  - `true` = Show installed games.
+  - `false` = Show games that are not installed (only Steam games are supported at the moment).
+  - `all` = All games are shown regardless of whether or not they are installed or not.
+
+- `hidden:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+  
+  - `true` = Show only games that are hidden.
+  - `false` = Show only games that are not hidden.
+
+- `games:all`
+
+  Show all games regardless of whether or not the game is installed, uninstalled, or hidden.
+
+- `played:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+
+  - `true` = Show all games with a total played time above 0 hours.
+  - `false` = Show all games with a total played time equal to 0 hours.
+
+- `shortcuts:<argument>`
+
+  Replace `<argument>` with the (partial) name of a folder in `\Lauhdutin\@Resources\Shortcuts` to show the shortcuts in that folder.
+
+- `tags:<argument>`
+
+  Replace `<argument>` with a (partial) match to a tag that is assigned to a game. Tags can be assigned by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Tags*, and editing the text file that is opened in Notepad (one tag per line). Tags/categories assigned in Steam are also supported.
+
+- `random:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+
+  - `all` = Show one random game (installed or uninstalled).
+  - `played` = Show one random game (installed or uninstalled) that has a total played time above 0 hours.
+  - `not played` = Show one random game (installed or uninstalled) that has a total played time equal to 0 hours.
+  - `steam` = Show one random game (installed or uninstalled) from Steam.
+  - `galaxy` = Show one random game (installed or uninstalled) from GOG Galaxy.
+  - `battlenet` = Show one random game (installed or uninstalled) from Battle.net.
+
+- `+<filter>`
+
+  Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
 
 Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
@@ -192,7 +242,7 @@ If there is no previously submitted issue that matches your issue, then submit a
 
 # Contributing
 
-Fork [this](https://github.com/Kapiainen/Lauhdutin) repository, make your changes, and submit a pull request with a summary of the changes you've made.
+Fork [this](https://github.com/Kapiainen/Lauhdutin) repository (preferrably the `development` branch), make your changes, and submit a pull request to the `development` branch with a summary of the changes you've made.
 
 Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
 
