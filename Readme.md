@@ -167,6 +167,8 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
   - `steam` = Show one random game (installed or uninstalled) from Steam.
   - `galaxy` = Show one random game (installed or uninstalled) from GOG Galaxy.
   - `battlenet` = Show one random game (installed or uninstalled) from Battle.net.
+  
+  If no argument is provided, then one random game from the current list of games is shown.
 
 - `+<filter>`
 
