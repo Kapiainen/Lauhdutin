@@ -10,10 +10,15 @@ A Rainmeter skin for aggregating games from different platforms and then launchi
  - [Requirements](#requirements)
  - [Installing](#installing)
  - [Updating](#updating)
- - [Supported platforms](#supported-platforms)
- - [Filtering](#filtering)
- - [Bangs](#bangs)
- - [Animations](#animations)
+ - [Features](#features)
+   - [Supported platforms](#supported-platforms)
+   - [Filtering](#filtering)
+   - [Sorting](#sorting)
+   - [Bangs](#bangs)
+   - [Notes](#notes)
+   - [Manual process override](#manual-process-override)
+   - [Highlighting](#highlighting)
+   - [Animations](#animations)
  - [Reporting issues](#reporting-issues)
  - [Contributing](#contributing)
  - [Changelog](#changelog)
@@ -60,9 +65,11 @@ or
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
 - Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
 
-# Supported platforms
+# Features
 
-## Steam
+## Supported platforms
+
+### Steam
 Support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
@@ -72,13 +79,13 @@ Support includes:
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
-## GOG Galaxy
+### GOG Galaxy
 Support includes:
 - Acquire a list of games installed via GOG Galaxy.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-## Battle.net
+### Battle.net
 Support includes:
 - Acquire a list of games installed via Battle.net.
 - Launch games that were found.
@@ -86,11 +93,11 @@ Support includes:
 
 Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
-## Other platforms
+### Other platforms
 
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
-# Filtering
+## Filtering
 The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
 
 - `steam:` followed by `installed`, `uninstalled`, `all`, `played` or `false`. If `installed`, then only show games installed via Steam. If `uninstalled`, then only show games that are uninstalled on Steam. If `all`, then show both installed and uninstalled games on Steam. If `played`, then show both installed and uninstalled games on Steam with a total played time above 0 hours. If `false`, then show all other games that were not installed via Steam.
@@ -109,7 +116,7 @@ The list of games can be narrowed down by applying a filter. A filter can just b
 
 - `shortcuts:` followed by the name, or a part of the name, of a subfolder in `\Lauhdutin\@Resources\Shortcuts`.
 
-- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
+- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*. Tags can also be assigned by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Tags*, and editing the text file that is opened in Notepad (one tag per line).
 
 - `random:` followed by `all`, `steam` or `played`. If `all`, then show one random game from games installed or not. If `steam`, then show one random game from Steam games installed or not. If  `played`, then show one random game from all games (hidden, instaled or not) with a total played time above 0 hours.
 
@@ -121,10 +128,10 @@ A fuzzy search algorithm is used by default, but can be disabled so that the fil
 
 Hidden games are not showed by default on filtering (except on games:all and hidden: filters, that will show hidden games always), but can be enabled so that the filtering shows also those games.
 
-# Sorting
+## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
-# Bangs
+## Bangs
 There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
 
 This feature can be used to e.g. load and unload skins.
@@ -137,13 +144,21 @@ Currently supported events that can be used to trigger the execution of bangs:
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
-# Highlighting
+Games can be excempted from executing bangs by middle-mouse clicking on the slot that contains the game and then clicking on the button labeled *Bangs*.
+
+## Notes
+Notes can be added to a game by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Notes*, and editing the text file that is opened in Notepad.
+
+## Manual process override
+In some circumstances it may be necessary or desirable to monitor a process other than the default one (e.g. Steam Overlay in the case of Steam games). This can be done by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Process*, and typing in the name of the process in the input field that is opened at the top of the skin. Inputting a blank value will remove the override. Process names can be found in the Windows Task Manager (<kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>ESC</kbd>).
+
+## Highlighting
 
 If highlighting is enabled, then additional contextual information can be shown when the mouse cursor is hovered over a slot ([animated example](Docs/Highlighting.gif)). There are some settings for toggling certain pieces of information (e.g. platform, hours played).
 
-# Animations
+## Animations
 
-## Clicking
+### Clicking
 One of these animations can be played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
 
 - Shift left
@@ -154,7 +169,7 @@ One of these animations can be played when a slot is left-clicked ([animated exa
 
 Click animations can be disabled completely.
 
-## Hovering
+### Hovering
 One of these animations can be played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
 
 - Zoom in
@@ -164,6 +179,9 @@ One of these animations can be played when the mouse cursor hovers over a slot (
 Hover animations can be disabled completely.
 
 Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
+
+### Skin
+The entire skin can be made to slide into and out of view when placed along an edge of a monitor. There is a setting that can be used to determine which direction the skin slide into view from and out of view. Each orientation has two directions and this feature can also be disabled completely. A 1 px wide/tall invisible sliver is placed along the corresponding edge of the skin when this feature is enabled and hovering the mouse cursor on this sliver makes the skin slide into view.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
@@ -179,6 +197,8 @@ Fork [this](https://github.com/Kapiainen/Lauhdutin) repository, make your change
 Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
 
 Try to keep the number of dependencies, which cannot be included in the skin or are not a part of a default Windows installation, to a minimum.
+
+[List of contributors](Contributors.md)
 
 ## Graphical user interface changes
 Try to keep draw calls to a minimum by, for example:
@@ -196,6 +216,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.

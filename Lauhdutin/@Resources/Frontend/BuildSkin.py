@@ -59,13 +59,14 @@ SlotHighlightMessage%s=
 [ClickAnimation]
 Measure=Plugin
 Plugin=ActionTimer
-ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
-ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
-ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | Launch
-ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
-ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
-ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | Launch
+ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
+ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
+ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
+ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
+ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
+ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
 Launch=[!CommandMeasure LauhdutinScript "Launch('#SlotToAnimate#')"]
+StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]
 BlankSlot=[!SetVariable "SlotImage#SlotToAnimate#" ""][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""")
 
         f.write("""
@@ -147,10 +148,11 @@ DynamicVariables=1
 Measure=Plugin
 Plugin=ActionTimer
 DynamicVariables=1
-ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical
-ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal
-ActionList3=Jiggle1 | Wait #FrameInterval# | Jiggle2 | Wait #FrameInterval# | Jiggle3 | Wait #FrameInterval# | Jiggle2
-ActionList4=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2""")
+ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical | StopAnimating
+ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal | StopAnimating
+ActionList3=Jiggle1 | Wait #FrameInterval# | Jiggle2 | Wait #FrameInterval# | Jiggle3 | Wait #FrameInterval# | Jiggle2 | StopAnimating
+ActionList4=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2 | StopAnimating
+StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]""")
 
         f.write("""
 ZoomIn1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
@@ -194,14 +196,77 @@ Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "5"][!UpdateMeter "SlotBanner
 [HoverOffAnimation]
 Measure=Plugin
 Plugin=ActionTimer
-ActionList1=ResetVertical
-ActionList2=ResetHorizontal
+ActionList1=ResetVertical | StopAnimating
+ActionList2=ResetHorizontal | StopAnimating
+StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]
 ResetVertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 ResetHorizontal=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "0"][!SetOption "SlotBanner#SlotToAnimate#" "X" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
 DynamicVariables=1
 """ % (
         SLOT_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT,
         SLOT_WIDTH, SLOT_WIDTH, SLOT_HEIGHT
+    )
+)
+
+        # Skin showing sliver
+        if ORIENTATION == "vertical":
+            if settings.get("skin_slide_animation_direction", 0) == 1: # From the right
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=0
+W=1
+H=%s
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_HEIGHT * SLOT_COUNT
+    )
+)
+            elif settings.get("skin_slide_animation_direction", 0) == 2: # From the right
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=%s
+Y=0
+W=1
+H=%s
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_WIDTH - 1,
+        SLOT_HEIGHT * SLOT_COUNT
+    )
+)
+        else:
+            if settings.get("skin_slide_animation_direction", 0) == 3: # From above
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=0
+W=%s
+H=1
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_WIDTH * SLOT_COUNT
+    )
+)
+            elif settings.get("skin_slide_animation_direction", 0) == 4: # From below
+                f.write("""
+[SkinEnabler]
+Meter=Image
+X=0
+Y=%s
+W=%s
+H=1
+SolidColor=0,0,0,1
+MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
+""" % (
+        SLOT_HEIGHT - 1,
+        SLOT_WIDTH * SLOT_COUNT
     )
 )
 
@@ -317,7 +382,7 @@ MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
 )
 
             if settings.get("click_animation", 1) > 0:
-                f.write("""LeftMouseUpAction=[!SetVariable "SlotToAnimate" "%s"][!UpdateMeasure "ClickAnimation"][!CommandMeasure "ClickAnimation" "Execute %s"]
+                f.write("""LeftMouseUpAction=[!SetVariable "SlotToAnimate" "%s"][!UpdateMeasure "ClickAnimation"][!CommandMeasure LauhdutinScript "StartClickAnimation('%s')"]
 Group=Slots
 """ % (i, settings.get("click_animation", 1)))
             else:
@@ -350,7 +415,7 @@ H=%s
 SolidColor=0,0,0,160
 PreserveAspectRatio=2
 DynamicVariables=1
-Group=SlotHighlight%s
+Group=SlotHighlight%s | SlotHighlights
 """ % (
         SLOT_WIDTH,
         SLOT_HEIGHT,
@@ -369,7 +434,7 @@ H=%s
 SolidColor=0,0,0,1
 PreserveAspectRatio=2
 DynamicVariables=1
-Group=SlotHighlight%s
+Group=SlotHighlight%s | SlotHighlights
 """ % (
         i,
         SLOT_WIDTH,
@@ -394,7 +459,7 @@ StringEffect=Shadow
 ClipString=1
 AntiAlias=1
 DynamicVariables=1
-Group=SlotHighlight%s
+Group=SlotHighlight%s | SlotHighlights
 """ % (
         i,
         SLOT_WIDTH / 2,

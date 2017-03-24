@@ -18,6 +18,7 @@ class GameKeys():
     PLATFORM = "platform"
     PLATFORM_OVERRIDE = "platformoverride"
     PROCESS = "process"
+    PROCESS_OVERRIDE = "processoverride"
     TAGS = "tags"
 
 
