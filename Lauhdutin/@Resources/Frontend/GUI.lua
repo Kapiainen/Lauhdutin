@@ -215,8 +215,6 @@ function SetSlotsXPosition(anValue)
 			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "X" "' .. anValue .. '"]'
 			.. '[!SetOption "SlotHighlightBackground' .. i .. '" "X" "' .. anValue .. '"]'
---			.. '[!SetOption "SlotHighlight' .. i .. '" "X" "' .. anValue .. '"]'
---			.. '[!SetOption "SlotHighlightText' .. i .. '" "X" "' .. anValue .. '"]'
 		)
 	end
 	SKIN:Bang(
