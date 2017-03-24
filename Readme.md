@@ -216,6 +216,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
