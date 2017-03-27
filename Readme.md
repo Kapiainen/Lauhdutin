@@ -229,7 +229,7 @@ Hover animations can be disabled completely.
 Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
 
 ### Skin
-The entire skin can be made to slide into and out of view when placed along an edge of a monitor. There is a setting that can be used to determine which direction the skin slide into view from and out of view. Each orientation has two directions and this feature can also be disabled completely. A 1 px wide/tall invisible sliver is placed along the corresponding edge of the skin when this feature is enabled and hovering the mouse cursor on this sliver makes the skin slide into view.
+The entire skin can be made to slide into and out of view when placed along an edge of a monitor ([animated example](Docs/SkinAnimation.gif)). There is a setting that can be used to determine which direction the skin slide into view from and out of view. Each orientation has two directions and this feature can also be disabled completely. A 1 px wide/tall invisible sliver is placed along the corresponding edge of the skin when this feature is enabled and hovering the mouse cursor on this sliver makes the skin slide into view.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
