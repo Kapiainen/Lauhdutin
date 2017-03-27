@@ -266,11 +266,16 @@ Any deviations from the rules regarding adding platform support will most likely
 **Version 2.7.0 - YYYY/MM/DD:**
 - Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
+- Added support for adding notes to a game.
+- Added support for adding tags to a game.
+- Added support for defining which process to monitor for each game.
+- Added support for toggling whether or not a game executes bangs.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
-- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
-- Added new filter tags.
 - Added setting for whether or not new games execute bangs by default.
 - Added a setting for making all games execute/ignore bangs.
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Added new filter tags.
+- Refactored GUI code.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
