@@ -180,8 +180,13 @@ try:
                                     combined_tags[str(j)] = tag
                                     j += 1
                                 game_new[GameKeys.TAGS] = combined_tags
-                        if game_old.get(GameKeys.IGNORES_BANGS, None):
+                        if game_old.get(GameKeys.IGNORES_BANGS, None) != None:
                             game_new[GameKeys.IGNORES_BANGS] = game_old[GameKeys.IGNORES_BANGS]
+                        else:
+                            if settings.get("execute_bangs_by_default", True):
+                                game_new[GameKeys.IGNORES_BANGS] = False
+                            else:
+                                game_new[GameKeys.IGNORES_BANGS] = True
                         if game_old.get(GameKeys.PROCESS_OVERRIDE, None):
                             game_new[GameKeys.PROCESS_OVERRIDE] = game_old[GameKeys.PROCESS_OVERRIDE]
                         del all_games_old[i]

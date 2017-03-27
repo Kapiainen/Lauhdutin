@@ -3,6 +3,7 @@ function Initialize()
 	SETTING_KEYS = dofile(SKIN:GetVariable('@') .. 'Frontend\\SettingsEnum.lua')
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
+	EXECUTE_BANGS_SWITCH = false
 	SAVING_SETTINGS = false
 	SETTINGS = ReadSettings()
 	OLD_SETTINGS = ReadSettings()
@@ -108,6 +109,12 @@ function Initialize()
 		"From above",
 		"From below"
 	}
+	if SETTINGS[SETTING_KEYS.EXECUTE_BANGS_BY_DEFAULT] == nil then
+		SETTINGS[SETTING_KEYS.EXECUTE_BANGS_BY_DEFAULT] = true
+	end
+	if SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] == nil then
+		SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] = true
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -134,8 +141,49 @@ function Save()
 		WritePythonPath()
 		REBUILD_SWITCH = true
 	end
+	if EXECUTE_BANGS_SWITCH == true then
+		--Create a backup
+		games = ReadJSON(RESOURCES_PATH .. 'games.json')
+		if games ~= nil then
+			WriteJSON(RESOURCES_PATH .. 'games_backup.json', games)
+			if SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] == true then
+				for i, game in ipairs(games) do
+					game['ignoresbangs'] = false
+				end
+			else
+				for i, game in ipairs(games) do
+					game['ignoresbangs'] = true
+				end
+			end
+			WriteJSON(RESOURCES_PATH .. 'games.json', games)
+		end
+	end
 	WriteSettings(SETTINGS)
 	SAVING_SETTINGS = false
+end
+
+function ReadJSON(asPath)
+	local f = io.open(asPath, 'r')
+	if f ~= nil then
+		local json_string = f:read('*a')
+		f:close()
+		return JSON.decode(json_string)
+	end
+	return nil
+end
+
+function WriteJSON(asPath, atTable)
+	local json_string = JSON.encode(atTable)
+	if json_string == nil then
+		return false
+	end
+	local f = io.open(asPath, 'w')
+	if f ~= nil then
+		f:write(json_string)
+		f:close()
+		return true
+	end
+	return false
 end
 
 function Exit()
@@ -253,6 +301,16 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "Disabled"]')
 		else
 			SKIN:Bang('[!SetOption "SkinSlideAnimationDirectionStatus" "Text" "' .. SKIN_SLIDE_ANIMATION_DIRECTION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]] .. '"]')
+		end
+		if SETTINGS[SETTING_KEYS.EXECUTE_BANGS_BY_DEFAULT] == true then
+			SKIN:Bang('[!SetOption "ExecuteBangsByDefaultStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ExecuteBangsByDefaultStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] == true then
+			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -528,6 +586,17 @@ function CycleSkinSlideAnimationDirection()
 			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 		end
 	end
+	UpdateSettings()
+end
+
+function ToggleExecuteBangsByDefault()
+	SETTINGS[SETTING_KEYS.EXECUTE_BANGS_BY_DEFAULT] = not SETTINGS[SETTING_KEYS.EXECUTE_BANGS_BY_DEFAULT]
+	UpdateSettings()
+end
+
+function ToggleExecuteIgnoreBangs()
+	SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] = not SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS]
+	EXECUTE_BANGS_SWITCH = true
 	UpdateSettings()
 end
 
