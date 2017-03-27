@@ -274,7 +274,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added setting for whether or not new games execute bangs by default.
 - Added a setting for making all games execute/ignore bangs.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
-- Added new filter tags.
+- Added new filters.
 - Refactored GUI code.
 
 **Version 2.6.0 - 2017/03/15:**
