@@ -1460,7 +1460,7 @@ end
 			--Move game
 			if game[GAME_KEYS.HIDDEN] == true then
 				--Unhide game
-				game[GAME_KEYS.HIDDEN] = nil
+				game[GAME_KEYS.HIDDEN] = false
 				if not move_game_from_to(game, T_HIDDEN_GAMES, T_ALL_GAMES) then
 					move_game_from_to(game, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
 				end

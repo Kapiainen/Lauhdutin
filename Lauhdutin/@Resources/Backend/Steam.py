@@ -324,7 +324,7 @@ class Steam():
                                                           0)
             else:
                 print("\t\t\tAccount does not have '%s'" % game[GameKeys.NAME])
-                return None
+                game[GameKeys.HIDDEN] = True
         return game
 
     def get_game_name(self, a_appmanifest):

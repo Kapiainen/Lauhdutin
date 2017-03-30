@@ -276,6 +276,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added new filters.
 - Refactored GUI code.
+- Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
