@@ -277,6 +277,8 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added new filters.
 - Refactored GUI code.
 - Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
+- Updated `Battle.net` to `Blizzard App` in the GUI.
+- Updated the setting title and tooltip for the paths to Blizzard games.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.

@@ -74,7 +74,7 @@ function Initialize()
 		"GOG Galaxy",
 		"",
 		"",
-		"Battle.net"
+		"Blizzard App"
 	}
 	B_FORCE_TOOLBAR = false
 	HideToolbar()
