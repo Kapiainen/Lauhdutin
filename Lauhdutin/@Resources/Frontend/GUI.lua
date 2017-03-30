@@ -80,6 +80,8 @@ function Initialize()
 	HideToolbar()
 	B_REVERSE_SORT = false
 	SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+	N_LAST_DRAWN_SCROLL_INDEX = -1
+	HideSlotSubmenu(false)
 	if T_SETTINGS ~= nil then
 		SKIN:Bang(
 			'[!SetOption StatusMessage Text "Initializing backend..."]'
@@ -96,13 +98,12 @@ function Initialize()
 			.. '[!Redraw]'
 		)
 	end
-	N_LAST_DRAWN_SCROLL_INDEX = -1
-	HideSlotSubmenu()
 end
 
 -- Called once after Initialize() has been called. Runs Backend\GetGames.py.
 function Update()
 	if N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
+		HideSlotSubmenu(false)
 		PopulateSlots()
 		N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 	end
@@ -1103,7 +1104,6 @@ end
 					N_SCROLL_INDEX = nUpperLimit
 				end
 			end
-			HideSlotSubmenu()
 		end
 	end
 
@@ -1318,8 +1318,6 @@ end
 					.. '[!CommandMeasure "HoverOffAnimation" "Execute 2"]'
 				)
 			end
-		else
-			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
 	end
 
@@ -1362,8 +1360,6 @@ end
 					.. '[!CommandMeasure "HoverOnAnimation" "Execute 4"]'
 				)
 			end
-		else
-			SKIN:Bang('[!Redraw]') --Optimization: This can be omitted if a slot is being animated
 		end
 	end
 
@@ -1406,11 +1402,15 @@ end
 		)
 	end
 
-	function HideSlotSubmenu()
-		SKIN:Bang(
-			'[!HideMeterGroup "SlotSubmenu"]'
-			.. '[!Redraw]'
-		)
+	function HideSlotSubmenu(abRedraw)
+		if abRedraw then
+			SKIN:Bang(
+				'[!HideMeterGroup "SlotSubmenu"]'
+				.. '[!Redraw]'
+			)
+		else
+			SKIN:Bang('[!HideMeterGroup "SlotSubmenu"]')
+		end
 	end
 
 	function SlotSubmenuButton(anSlotIndex, anActionID)
@@ -1483,7 +1483,7 @@ end
 			PopulateSlots()
 		end
 		--Write updated 'games.json' to disk
-		HideSlotSubmenu()
+		HideSlotSubmenu(true)
 	end
 
 	function OnFinishedEditingNotes()
