@@ -599,12 +599,20 @@ class SteamTests(unittest.TestCase):
                 },
                 GameKeys.HOURS_LAST_TWO_WEEKS: 0,
                 GameKeys.HOURS_TOTAL: 528.2
+            }, {
+                GameKeys.PLATFORM: 0,
+                GameKeys.PATH: 'steam://rungameid/274170',
+                GameKeys.NAME: 'Hotline Miami 2: Wrong Number',
+                GameKeys.BANNER_PATH: 'Steam\\274170.jpg',
+                GameKeys.BANNER_URL:
+                'http://cdn.akamai.steamstatic.com/steam/apps/274170/header.jpg',
+                GameKeys.LASTPLAYED: 0,
+                GameKeys.HIDDEN: True
             }, None]
             appmanifests = [
                 steam.get_appmanifest(appmanifest_path)
                 for appmanifest_path in appmanifest_paths
             ]
-            self.assertEqual(len(appmanifests), len(expected_results))
             i = 0
             while i < len(appmanifests):
                 self.assertEqual(
