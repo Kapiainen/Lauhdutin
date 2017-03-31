@@ -68,52 +68,95 @@
 		SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
 
+		else
+
 		end
 	end
 
-	function OnMouseLeaveSkin(abAnimate)
+	function OnMouseLeaveSkin()
 	-- Called when the mouse cursor leaves the skin
 	-- abAnimate: Whether or not to play an animation to hide the skin
 		SCRIPT:SetUpdateDivider(-1)
-		if abAnimate then
-
+		SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
+		if T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
+			
+		else
+			SKIN:Bang('[!Redraw]')
 		end
 	end
 
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		SLOT:Highlight(anIndex)
+		if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+			SKIN:Bang(
+				'[!SetOption "SlotHighlightBackground" "Y" "' .. (anIndex - 1)
+				* T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] .. '"]'
+			)
+		else
+			SKIN:Bang(
+				'[!SetOption "SlotHighlightBackground" "X" "' .. (anIndex - 1)
+				* T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] .. '"]'
+			)
+		end
+		SKIN:Bang(
+			'[!UpdateMeterGroup "SlotHighlight"]'
+			.. '[!ShowMeterGroup "SlotHighlight"]'
+			.. '[!Redraw]'
+		)
+		--SLOT:Highlight(anIndex)
 	end
 
 	function OnMouseLeaveSlot(anIndex)
 	-- Called when the mouse cursor leaves a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		SLOT:Unhighlight(anIndex)
+		--SLOT:Unhighlight(anIndex)
 	end
 
 	function OnLeftClickSlot(anIndex)
 	-- Called when a slot is left-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
 		--PROCESS_MONITOR:Start()
+		--If EXECUTE
+		--If HIDE
+		--If UNHIDE
 	end
 
 	function OnMiddleClickSlot(anIndex)
 	-- Called when a slot is middle-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
-
+		--Move menu
+		--Show menu
 	end
 
 	function OnScrollSlots(anDirection)
 	-- Called when the list of games is scrolled
 	-- anDirection: Positive value -> Upwards, Negative value -> Downwards
-		if anDirection > 0 then
-			print("Scrolling up")
-			SCROLL_INDEX = SCROLL_INDEX - 1
-		elseif anDirection < 0 then
-			print("Scrolling down")
-			SCROLL_INDEX = SCROLL_INDEX + 1
+		local nSlotCount = tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT])
+		local nScrollIndex = N_SCROLL_INDEX
+		if #T_FILTERED_GAMES > nSlotCount then
+			if anDirection > 0 then
+				if nScrollIndex == 1 then
+					return
+				end
+				nScrollIndex = nScrollIndex - 1
+				if nScrollIndex < 1 then
+					nScrollIndex = 1
+				end
+				print("Scrolling up")
+			elseif anDirection < 0 then
+				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
+				if nScrollIndex == nUpperLimit then
+					return
+				end
+				nScrollIndex = nScrollIndex + 1
+				if nScrollIndex > nUpperLimit then
+					nScrollIndex = nUpperLimit
+				end
+				print("Scrolling down")
+			end
 		end
+		N_SCROLL_INDEX = nScrollIndex
 	end
 
 	function OnApplyFilter(asPattern)
@@ -160,13 +203,29 @@
 	end
 
 	function OnToggleHideGames()
-	-- Update context menu entry/entries
-
+		if N_ACTION_STATE == ACTION_STATES.HIDE then
+			SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
+			N_ACTION_STATE = ACTION_STATES.EXECUTE
+		else
+			SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Stop hiding games"]')
+			if N_ACTION_STATE == ACTION_STATES.UNHIDE then
+				SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Start unhiding games"]')
+			end
+			N_ACTION_STATE = ACTION_STATES.HIDE
+		end
 	end
 
 	function OnToggleUnhideGames()
-	-- Update context menu entry/entries
-
+		if N_ACTION_STATE == ACTION_STATES.UNHIDE then
+			SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Start unhiding games"]')
+			N_ACTION_STATE = ACTION_STATES.EXECUTE
+		else
+			SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Stop unhiding games"]')
+			if N_ACTION_STATE == ACTION_STATES.HIDE then
+				SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
+			end
+			N_ACTION_STATE = ACTION_STATES.UNHIDE
+		end
 	end
 
 	function OnOpenSettings()
@@ -218,11 +277,12 @@
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 				Redraw()
 			end
-		elseif UPDATES_TO_SKIP > 0 then
-			UPDATES_TO_SKIP = UPDATES_TO_SKIP - 1
-		elseif UPDATES_TO_SKIP <= 0 then
+		elseif N_UPDATES_TO_SKIP > 0 then
+			N_UPDATES_TO_SKIP = N_UPDATES_TO_SKIP - 1
+		elseif N_UPDATES_TO_SKIP <= 0 then
+		-- Redraw once every second that the mouse is on the skin
 			Redraw()
-			UPDATES_TO_SKIP = 60
+			N_UPDATES_TO_SKIP = 124
 		end
 	end
 

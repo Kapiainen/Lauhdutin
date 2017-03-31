@@ -2,10 +2,10 @@
 import sys, os, subprocess, json
 
 try:
-    RainmeterPath = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
-    ResourcePath = sys.argv[2][:-1]
-    Config = sys.argv[3][:-1]
-    CurrentFile = sys.argv[4][:-1]
+    RAINMETERPATH = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
+    RESOURCEPATH = sys.argv[2][:-1]
+    CONFIG = sys.argv[3][:-1]
+    CURRENTFILE = sys.argv[4][:-1]
 
     def read_json(a_path):
         if os.path.isfile(a_path):
@@ -13,473 +13,288 @@ try:
                 return json.load(f)
         return None
 
-    settings = read_json(os.path.join(ResourcePath, "settings.json"))
-    SLOT_WIDTH = int(settings.get("slot_width", 418))
-    SLOT_HEIGHT = int(settings.get("slot_height", 195))
-    SLOT_COUNT = int(settings.get("slot_count", 6))
-    ORIENTATION = settings.get("orientation", "vertical")
-
-    with open(os.path.join(ResourcePath, "Frontend", "GameSlots.inc"),
-              "w") as f:
-        # Variables
+    SETTINGS = read_json(os.path.join(RESOURCEPATH, "settings.json"))
+    SLOT_WIDTH = int(SETTINGS.get("slot_width", 418))
+    SLOT_HEIGHT = int(SETTINGS.get("slot_height", 195))
+    SLOT_COUNT = int(SETTINGS.get("slot_count", 6))
+    ORIENTATION = SETTINGS.get("orientation", "vertical")
+    
+    with open(os.path.join(RESOURCEPATH, "Frontend", "GameSlots.inc"), "w") as file:
+        # Variables section
+        contents = ["[Variables]"]
         if ORIENTATION == "vertical":
-            f.write("""[Variables]
-ToolbarWidth=%s
-SkinMaxWidth=%s
-SkinMaxHeight=%s""" % (SLOT_WIDTH, SLOT_WIDTH, SLOT_HEIGHT * SLOT_COUNT))
+            contents.extend([
+                "ToolbarWidth=%s" % SLOT_WIDTH,
+                "SkinMaxWidth=%s" % SLOT_WIDTH,
+                "SkinMaxHeight=%s" % int(SLOT_HEIGHT * SLOT_COUNT)
+            ])
         else:
-            f.write("""[Variables]
-ToolbarWidth=%s
-SkinMaxWidth=%s
-SkinMaxHeight=%s""" % (SLOT_WIDTH *
-                      SLOT_COUNT, SLOT_WIDTH * SLOT_COUNT, SLOT_HEIGHT))
-        f.write("""
-SlotCount=%s
-SlotWidth=%s
-SlotHeight=%s
-SlotBackgroundColor=%s
-SlotTextColor=%s
-""" % (
-        SLOT_COUNT,
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        settings.get("slot_background_color", "0,0,0,196"),
-        settings.get("slot_text_color", "255,255,255,255")
-    )
-)
-        i = 1
-        while i <= SLOT_COUNT:
-            f.write("""SlotImage%s=
-SlotName%s=
-SlotHighlightMessage%s=
-""" % (i, i, i))
-            i += 1
+            contents.extend([
+                "ToolbarWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                "SkinMaxWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                "SkinMaxHeight=%s" % SLOT_HEIGHT
+            ])
+        contents.extend([
+            "SlotCount=%s" % SLOT_COUNT,
+            "SlotWidth=%s" % SLOT_WIDTH,
+            "SlotHeight=%s" % SLOT_HEIGHT,
+            "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,196"),
+            "SlotTextColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255")
+        ])
+        for i in range(1, SLOT_COUNT + 1):
+            contents.extend([
+                "SlotImage%s=" % i,
+                "SlotName%s=" % i,
+                "SlotHighlightMessage%s=" % i
+            ])
+        contents.append("\n")
 
-        f.write("""
-[ClickAnimation]
-Measure=Plugin
-Plugin=ActionTimer
-ActionList1=ResetVertical | Wait #FrameInterval# | Shrink1Vertical | Wait #FrameInterval# | Shrink2Vertical | Wait #FrameInterval# | Shrink3Vertical | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
-ActionList2=ResetVertical | Wait #FrameInterval# | ShiftLeft1 | Wait #FrameInterval# | ShiftLeft2 | Wait #FrameInterval# | ShiftLeft3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
-ActionList3=ResetVertical | Wait #FrameInterval# | ShiftRight1 | Wait #FrameInterval# | ShiftRight2 | Wait #FrameInterval# | ShiftRight3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetVertical | StopAnimating | Launch
-ActionList4=ResetHorizontal | Wait #FrameInterval# | Shrink1Horizontal | Wait #FrameInterval# | Shrink2Horizontal | Wait #FrameInterval# | Shrink3Horizontal | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
-ActionList5=ResetHorizontal | Wait #FrameInterval# | ShiftUp1 | Wait #FrameInterval# | ShiftUp2 | Wait #FrameInterval# | ShiftUp3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
-ActionList6=ResetHorizontal | Wait #FrameInterval# | ShiftDown1 | Wait #FrameInterval# | ShiftDown2 | Wait #FrameInterval# | ShiftDown3 | Wait #FrameInterval# | BlankSlot | Wait #FrameInterval# | ResetHorizontal | StopAnimating | Launch
-Launch=[!CommandMeasure LauhdutinScript "Launch('#SlotToAnimate#')"]
-StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]
-BlankSlot=[!SetVariable "SlotImage#SlotToAnimate#" ""][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""")
-
-        f.write("""
-ResetVertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ResetHorizontal=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "0"][!SetOption "SlotBanner#SlotToAnimate#" "X" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
-    (
-        SLOT_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT,
-        SLOT_WIDTH, SLOT_WIDTH, SLOT_HEIGHT
-    )
-)
-
-        ShrinkLevel1Width = SLOT_WIDTH / 1.8
-        ShrinkLevel2Width = SLOT_WIDTH / 4
-        ShrinkLevel3Width = SLOT_WIDTH / 20
-        ShrinkLevel1Height = SLOT_HEIGHT / 1.8
-        ShrinkLevel2Height = SLOT_HEIGHT / 4
-        ShrinkLevel3Height = SLOT_HEIGHT / 20
-        f.write("""
-Shrink1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shrink2Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shrink3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
-    (
-        ((SLOT_WIDTH - ShrinkLevel1Width) / 2), SLOT_HEIGHT, ((SLOT_HEIGHT - ShrinkLevel1Height) / 2), (ShrinkLevel1Width), (ShrinkLevel1Height),
-        ((SLOT_WIDTH - ShrinkLevel2Width) / 2), SLOT_HEIGHT, ((SLOT_HEIGHT - ShrinkLevel2Height) / 2), (ShrinkLevel2Width), (ShrinkLevel2Height),
-        ((SLOT_WIDTH - ShrinkLevel3Width) / 2), SLOT_HEIGHT, ((SLOT_HEIGHT - ShrinkLevel3Height) / 2), (ShrinkLevel3Width), (ShrinkLevel3Height)
-    )
-)
-
-        f.write("""
-Shrink1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shrink2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shrink3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(((#SlotToAnimate# - 1) * %s) + %s)"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
-    (
-        SLOT_WIDTH, ((SLOT_WIDTH - ShrinkLevel1Width) / 2), ((SLOT_HEIGHT - ShrinkLevel1Height) / 2), (ShrinkLevel1Width), (ShrinkLevel1Height),
-        SLOT_WIDTH, ((SLOT_WIDTH - ShrinkLevel2Width) / 2), ((SLOT_HEIGHT - ShrinkLevel2Height) / 2), (ShrinkLevel2Width), (ShrinkLevel2Height),
-        SLOT_WIDTH, ((SLOT_WIDTH - ShrinkLevel3Width) / 2), ((SLOT_HEIGHT - ShrinkLevel3Height) / 2), (ShrinkLevel3Width), (ShrinkLevel3Height)
-    )
-)
-
-        ShiftLevel1Vertical = (SLOT_WIDTH / 20.0)
-        ShiftLevel2Vertical = (SLOT_WIDTH / 4.0)
-        ShiftLevel3Vertical = (SLOT_WIDTH / 1.8)
-        ShiftLevel1Horizontal = (SLOT_HEIGHT / 20.0)
-        ShiftLevel2Horizontal = (SLOT_HEIGHT / 4.0)
-        ShiftLevel3Horizontal = (SLOT_HEIGHT / 1.8)
-        f.write("""
-ShiftLeft1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftLeft2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftLeft3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftRight3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftUp3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "(0 - %s)"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ShiftDown3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-DynamicVariables=1
-""" %
-    (
-        ShiftLevel1Vertical,
-        ShiftLevel2Vertical,
-        ShiftLevel3Vertical,
-        ShiftLevel1Vertical,
-        ShiftLevel2Vertical,
-        ShiftLevel3Vertical,
-        ShiftLevel1Horizontal,
-        ShiftLevel2Horizontal,
-        ShiftLevel3Horizontal,
-        ShiftLevel1Horizontal,
-        ShiftLevel2Horizontal,
-        ShiftLevel3Horizontal
-    )
-)
-
-        f.write("""
-[HoverOnAnimation]
-Measure=Plugin
-Plugin=ActionTimer
-DynamicVariables=1
-ActionList1=ZoomIn1Vertical | Wait #FrameInterval# | ZoomIn2Vertical | Wait #FrameInterval# | ZoomIn3Vertical | StopAnimating
-ActionList2=ZoomIn1Horizontal | Wait #FrameInterval# | ZoomIn2Horizontal | Wait #FrameInterval# | ZoomIn3Horizontal | StopAnimating
-ActionList3=Jiggle1 | Wait #FrameInterval# | Jiggle2 | Wait #FrameInterval# | Jiggle3 | Wait #FrameInterval# | Jiggle2 | StopAnimating
-ActionList4=Shake1 | Wait #FrameInterval# | Shake2 | Wait #FrameInterval# | Shake3 | Wait #FrameInterval# | Shake2 | StopAnimating
-StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]""")
-
-        f.write("""
-ZoomIn1Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ZoomIn2Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ZoomIn3Vertical=[!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "X" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
-    (
-        (SLOT_WIDTH / 100 * 105), (0 - ((SLOT_WIDTH / 100 * 105) - SLOT_WIDTH) / 2),
-        (SLOT_WIDTH / 100 * 110), (0 - ((SLOT_WIDTH / 100 * 110) - SLOT_WIDTH) / 2),
-        (SLOT_WIDTH / 100 * 115), (0 - ((SLOT_WIDTH / 100 * 115) - SLOT_WIDTH) / 2)
-    )
-)
-
-        f.write("""
-ZoomIn1Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ZoomIn2Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ZoomIn3Horizontal=[!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Jiggle1=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Jiggle2=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Jiggle3=[!SetOption "SlotBanner#SlotToAnimate#" "ImageRotate" "-2"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]""" %
-    (
-        (SLOT_HEIGHT / 100 * 105), (0 - ((SLOT_HEIGHT / 100 * 105) - SLOT_HEIGHT) / 2),
-        (SLOT_HEIGHT / 100 * 110), (0 - ((SLOT_HEIGHT / 100 * 110) - SLOT_HEIGHT) / 2),
-        (SLOT_HEIGHT / 100 * 115), (0 - ((SLOT_HEIGHT / 100 * 115) - SLOT_HEIGHT) / 2)
-    )
-)
-
+        # Sliver of skin that triggers animation when the mouse hovers over it
         if ORIENTATION == "vertical":
-            f.write("""
-Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "X" "-5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "X" "5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-""")
+            if SETTINGS.get("skin_slide_animation_direction", 0) == 1: # From the right
+                contents.extend([
+                    "[SkinEnabler]",
+                    "Meter=Image",
+                    "X=0",
+                    "Y=0",
+                    "W=1",
+                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
+                    "SolidColor=0,0,0,1",
+                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
+                    "\n"
+                ])
+            elif SETTINGS.get("skin_slide_animation_direction", 0) == 2: # From the right
+                contents.extend([
+                    "[SkinEnabler]",
+                    "Meter=Image",
+                    "X=%s" % int(SLOT_WIDTH - 1),
+                    "Y=0",
+                    "W=1",
+                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
+                    "SolidColor=0,0,0,1",
+                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
+                    "\n"
+                ])
         else:
-            f.write("""
-Shake1=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "-5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake2=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "0"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-Shake3=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "5"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-""")
+            if SETTINGS.get("skin_slide_animation_direction", 0) == 3: # From above
+                contents.extend([
+                    "[SkinEnabler]",
+                    "Meter=Image",
+                    "X=0",
+                    "Y=0",
+                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                    "H=1",
+                    "SolidColor=0,0,0,1",
+                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
+                    "\n"
+                ])
+            elif SETTINGS.get("skin_slide_animation_direction", 0) == 4: # From below
+                contents.extend([
+                    "[SkinEnabler]",
+                    "Meter=Image",
+                    "X=0",
+                    "Y=%s" % int(SLOT_HEIGHT - 1),
+                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                    "H=1",
+                    "SolidColor=0,0,0,1",
+                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
+                    "\n"
+                ])
 
-        f.write("""
-[HoverOffAnimation]
-Measure=Plugin
-Plugin=ActionTimer
-ActionList1=ResetVertical | StopAnimating
-ActionList2=ResetHorizontal | StopAnimating
-StopAnimating=[!CommandMeasure LauhdutinScript "StopAnimating()"]
-ResetVertical=[!SetOption "SlotBanner#SlotToAnimate#" "X" "0"][!SetOption "SlotBanner#SlotToAnimate#" "Y" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-ResetHorizontal=[!SetOption "SlotBanner#SlotToAnimate#" "Y" "0"][!SetOption "SlotBanner#SlotToAnimate#" "X" "((#SlotToAnimate# - 1) * %s)"][!SetOption "SlotBanner#SlotToAnimate#" "W" "%s"][!SetOption "SlotBanner#SlotToAnimate#" "H" "%s"][!UpdateMeter "SlotBanner#SlotToAnimate#"][!Redraw]
-DynamicVariables=1
-""" % (
-        SLOT_HEIGHT, SLOT_WIDTH, SLOT_HEIGHT,
-        SLOT_WIDTH, SLOT_WIDTH, SLOT_HEIGHT
-    )
-)
-
-        # Skin showing sliver
+        # Slots background
+        contents.extend([
+            "[SlotsBackground]",
+            "Meter=Image",
+            "X=0",
+            "Y=0",
+            "SolidColor=#SlotBackgroundColor#"
+        ])
         if ORIENTATION == "vertical":
-            if settings.get("skin_slide_animation_direction", 0) == 1: # From the right
-                f.write("""
-[SkinEnabler]
-Meter=Image
-X=0
-Y=0
-W=1
-H=%s
-SolidColor=0,0,0,1
-MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
-""" % (
-        SLOT_HEIGHT * SLOT_COUNT
-    )
-)
-            elif settings.get("skin_slide_animation_direction", 0) == 2: # From the right
-                f.write("""
-[SkinEnabler]
-Meter=Image
-X=%s
-Y=0
-W=1
-H=%s
-SolidColor=0,0,0,1
-MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
-""" % (
-        SLOT_WIDTH - 1,
-        SLOT_HEIGHT * SLOT_COUNT
-    )
-)
+            contents.extend([
+                "W=%s" % SLOT_WIDTH,
+                "H=%s" % int(SLOT_COUNT * SLOT_HEIGHT)
+            ])
         else:
-            if settings.get("skin_slide_animation_direction", 0) == 3: # From above
-                f.write("""
-[SkinEnabler]
-Meter=Image
-X=0
-Y=0
-W=%s
-H=1
-SolidColor=0,0,0,1
-MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
-""" % (
-        SLOT_WIDTH * SLOT_COUNT
-    )
-)
-            elif settings.get("skin_slide_animation_direction", 0) == 4: # From below
-                f.write("""
-[SkinEnabler]
-Meter=Image
-X=0
-Y=%s
-W=%s
-H=1
-SolidColor=0,0,0,1
-MouseOverAction=[!CommandMeasure "LauhdutinScript" "SlideSkinIn()"]
-""" % (
-        SLOT_HEIGHT - 1,
-        SLOT_WIDTH * SLOT_COUNT
-    )
-)
-
-        # Slot background
-        f.write("""
-[SlotBackground]
-Meter=Image
-X=0
-Y=0
-SolidColor=#SlotBackgroundColor#""")
-        if ORIENTATION == "vertical":
-            f.write("""
-W=%s
-H=%s
-""" % (
-        SLOT_WIDTH,
-        SLOT_COUNT * SLOT_HEIGHT
-    )
-)
-        else:
-            f.write("""
-W=%s
-H=%s
-""" % (
-        SLOT_COUNT * SLOT_WIDTH,
-        SLOT_HEIGHT
-    )
-)
+            contents.extend([
+                "W=%s" % int(SLOT_COUNT * SLOT_WIDTH),
+                "H=%s" % SLOT_HEIGHT
+            ])
+        contents.append("\n")
 
         # Slots
-        i = 1
-        while i <= SLOT_COUNT:
-            # Text for game title
-            f.write("""
-[SlotText%s]
-Meter=String""" % i)
-
+        for i in range(1, SLOT_COUNT + 1):
+            # Game title
+            contents.extend([
+                "[SlotText%s]" % i,
+                "Meter=String",
+            ])
             if ORIENTATION == "vertical":
-                f.write("""
-X=%s
-Y=%s""" % (
-        SLOT_WIDTH / 2,
-        (i - 1) * SLOT_HEIGHT + SLOT_HEIGHT / 2
-    )
-)
+                contents.extend([
+                    "X=%s" % int(SLOT_WIDTH / 2),
+                    "Y=%s" % int((i - 1) * SLOT_HEIGHT + SLOT_HEIGHT / 2)
+                ])
             else:
-                f.write("""
-X=%s
-Y=%s""" % (
-        (i - 1) * SLOT_WIDTH + SLOT_WIDTH / 2,
-        SLOT_HEIGHT / 2
-    )
-)
-
-            f.write("""
-W=%s
-H=%s
-Text=#SlotName%s#
-FontFace=Arial
-FontSize=%s
-FontColor=%s
-StringAlign=CenterCenter
-StringEffect=Shadow
-ClipString=1
-AntiAlias=1
-DynamicVariables=1
-Group=Slots
-""" % (
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        i,
-        SLOT_WIDTH / 15,
-        settings.get("slot_text_color", "255,255,255,255")
-    )
-)
+                contents.extend([
+                    "X=%s" % int((i - 1) * SLOT_WIDTH + SLOT_WIDTH / 2),
+                    "Y=%s" % int(SLOT_HEIGHT / 2)
+                ])
+            contents.extend([
+                "W=%s" % SLOT_WIDTH,
+                "H=%s" % SLOT_HEIGHT,
+                "Text=#SlotName%s#" % i,
+                "FontFace=Arial", 
+                "FontSize=%s" % int(SLOT_WIDTH / 15),
+                "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
+                "StringAlign=CenterCenter",
+                "StringEffect=Shadow",
+                "ClipString=1",
+                "AntiAlias=1",
+                "DynamicVariables=1",
+                "Group=Slots",
+                "\n"
+            ])
 
             # Game banner
-            f.write("""
-[SlotBanner%s]
-Meter=Image
-ImageName=#SlotImage%s#""" % (i, i))
+            contents.extend([
+                "[SlotBanner%s]" % i,
+                "Meter=Image",
+                "ImageName=#SlotImage%s#" % i
+            ])
             if ORIENTATION == "vertical":
-                f.write("""
-X=0
-Y=%s""" % (
-        (i - 1) * SLOT_HEIGHT
-    )
-)
+                contents.extend([
+                    "X=0",
+                    "Y=%s" % int((i - 1) * SLOT_HEIGHT)
+                ])
             else:
-                f.write("""
-X=%s
-Y=0""" % (
-        (i - 1) * SLOT_WIDTH
-    )
-)
+                contents.extend([
+                    "X=%s" % int((i - 1) * SLOT_WIDTH),
+                    "Y=0"
+                ])
+            contents.extend([
+                "W=%s" % SLOT_WIDTH,
+                "H=%s" % SLOT_HEIGHT,
+                "SolidColor=0,0,0,1",
+                "PreserveAspectRatio=2",
+                "DynamicVariables=1",
+                """MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "OnMiddleClickSlot(%s)"]""" % i,
+                """MouseOverAction=[!CommandMeasure LauhdutinScript "OnMouseEnterSlot(%s)"]""" % i,
+                """MouseLeaveAction=[!CommandMeasure LauhdutinScript "OnMouseLeaveSlot(%s)"]""" % i,
+                """LeftMouseUpAction=[!CommandMeasure LauhdutinScript "OnLeftClickSlot(%s)"]""" % i,
+                "Group=Slots",
+                "\n"
+            ])
 
-            f.write("""
-W=%s
-H=%s
-SolidColor=0,0,0,1
-PreserveAspectRatio=2
-DynamicVariables=1
-MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "ShowSlotSubmenu('%s')"]
-MouseOverAction=[!CommandMeasure LauhdutinScript "Highlight('%s')"]
-MouseLeaveAction=[!CommandMeasure LauhdutinScript "Unhighlight('%s')"]
-""" % (
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        i,
-        i,
-        i
-    )
-)
+#            # Game highlight
+#            contents.extend([
+#                "[SlotHighlightBackground%s]" % i,
+#                "Meter=Image"
+#            ])
+#            if ORIENTATION == "vertical":
+#                contents.extend([
+#                    "X=0",
+#                    "Y=%s" % (i - 1) * SLOT_HEIGHT
+#                ])
+#            else:
+#                contents.extend([
+#                    "X=%s" % (i - 1) * SLOT_WIDTH,
+#                    "Y=0"
+#                ])
+#            contents.extend([
+#                "W=%s" % SLOT_WIDTH,
+#                "H=%s" % SLOT_HEIGHT,
+#                "SolidColor=0,0,0,160",
+#                "PreserveAspectRatio=2",
+#                "DynamicVariables=1",
+#                "Group=SlotHighlight%s | SlotHighlights" % i,
+#                ""
+#            ])
+#            contents.extend([
+#                "[SlotHighlight%s]" % i,
+#                "Meter=Image",
+#                "ImageName=",
+#                "X=0r",
+#                "Y=0r",
+#                "W=%s" % SLOT_WIDTH,
+#                "H=%s" % SLOT_HEIGHT,
+#                "SolidColor=0,0,0,1",
+#                "PreserveAspectRatio=2",
+#                "DynamicVariables=1",
+#                "Group=SlotHighlight%s | SlotHighlights" % i,
+#                ""
+#            ])
+#            contents.extend([
+#                "[SlotHighlightText%s]" % i,
+#                "Meter=String",
+#                "X=%sr" % SLOT_WIDTH / 2,
+#                "Y=%sr" % SLOT_HEIGHT / 2,
+#                "W=%s" % SLOT_WIDTH,
+#                "H=%s" % SLOT_HEIGHT,
+#                "Text=#SlotHighlightMessage%s#" % i,
+#                "FontFace=Arial",
+#                "FontSize=%s" % SLOT_WIDTH / 25,
+#                "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
+#                "StringAlign=CenterCenter",
+#                "StringEffect=Shadow",
+#                "ClipString=1",
+#                "AntiAlias=1",
+#                "DynamicVariables=1",
+#                "Group=SlotHighlight%s | SlotHighlights" % i,
+#                ""
+#            ])
 
-            if settings.get("click_animation", 1) > 0:
-                f.write("""LeftMouseUpAction=[!SetVariable "SlotToAnimate" "%s"][!UpdateMeasure "ClickAnimation"][!CommandMeasure LauhdutinScript "StartClickAnimation('%s')"]
-Group=Slots
-""" % (i, settings.get("click_animation", 1)))
-            else:
-                f.write("""LeftMouseUpAction=[!CommandMeasure LauhdutinScript "Launch('%s')"]
-Group=Slots
-""" % i)
+        # Game highlight
+        contents.extend([
+            "[SlotHighlightBackground]",
+            "Meter=Image",
+            "X=0",
+            "Y=0",
+            "W=%s" % SLOT_WIDTH,
+            "H=%s" % SLOT_HEIGHT,
+            "SolidColor=0,0,0,160",
+            "PreserveAspectRatio=2",
+            "DynamicVariables=1",
+            "Group=SlotHighlight",
+            "\n"
+            "[SlotHighlight]",
+            "Meter=Image",
+            "ImageName=",
+            "X=0r",
+            "Y=0r",
+            "W=%s" % SLOT_WIDTH,
+            "H=%s" % SLOT_HEIGHT,
+            "SolidColor=0,0,0,1",
+            "PreserveAspectRatio=2",
+            "DynamicVariables=1",
+            "Group=SlotHighlight",
+            "\n"
+            "[SlotHighlightText]",
+            "Meter=String",
+            "X=%sr" % int(SLOT_WIDTH / 2),
+            "Y=%sr" % int(SLOT_HEIGHT / 2),
+            "W=%s" % SLOT_WIDTH,
+            "H=%s" % SLOT_HEIGHT,
+            "Text=#SlotHighlightMessage#",
+            "FontFace=Arial",
+            "FontSize=%s" % int(SLOT_WIDTH / 25),
+            "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
+            "StringAlign=CenterCenter",
+            "StringEffect=Shadow",
+            "ClipString=1",
+            "AntiAlias=1",
+            "DynamicVariables=1",
+            "Group=SlotHighlight",
+            "\n"
+        ])
 
-            # Game highlight
-            f.write("""
-[SlotHighlightBackground%s]
-Meter=Image""" % i)
-            if ORIENTATION == "vertical":
-                f.write("""
-X=0
-Y=%s""" % (
-        (i - 1) * SLOT_HEIGHT
-    )
-)
-            else:
-                f.write("""
-X=%s
-Y=0""" % (
-        (i - 1) * SLOT_WIDTH
-    )
-)
+        contents = "\n".join(contents)
+        file.write(contents)
 
-            f.write("""
-W=%s
-H=%s
-SolidColor=0,0,0,160
-PreserveAspectRatio=2
-DynamicVariables=1
-Group=SlotHighlight%s | SlotHighlights
-""" % (
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        i
-    )
-)
-
-            f.write("""
-[SlotHighlight%s]
-Meter=Image
-ImageName=
-X=0r
-Y=0r
-W=%s
-H=%s
-SolidColor=0,0,0,1
-PreserveAspectRatio=2
-DynamicVariables=1
-Group=SlotHighlight%s | SlotHighlights
-""" % (
-        i,
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        i
-    )
-)
-
-            f.write("""
-[SlotHighlightText%s]
-Meter=String
-X=%sr
-Y=%sr
-W=%s
-H=%s
-Text=#SlotHighlightMessage%s#
-FontFace=Arial
-FontSize=%s
-FontColor=%s
-StringAlign=CenterCenter
-StringEffect=Shadow
-ClipString=1
-AntiAlias=1
-DynamicVariables=1
-Group=SlotHighlight%s | SlotHighlights
-""" % (
-        i,
-        SLOT_WIDTH / 2,
-        SLOT_HEIGHT / 2,
-        SLOT_WIDTH,
-        SLOT_HEIGHT,
-        i,
-        SLOT_WIDTH / 25,
-        settings.get("slot_text_color", "255,255,255,255"),
-        i
-    )
-)
-            i += 1
-
-    if CurrentFile != "Main.ini":
+    if CURRENTFILE != "Main.ini":
         subprocess.call(
-            [RainmeterPath, "!ActivateConfig", Config, "Main.ini"], shell=False)
+            [RAINMETERPATH, "!ActivateConfig", CONFIG, "Main.ini"], shell=False)
     else:
-        subprocess.call([RainmeterPath, "!Refresh", Config], shell=False)
+        subprocess.call([RAINMETERPATH, "!Refresh", CONFIG], shell=False)
 except:
     import traceback
     traceback.print_exc()
-    input()
+input()
