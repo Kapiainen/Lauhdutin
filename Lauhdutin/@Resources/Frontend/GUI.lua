@@ -1,3 +1,1046 @@
+--###########################################################################################################
+-- Code formatting
+--###########################################################################################################
+--                 -> General
+--###########################################################################################################
+	-- Max line length: 110 characters
+	--   A line that exceeds the maximum number of characters should be made to span multiple lines.
+	--   For example the following:
+	--
+	--     if bSomeCondition and ... and nSomeOtherCondition > 2 then
+	--
+	--   Would become:
+	--
+	--     if bSomeCondition
+	--        and ...
+	--        and nSomeOtherCondition > 2 then
+	--
+--###########################################################################################################
+--                 -> Identifiers
+--###########################################################################################################
+	-- Identifier formatting
+	--   Global variables = All caps with words separated by underscores (e.g. SOME_GLOBAL_VARIABLE)
+	--   Local variables = Hungarian notation (e.g. sSomeString)
+	--     b = boolean
+	--     n = number
+	--     s = string
+	--     t = table
+	--   Function parameters = Hungarian notation prefixed with 'a' (e.g. abSomeBoolean)
+	--   Functions = CamelCase (e.g. SomeFunction)
+--###########################################################################################################
+-- Public
+--###########################################################################################################
+--        -> Events
+--###########################################################################################################
+	function OnInitialized()
+	-- Called by the Python backend script when it has finished
+	-- Show games or display a message that there are no games to show
+		local tGames = RESOURCES:ReadGames()
+		print(#tGames)
+		for sKey, tTable in pairs(tGames) do
+			if tTable[GAME_KEYS.HIDDEN] == true then
+				table.insert(T_HIDDEN_GAMES, tTable)
+			elseif tTable[GAME_KEYS.NOT_INSTALLED] == true then
+				table.insert(T_NOT_INSTALLED_GAMES, tTable)
+			else
+				table.insert(T_ALL_GAMES, tTable)
+			end
+		end
+		--T_FILTERED_GAMES = T_ALL_GAMES
+		if T_ALL_GAMES ~= nil and #T_ALL_GAMES > 0 then
+			FilterBy('')
+		elseif T_NOT_INSTALLED_GAMES ~= nil and #T_NOT_INSTALLED_GAMES > 0 then
+			FilterBy('installed:false')
+		elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
+			FilterBy('hidden:true')
+		else
+			SKIN:Bang(
+				'[!SetOption StatusMessage Text "No games to display"]'
+				.. '[!UpdateMeterGroup Status]'
+				.. '[!ShowMeterGroup Status]'
+			)
+		end
+	end
+
+	function OnMouseEnterSkin(abAnimate)
+	-- Called when the mouse cursor enters the skin
+	-- abAnimate: Whether or not to play an animation to unhide the skin
+		SCRIPT:SetUpdateDivider(1)
+		if abAnimate then
+
+		end
+	end
+
+	function OnMouseLeaveSkin(abAnimate)
+	-- Called when the mouse cursor leaves the skin
+	-- abAnimate: Whether or not to play an animation to hide the skin
+		SCRIPT:SetUpdateDivider(-1)
+		if abAnimate then
+
+		end
+	end
+
+	function OnMouseEnterSlot(anIndex)
+	-- Called when the mouse cursor enters a slot
+	-- anIndex: The index of the slot in question (1-indexed)
+		SLOT:Highlight(anIndex)
+	end
+
+	function OnMouseLeaveSlot(anIndex)
+	-- Called when the mouse cursor leaves a slot
+	-- anIndex: The index of the slot in question (1-indexed)
+		SLOT:Unhighlight(anIndex)
+	end
+
+	function OnLeftClickSlot(anIndex)
+	-- Called when a slot is left-mouse clicked
+	-- anIndex: The index of the slot in question (1-indexed)
+		--PROCESS_MONITOR:Start()
+	end
+
+	function OnMiddleClickSlot(anIndex)
+	-- Called when a slot is middle-mouse clicked
+	-- anIndex: The index of the slot in question (1-indexed)
+
+	end
+
+	function OnScrollSlots(anDirection)
+	-- Called when the list of games is scrolled
+	-- anDirection: Positive value -> Upwards, Negative value -> Downwards
+		if anDirection > 0 then
+			print("Scrolling up")
+			SCROLL_INDEX = SCROLL_INDEX - 1
+		elseif anDirection < 0 then
+			print("Scrolling down")
+			SCROLL_INDEX = SCROLL_INDEX + 1
+		end
+	end
+
+	function OnApplyFilter(asPattern)
+		if asPattern == '' then
+			OnClearFilter()
+		else
+			asPattern = STRING:Trim(asPattern:lower())
+		end
+		OnDismissFilterInput()
+	end
+
+	function OnDismissFilterInput()
+
+	end
+
+	function OnClearFilter()
+
+	end
+
+	function OnProcessStarted()
+		print("Process started")
+		ExecuteStartingBangs()
+	end
+
+	function OnProcessTerminated()
+		print("Process terminated")
+		PROCESS_MONITOR:Stop()
+		if T_RECENTLY_LAUNCHED_GAME == nil then
+			return
+		end
+		local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
+		T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed
+														  + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
+		WriteGames()
+		if PopulateSlots() then
+			Redraw()
+		end
+		ExecuteStoppingBangs()
+		T_RECENTLY_LAUNCHED_GAME = nil
+	end
+
+	function OnRebuildSkin()
+
+	end
+
+	function OnToggleHideGames()
+	-- Update context menu entry/entries
+
+	end
+
+	function OnToggleUnhideGames()
+	-- Update context menu entry/entries
+
+	end
+
+	function OnOpenSettings()
+
+	end
+
+	function OnOpenShortcutsFolder()
+
+	end
+
+	function OnOpenShortcutBannersFolder()
+
+	end
+
+	function OnShowUninstalled()
+
+	end
+
+	function OnShowHidden()
+
+	end
+--###########################################################################################################
+-- Private
+--###########################################################################################################
+--         -> State update and rendering
+--###########################################################################################################
+	function Update()
+	-- Called regularly (every ~16 ms) by Rainmeter when the mouse is on the skin
+		if #T_SLOT_ANIMATION_QUEUE > 0 then
+		-- If there are animations do play, then redraw
+			local nSlotIndex = 1
+			while nSlotIndex <= SETTINGS.SLOT_COUNT do
+				local tAnimation = SLOT_ANIMATION_QUEUE[nSlotIndex]
+				if tAnimation ~= nil then
+					if tAnimation.nFrame > 0 then
+						tAnimation.fAnimation(nSlotIndex, tAnimation.nFrame)
+						tAnimation.nFrame = tAnimation.nFrame - 1
+					else
+						SLOT_ANIMATION_QUEUE[nSlotIndex] = nil
+					end
+				end
+				nSlotIndex = nSlotIndex + 1
+			end
+			Redraw()
+		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
+		-- If scroll index has changed, then redraw
+			SLOT_SUBMENU:Hide(false)
+			if PopulateSlots() then
+				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
+				Redraw()
+			end
+		elseif UPDATES_TO_SKIP > 0 then
+			UPDATES_TO_SKIP = UPDATES_TO_SKIP - 1
+		elseif UPDATES_TO_SKIP <= 0 then
+			Redraw()
+			UPDATES_TO_SKIP = 60
+		end
+	end
+
+	function Redraw()
+		print("Redraw")
+		SKIN:Bang('[!Redraw]')
+	end
+
+	function PopulateSlots()
+		if T_FILTERED_GAMES == nil then
+			return false
+		end
+		local nSlotCount = tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT])
+		local j = N_SCROLL_INDEX
+		for i = 1, nSlotCount do -- Iterate through each slot.
+			if j > 0 and j <= #T_FILTERED_GAMES then -- If the scroll index, 'j', is a valid index in the table 'T_FILTERED_GAMES'
+				if RESOURCES:BannerExists(T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH]) then
+					SKIN:Bang(
+						'[!SetVariable SlotName' .. i .. ' ""]'
+						.. '[!SetVariable SlotImage' .. i .. ' "#@#Banners\\' .. T_FILTERED_GAMES[j][GAME_KEYS.BANNER_PATH] .. '"]'
+					)
+				else
+					SKIN:Bang(
+						'[!SetVariable SlotName' .. i .. ' "' .. T_FILTERED_GAMES[j][GAME_KEYS.NAME] .. '"]'
+						.. '[!SetVariable SlotImage' .. i .. ' ""]'
+					)
+				end
+				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+					if N_ACTION_STATE == ACTION_STATES.EXECUTE then
+						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+							local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
+							local hoursPlayed = math.floor(totalHoursPlayed)
+							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
+							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+							else
+								if T_SETTINGS["show_platform"] then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+								else
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+								end								
+							end
+						else
+							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+							else
+								if T_SETTINGS["show_platform"] then
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+								else
+									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+								end
+							end
+						end
+						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+						elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
+						else
+							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
+						end
+					elseif N_ACTION_STATE == ACTION_STATES.HIDE then
+						SKIN:Bang(
+							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"]'
+							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]'
+						)
+					elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
+						SKIN:Bang(
+							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"]'
+							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]'
+						)
+					end
+				end
+			else -- Slot has no game to show.
+				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+					SKIN:Bang(
+						'[!SetVariable SlotImage' .. i .. ' ""]'
+						.. '[!SetVariable SlotName' .. i .. ' ""]'
+						.. '[!SetVariable "SlotHighlightMessage' .. i .. '" ""]'
+					)
+				else
+					SKIN:Bang(
+						'[!SetVariable SlotImage' .. i .. ' ""]'
+						.. '[!SetVariable SlotName' .. i .. ' ""]'
+					)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
+			end
+			j = j + 1
+		end
+		SKIN:Bang('[!UpdateMeterGroup Slots]')
+		return true
+	end
+--###########################################################################################################
+--         -> Initialization
+--###########################################################################################################
+	function Initialize()
+	-- Called when the skin is loaded
+		local sResourcesPath = SKIN:GetVariable('@')
+		JSON = dofile(sResourcesPath .. 'Dependencies\\json4lua\\json.lua')
+		STRING = dofile(sResourcesPath .. 'Frontend\\String.lua')
+		InitializeComponents(sResourcesPath)
+		T_SETTINGS = RESOURCES:ReadSettings()
+		InitializeEnums(sResourcesPath)
+		InitializeStateVariables()
+		InitializeConstants()
+		-- Start the Python backend script
+		OnInitialized() -- Debug
+	end
+
+	function InitializeComponents(asResourcesPath)
+		SCRIPT = InitializeScript()
+		RESOURCES = InitializeResources(asResourcesPath)
+		TOOLBAR = InitializeToolbar()
+		STATUS_MESSAGE = InitializeStatusMessage()
+		SLOT_SUBMENU = InitializeSlotSubmenu()
+		SORT = InitializeSort()
+		PROCESS_MONITOR = InitializeProcessMonitor()
+	end
+
+	function InitializeScript()
+		return {
+			sMeasureName = 'LauhdutinScript',
+			SetUpdateDivider = function (self, anValue)
+				SKIN:Bang(
+					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "' .. anValue .. '"]'
+					.. '[!UpdateMeasure "' .. self.sMeasureName .. '"]'
+				)
+			end
+		}
+	end
+
+	function InitializeResources(asResourcesPath)
+		return {
+			sResourcesPath = asResourcesPath,
+			FileExists = function (self, asPath)
+				local f = io.open(self.sResourcesPath .. asPath, 'r')
+				if f ~= nil then
+					f:close()
+					return true
+				end
+				return false
+			end,
+			BannerExists = function (self, asPath)
+				return self:FileExists('Banners\\' .. asPath)
+			end,
+			ReadJSON = function (self, asPath)
+				local f = io.open(self.sResourcesPath .. asPath, 'r')
+				if f ~= nil then
+					local json_string = f:read('*a')
+					f:close()
+					return JSON.decode(json_string)
+				end
+				return nil
+			end,
+			WriteJSON = function (self, asPath, atTable)
+				local json_string = JSON.encode(atTable)
+				if json_string == nil then
+					return false
+				end
+				local f = io.open(self.sResourcesPath .. asPath, 'w')
+				if f ~= nil then
+					f:write(json_string)
+					f:close()
+					return true
+				end
+				return false
+			end,
+			ReadSettings = function (self)
+				return self:ReadJSON('settings.json')
+			end,
+			WriteSettings = function (self, atTable)
+				return self:WriteJSON('settings.json', atTable)
+			end,
+			ReadGames = function (self)
+				return self:ReadJSON('games.json')
+			end,
+			WriteGames = function (self) --TODO: vararg parameter?
+				tTable = {}
+				for i=1, #T_ALL_GAMES do
+					table.insert(tTable, T_ALL_GAMES[i])
+				end
+				for i=1, #T_HIDDEN_GAMES do
+					table.insert(tTable, T_HIDDEN_GAMES[i])
+				end
+				for i=1, #T_NOT_INSTALLED_GAMES do
+					table.insert(tTable, T_NOT_INSTALLED_GAMES[i])
+				end
+				return WriteJSON('games.json', tTable)
+			end
+		}
+	end
+
+	function InitializeToolbar()
+		return {
+			bForciblyVisible = false,
+			Show = function (self, abForce)
+			-- 
+			-- abForce: 
+				abForce = abForce or false
+				-- If skin not visible, then return
+				if abForce then
+					self.bForciblyVisible = true
+				end
+				-- If reverse sort, then show appropriate icon
+				SKIN:Bang(
+					'[!ShowMeterGroup Toolbar]'
+					.. '[!Redraw]'
+				)
+			end,
+			Hide = function (self, abForce)
+			-- 
+			-- abForce: 
+				abForce = abForce or false
+				-- If skin not visible, then return
+				if self.bForciblyVisible and not abForce then
+					return
+				end
+				if abForce then
+					self.bForciblyVisible = false
+				end
+				SKIN:Bang(
+					'[!HideMeterGroup Toolbar]'
+					.. '[!Redraw]'
+				)
+			end,
+		}
+	end
+
+	function InitializeStatusMessage()
+		return {
+			Show = function (self, asMessage)
+			--
+			-- asMessage: 
+				SKIN:Bang(
+					'[!SetVariable Message ' .. asMessage .. ']'
+					.. '[!ShowMeterGroup Message]'
+					.. '[!Redraw]'
+				)
+			end,
+			Hide = function (self)
+			--
+			-- asMessage: 
+				SKIN:Bang(
+					'[!HideMeterGroup Message]'
+					.. '[!Redraw]'
+				)
+			end
+		}
+	end
+
+	function InitializeSlotSubmenu()
+		return {
+			Show = function (self, anIndex)
+				
+			end,
+			Hide = function (self, abRedraw)
+
+			end,
+			EditNotes = function (self, anIndex)
+
+			end,
+			EditTags = function (self, anIndex)
+
+			end,
+			ToggleBangs = function (self, anIndex)
+
+			end,
+			EditProcess = function (self, anIndex)
+
+			end,
+			ToggleVisibility = function (self, anIndex)
+
+			end
+		}
+	end
+
+	function InitializeSort()
+		return {
+			Alphabetically = function (self, atFirst, atSecond)
+				if atFirst[GAME_KEYS.NAME]:lower():gsub(':', ' ')
+				   < atSecond[GAME_KEYS.NAME]:lower():gsub(':', ' ') then
+					return true
+				else
+					return false
+				end
+			end,
+			LastPlayed = function (self, atFirst, atSecond)
+				local nFirst = tonumber(atFirst[GAME_KEYS.LASTPLAYED])
+				local nSecond = tonumber(atSecond[GAME_KEYS.LASTPLAYED])
+				if nFirst > nSecond then
+					return true
+				elseif nFirst == nSecond then
+					return self:Alphabetically(atFirst, atSecond)
+				else
+					return false
+				end
+			end,
+			HoursPlayed = function (self, atFirst, atSecond)
+				local nFirst = tonumber(atFirst[GAME_KEYS.HOURS_TOTAL])
+				local nSecond = tonumber(atSecond[GAME_KEYS.HOURS_TOTAL])
+				if nFirst > nSecond then
+					return true
+				elseif nFirst == nSecond then
+					return self:Alphabetically(atFirst, atSecond)
+				else
+					return false
+				end
+			end
+		}
+	end
+
+	function InitializeProcessMonitor()
+		return {
+			sMeasureName = 'ProcessMonitor',
+			Start = function (self, asProcessName)
+				SKIN:Bang(
+					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "160"]'
+					.. '[!SetOption "' .. self.sMeasureName .. '" "ProcessName" "' .. asProcessName .. '"]'
+					.. '[!UpdateMeasure "ProcessMonitor"]'
+				)
+			end,
+			Stop = function (self)
+				SKIN:Bang(
+					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "-1"]'
+					.. '[!UpdateMeasure "ProcessMonitor"]'
+				)
+			end
+		}
+	end
+
+	function InitializeEnums(asResourcesPath)
+		local enums = dofile(asResourcesPath .. 'Frontend\\Enums.lua')
+		SETTING_KEYS = enums.SETTING_KEYS
+		INITIALIZATION_STATES = enums.INITIALIZATION_STATES
+		VISIBILITY_STATES = enums.VISIBILITY_STATES
+		ACTION_STATES = enums.ACTION_STATES
+		ANIMATION_STATES = enums.ANIMATION_STATES
+		GAME_KEYS = enums.GAME_KEYS
+		PLATFORMS = enums.PLATFORMS
+	end
+
+	function InitializeStateVariables()
+		T_SLOT_ANIMATION_QUEUE = {}
+		N_ACTION_STATE = 0
+		N_UPDATES_TO_SKIP = 0
+		N_LAST_DRAWN_SCROLL_INDEX = -1
+		N_SCROLL_INDEX = 1
+		T_ALL_GAMES = {}
+		T_FILTERED_GAMES = {}
+		T_HIDDEN_GAMES = {}
+		T_NOT_INSTALLED_GAMES = {}
+	end
+
+	function InitializeConstants()
+		PLATFORM_DESCRIPTIONS = {
+			"Steam",
+			"Steam",
+			"GOG Galaxy",
+			"",
+			"",
+			"Blizzard App"
+		}
+	end
+--###########################################################################################################
+--         -> Functionality
+--###########################################################################################################
+--                          -> Bangs
+--###########################################################################################################
+	function ExecuteStartingBangs()
+		print("Executing starting bangs")
+	end
+
+	function ExecuteStoppingBangs()
+		print("Executing stopping bangs")
+		--if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= nil and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= '' then
+		--	SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
+		--end
+	end
+--###########################################################################################################
+--                          -> Filtering
+--###########################################################################################################
+	function FilterBy(asPattern)
+		if asPattern == '' then
+			T_FILTERED_GAMES = ClearFilter(T_ALL_GAMES)
+			--Sort()
+			PopulateSlots()
+			return
+		end
+		local sort = true
+		asPattern = asPattern:lower()
+		if StartsWith(asPattern, '+') then
+			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
+		else
+			T_FILTERED_GAMES, sort = Filter(T_ALL_GAMES, asPattern)
+		end
+		if sort then
+			Sort()
+		else
+			N_SCROLL_INDEX = 1
+		end
+		PopulateSlots()
+	end
+
+	function FilterPlatform(atTable, asPattern, asTag, anPlatform)
+		local tResult = {}
+		asPattern = asPattern:sub(#asTag + 1)
+		if StartsWith(asPattern, 'i') then --platform:installed
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'u') then --platform:uninstalled
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.NOT_INSTALLED] == true then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'a') then --platform:all
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform then
+					table.insert(tResult, game)
+				end
+			end
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == anPlatform then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'p') then --platform:played
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+					table.insert(tResult, game)
+				end
+			end
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'n') then --platform:not played
+			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+					table.insert(tResult, game)
+				end
+			end
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'f') then --platform:false
+			for i, game in ipairs(T_ALL_GAMES) do
+				if game[GAME_KEYS.PLATFORM] ~= anPlatform then
+					table.insert(tResult, game)
+				end
+			end
+			if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					if game[GAME_KEYS.PLATFORM] ~= anPlatform and game[GAME_KEYS.NOT_INSTALLED] ~= true then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		end
+		return tResult
+	end
+
+	function Filter(atTable, asPattern)
+		if atTable == nil then
+			return
+		end
+		local tResult = {}
+		if StartsWith(asPattern, 'steam:') then
+			tResult = FilterPlatform(atTable, asPattern, 'steam:', PLATFORM.STEAM)
+		elseif StartsWith(asPattern, 'galaxy:') then
+			tResult = FilterPlatform(atTable, asPattern, 'galaxy:', PLATFORM.GOG_GALAXY)
+		elseif StartsWith(asPattern, 'battlenet:') then
+			tResult = FilterPlatform(atTable, asPattern, 'battlenet:', PLATFORM.BATTLENET)
+		elseif StartsWith(asPattern, 'tags:') then
+			asPattern = asPattern:sub(6)
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.TAGS] ~= nil then
+					for sKey, sValue in pairs(game[GAME_KEYS.TAGS]) do
+						if sValue:lower():find(asPattern) then
+							table.insert(tResult, game)
+							break
+						end
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'installed:') then
+			asPattern = asPattern:sub(11)
+			if StartsWith(asPattern, 't') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] ~= true then
+							table.insert(tResult, game)
+						end
+					end
+				end				
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.NOT_INSTALLED] == true then
+							table.insert(tResult, game)
+						end
+					end
+				end	
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						table.insert(tResult, game)
+					end
+				end	
+			end
+		elseif StartsWith(asPattern, 'hidden:') then
+			asPattern = asPattern:sub(8)
+			if StartsWith(asPattern, 't') then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
+			elseif StartsWith(asPattern, 'f') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+			elseif StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+			end
+		elseif StartsWith(asPattern, 'games:') then
+			asPattern = asPattern:sub(7)
+			if StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResult, game)
+				end
+				for i, game in ipairs(T_HIDDEN_GAMES) do
+					table.insert(tResult, game)
+				end
+			end	
+		elseif StartsWith(asPattern, 'random:') then
+			asPattern = asPattern:sub(8)
+			local tResultR = {}
+			if StartsWith(asPattern, 'a') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					table.insert(tResultR, game)
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					table.insert(tResultR, game)
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						table.insert(tResultR, game)
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
+			elseif StartsWith(asPattern, 's') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'g') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'b') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+						if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
+							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'p') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			elseif StartsWith(asPattern, 'n') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+						table.insert(tResultR, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+ 							table.insert(tResultR, game)
+						end
+					end
+				end
+				table.insert(tResult, tResultR[math.random(1, #tResultR)])
+			else
+				table.insert(tResult, atTable[math.random(1, #atTable)])
+			end		
+		elseif StartsWith(asPattern, 'played:') then
+			asPattern = asPattern:sub(8)
+			if StartsWith(asPattern, 't') then
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+ 							table.insert(tResult, game)
+						end
+					end
+				end
+			elseif StartsWith(asPattern, 'f') then	
+				for i, game in ipairs(T_ALL_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+						table.insert(tResult, game)
+					end
+				end
+				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+						table.insert(tResult, game)
+					end
+				end
+				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
+					for i, game in ipairs(T_HIDDEN_GAMES) do
+ 						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+ 							table.insert(tResult, game)
+						end
+					end
+				end
+			else
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		elseif StartsWith(asPattern, 'shortcuts:') then
+			asPattern = asPattern:sub(11)
+			for i, game in ipairs(atTable) do
+				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil
+				   and game[GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
+					table.insert(tResult, game)
+				end
+			end
+		else
+			if T_SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == true then
+				local rankings = {}
+				local perfectMatches = {}
+				for i, game in ipairs(atTable) do
+					score = FuzzySearch(asPattern, game[GAME_KEYS.NAME])
+					if score > 0 then
+						table.insert(rankings, {["score"]=score, ["game"]=game})
+					end
+				end
+				table.sort(rankings, SortRanking)
+				--print("== " .. asPattern .. " ==") -- Debug
+				for i, entry in ipairs(rankings) do
+					--print(entry.score, entry.game[GAME_KEYS.NAME]) -- Debug
+					table.insert(tResult, entry.game)
+				end
+				return tResult, false
+			else
+				for i, game in ipairs(atTable) do
+					if game[GAME_KEYS.NAME]:lower():find(asPattern) then
+						table.insert(tResult, game)
+					end
+				end
+			end
+		end
+		return tResult, true
+	end
+
+	function ClearFilter(atTable)
+		if atTable == nil then
+			return
+		end
+		local tResult = {}
+		for i = 1, #atTable do
+			if atTable[i][GAME_KEYS.HIDDEN] ~= true and atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true  then
+				table.insert(tResult, atTable[i])
+			end
+		end
+		return tResult
+	end
+--###########################################################################################################
+--                          -> Sorting
+--###########################################################################################################
+--###########################################################################################################
+--         -> Animations
+--###########################################################################################################
+--###########################################################################################################
+-- End of refactoring
+--###########################################################################################################
+--[[
+-- OLD VERSION
 function Initialize()
 	B_ANIMATING = false
 	B_INITIALIZED = false
@@ -166,7 +1209,8 @@ function SlideSkinIn()
 end
 --not B_INITIALIZED or B_FORCE_TOOLBAR
 function SlideSkinOut()
-	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE or T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 or B_ANIMATING then
+	if not B_INITIALIZED or B_FORCE_TOOLBAR or not B_SKIN_VISIBLE
+	   or T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == 0 or B_ANIMATING then
 		return
 	end
 	B_ANIMATING = true
@@ -213,7 +1257,8 @@ end
 function SetSlotsXPosition(anValue)
 	for i = 1, tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT]) do
 		SKIN:Bang(
-			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 2 .. '"]'
+			'[!SetOption "SlotText' .. i .. '" "X" "' .. anValue
+			+ T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "X" "' .. anValue .. '"]'
 			.. '[!SetOption "SlotHighlightBackground' .. i .. '" "X" "' .. anValue .. '"]'
 		)
@@ -231,7 +1276,8 @@ end
 function SetSlotsYPosition(anValue)
 	for i = 1, tonumber(T_SETTINGS[SETTING_KEYS.SLOT_COUNT]) do
 		SKIN:Bang(
-			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue + T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 2 .. '"]'
+			'[!SetOption "SlotText' .. i .. '" "Y" "' .. anValue
+			+ T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 2 .. '"]'
 			.. '[!SetOption "SlotBanner' .. i .. '" "Y" "' .. anValue .. '"]'
 			.. '[!SetOption "SlotHighlightBackground' .. i .. '" "Y" "' .. anValue .. '"]'
 		)
@@ -725,7 +1771,8 @@ end
 		elseif StartsWith(asPattern, 'shortcuts:') then
 			asPattern = asPattern:sub(11)
 			for i, game in ipairs(atTable) do
-				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil and game[GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
+				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil
+				   and game[GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
 					table.insert(tResult, game)
 				end
 			end
@@ -755,6 +1802,19 @@ end
 			end
 		end
 		return tResult, true
+	end
+
+	function ClearFilter(atTable)
+		if atTable == nil then
+			return
+		end
+		local tResult = {}
+		for i = 1, #atTable do
+			if atTable[i][GAME_KEYS.HIDDEN] ~= true and atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true  then
+				table.insert(tResult, atTable[i])
+			end
+		end
+		return tResult
 	end
 
 	function SortRanking(aFirst, aSecond)
@@ -885,19 +1945,6 @@ end
 			return 0
 		end
 		return score
-	end
-
-	function ClearFilter(atTable)
-		if atTable == nil then
-			return
-		end
-		local tResult = {}
-		for i = 1, #atTable do
-			if atTable[i][GAME_KEYS.HIDDEN] ~= true and atTable[i][GAME_KEYS.NOT_INSTALLED] ~= true  then
-				table.insert(tResult, atTable[i])
-			end
-		end
-		return tResult
 	end
 
 	function Sort()
@@ -1596,3 +2643,4 @@ end
 		B_FORCE_TOOLBAR = false
 		HideToolbar()
 	end
+--]]
