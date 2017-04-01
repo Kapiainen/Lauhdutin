@@ -37,6 +37,7 @@
 	function OnInitialized()
 	-- Called by the Python backend script when it has finished
 	-- Show games or display a message that there are no games to show
+		STATUS_MESSAGE:Hide()
 		local tGames = RESOURCES:ReadGames()
 		print(#tGames)
 		for sKey, tTable in pairs(tGames) do
@@ -48,7 +49,6 @@
 				table.insert(T_ALL_GAMES, tTable)
 			end
 		end
-		--T_FILTERED_GAMES = T_ALL_GAMES
 		if T_ALL_GAMES ~= nil and #T_ALL_GAMES > 0 then
 			FilterBy('')
 		elseif T_NOT_INSTALLED_GAMES ~= nil and #T_NOT_INSTALLED_GAMES > 0 then
@@ -86,9 +86,11 @@
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		SLOT_HIGHLIGHT:MoveTo(anIndex)
-		SLOT_HIGHLIGHT:Update()
-		SLOT_HIGHLIGHT:Show(true)
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+			SLOT_HIGHLIGHT:MoveTo(anIndex)
+			SLOT_HIGHLIGHT:Update()
+			SLOT_HIGHLIGHT:Show(true)
+		end
 	end
 
 	function OnMouseLeaveSlot(anIndex)
@@ -173,21 +175,74 @@
 		N_SCROLL_INDEX = nScrollIndex
 	end
 
+	function OnShowToolbar(abForce)
+		abForce = abForce or false
+		TOOLBAR:Show(abForce)
+	end
+
+	function OnHideToolbar(abForce)
+		abForce = abForce or false
+		TOOLBAR:Hide(abForce)
+	end
+
 	function OnApplyFilter(asPattern)
 		if asPattern == '' then
 			OnClearFilter()
 		else
-			asPattern = STRING:Trim(asPattern:lower())
+			FilterBy(asPattern)
 		end
-		OnDismissFilterInput()
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+			SLOT_HIGHLIGHT:Update()
+		end
+		TOOLBAR:Hide(true)
 	end
 
 	function OnDismissFilterInput()
-
+		TOOLBAR.bForciblyVisible = false
 	end
 
 	function OnClearFilter()
+		FilterBy('')
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+			SLOT_HIGHLIGHT:Update()
+		end
+	end
 
+	function OnCycleSorting()
+		B_REVERSE_SORT = false
+		SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+		print(T_SETTINGS[SETTING_KEYS.SORT_STATE])
+		T_SETTINGS[SETTING_KEYS.SORT_STATE] = T_SETTINGS[SETTING_KEYS.SORT_STATE] + 1
+		if T_SETTINGS[SETTING_KEYS.SORT_STATE] > 2 then
+			T_SETTINGS[SETTING_KEYS.SORT_STATE] = 0
+		end
+		TOOLBAR:UpdateSortingIcon()
+		RESOURCES:WriteSettings()
+		SortGames()
+		PopulateSlots()
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+			SLOT_HIGHLIGHT:Update()
+		end
+		Redraw()
+	end
+
+	function OnReverseSorting()
+		B_REVERSE_SORT = not B_REVERSE_SORT
+		if B_REVERSE_SORT then
+			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+		else
+			SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
+		end
+		local tReversed = {}
+		for i, tGame in ipairs(T_FILTERED_GAMES) do
+			table.insert(tReversed, 1, tGame)
+		end
+		T_FILTERED_GAMES = tReversed
+		PopulateSlots()
+		if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+			SLOT_HIGHLIGHT:Update()
+		end
+		Redraw()
 	end
 
 	function OnProcessStarted()
@@ -385,61 +440,11 @@
 						.. '[!SetVariable SlotImage' .. i .. ' ""]'
 					)
 				end
---				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
---					if N_ACTION_STATE == ACTION_STATES.EXECUTE then
---						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
---							local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
---							local hoursPlayed = math.floor(totalHoursPlayed)
---							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
---							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
---								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
---							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
---								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
---							else
---								if T_SETTINGS["show_platform"] then
---									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
---								else
---									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
---								end								
---							end
---						else
---							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
---								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
---							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
---								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
---							else
---								if T_SETTINGS["show_platform"] then
---									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
---								else
---									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
---								end
---							end
---						end
---						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
---							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
---						elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
---							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
---						else
---							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
---						end
---					elseif N_ACTION_STATE == ACTION_STATES.HIDE then
---						SKIN:Bang(
---							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"]'
---							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]'
---						)
---					elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
---						SKIN:Bang(
---							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"]'
---							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]'
---						)
---					end
---				end
 			else -- Slot has no game to show.
 				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 					SKIN:Bang(
 						'[!SetVariable SlotImage' .. i .. ' ""]'
 						.. '[!SetVariable SlotName' .. i .. ' ""]'
---						.. '[!SetVariable "SlotHighlightMessage' .. i .. '" ""]'
 					)
 				else
 					SKIN:Bang(
@@ -448,9 +453,6 @@
 					)
 				end
 			end
---			if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
---				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
---			end
 			j = j + 1
 		end
 		SKIN:Bang('[!UpdateMeterGroup Slots]')
@@ -469,8 +471,13 @@
 		InitializeEnums(sResourcesPath)
 		InitializeStateVariables()
 		InitializeConstants()
+		TOOLBAR:UpdateSortingIcon()
+		TOOLBAR:Hide()
+		SLOT_HIGHLIGHT:Hide()
+		STATUS_MESSAGE:Show('Initializing...')
 		-- Start the Python backend script
-		OnInitialized() -- Debug
+		SKIN:Bang('["#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
+		--OnInitialized() -- Debug
 	end
 
 	function InitializeComponents(asResourcesPath)
@@ -479,7 +486,6 @@
 		TOOLBAR = InitializeToolbar()
 		STATUS_MESSAGE = InitializeStatusMessage()
 		SLOT_SUBMENU = InitializeSlotSubmenu()
-		SORT = InitializeSort()
 		PROCESS_MONITOR = InitializeProcessMonitor()
 		SLOT_HIGHLIGHT = InitializeSlotHighlight()
 	end
@@ -535,8 +541,8 @@
 			ReadSettings = function (self)
 				return self:ReadJSON('settings.json')
 			end,
-			WriteSettings = function (self, atTable)
-				return self:WriteJSON('settings.json', atTable)
+			WriteSettings = function (self)
+				return self:WriteJSON('settings.json', T_SETTINGS)
 			end,
 			ReadGames = function (self)
 				return self:ReadJSON('games.json')
@@ -569,10 +575,11 @@
 					self.bForciblyVisible = true
 				end
 				-- If reverse sort, then show appropriate icon
-				SKIN:Bang(
-					'[!ShowMeterGroup Toolbar]'
-					.. '[!Redraw]'
-				)
+				if B_REVERSE_SORT then
+					SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
+				end
+				SKIN:Bang('[!ShowMeterGroup Toolbar]')
+				Redraw()
 			end,
 			Hide = function (self, abForce)
 			-- 
@@ -586,10 +593,22 @@
 					self.bForciblyVisible = false
 				end
 				SKIN:Bang(
-					'[!HideMeterGroup Toolbar]'
-					.. '[!Redraw]'
+					'[!HideMeter "ToolbarButtonSortReverseIndicator"]'
+					.. '[!HideMeterGroup Toolbar]'
 				)
+				Redraw()
 			end,
+			UpdateSortingIcon = function (self, abRedraw)
+				abRedraw = abRedraw or false
+				SKIN:Bang(
+					'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort'
+					.. T_SETTINGS[SETTING_KEYS.SORT_STATE] .. '.png"]'
+					.. '[!UpdateMeter "ToolbarButtonSort"]'
+				)
+				if abRedraw then
+					Redraw()
+				end
+			end
 		}
 	end
 
@@ -599,8 +618,9 @@
 			--
 			-- asMessage: 
 				SKIN:Bang(
-					'[!SetVariable Message ' .. asMessage .. ']'
-					.. '[!ShowMeterGroup Message]'
+					'[!SetOption "StatusMessage" "Text" "' .. asMessage .. '"]'
+					.. '[!UpdateMeterGroup "Status"]'
+					.. '[!ShowMeterGroup "Status"]'
 					.. '[!Redraw]'
 				)
 			end,
@@ -608,7 +628,7 @@
 			--
 			-- asMessage: 
 				SKIN:Bang(
-					'[!HideMeterGroup Message]'
+					'[!HideMeterGroup "Status"]'
 					.. '[!Redraw]'
 				)
 			end
@@ -756,41 +776,6 @@
 		}
 	end
 
-	function InitializeSort()
-		return {
-			Alphabetically = function (self, atFirst, atSecond)
-				if atFirst[GAME_KEYS.NAME]:lower():gsub(':', ' ')
-				   < atSecond[GAME_KEYS.NAME]:lower():gsub(':', ' ') then
-					return true
-				else
-					return false
-				end
-			end,
-			LastPlayed = function (self, atFirst, atSecond)
-				local nFirst = tonumber(atFirst[GAME_KEYS.LASTPLAYED])
-				local nSecond = tonumber(atSecond[GAME_KEYS.LASTPLAYED])
-				if nFirst > nSecond then
-					return true
-				elseif nFirst == nSecond then
-					return self:Alphabetically(atFirst, atSecond)
-				else
-					return false
-				end
-			end,
-			HoursPlayed = function (self, atFirst, atSecond)
-				local nFirst = tonumber(atFirst[GAME_KEYS.HOURS_TOTAL])
-				local nSecond = tonumber(atSecond[GAME_KEYS.HOURS_TOTAL])
-				if nFirst > nSecond then
-					return true
-				elseif nFirst == nSecond then
-					return self:Alphabetically(atFirst, atSecond)
-				else
-					return false
-				end
-			end
-		}
-	end
-
 	function InitializeProcessMonitor()
 		return {
 			sMeasureName = 'ProcessMonitor',
@@ -831,6 +816,7 @@
 			Update = function (self)
 				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + self.nCurrentIndex - 1]
 				if tGame == nil then
+					self:Hide(true)
 					return
 				end
 				local sHighlightMessage = ''
@@ -871,7 +857,11 @@
 				sHighlightMessage = sHighlightMessage .. '#CRLF##CRLF##CRLF##CRLF##CRLF#'
 				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] then
 					local nHoursPlayed = math.floor(tGame[GAME_KEYS.HOURS_TOTAL])
-					sHighlightMessage = sHighlightMessage .. nHoursPlayed .. ' hours'
+					if nHoursPlayed == 1 then
+						sHighlightMessage = sHighlightMessage .. '1 hour'
+					else
+						sHighlightMessage = sHighlightMessage .. nHoursPlayed .. ' hours'
+					end
 				end
 				SKIN:Bang('[!SetOption "SlotHighlightText" "Text" "' .. sHighlightMessage .. '"]')
 				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight"]')
@@ -902,6 +892,7 @@
 		ANIMATION_STATES = enums.ANIMATION_STATES
 		GAME_KEYS = enums.GAME_KEYS
 		PLATFORMS = enums.PLATFORMS
+		SORTING_STATES = enums.SORTING_STATES
 	end
 
 	function InitializeStateVariables()
@@ -915,6 +906,7 @@
 		T_HIDDEN_GAMES = {}
 		T_NOT_INSTALLED_GAMES = {}
 		T_RECENTLY_LAUNCHED_GAME = nil
+		B_REVERSE_SORT = false
 	end
 
 	function InitializeConstants()
@@ -960,7 +952,7 @@
 		atGame[GAME_KEYS.LASTPLAYED] = os.time()
 		RESOURCES:WriteGames()
 		OnClearFilter()
-		Sort()
+		SortGames()
 		PopulateSlots()
 		if not bInstalling then
 			T_RECENTLY_LAUNCHED_GAME = atGame
@@ -1030,7 +1022,7 @@
 				if tGame == atGame then
 					table.remove(T_FILTERED_GAMES, i)
 					local scrollIndex = N_SCROLL_INDEX
-					Sort()
+					SortGames()
 					N_SCROLL_INDEX = scrollIndex
 					PopulateSlots()
 					break
@@ -1075,7 +1067,7 @@
 			end
 			if #T_FILTERED_GAMES > 0 then
 				local scrollIndex = N_SCROLL_INDEX
-				Sort()
+				SortGames()
 				N_SCROLL_INDEX = scrollIndex
 				PopulateSlots()
 			else
@@ -1117,19 +1109,19 @@
 	function FilterBy(asPattern)
 		if asPattern == '' then
 			T_FILTERED_GAMES = ClearFilter(T_ALL_GAMES)
-			--Sort()
+			SortGames()
 			PopulateSlots()
 			return
 		end
 		local sort = true
 		asPattern = asPattern:lower()
-		if StartsWith(asPattern, '+') then
+		if STRING:StartsWith(asPattern, '+') then
 			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
 			T_FILTERED_GAMES, sort = Filter(T_ALL_GAMES, asPattern)
 		end
 		if sort then
-			Sort()
+			SortGames()
 		else
 			N_SCROLL_INDEX = 1
 		end
@@ -1139,7 +1131,7 @@
 	function FilterPlatform(atTable, asPattern, asTag, anPlatform)
 		local tResult = {}
 		asPattern = asPattern:sub(#asTag + 1)
-		if StartsWith(asPattern, 'i') then --platform:installed
+		if STRING:StartsWith(asPattern, 'i') then --platform:installed
 			for i, game in ipairs(T_ALL_GAMES) do
 				if game[GAME_KEYS.PLATFORM] == anPlatform then
 					table.insert(tResult, game)
@@ -1152,7 +1144,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'u') then --platform:uninstalled
+		elseif STRING:StartsWith(asPattern, 'u') then --platform:uninstalled
 			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 				if game[GAME_KEYS.PLATFORM] == anPlatform then
 					table.insert(tResult, game)
@@ -1165,7 +1157,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'a') then --platform:all
+		elseif STRING:StartsWith(asPattern, 'a') then --platform:all
 			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 				if game[GAME_KEYS.PLATFORM] == anPlatform then
 					table.insert(tResult, game)
@@ -1183,7 +1175,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'p') then --platform:played
+		elseif STRING:StartsWith(asPattern, 'p') then --platform:played
 			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] > 0 then
 					table.insert(tResult, game)
@@ -1201,7 +1193,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'n') then --platform:not played
+		elseif STRING:StartsWith(asPattern, 'n') then --platform:not played
 			for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 				if game[GAME_KEYS.PLATFORM] == anPlatform and game[GAME_KEYS.HOURS_TOTAL] <= 0 then
 					table.insert(tResult, game)
@@ -1219,7 +1211,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'f') then --platform:false
+		elseif STRING:StartsWith(asPattern, 'f') then --platform:false
 			for i, game in ipairs(T_ALL_GAMES) do
 				if game[GAME_KEYS.PLATFORM] ~= anPlatform then
 					table.insert(tResult, game)
@@ -1241,13 +1233,13 @@
 			return
 		end
 		local tResult = {}
-		if StartsWith(asPattern, 'steam:') then
+		if STRING:StartsWith(asPattern, 'steam:') then
 			tResult = FilterPlatform(atTable, asPattern, 'steam:', PLATFORM.STEAM)
-		elseif StartsWith(asPattern, 'galaxy:') then
+		elseif STRING:StartsWith(asPattern, 'galaxy:') then
 			tResult = FilterPlatform(atTable, asPattern, 'galaxy:', PLATFORM.GOG_GALAXY)
-		elseif StartsWith(asPattern, 'battlenet:') then
+		elseif STRING:StartsWith(asPattern, 'battlenet:') then
 			tResult = FilterPlatform(atTable, asPattern, 'battlenet:', PLATFORM.BATTLENET)
-		elseif StartsWith(asPattern, 'tags:') then
+		elseif STRING:StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
 			for i, game in ipairs(atTable) do
 				if game[GAME_KEYS.TAGS] ~= nil then
@@ -1259,9 +1251,9 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'installed:') then
+		elseif STRING:StartsWith(asPattern, 'installed:') then
 			asPattern = asPattern:sub(11)
-			if StartsWith(asPattern, 't') then
+			if STRING:StartsWith(asPattern, 't') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
@@ -1272,7 +1264,7 @@
 						end
 					end
 				end				
-			elseif StartsWith(asPattern, 'f') then
+			elseif STRING:StartsWith(asPattern, 'f') then
 				for i, game in ipairs(T_NOT_INSTALLED_GAMES) do
 					table.insert(tResult, game)
 				end
@@ -1283,7 +1275,7 @@
 						end
 					end
 				end	
-			elseif StartsWith(asPattern, 'a') then
+			elseif STRING:StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
@@ -1296,17 +1288,17 @@
 					end
 				end	
 			end
-		elseif StartsWith(asPattern, 'hidden:') then
+		elseif STRING:StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
-			if StartsWith(asPattern, 't') then
+			if STRING:StartsWith(asPattern, 't') then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					table.insert(tResult, game)
 				end
-			elseif StartsWith(asPattern, 'f') then
+			elseif STRING:StartsWith(asPattern, 'f') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
-			elseif StartsWith(asPattern, 'a') then
+			elseif STRING:StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_HIDDEN_GAMES) do
 					table.insert(tResult, game)
 				end
@@ -1314,9 +1306,9 @@
 					table.insert(tResult, game)
 				end
 			end
-		elseif StartsWith(asPattern, 'games:') then
+		elseif STRING:StartsWith(asPattern, 'games:') then
 			asPattern = asPattern:sub(7)
-			if StartsWith(asPattern, 'a') then
+			if STRING:StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResult, game)
 				end
@@ -1327,10 +1319,10 @@
 					table.insert(tResult, game)
 				end
 			end	
-		elseif StartsWith(asPattern, 'random:') then
+		elseif STRING:StartsWith(asPattern, 'random:') then
 			asPattern = asPattern:sub(8)
 			local tResultR = {}
-			if StartsWith(asPattern, 'a') then
+			if STRING:StartsWith(asPattern, 'a') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					table.insert(tResultR, game)
 				end
@@ -1343,7 +1335,7 @@
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])	
-			elseif StartsWith(asPattern, 's') then
+			elseif STRING:StartsWith(asPattern, 's') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.STEAM then
 						table.insert(tResultR, game)
@@ -1362,7 +1354,7 @@
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])
-			elseif StartsWith(asPattern, 'g') then
+			elseif STRING:StartsWith(asPattern, 'g') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.GOG_GALAXY then
 						table.insert(tResultR, game)
@@ -1381,7 +1373,7 @@
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])
-			elseif StartsWith(asPattern, 'b') then
+			elseif STRING:StartsWith(asPattern, 'b') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.PLATFORM] == PLATFORM.BATTLENET then
 						table.insert(tResultR, game)
@@ -1400,7 +1392,7 @@
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])
-			elseif StartsWith(asPattern, 'p') then
+			elseif STRING:StartsWith(asPattern, 'p') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResultR, game)
@@ -1419,7 +1411,7 @@
 					end
 				end
 				table.insert(tResult, tResultR[math.random(1, #tResultR)])
-			elseif StartsWith(asPattern, 'n') then
+			elseif STRING:StartsWith(asPattern, 'n') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
 						table.insert(tResultR, game)
@@ -1441,9 +1433,9 @@
 			else
 				table.insert(tResult, atTable[math.random(1, #atTable)])
 			end		
-		elseif StartsWith(asPattern, 'played:') then
+		elseif STRING:StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
-			if StartsWith(asPattern, 't') then
+			if STRING:StartsWith(asPattern, 't') then
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, game)
@@ -1461,7 +1453,7 @@
 						end
 					end
 				end
-			elseif StartsWith(asPattern, 'f') then	
+			elseif STRING:StartsWith(asPattern, 'f') then	
 				for i, game in ipairs(T_ALL_GAMES) do
 					if game[GAME_KEYS.HOURS_TOTAL] == 0 then
 						table.insert(tResult, game)
@@ -1486,7 +1478,7 @@
 					end
 				end
 			end
-		elseif StartsWith(asPattern, 'shortcuts:') then
+		elseif STRING:StartsWith(asPattern, 'shortcuts:') then
 			asPattern = asPattern:sub(11)
 			for i, game in ipairs(atTable) do
 				if game[GAME_KEYS.PLATFORM_OVERRIDE] ~= nil
@@ -1534,9 +1526,186 @@
 		end
 		return tResult
 	end
+
+	function SplitStringIntoChars(aString)
+		local characters = {}
+		for char in aString:gmatch(".") do
+			table.insert(characters, char)
+		end
+		return characters
+	end
+
+	function SplitStringIntoWords(aString)
+		local words = {}
+		for word in aString:gmatch("[^%s%p]*") do
+			if word ~= nil and word ~= "" then
+				table.insert(words, word)
+			end
+		end
+		return words
+	end
+
+	function FuzzySearch(aPattern, aString)
+		-- Case-insensitive fuzzy match that returns a score
+		if aPattern == "" or aString == "" then
+			return 0
+		end
+		-- Bonuses
+		local bonusPerfectMatch = 50
+		local bonusFirstMatch = 25
+		local bonusMatch = 10
+		local bonusMatchDistance = 10
+		local bonusConsecutiveMatches = 10
+		local bonusFirstWordMatch = 20
+		-- Penalties
+		local penaltyNotMatch = -5
+		--
+		local score = 0
+		aPattern = aPattern:lower()
+		aString = aString:lower()
+		-- Pattern matches perfectly
+		if aPattern == aString then
+			score = score + bonusPerfectMatch
+		end
+		local patternCharacters = SplitStringIntoChars(aPattern)
+		local stringChars = SplitStringIntoChars(aString)
+		local stringWords = SplitStringIntoWords(aString)
+
+		function match_string(aPatternCharacters, aStringToMatch)
+			local matchIndex = aStringToMatch:find(aPatternCharacters[1])
+			if matchIndex ~= nil then
+				-- Distance of first match from start of a string
+				score = score + bonusFirstMatch / matchIndex
+				-- Number of matches in order
+				-- Number of consecutive matches
+				-- Distance between matches
+				local matchIndices = {}
+				table.insert(matchIndices, matchIndex)
+				local consecutiveMatches = 0
+				for i, char in ipairs(aPatternCharacters) do
+					if i > 1 and matchIndices[i - 1] ~= nil then
+						matchIndex = aStringToMatch:find(char, matchIndices[i - 1] + 1)
+						if matchIndex ~= nil then
+							table.insert(matchIndices, matchIndex)
+							score = score + bonusMatch
+							local distance = matchIndex - matchIndices[i - 1]
+							if distance == 1 then
+								consecutiveMatches = consecutiveMatches + 1
+							else
+								score = score + consecutiveMatches * bonusConsecutiveMatches
+								consecutiveMatches = 0
+							end
+							score = score + bonusMatchDistance / distance
+						else
+							score = score + consecutiveMatches * bonusConsecutiveMatches
+							score = score + penaltyNotMatch
+							consecutiveMatches = 0
+						end
+					end
+				end
+				if consecutiveMatches > 0 then
+					score = score + consecutiveMatches * bonusConsecutiveMatches
+				end
+				return true
+			end
+			return false
+		end
+		-- Matches in entire string
+		if not match_string(patternCharacters, aString) then
+			function slice(t, s, e)
+				local r = {}
+				for i = s or 1, e or #t do
+					table.insert(r, t[i])
+				end
+				return r
+			end
+			local min = 1
+			while not match_string(slice(patternCharacters, min), aString) and min < #patternCharacters do
+				min = min + 1
+			end
+		end
+		if #stringWords > 0 then
+			-- Matches at beginning of words
+			local j = 1
+			for i, char in ipairs(patternCharacters) do
+				if j <= #stringWords then
+					if stringWords[j]:find(char) == 1 then
+						score = score + bonusFirstWordMatch
+						j = j + 1
+					end
+				end
+			end
+			-- Matches in words
+			for i, word in ipairs(stringWords) do
+				match_string(patternCharacters, word)
+			end
+		end
+		if score < 0 then
+			return 0
+		end
+		return score
+	end
 --###########################################################################################################
 --                          -> Sorting
 --###########################################################################################################
+	function SortGames()
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
+			return
+		end
+		if T_SETTINGS[SETTING_KEYS.SORT_STATE] == SORTING_STATES.ALPHABETICALLY then
+			table.sort(T_FILTERED_GAMES, SortAlphabetically)
+		elseif T_SETTINGS[SETTING_KEYS.SORT_STATE] == SORTING_STATES.LAST_PLAYED then
+			table.sort(T_FILTERED_GAMES, SortLastPlayed)
+		elseif T_SETTINGS[SETTING_KEYS.SORT_STATE] == SORTING_STATES.HOURS_PLAYED then
+			table.sort(T_FILTERED_GAMES, SortHoursPlayed)
+		end
+		N_SCROLL_INDEX = 1
+	end
+
+	function SortAlphabetically(atFirst, atSecond)
+		if atFirst[GAME_KEYS.NAME]:lower():gsub(':', ' ')
+		   < atSecond[GAME_KEYS.NAME]:lower():gsub(':', ' ') then
+			return true
+		else
+			return false
+		end
+	end
+
+	function SortLastPlayed(atFirst, atSecond)
+		local nFirst = tonumber(atFirst[GAME_KEYS.LASTPLAYED])
+		local nSecond = tonumber(atSecond[GAME_KEYS.LASTPLAYED])
+		if nFirst > nSecond then
+			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
+		else
+			return false
+		end
+	end
+
+	function SortHoursPlayed(atFirst, atSecond)
+		local nFirst = tonumber(atFirst[GAME_KEYS.HOURS_TOTAL])
+		local nSecond = tonumber(atSecond[GAME_KEYS.HOURS_TOTAL])
+		if nFirst > nSecond then
+			return true
+		elseif nFirst == nSecond then
+			return SortAlphabetically(atFirst, atSecond)
+		else
+			return false
+		end
+	end
+
+	function SortRanking(aFirst, aSecond)
+		--if aFirst.ranking == -1 or aFirst.ranking > aSecond.ranking then
+		if aFirst.score > aSecond.score then
+			return true
+		elseif aFirst.score == aSecond.score then
+			return SortAlphabetically(aFirst.game, aSecond.game)
+		else
+			return false
+		end
+	end
+
 --###########################################################################################################
 --         -> Animations
 --###########################################################################################################
