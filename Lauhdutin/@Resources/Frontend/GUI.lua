@@ -189,10 +189,6 @@
 		T_RECENTLY_LAUNCHED_GAME = nil
 	end
 
-	function OnRebuildSkin()
-
-	end
-
 	function OnToggleHideGames()
 		if N_ACTION_STATE == ACTION_STATES.HIDE then
 			SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
@@ -217,6 +213,68 @@
 			end
 			N_ACTION_STATE = ACTION_STATES.UNHIDE
 		end
+	end
+
+	function OnFinishedEditingNotes()
+	-- Called by '\Backend\EditNotes.py'
+		local tEditedGame = RESOURCES:ReadJSON('Temp\\notes_temp.json')
+		if tEditedGame ~= nil then
+			function update_game(atEditedGame, atTableOfGames)
+				for i, tGame in ipairs(atTableOfGames) do
+					if tGame[GAME_KEYS.NAME] == atEditedGame[GAME_KEYS.NAME] then
+						tGame[GAME_KEYS.NOTES] = atEditedGame[GAME_KEYS.NOTES]
+						RESOURCES:WriteGames()
+						return true
+					end
+				end
+				return false
+			end
+			if update_game(tEditedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(tEditedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(tEditedGame, T_HIDDEN_GAMES) then
+				return
+			end
+		end
+	end
+
+	function OnFinishedEditingTags()
+	-- Called by '\Backend\EditTags.py'
+		local tEditedGame = RESOURCES:ReadJSON('Temp\\tags_temp.json')
+		if tEditedGame ~= nil then
+			function update_game(atEditedGame, atTableOfGames)
+				for i, tGame in ipairs(atTableOfGames) do
+					if tGame[GAME_KEYS.NAME] == atEditedGame[GAME_KEYS.NAME] then
+						tGame[GAME_KEYS.TAGS] = atEditedGame[GAME_KEYS.TAGS]
+						RESOURCES:WriteGames()
+						return true
+					end
+				end
+				return false
+			end
+			if update_game(tEditedGame, T_ALL_GAMES) then
+				return
+			elseif update_game(tEditedGame, T_NOT_INSTALLED_GAMES) then
+				return
+			elseif update_game(tEditedGame, T_HIDDEN_GAMES) then
+				return
+			end
+		end
+	end
+
+	function OnFinishedManualProcessOverride(anIndex, asProcessName)
+	-- Called by 'ProcessOverrideInput' measure
+		local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + anIndex - 1]
+		if tGame == nil then
+			return
+		end
+		if asProcessName == nil or asProcessName == '' then
+			tGame[GAME_KEYS.PROCESS_OVERRIDE] = nil
+		else
+			tGame[GAME_KEYS.PROCESS_OVERRIDE] = asProcessName
+		end
+		RESOURCES:WriteGames()
 	end
 
 	function OnOpenSettings()
@@ -468,7 +526,7 @@
 				for i=1, #T_NOT_INSTALLED_GAMES do
 					table.insert(tTable, T_NOT_INSTALLED_GAMES[i])
 				end
-				return WriteJSON('games.json', tTable)
+				return self:WriteJSON('games.json', tTable)
 			end
 		}
 	end
@@ -535,17 +593,6 @@
 		return {
 			MoveTo = function (self, anIndex)
 				anIndex = anIndex or 1
---				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
---					SKIN:Bang(
---						'[!SetOption "SlotSubmenuBackground" "Y" "' .. (anIndex - 1)
---						* T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] .. '"]'
---					)
---				else
---					SKIN:Bang(
---						'[!SetOption "SlotSubmenuBackground" "X" "' .. (anIndex - 1)
---						* T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] .. '"]'
---					)
---				end
 				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 					SKIN:Bang(
 						'[!SetOption "SlotSubmenuIcon1" "X" "(#SlotWidth# / 6 - 15)"]'
@@ -566,7 +613,10 @@
 						   - T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 1.1) / 2 .. '"]'
 					)
 				end
-				SKIN:Bang('[!UpdateMeterGroup "SlotSubmenu"]')
+				SKIN:Bang(
+					'[!SetVariable "SlotSubmenuIndex" "' .. anIndex .. '"]'
+					.. '[!UpdateMeterGroup "SlotSubmenu"]'
+				)
 			end,
 			Show = function (self, abRedraw)
 				abRedraw = abRedraw or false
@@ -583,19 +633,99 @@
 				end
 			end,
 			EditNotes = function (self, anIndex)
-
+				local tGame = self:_GetGame(anIndex)
+				if tGame == nil then
+					return
+				end
+				RESOURCES:WriteJSON('Temp\\notes_temp.json', tGame)
+				SKIN:Bang(
+					'["#Python#" "#@#Backend\\EditNotes.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]'
+				)
+				self:Hide(true)
 			end,
 			EditTags = function (self, anIndex)
-
+				local tGame = self:_GetGame(anIndex)
+				if tGame == nil then
+					return
+				end
+				RESOURCES:WriteJSON('Temp\\tags_temp.json', tGame)
+				SKIN:Bang(
+					'["#Python#" "#@#Backend\\EditTags.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]'
+				)
+				self:Hide(true)
 			end,
 			ToggleBangs = function (self, anIndex)
-
+				local tGame = self:_GetGame(anIndex)
+				if tGame == nil then
+					return
+				end
+				if tGame[GAME_KEYS.IGNORES_BANGS] ~= true then
+					tGame[GAME_KEYS.IGNORES_BANGS] = true
+				else
+					tGame[GAME_KEYS.IGNORES_BANGS] = nil
+				end
+				RESOURCES:WriteGames()
+				self:Hide(true)
 			end,
 			EditProcess = function (self, anIndex)
-
+				local tGame = self:_GetGame(anIndex)
+				if tGame == nil then
+					return
+				end
+				local sDefaultProcess = ''
+				if tGame[GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+					sDefaultProcess = tGame[GAME_KEYS.PROCESS_OVERRIDE]
+				end
+				SKIN:Bang(
+					'[!SetOption "ProcessOverrideInput" "DefaultValue" "' .. sDefaultProcess .. '"]'
+					.. '[!UpdateMeasure "ProcessOverrideInput"]'
+					.. '[!CommandMeasure "ProcessOverrideInput" "ExecuteBatch 1"]'
+				)
+				self:Hide(true)
 			end,
 			ToggleVisibility = function (self, anIndex)
-
+				local tGame = self:_GetGame(anIndex)
+				if tGame == nil then
+					return
+				end
+				function move_game_from_to(aGame, aFrom, aTo)
+					for i = 1, #aFrom do
+						if aFrom[i] == aGame then
+							table.insert(aTo, table.remove(aFrom, i))
+							return true
+						end
+					end
+					return false
+				end
+				--Toggle flag and move to the appropriate table
+				if tGame[GAME_KEYS.HIDDEN] == true then --Unhide game
+					
+					tGame[GAME_KEYS.HIDDEN] = false
+					if not move_game_from_to(tGame, T_HIDDEN_GAMES, T_ALL_GAMES) then
+						move_game_from_to(tGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+					end
+				else --Hide game
+					tGame[GAME_KEYS.HIDDEN] = true
+					if not move_game_from_to(tGame, T_ALL_GAMES, T_HIDDEN_GAMES) then
+						move_game_from_to(tGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES)
+					end
+				end
+				--Remove from filtered games
+				for i = 1, #T_FILTERED_GAMES do
+					if T_FILTERED_GAMES[i] == tGame then
+						table.remove(T_FILTERED_GAMES, i)
+						break
+					end
+				end
+				RESOURCES:WriteGames()
+				PopulateSlots()
+				self:Hide(true)
+			end,
+			_GetGame = function (self, anIndex)
+				if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES == 0 then
+					return nil
+				end
+				return T_FILTERED_GAMES[N_SCROLL_INDEX + anIndex - 1]
 			end
 		}
 	end
