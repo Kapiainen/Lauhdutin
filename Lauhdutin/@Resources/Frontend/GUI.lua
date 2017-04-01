@@ -259,7 +259,7 @@
 		local hoursPlayed = os.difftime(os.time(), T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.LASTPLAYED]) / 3600
 		T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL] = hoursPlayed
 														  + T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.HOURS_TOTAL]
-		WriteGames()
+		RESOURCES:WriteGames()
 		if PopulateSlots() then
 			Redraw()
 		end
@@ -975,10 +975,8 @@
 					PROCESS_MONITOR:Start(sProcessName)
 				end
 			end
-			if tGame[GAME_KEYS.IGNORES_BANGS] ~= true
-			   and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= nil
-			   and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= '' then
-				SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STARTING]:gsub('`', '"')))
+			if atGame[GAME_KEYS.IGNORES_BANGS] ~= true then
+				ExecuteStartingBangs()
 			end
 		end
 		local tArguments = atGame[GAME_KEYS.ARGUMENTS]
@@ -1095,13 +1093,20 @@
 --###########################################################################################################
 	function ExecuteStartingBangs()
 		print("Executing starting bangs")
+		if T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= nil
+		   and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= '' then
+			SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STARTING]:gsub('`', '"')))
+		end
 	end
 
 	function ExecuteStoppingBangs()
 		print("Executing stopping bangs")
-		--if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= nil and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= '' then
-		--	SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"'))) -- The extra set of parentheses are used to just use the first return value of gsub
-		--end
+		if T_RECENTLY_LAUNCHED_GAME[GAME_KEYS.IGNORES_BANGS] ~= true
+		   and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= nil
+		   and T_SETTINGS[SETTING_KEYS.BANGS_STOPPING] ~= '' then
+		    -- The extra set of parentheses are used to just use the first return value of gsub
+			SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"')))
+		end
 	end
 --###########################################################################################################
 --                          -> Filtering
