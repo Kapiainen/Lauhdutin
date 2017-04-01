@@ -54,11 +54,7 @@
 		elseif T_HIDDEN_GAMES ~= nil and #T_HIDDEN_GAMES > 0 then
 			FilterBy('hidden:true')
 		else
-			SKIN:Bang(
-				'[!SetOption StatusMessage Text "No games to display"]'
-				.. '[!UpdateMeterGroup Status]'
-				.. '[!ShowMeterGroup Status]'
-			)
+			STATUS_MESSAGE:Show('No games to display')
 		end
 	end
 
@@ -77,7 +73,7 @@
 	-- Called when the mouse cursor leaves the skin
 	-- abAnimate: Whether or not to play an animation to hide the skin
 		SCRIPT:SetUpdateDivider(-1)
-		SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
+		SLOT_HIGHLIGHT:Hide(false)
 		if T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
 			
 		else
@@ -88,23 +84,8 @@
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
-			SKIN:Bang(
-				'[!SetOption "SlotHighlightBackground" "Y" "' .. (anIndex - 1)
-				* T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] .. '"]'
-			)
-		else
-			SKIN:Bang(
-				'[!SetOption "SlotHighlightBackground" "X" "' .. (anIndex - 1)
-				* T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] .. '"]'
-			)
-		end
-		SKIN:Bang(
-			'[!UpdateMeterGroup "SlotHighlight"]'
-			.. '[!ShowMeterGroup "SlotHighlight"]'
-			.. '[!Redraw]'
-		)
-		--SLOT:Highlight(anIndex)
+		SLOT_HIGHLIGHT:MoveTo(anIndex)
+		SLOT_HIGHLIGHT:Show(true)
 	end
 
 	function OnMouseLeaveSlot(anIndex)
@@ -127,6 +108,16 @@
 	-- anIndex: The index of the slot in question (1-indexed)
 		--Move menu
 		--Show menu
+		SLOT_SUBMENU:MoveTo(anIndex)
+		SLOT_SUBMENU:Show(true)
+	end
+
+	function OnLeaveSlotSubmenu()
+		SLOT_SUBMENU:Hide(true)
+	end
+
+	function OnMiddleClickSlotSubmenu()
+		SLOT_SUBMENU:Hide(true)
 	end
 
 	function OnScrollSlots(anDirection)
@@ -406,6 +397,7 @@
 		SLOT_SUBMENU = InitializeSlotSubmenu()
 		SORT = InitializeSort()
 		PROCESS_MONITOR = InitializeProcessMonitor()
+		SLOT_HIGHLIGHT = InitializeSlotHighlight()
 	end
 
 	function InitializeScript()
@@ -541,11 +533,54 @@
 
 	function InitializeSlotSubmenu()
 		return {
-			Show = function (self, anIndex)
-				
+			MoveTo = function (self, anIndex)
+				anIndex = anIndex or 1
+--				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+--					SKIN:Bang(
+--						'[!SetOption "SlotSubmenuBackground" "Y" "' .. (anIndex - 1)
+--						* T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] .. '"]'
+--					)
+--				else
+--					SKIN:Bang(
+--						'[!SetOption "SlotSubmenuBackground" "X" "' .. (anIndex - 1)
+--						* T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] .. '"]'
+--					)
+--				end
+				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+					SKIN:Bang(
+						'[!SetOption "SlotSubmenuIcon1" "X" "(#SlotWidth# / 6 - 15)"]'
+						.. '[!SetOption "SlotSubmenuBackground" "X" "' .. (T_SETTINGS[SETTING_KEYS.SLOT_WIDTH]
+						   - T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 1.1) / 2 .. '"]'
+						.. '[!SetOption "SlotSubmenuBackground" "Y"' .. T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT]
+						   * (anIndex - 1) + (T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT]
+						   - T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 1.1) / 2 .. '"]'
+					)
+				else --horizontal
+					SKIN:Bang(
+						'[!SetOption "SlotSubmenuIcon1" "X" "(' .. T_SETTINGS[SETTING_KEYS.SLOT_WIDTH]
+						* (anIndex - 1) .. '+ #SlotWidth# / 6 - 15)"]'
+						.. '[!SetOption "SlotSubmenuBackground" "X" "' .. T_SETTINGS[SETTING_KEYS.SLOT_WIDTH]
+						   * (anIndex - 1) + (T_SETTINGS[SETTING_KEYS.SLOT_WIDTH]
+						   - T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] / 1.1) / 2 .. '"]'
+						.. '[!SetOption "SlotSubmenuBackground" "Y"' .. (T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT]
+						   - T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] / 1.1) / 2 .. '"]'
+					)
+				end
+				SKIN:Bang('[!UpdateMeterGroup "SlotSubmenu"]')
+			end,
+			Show = function (self, abRedraw)
+				abRedraw = abRedraw or false
+				SKIN:Bang('[!ShowMeterGroup "SlotSubmenu"]')
+				if abRedraw then
+					SKIN:Bang('[!Redraw]')
+				end
 			end,
 			Hide = function (self, abRedraw)
-
+				abRedraw = abRedraw or false
+				SKIN:Bang('[!HideMeterGroup "SlotSubmenu"]')
+				if abRedraw then
+					SKIN:Bang('[!Redraw]')
+				end
 			end,
 			EditNotes = function (self, anIndex)
 
@@ -615,6 +650,39 @@
 					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "-1"]'
 					.. '[!UpdateMeasure "ProcessMonitor"]'
 				)
+			end
+		}
+	end
+
+	function InitializeSlotHighlight()
+		return {
+			MoveTo = function (self, anIndex)
+				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
+					SKIN:Bang(
+						'[!SetOption "SlotHighlightBackground" "Y" "' .. (anIndex - 1)
+						* T_SETTINGS[SETTING_KEYS.SLOT_HEIGHT] .. '"]'
+					)
+				else
+					SKIN:Bang(
+						'[!SetOption "SlotHighlightBackground" "X" "' .. (anIndex - 1)
+						* T_SETTINGS[SETTING_KEYS.SLOT_WIDTH] .. '"]'
+					)
+				end
+				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight"]')
+			end,
+			Show = function (self, abRedraw)
+				abRedraw = abRedraw or false
+				SKIN:Bang('[!ShowMeterGroup "SlotHighlight"]')
+				if abRedraw then
+					SKIN:Bang('[!Redraw]')
+				end
+			end,
+			Hide = function (self, abRedraw)
+				abRedraw = abRedraw or false
+				SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
+				if abRedraw then
+					SKIN:Bang('[!Redraw]')
+				end
 			end
 		}
 	end

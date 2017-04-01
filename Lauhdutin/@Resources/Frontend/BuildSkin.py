@@ -44,9 +44,10 @@ try:
         for i in range(1, SLOT_COUNT + 1):
             contents.extend([
                 "SlotImage%s=" % i,
-                "SlotName%s=" % i,
-                "SlotHighlightMessage%s=" % i
+                "SlotName%s=" % i
+                #"SlotHighlightMessage%s=" % i
             ])
+        contents.append("SlotHighlightMessage=")
         contents.append("\n")
 
         # Sliver of skin that triggers animation when the mouse hovers over it
@@ -297,4 +298,4 @@ try:
 except:
     import traceback
     traceback.print_exc()
-input()
+    input()
