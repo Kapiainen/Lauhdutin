@@ -27,6 +27,8 @@
 	--     t = table
 	--   Function parameters = Hungarian notation prefixed with 'a' (e.g. abSomeBoolean)
 	--   Functions = CamelCase (e.g. SomeFunction)
+	--   Private functions = Underscore followed by CamelCase (e.g. _SomeFunction)
+	--   Nested functions = Lowercase with words separated by underscores
 --###########################################################################################################
 -- Public
 --###########################################################################################################
@@ -106,17 +108,17 @@
 	function OnMiddleClickSlot(anIndex)
 	-- Called when a slot is middle-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
-		--Move menu
-		--Show menu
 		SLOT_SUBMENU:MoveTo(anIndex)
 		SLOT_SUBMENU:Show(true)
 	end
 
 	function OnLeaveSlotSubmenu()
+	-- Called when the mouse cursor leaves the slot submenu
 		SLOT_SUBMENU:Hide(true)
 	end
 
 	function OnMiddleClickSlotSubmenu()
+	-- Called when the slot submenu is middle-mouse clicked
 		SLOT_SUBMENU:Hide(true)
 	end
 
