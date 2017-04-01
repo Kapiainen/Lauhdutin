@@ -79,7 +79,7 @@
 		if T_SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
 			
 		else
-			SKIN:Bang('[!Redraw]')
+			Redraw()
 		end
 	end
 
@@ -87,6 +87,7 @@
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
 		SLOT_HIGHLIGHT:MoveTo(anIndex)
+		SLOT_HIGHLIGHT:Update()
 		SLOT_HIGHLIGHT:Show(true)
 	end
 
@@ -103,6 +104,26 @@
 		--If EXECUTE
 		--If HIDE
 		--If UNHIDE
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
+			return
+		end
+		local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + anIndex - 1]
+		if tGame == nil then
+			return
+		end
+		if N_ACTION_STATE == ACTION_STATES.EXECUTE then
+			if LaunchGame(tGame) then
+				Redraw()
+			end
+		elseif N_ACTION_STATE == ACTION_STATES.HIDE then
+			if HideGame(tGame) then
+				Redraw()
+			end
+		elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
+			if UnhideGame(tGame) then
+				Redraw()
+			end
+		end
 	end
 
 	function OnMiddleClickSlot(anIndex)
@@ -323,6 +344,9 @@
 			Redraw()
 		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
 		-- If scroll index has changed, then redraw
+			if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+				SLOT_HIGHLIGHT:Update()
+			end
 			SLOT_SUBMENU:Hide(false)
 			if PopulateSlots() then
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
@@ -361,61 +385,61 @@
 						.. '[!SetVariable SlotImage' .. i .. ' ""]'
 					)
 				end
-				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
-					if N_ACTION_STATE == ACTION_STATES.EXECUTE then
-						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
-							local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
-							local hoursPlayed = math.floor(totalHoursPlayed)
-							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
-							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-							else
-								if T_SETTINGS["show_platform"] then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-								else
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
-								end								
-							end
-						else
-							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
-							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
-								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
-							else
-								if T_SETTINGS["show_platform"] then
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
-								else
-									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
-								end
-							end
-						end
-						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
-						elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
-						else
-							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
-						end
-					elseif N_ACTION_STATE == ACTION_STATES.HIDE then
-						SKIN:Bang(
-							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"]'
-							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]'
-						)
-					elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
-						SKIN:Bang(
-							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"]'
-							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]'
-						)
-					end
-				end
+--				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+--					if N_ACTION_STATE == ACTION_STATES.EXECUTE then
+--						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] and T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL] then
+--							local totalHoursPlayed = T_FILTERED_GAMES[j][GAME_KEYS.HOURS_TOTAL]
+--							local hoursPlayed = math.floor(totalHoursPlayed)
+--							local minutesPlayed = math.floor((totalHoursPlayed - hoursPlayed) * 60)
+--							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+--								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+--							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+--								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+--							else
+--								if T_SETTINGS["show_platform"] then
+--									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+--								else
+--									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "#CRLF##CRLF##CRLF##CRLF##CRLF#' .. hoursPlayed .. ' hours ' .. minutesPlayed .. ' minutes played"]')
+--								end								
+--							end
+--						else
+--							if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+--								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Install via ' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+--							elseif T_FILTERED_GAMES[j][GAME_KEYS.INVALID_PATH] == true then
+--								SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "Invalid path#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+--							else
+--								if T_SETTINGS["show_platform"] then
+--									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" "' .. GetPlatformDescription(T_FILTERED_GAMES[j]) .. '#CRLF##CRLF##CRLF##CRLF##CRLF#"]')
+--								else
+--									SKIN:Bang('[!SetVariable "SlotHighlightMessage' .. i .. '" ""]')
+--								end
+--							end
+--						end
+--						if T_FILTERED_GAMES[j][GAME_KEYS.NOT_INSTALLED] == true then
+--							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]')
+--						elseif T_FILTERED_GAMES[j][GAME_KEYS.ERROR] == true then
+--							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightError.png"]')
+--						else
+--							SKIN:Bang('[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]')
+--						end
+--					elseif N_ACTION_STATE == ACTION_STATES.HIDE then
+--						SKIN:Bang(
+--							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Hide"]'
+--							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightHide.png"]'
+--						)
+--					elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
+--						SKIN:Bang(
+--							'[!SetVariable "SlotHighlightMessage' .. i .. '" "Unhide"]'
+--							.. '[!SetOption "SlotHighlight' .. i .. '" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]'
+--						)
+--					end
+--				end
 			else -- Slot has no game to show.
 				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
 					SKIN:Bang(
 						'[!SetVariable SlotImage' .. i .. ' ""]'
 						.. '[!SetVariable SlotName' .. i .. ' ""]'
-						.. '[!SetVariable "SlotHighlightMessage' .. i .. '" ""]'
+--						.. '[!SetVariable "SlotHighlightMessage' .. i .. '" ""]'
 					)
 				else
 					SKIN:Bang(
@@ -424,9 +448,9 @@
 					)
 				end
 			end
-			if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
-				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
-			end
+--			if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] then
+--				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight' .. i .. '"]')
+--			end
 			j = j + 1
 		end
 		SKIN:Bang('[!UpdateMeterGroup Slots]')
@@ -624,14 +648,14 @@
 				abRedraw = abRedraw or false
 				SKIN:Bang('[!ShowMeterGroup "SlotSubmenu"]')
 				if abRedraw then
-					SKIN:Bang('[!Redraw]')
+					Redraw()
 				end
 			end,
 			Hide = function (self, abRedraw)
 				abRedraw = abRedraw or false
 				SKIN:Bang('[!HideMeterGroup "SlotSubmenu"]')
 				if abRedraw then
-					SKIN:Bang('[!Redraw]')
+					Redraw()
 				end
 			end,
 			EditNotes = function (self, anIndex)
@@ -788,7 +812,9 @@
 
 	function InitializeSlotHighlight()
 		return {
+			nCurrentIndex = 0,
 			MoveTo = function (self, anIndex)
+				self.nCurrentIndex = anIndex
 				if T_SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 					SKIN:Bang(
 						'[!SetOption "SlotHighlightBackground" "Y" "' .. (anIndex - 1)
@@ -802,18 +828,66 @@
 				end
 				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight"]')
 			end,
+			Update = function (self)
+				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + self.nCurrentIndex - 1]
+				if tGame == nil then
+					return
+				end
+				local sHighlightMessage = ''
+				if N_ACTION_STATE == ACTION_STATES.EXECUTE then
+					if tGame[GAME_KEYS.ERROR] then
+						SKIN:Bang(
+							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightError.png"]'
+						)
+						if tGame[GAME_KEYS.INVALID_PATH] then
+							sHighlightMessage = 'Invalid path'
+						end
+					elseif tGame[GAME_KEYS.NOT_INSTALLED] then
+						SKIN:Bang(
+							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]'
+						)
+						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
+							if tGame[GAME_KEYS.PLATFORM] == PLATFORMS.STEAM
+							   or tGame[GAME_KEYS.PLATFORM] == PLATFORMS.BATTLENET then
+							   sHighlightMessage = 'Install via '
+							   					   .. PLATFORM_DESCRIPTIONS[tGame[GAME_KEYS.PLATFORM] + 1]
+							else
+								sHighlightMessage = 'Not installed'
+							end
+						end
+					else
+						SKIN:Bang(
+							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]'
+						)
+						if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
+							sHighlightMessage = PLATFORM_DESCRIPTIONS[tGame[GAME_KEYS.PLATFORM] + 1]
+						end
+					end
+				elseif N_ACTION_STATE == ACTION_STATES.HIDE then
+					SKIN:Bang('[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightHide.png"]')
+				elseif N_ACTION_STATE == ACTION_STATES.UNHIDE then
+					SKIN:Bang('[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]')
+				end
+				sHighlightMessage = sHighlightMessage .. '#CRLF##CRLF##CRLF##CRLF##CRLF#'
+				if T_SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] then
+					local nHoursPlayed = math.floor(tGame[GAME_KEYS.HOURS_TOTAL])
+					sHighlightMessage = sHighlightMessage .. nHoursPlayed .. ' hours'
+				end
+				SKIN:Bang('[!SetOption "SlotHighlightText" "Text" "' .. sHighlightMessage .. '"]')
+				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight"]')
+			end,
 			Show = function (self, abRedraw)
 				abRedraw = abRedraw or false
 				SKIN:Bang('[!ShowMeterGroup "SlotHighlight"]')
 				if abRedraw then
-					SKIN:Bang('[!Redraw]')
+					Redraw()
 				end
 			end,
 			Hide = function (self, abRedraw)
 				abRedraw = abRedraw or false
 				SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
 				if abRedraw then
-					SKIN:Bang('[!Redraw]')
+					Redraw()
 				end
 			end
 		}
@@ -840,6 +914,7 @@
 		T_FILTERED_GAMES = {}
 		T_HIDDEN_GAMES = {}
 		T_NOT_INSTALLED_GAMES = {}
+		T_RECENTLY_LAUNCHED_GAME = nil
 	end
 
 	function InitializeConstants()
@@ -854,6 +929,175 @@
 	end
 --###########################################################################################################
 --         -> Functionality
+--###########################################################################################################
+--                          -> Launching games
+--###########################################################################################################
+	function LaunchGame(atGame)
+		print('Launch: ' .. atGame[GAME_KEYS.NAME])
+		if atGame[GAME_KEYS.ERROR] == true then
+			SKIN:Bang(
+				'[!Log "Lauhdutin - Error: There is something wrong with ' .. atGame[GAME_KEYS.NAME] .. '"]'
+			)
+			return false
+		end
+		local sPath = atGame[GAME_KEYS.PATH]
+		if sPath == nil or sPath == '' then
+			return false
+		end
+		local bInstalling = false
+		if atGame[GAME_KEYS.NOT_INSTALLED] then -- Install, move to list of all games, and potentially unhide
+			bInstalling = true
+			if not (atGame[GAME_KEYS.PLATFORM] == PLATFORMS.STEAM
+			   or atGame[GAME_KEYS.PLATFORM] == PLATFORMS.BATTLENET) then
+				return false
+			end
+			if not InstallGame(atGame) then
+				UnhideGame(atGame)
+			end
+		elseif atGame[GAME_KEYS.HIDDEN] then -- Unhide and launch
+			UnhideGame(atGame)
+		end
+		atGame[GAME_KEYS.LASTPLAYED] = os.time()
+		RESOURCES:WriteGames()
+		OnClearFilter()
+		Sort()
+		PopulateSlots()
+		if not bInstalling then
+			T_RECENTLY_LAUNCHED_GAME = atGame
+			if atGame[GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+				-- Monitor the process defined in the manual override
+				PROCESS_MONITOR:Start(atGame[GAME_KEYS.PROCESS_OVERRIDE])
+			elseif atGame[GAME_KEYS.PLATFORM] == PLATFORMS.STEAM then
+				-- Monitor the Steam Overlay process
+				PROCESS_MONITOR:Start('GameOverlayUI.exe')
+			elseif atGame[GAME_KEYS.PLATFORM] == PLATFORMS.BATTLENET then
+				-- Monitor the default game process
+				PROCESS_MONITOR:Start(atGame[GAME_KEYS.PROCESS])
+			else
+				-- Monitor the executable that the shortcut points to
+				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+				local sProcessName = sProcessPath:reverse()
+				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
+				if sProcessName ~= nil then
+					sProcessName = sProcessName:reverse()
+					PROCESS_MONITOR:Start(sProcessName)
+				end
+			end
+			if tGame[GAME_KEYS.IGNORES_BANGS] ~= true
+			   and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= nil
+			   and T_SETTINGS[SETTING_KEYS.BANGS_STARTING] ~= '' then
+				SKIN:Bang((T_SETTINGS[SETTING_KEYS.BANGS_STARTING]:gsub('`', '"')))
+			end
+		end
+		local tArguments = atGame[GAME_KEYS.ARGUMENTS]
+		if tArguments ~= nil then
+			sArguments = table.concat(tArguments, '" "')
+			SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
+		else
+			SKIN:Bang('["' .. sPath .. '"]')
+		end
+		return true
+	end
+--###########################################################################################################
+--                          -> Hiding games
+--###########################################################################################################
+	function HideGame(atGame, abSerializeAndUpdateSlots)
+		abSerializeAndUpdateSlots = abSerializeAndUpdateSlots or false
+		if atGame[GAME_KEYS.HIDDEN] then
+			return false
+		end
+		atGame[GAME_KEYS.HIDDEN] = true
+
+		function move_game_from_to(atGameToMove, atFrom, atTo)
+			for i, tGame in ipairs(atFrom) do
+				if tGame == atGameToMove then
+					table.insert(atTo, table.remove(atFrom, i))
+					return true
+				end
+			end
+			return false
+		end
+
+		local bMoved = false
+		if move_game_from_to(atGame, T_ALL_GAMES, T_HIDDEN_GAMES) then
+			bMoved = true
+		elseif move_game_from_to(atGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES) then
+			bMoved = true
+		end
+		if abSerializeAndUpdateSlots and bMoved then
+			RESOURCES:WriteGames()
+			for i, tGame in ipairs(T_FILTERED_GAMES) do
+				if tGame == atGame then
+					table.remove(T_FILTERED_GAMES, i)
+					local scrollIndex = N_SCROLL_INDEX
+					Sort()
+					N_SCROLL_INDEX = scrollIndex
+					PopulateSlots()
+					break
+				end
+			end
+		end
+		return bMoved
+	end
+--###########################################################################################################
+--                          -> Unhiding games
+--###########################################################################################################
+	function UnhideGame(atGame, abSerializeAndUpdateSlots)
+		abSerializeAndUpdateSlots = abSerializeAndUpdateSlots or false
+		if not atGame[GAME_KEYS.HIDDEN] then
+			return false
+		end
+		atGame[GAME_KEYS.HIDDEN] = nil
+
+		function move_game_from_to(atGameToMove, atFrom, atTo)
+			for i, tGame in ipairs(atFrom) do
+				if tGame == atGameToMove then
+					table.insert(atTo, table.remove(atFrom, i))
+					return true
+				end
+			end
+			return false
+		end
+
+		local bMoved = false
+		if atGame[GAME_KEYS.NOT_INSTALLED] then
+			bMoved = move_game_from_to(atGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+		else
+			bMoved = move_game_from_to(atGame, T_HIDDEN_GAMES, T_ALL_GAMES)
+		end
+		if abSerializeAndUpdateSlots and bMoved then
+			RESOURCES:WriteGames()
+			for i, tGame in ipairs(T_FILTERED_GAMES) do
+				if tGame == atGame then
+					table.remove(T_FILTERED_GAMES, i)
+					break
+				end
+			end
+			if #T_FILTERED_GAMES > 0 then
+				local scrollIndex = N_SCROLL_INDEX
+				Sort()
+				N_SCROLL_INDEX = scrollIndex
+				PopulateSlots()
+			else
+				OnToggleUnhideGames()
+				OnClearFilter()
+			end
+		end
+		return bMoved
+	end
+--###########################################################################################################
+--                          -> Installing games
+--###########################################################################################################
+	function InstallGame(atGame)
+		atGame[GAME_KEYS.NOT_INSTALLED] = nil
+		for i, tNotInstalledGame in ipairs(T_NOT_INSTALLED_GAMES) do
+			if tNotInstalledGame == atGame then
+				table.insert(T_ALL_GAMES, table.remove(T_NOT_INSTALLED_GAMES, i))
+				return true
+			end
+		end
+		return false
+	end
 --###########################################################################################################
 --                          -> Bangs
 --###########################################################################################################
@@ -1169,8 +1413,8 @@
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- 							table.insert(tResultR, game)
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResultR, game)
 						end
 					end
 				end
@@ -1188,8 +1432,8 @@
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
- 							table.insert(tResultR, game)
+						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+							table.insert(tResultR, game)
 						end
 					end
 				end
@@ -1212,8 +1456,8 @@
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- 							table.insert(tResult, game)
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResult, game)
 						end
 					end
 				end
@@ -1230,8 +1474,8 @@
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
- 							table.insert(tResult, game)
+						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+							table.insert(tResult, game)
 						end
 					end
 				end
@@ -1955,8 +2199,8 @@ end
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- 							table.insert(tResultR, game)
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResultR, game)
 						end
 					end
 				end
@@ -1974,8 +2218,8 @@ end
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
- 							table.insert(tResultR, game)
+						if game[GAME_KEYS.HOURS_TOTAL] <= 0 then
+							table.insert(tResultR, game)
 						end
 					end
 				end
@@ -1998,8 +2242,8 @@ end
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
- 							table.insert(tResult, game)
+						if game[GAME_KEYS.HOURS_TOTAL] > 0 then
+							table.insert(tResult, game)
 						end
 					end
 				end
@@ -2016,8 +2260,8 @@ end
 				end
 				if T_SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
 					for i, game in ipairs(T_HIDDEN_GAMES) do
- 						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
- 							table.insert(tResult, game)
+						if game[GAME_KEYS.HOURS_TOTAL] == 0 then
+							table.insert(tResult, game)
 						end
 					end
 				end

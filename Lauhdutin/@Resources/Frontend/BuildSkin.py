@@ -47,7 +47,7 @@ try:
                 "SlotName%s=" % i
                 #"SlotHighlightMessage%s=" % i
             ])
-        contents.append("SlotHighlightMessage=")
+        #contents.append("SlotHighlightMessage=")
         contents.append("\n")
 
         # Sliver of skin that triggers animation when the mouse hovers over it
@@ -274,7 +274,8 @@ try:
             "Y=%sr" % int(SLOT_HEIGHT / 2),
             "W=%s" % SLOT_WIDTH,
             "H=%s" % SLOT_HEIGHT,
-            "Text=#SlotHighlightMessage#",
+            #"Text=#SlotHighlightMessage#",
+            "Text=",
             "FontFace=Arial",
             "FontSize=%s" % int(SLOT_WIDTH / 25),
             "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),

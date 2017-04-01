@@ -37,7 +37,7 @@ return {
 		VISIBLE = 1
 	},
 	ACTION_STATES = {
-		EXEUCTE = 0,
+		EXECUTE = 0,
 		HIDE = 1,
 		UNHIDE = 2
 	},
