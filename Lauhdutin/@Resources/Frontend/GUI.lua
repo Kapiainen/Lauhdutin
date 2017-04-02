@@ -19,12 +19,15 @@
 --                 -> Identifiers
 --###########################################################################################################
 	-- Identifier formatting
-	--   Global variables = All caps with words separated by underscores (e.g. SOME_GLOBAL_VARIABLE)
-	--   Local variables = Hungarian notation (e.g. sSomeString)
+	--   Types
 	--     b = boolean
+	--     c = component
+	--     e = enum
 	--     n = number
 	--     s = string
 	--     t = table
+	--   Global variables = All caps with words separated by underscores (e.g. SOME_GLOBAL_VARIABLE)
+	--   Local variables = Hungarian notation (e.g. sSomeString)
 	--   Function parameters = Hungarian notation prefixed with 'a' (e.g. abSomeBoolean)
 	--   Functions = CamelCase (e.g. SomeFunction)
 	--   Private functions = Underscore followed by CamelCase (e.g. _SomeFunction)
