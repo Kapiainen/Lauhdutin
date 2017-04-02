@@ -1440,44 +1440,14 @@
 		elseif STRING:StartsWith(asPattern, 'played:') then
 			asPattern = asPattern:sub(8)
 			if STRING:StartsWith(asPattern, 't') then
-				for i, tGame in ipairs(T_ALL_GAMES) do
+				for i, tGame in ipairs(atTable) do
 					if tGame[E_GAME_KEYS.HOURS_TOTAL] > 0 then
 						table.insert(tResult, tGame)
-					end
-				end
-				for i, tGame in ipairs(T_NOT_INSTALLED_GAMES) do
-					if tGame[E_GAME_KEYS.HOURS_TOTAL] > 0 then
-						table.insert(tResult, tGame)
-					end
-				end
-				if T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
-					for i, tGame in ipairs(T_HIDDEN_GAMES) do
-						if tGame[E_GAME_KEYS.HOURS_TOTAL] > 0 then
-							table.insert(tResult, tGame)
-						end
 					end
 				end
 			elseif STRING:StartsWith(asPattern, 'f') then	
-				for i, tGame in ipairs(T_ALL_GAMES) do
-					if tGame[E_GAME_KEYS.HOURS_TOTAL] == 0 then
-						table.insert(tResult, tGame)
-					end
-				end
-				for i, tGame in ipairs(T_NOT_INSTALLED_GAMES) do
-					if tGame[E_GAME_KEYS.HOURS_TOTAL] == 0 then
-						table.insert(tResult, tGame)
-					end
-				end
-				if T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
-					for i, tGame in ipairs(T_HIDDEN_GAMES) do
-						if tGame[E_GAME_KEYS.HOURS_TOTAL] == 0 then
-							table.insert(tResult, tGame)
-						end
-					end
-				end
-			else
 				for i, tGame in ipairs(atTable) do
-					if tGame[E_GAME_KEYS.HOURS_TOTAL] == 0 then
+					if tGame[E_GAME_KEYS.HOURS_TOTAL] <= 0 then
 						table.insert(tResult, tGame)
 					end
 				end

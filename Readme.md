@@ -145,8 +145,8 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<argument>` with one of the supported arguments:
 
-  - `true` = Show all games with a total played time above 0 hours.
-  - `false` = Show all games with a total played time equal to 0 hours.
+  - `true` = Show games with a total played time above 0 hours.
+  - `false` = Show games with a total played time equal to 0 hours.
 
 - `shortcuts:<argument>`
 
