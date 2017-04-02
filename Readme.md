@@ -129,7 +129,6 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   - `true` = Show installed games.
   - `false` = Show games that are not installed (only Steam games are supported at the moment).
-  - `all` = All games are shown regardless of whether or not they are installed or not.
 
 - `hidden:<argument>`
 
