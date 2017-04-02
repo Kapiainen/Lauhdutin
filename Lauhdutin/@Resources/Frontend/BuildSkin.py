@@ -35,18 +35,18 @@ try:
                 "SkinMaxHeight=%s" % SLOT_HEIGHT
             ])
         contents.extend([
-            "SlotCount=%s" % SLOT_COUNT,
+            #"SlotCount=%s" % SLOT_COUNT,
             "SlotWidth=%s" % SLOT_WIDTH,
             "SlotHeight=%s" % SLOT_HEIGHT,
             "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,196"),
             "SlotTextColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255")
         ])
-        for i in range(1, SLOT_COUNT + 1):
-            contents.extend([
-                "SlotImage%s=" % i,
-                "SlotName%s=" % i
-                #"SlotHighlightMessage%s=" % i
-            ])
+        #for i in range(1, SLOT_COUNT + 1):
+        #    contents.extend([
+        #        "SlotImage%s=" % i,
+        #        "SlotName%s=" % i
+        #        #"SlotHighlightMessage%s=" % i
+        #    ])
         #contents.append("SlotHighlightMessage=")
         contents.append("\n")
 
@@ -142,7 +142,7 @@ try:
             contents.extend([
                 "W=%s" % SLOT_WIDTH,
                 "H=%s" % SLOT_HEIGHT,
-                "Text=#SlotName%s#" % i,
+                "Text=",
                 "FontFace=Arial", 
                 "FontSize=%s" % int(SLOT_WIDTH / 15),
                 "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
@@ -159,7 +159,7 @@ try:
             contents.extend([
                 "[SlotBanner%s]" % i,
                 "Meter=Image",
-                "ImageName=#SlotImage%s#" % i
+                "ImageName="
             ])
             if ORIENTATION == "vertical":
                 contents.extend([

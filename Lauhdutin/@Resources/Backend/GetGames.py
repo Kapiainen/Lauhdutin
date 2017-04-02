@@ -12,7 +12,7 @@ Config = sys.argv[3][:-1]
 def set_skin_status(a_message=""):
     subprocess.call(
         [
-            RainmeterPath, "!CommandMeasure", "LauhdutinScript", "STATUS_MESSAGE:Show('%s')" % a_message,
+            RainmeterPath, "!CommandMeasure", "LauhdutinScript", "OnShowStatus('%s')" % a_message,
             Config
         ],
         shell=False
