@@ -298,7 +298,7 @@
 	end
 
 	function OnToggleVisibility()
-		SLOT_SUBMENU:ToggleVisibility()
+		C_SLOT_SUBMENU:ToggleVisibility()
 	end
 --###########################################################################################################
 --                  -> Context menu actions
@@ -832,7 +832,12 @@
 					end
 				end
 				C_RESOURCES:WriteGames()
-				PopulateSlots()
+				if #T_FILTERED_GAMES > 0 then
+					PopulateSlots()
+					C_SLOT_HIGHLIGHT:Update()
+				else
+					OnApplyFilter('')
+				end
 				self:Hide(true)
 			end,
 
