@@ -22,10 +22,12 @@ try:
 		notes_content = None
 		with open(notes_path, "r") as file:
 			notes_content = file.read()
-		if notes_content:
+		if not notes_content:
+			del game_json[GameKeys.NOTES]
+		else:
 			game_json[GameKeys.NOTES] = notes_content
-			with open(game_path, "w") as file:
-				json.dump(game_json, file)
+		with open(game_path, "w") as file:
+			json.dump(game_json, file)
 		# Let the skin know that note editing has finished
 		subprocess.call([RainmeterPath, "!CommandMeasure", "LauhdutinScript", "OnFinishedEditingNotes()", Config], shell=False)
 except:

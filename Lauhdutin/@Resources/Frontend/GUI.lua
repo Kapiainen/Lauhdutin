@@ -726,7 +726,8 @@
 				local tEditedGame = C_RESOURCES:ReadJSON('Temp\\notes_temp.json')
 				if tEditedGame ~= nil then
 					for i, tGame in ipairs(T_ALL_GAMES) do
-						if tGame[E_GAME_KEYS.NAME] == tEditedGame[E_GAME_KEYS.NAME] then
+						if tGame[E_GAME_KEYS.NAME] == tEditedGame[E_GAME_KEYS.NAME]
+						   and tGame[E_GAME_KEYS.PLATFORM] == tEditedGame[E_GAME_KEYS.PLATFORM]  then
 							tGame[E_GAME_KEYS.NOTES] = tEditedGame[E_GAME_KEYS.NOTES]
 							C_RESOURCES:WriteGames()
 							return true
