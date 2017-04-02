@@ -35,19 +35,11 @@ try:
                 "SkinMaxHeight=%s" % SLOT_HEIGHT
             ])
         contents.extend([
-            #"SlotCount=%s" % SLOT_COUNT,
             "SlotWidth=%s" % SLOT_WIDTH,
             "SlotHeight=%s" % SLOT_HEIGHT,
             "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,196"),
             "SlotTextColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255")
         ])
-        #for i in range(1, SLOT_COUNT + 1):
-        #    contents.extend([
-        #        "SlotImage%s=" % i,
-        #        "SlotName%s=" % i
-        #        #"SlotHighlightMessage%s=" % i
-        #    ])
-        #contents.append("SlotHighlightMessage=")
         contents.append("\n")
 
         # Sliver of skin that triggers animation when the mouse hovers over it
@@ -185,64 +177,6 @@ try:
                 "\n"
             ])
 
-#            # Game highlight
-#            contents.extend([
-#                "[SlotHighlightBackground%s]" % i,
-#                "Meter=Image"
-#            ])
-#            if ORIENTATION == "vertical":
-#                contents.extend([
-#                    "X=0",
-#                    "Y=%s" % (i - 1) * SLOT_HEIGHT
-#                ])
-#            else:
-#                contents.extend([
-#                    "X=%s" % (i - 1) * SLOT_WIDTH,
-#                    "Y=0"
-#                ])
-#            contents.extend([
-#                "W=%s" % SLOT_WIDTH,
-#                "H=%s" % SLOT_HEIGHT,
-#                "SolidColor=0,0,0,160",
-#                "PreserveAspectRatio=2",
-#                "DynamicVariables=1",
-#                "Group=SlotHighlight%s | SlotHighlights" % i,
-#                ""
-#            ])
-#            contents.extend([
-#                "[SlotHighlight%s]" % i,
-#                "Meter=Image",
-#                "ImageName=",
-#                "X=0r",
-#                "Y=0r",
-#                "W=%s" % SLOT_WIDTH,
-#                "H=%s" % SLOT_HEIGHT,
-#                "SolidColor=0,0,0,1",
-#                "PreserveAspectRatio=2",
-#                "DynamicVariables=1",
-#                "Group=SlotHighlight%s | SlotHighlights" % i,
-#                ""
-#            ])
-#            contents.extend([
-#                "[SlotHighlightText%s]" % i,
-#                "Meter=String",
-#                "X=%sr" % SLOT_WIDTH / 2,
-#                "Y=%sr" % SLOT_HEIGHT / 2,
-#                "W=%s" % SLOT_WIDTH,
-#                "H=%s" % SLOT_HEIGHT,
-#                "Text=#SlotHighlightMessage%s#" % i,
-#                "FontFace=Arial",
-#                "FontSize=%s" % SLOT_WIDTH / 25,
-#                "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
-#                "StringAlign=CenterCenter",
-#                "StringEffect=Shadow",
-#                "ClipString=1",
-#                "AntiAlias=1",
-#                "DynamicVariables=1",
-#                "Group=SlotHighlight%s | SlotHighlights" % i,
-#                ""
-#            ])
-
         # Game highlight
         contents.extend([
             "[SlotHighlightBackground]",
@@ -274,7 +208,6 @@ try:
             "Y=%sr" % int(SLOT_HEIGHT / 2),
             "W=%s" % SLOT_WIDTH,
             "H=%s" % SLOT_HEIGHT,
-            #"Text=#SlotHighlightMessage#",
             "Text=",
             "FontFace=Arial",
             "FontSize=%s" % int(SLOT_WIDTH / 25),
