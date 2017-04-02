@@ -41,18 +41,17 @@
 	-- Called by the Python backend script when it has finished
 	-- Show games or display a message that there are no games to show
 		C_STATUS_MESSAGE:Hide()
-		local tGames = C_RESOURCES:ReadGames()
-		print(#tGames)
-		for sKey, tTable in pairs(tGames) do
+		T_ALL_GAMES = C_RESOURCES:ReadGames()
+		for sKey, tTable in pairs(T_ALL_GAMES) do
 			if tTable[E_GAME_KEYS.HIDDEN] == true then
 				table.insert(T_HIDDEN_GAMES, tTable)
 			elseif tTable[E_GAME_KEYS.NOT_INSTALLED] == true then
 				table.insert(T_NOT_INSTALLED_GAMES, tTable)
 			else
-				table.insert(T_ALL_GAMES, tTable)
+				table.insert(T_GAMES, tTable)
 			end
 		end
-		if T_ALL_GAMES ~= nil and #T_ALL_GAMES > 0 then
+		if T_GAMES ~= nil and #T_GAMES > 0 then
 			FilterBy('')
 		elseif T_NOT_INSTALLED_GAMES ~= nil and #T_NOT_INSTALLED_GAMES > 0 then
 			FilterBy('installed:false')
@@ -87,6 +86,7 @@
 	-- abAnimate: Whether or not to play an animation to hide the skin
 		C_SCRIPT:SetUpdateDivider(-1)
 		C_SLOT_HIGHLIGHT:Hide(false)
+		C_TOOLBAR:Hide()
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
 			
 		else
@@ -108,7 +108,6 @@
 				if nScrollIndex < 1 then
 					nScrollIndex = 1
 				end
-				print("Scrolling up")
 			elseif anDirection < 0 then
 				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
 				if nScrollIndex == nUpperLimit then
@@ -118,7 +117,6 @@
 				if nScrollIndex > nUpperLimit then
 					nScrollIndex = nUpperLimit
 				end
-				print("Scrolling down")
 			end
 		end
 		N_SCROLL_INDEX = nScrollIndex
@@ -167,7 +165,6 @@
 	function OnCycleSorting()
 		B_REVERSE_SORT = false
 		SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
-		print(T_SETTINGS[E_SETTING_KEYS.SORT_STATE])
 		T_SETTINGS[E_SETTING_KEYS.SORT_STATE] = T_SETTINGS[E_SETTING_KEYS.SORT_STATE] + 1
 		if T_SETTINGS[E_SETTING_KEYS.SORT_STATE] > 2 then
 			T_SETTINGS[E_SETTING_KEYS.SORT_STATE] = 0
@@ -333,22 +330,20 @@
 	end
 
 	function OnShowNotInstalled()
-
+		OnApplyFilter('installed:false')
 	end
 
 	function OnShowHidden()
-
+		OnApplyFilter('hidden:true')
 	end
 --###########################################################################################################
 --                  -> Process monitoring
 --###########################################################################################################
 	function OnProcessStarted()
-		print("Process started")
 		ExecuteStartingBangs()
 	end
 
 	function OnProcessTerminated()
-		print("Process terminated")
 		C_PROCESS_MONITOR:Stop()
 		if T_RECENTLY_LAUNCHED_GAME == nil then
 			return
@@ -396,18 +391,18 @@
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 				Redraw()
 			end
-		elseif N_UPDATES_TO_SKIP > 0 then
-			N_UPDATES_TO_SKIP = N_UPDATES_TO_SKIP - 1
-		elseif N_UPDATES_TO_SKIP <= 0 then
+		elseif N_UPDATES_UNTIL_REDRAW > 0 then
+			N_UPDATES_UNTIL_REDRAW = N_UPDATES_UNTIL_REDRAW - 1
+		elseif N_UPDATES_UNTIL_REDRAW <= 0 then
 		-- Redraw once every second that the mouse is on the skin
 			Redraw()
-			N_UPDATES_TO_SKIP = 124
 		end
 	end
 
 	function Redraw()
 		print("Redraw")
 		SKIN:Bang('[!Redraw]')
+		N_UPDATES_UNTIL_REDRAW = 124
 	end
 
 	function PopulateSlots()
@@ -540,24 +535,15 @@
 				return self:ReadJSON('games.json')
 			end,
 
-			WriteGames = function (self) --TODO: vararg parameter?
-				tTable = {}
-				for i=1, #T_ALL_GAMES do
-					table.insert(tTable, T_ALL_GAMES[i])
-				end
-				for i=1, #T_HIDDEN_GAMES do
-					table.insert(tTable, T_HIDDEN_GAMES[i])
-				end
-				for i=1, #T_NOT_INSTALLED_GAMES do
-					table.insert(tTable, T_NOT_INSTALLED_GAMES[i])
-				end
-				return self:WriteJSON('games.json', tTable)
+			WriteGames = function (self)
+				return self:WriteJSON('games.json', T_ALL_GAMES)
 			end
 		}
 	end
 
 	function InitializeToolbar()
 		return {
+			bVisible = true,
 			bForciblyVisible = false,
 
 			Show = function (self, abForce)
@@ -565,6 +551,10 @@
 			-- abForce: 
 				abForce = abForce or false
 				-- If skin not visible, then return
+				if bVisible then
+					return
+				end
+				self.bVisible = true
 				if abForce then
 					self.bForciblyVisible = true
 				end
@@ -587,6 +577,10 @@
 				if abForce then
 					self.bForciblyVisible = false
 				end
+				if not self.bVisible then
+					return
+				end
+				self.bVisible = false
 				SKIN:Bang(
 					'[!HideMeter "ToolbarButtonSortReverseIndicator"]'
 					.. '[!HideMeterGroup Toolbar]'
@@ -641,6 +635,7 @@
 	function InitializeSlotSubmenu()
 		return {
 			nCurrentIndex = 0,
+			bVisible = false,
 
 			MoveTo = function (self, anIndex)
 				self.nCurrentIndex = anIndex or 1
@@ -699,6 +694,7 @@
 
 			Show = function (self, abRedraw)
 				abRedraw = abRedraw or false
+				self.bVisible = true
 				SKIN:Bang('[!ShowMeterGroup "SlotSubmenu"]')
 				if abRedraw then
 					Redraw()
@@ -707,6 +703,7 @@
 
 			Hide = function (self, abRedraw)
 				abRedraw = abRedraw or false
+				self.bVisible = false
 				SKIN:Bang('[!HideMeterGroup "SlotSubmenu"]')
 				if abRedraw then
 					Redraw()
@@ -728,24 +725,15 @@
 			FinishedEditingNotes = function (self)
 				local tEditedGame = C_RESOURCES:ReadJSON('Temp\\notes_temp.json')
 				if tEditedGame ~= nil then
-					function update_game(atEditedGame, atTableOfGames)
-						for i, tGame in ipairs(atTableOfGames) do
-							if tGame[E_GAME_KEYS.NAME] == atEditedGame[E_GAME_KEYS.NAME] then
-								tGame[E_GAME_KEYS.NOTES] = atEditedGame[E_GAME_KEYS.NOTES]
-								C_RESOURCES:WriteGames()
-								return true
-							end
+					for i, tGame in ipairs(T_ALL_GAMES) do
+						if tGame[E_GAME_KEYS.NAME] == tEditedGame[E_GAME_KEYS.NAME] then
+							tGame[E_GAME_KEYS.NOTES] = tEditedGame[E_GAME_KEYS.NOTES]
+							C_RESOURCES:WriteGames()
+							return true
 						end
-						return false
-					end
-					if update_game(tEditedGame, T_ALL_GAMES) then
-						return
-					elseif update_game(tEditedGame, T_NOT_INSTALLED_GAMES) then
-						return
-					elseif update_game(tEditedGame, T_HIDDEN_GAMES) then
-						return
 					end
 				end
+				return false
 			end,
 
 			StartEditingTags = function (self)
@@ -763,24 +751,15 @@
 			FinishedEditingTags = function (self)
 				local tEditedGame = C_RESOURCES:ReadJSON('Temp\\tags_temp.json')
 				if tEditedGame ~= nil then
-					function update_game(atEditedGame, atTableOfGames)
-						for i, tGame in ipairs(atTableOfGames) do
-							if tGame[E_GAME_KEYS.NAME] == atEditedGame[E_GAME_KEYS.NAME] then
-								tGame[E_GAME_KEYS.TAGS] = atEditedGame[E_GAME_KEYS.TAGS]
-								C_RESOURCES:WriteGames()
-								return true
-							end
+					for i, tGame in ipairs(T_ALL_GAMES) do
+						if tGame[E_GAME_KEYS.NAME] == tEditedGame[E_GAME_KEYS.NAME] then
+							tGame[E_GAME_KEYS.TAGS] = tEditedGame[E_GAME_KEYS.TAGS]
+							C_RESOURCES:WriteGames()
+							return true
 						end
-						return false
-					end
-					if update_game(tEditedGame, T_ALL_GAMES) then
-						return
-					elseif update_game(tEditedGame, T_NOT_INSTALLED_GAMES) then
-						return
-					elseif update_game(tEditedGame, T_HIDDEN_GAMES) then
-						return
 					end
 				end
+				return false
 			end,
 
 			ToggleBangs = function (self)
@@ -832,26 +811,17 @@
 				if tGame == nil then
 					return
 				end
-				function move_game_from_to(aGame, aFrom, aTo)
-					for i = 1, #aFrom do
-						if aFrom[i] == aGame then
-							table.insert(aTo, table.remove(aFrom, i))
-							return true
-						end
-					end
-					return false
-				end
 				--Toggle flag and move to the appropriate table
 				if tGame[E_GAME_KEYS.HIDDEN] == true then --Unhide game
 					
 					tGame[E_GAME_KEYS.HIDDEN] = false
-					if not move_game_from_to(tGame, T_HIDDEN_GAMES, T_ALL_GAMES) then
-						move_game_from_to(tGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+					if not MoveGameFromTo(tGame, T_HIDDEN_GAMES, T_GAMES) then
+						MoveGameFromTo(tGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
 					end
 				else --Hide game
 					tGame[E_GAME_KEYS.HIDDEN] = true
-					if not move_game_from_to(tGame, T_ALL_GAMES, T_HIDDEN_GAMES) then
-						move_game_from_to(tGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES)
+					if not MoveGameFromTo(tGame, T_GAMES, T_HIDDEN_GAMES) then
+						MoveGameFromTo(tGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES)
 					end
 				end
 				--Remove from filtered games
@@ -898,6 +868,7 @@
 	function InitializeSlotHighlight()
 		return {
 			nCurrentIndex = 0,
+			bVisible = true,
 
 			MoveTo = function (self, anIndex)
 				self.nCurrentIndex = anIndex
@@ -935,38 +906,59 @@
 							sHighlightMessage = 'Invalid path'
 						end
 					elseif tGame[E_GAME_KEYS.NOT_INSTALLED] then
-						SKIN:Bang(
-							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightInstall.png"]'
-						)
-						if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
-							if tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
-							   or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
-							   sHighlightMessage = 'Install via '
-							   					   .. PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
-							else
-								sHighlightMessage = 'Not installed'
+						if tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
+						   or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
+							SKIN:Bang(
+								'[!SetOption "SlotHighlight" "ImageName" '
+								.. '"#@#Icons\\SlotHighlightInstall.png"]'
+							)
+							if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
+								sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+													.. ' - Install'
 							end
+						else
+							SKIN:Bang(
+								'[!SetOption "SlotHighlight" "ImageName" '
+								.. '"#@#Icons\\SlotHighlightNotInstalled.png"]'
+							)
+							if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
+								sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+													.. ' - Not installed'
+							end
+							
 						end
 					else
 						SKIN:Bang(
 							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightPlay.png"]'
 						)
 						if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
-							sHighlightMessage = PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+							sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
 						end
 					end
 				elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
 					SKIN:Bang('[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightHide.png"]')
+					if tGame[E_GAME_KEYS.HIDDEN] then
+						sHighlightMessage = 'Already hidden'
+					else
+						sHighlightMessage = 'Hide'
+					end
 				elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
 					SKIN:Bang('[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightUnhide.png"]')
-				end
-				sHighlightMessage = sHighlightMessage .. '#CRLF##CRLF##CRLF##CRLF##CRLF#'
-				if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] then
-					local nHoursPlayed = math.floor(tGame[E_GAME_KEYS.HOURS_TOTAL])
-					if nHoursPlayed == 1 then
-						sHighlightMessage = sHighlightMessage .. '1 hour'
+					if tGame[E_GAME_KEYS.HIDDEN] then
+						sHighlightMessage = 'Unhide'
 					else
-						sHighlightMessage = sHighlightMessage .. nHoursPlayed .. ' hours'
+						sHighlightMessage = 'Already unhidden'
+					end
+				end
+				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+					sHighlightMessage = sHighlightMessage .. '#CRLF##CRLF##CRLF##CRLF##CRLF#'
+					if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] then
+						local nHoursPlayed = math.floor(tGame[E_GAME_KEYS.HOURS_TOTAL])
+						if nHoursPlayed == 1 then
+							sHighlightMessage = sHighlightMessage .. '1 hour'
+						else
+							sHighlightMessage = sHighlightMessage .. nHoursPlayed .. ' hours'
+						end
 					end
 				end
 				SKIN:Bang('[!SetOption "SlotHighlightText" "Text" "' .. sHighlightMessage .. '"]')
@@ -976,6 +968,10 @@
 
 			Show = function (self, abRedraw)
 				abRedraw = abRedraw or false
+				if self.bVisible then
+					return
+				end
+				self.bVisible = true
 				SKIN:Bang('[!ShowMeterGroup "SlotHighlight"]')
 				if abRedraw then
 					Redraw()
@@ -984,6 +980,10 @@
 
 			Hide = function (self, abRedraw)
 				abRedraw = abRedraw or false
+				if not self.bVisible then
+					return
+				end
+				self.bVisible = false
 				SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
 				if abRedraw then
 					Redraw()
@@ -1007,10 +1007,10 @@
 	function InitializeStateVariables()
 		T_SLOT_ANIMATION_QUEUE = {}
 		N_ACTION_STATE = 0
-		N_UPDATES_TO_SKIP = 0
+		N_UPDATES_UNTIL_REDRAW = 124
 		N_LAST_DRAWN_SCROLL_INDEX = -1
 		N_SCROLL_INDEX = 1
-		T_ALL_GAMES = {}
+		T_GAMES = {}
 		T_FILTERED_GAMES = {}
 		T_HIDDEN_GAMES = {}
 		T_NOT_INSTALLED_GAMES = {}
@@ -1019,12 +1019,12 @@
 	end
 
 	function InitializeConstants()
-		PLATFORM_DESCRIPTIONS = {
+		T_PLATFORM_DESCRIPTIONS = {
 			"Steam",
 			"Steam",
 			"GOG Galaxy",
-			"",
-			"",
+			"Shortcut",
+			"Shortcut",
 			"Blizzard App"
 		}
 	end
@@ -1034,7 +1034,6 @@
 --                          -> Launching games
 --###########################################################################################################
 	function LaunchGame(atGame)
-		print('Launch: ' .. atGame[E_GAME_KEYS.NAME])
 		if atGame[E_GAME_KEYS.ERROR] == true then
 			SKIN:Bang(
 				'[!Log "Lauhdutin - Error: There is something wrong with ' .. atGame[E_GAME_KEYS.NAME] .. '"]'
@@ -1100,71 +1099,18 @@
 --###########################################################################################################
 --                          -> Hiding games
 --###########################################################################################################
-	function HideGame(atGame, abSerializeAndUpdateSlots)
-		abSerializeAndUpdateSlots = abSerializeAndUpdateSlots or false
+	function HideGame(atGame)
 		if atGame[E_GAME_KEYS.HIDDEN] then
 			return false
 		end
 		atGame[E_GAME_KEYS.HIDDEN] = true
-
-		function move_game_from_to(atGameToMove, atFrom, atTo)
-			for i, tGame in ipairs(atFrom) do
-				if tGame == atGameToMove then
-					table.insert(atTo, table.remove(atFrom, i))
-					return true
-				end
-			end
-			return false
-		end
-
 		local bMoved = false
-		if move_game_from_to(atGame, T_ALL_GAMES, T_HIDDEN_GAMES) then
+		if MoveGameFromTo(atGame, T_GAMES, T_HIDDEN_GAMES) then
 			bMoved = true
-		elseif move_game_from_to(atGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES) then
+		elseif MoveGameFromTo(atGame, T_NOT_INSTALLED_GAMES, T_HIDDEN_GAMES) then
 			bMoved = true
 		end
-		if abSerializeAndUpdateSlots and bMoved then
-			C_RESOURCES:WriteGames()
-			for i, tGame in ipairs(T_FILTERED_GAMES) do
-				if tGame == atGame then
-					table.remove(T_FILTERED_GAMES, i)
-					local scrollIndex = N_SCROLL_INDEX
-					SortGames()
-					N_SCROLL_INDEX = scrollIndex
-					PopulateSlots()
-					break
-				end
-			end
-		end
-		return bMoved
-	end
---###########################################################################################################
---                          -> Unhiding games
---###########################################################################################################
-	function UnhideGame(atGame, abSerializeAndUpdateSlots)
-		abSerializeAndUpdateSlots = abSerializeAndUpdateSlots or false
-		if not atGame[E_GAME_KEYS.HIDDEN] then
-			return false
-		end
-		atGame[E_GAME_KEYS.HIDDEN] = nil
-
-		function move_game_from_to(atGameToMove, atFrom, atTo)
-			for i, tGame in ipairs(atFrom) do
-				if tGame == atGameToMove then
-					table.insert(atTo, table.remove(atFrom, i))
-					return true
-				end
-			end
-			return false
-		end
-
-		local bMoved = false
-		if atGame[E_GAME_KEYS.NOT_INSTALLED] then
-			bMoved = move_game_from_to(atGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
-		else
-			bMoved = move_game_from_to(atGame, T_HIDDEN_GAMES, T_ALL_GAMES)
-		end
-		if abSerializeAndUpdateSlots and bMoved then
+		if bMoved then
 			C_RESOURCES:WriteGames()
 			for i, tGame in ipairs(T_FILTERED_GAMES) do
 				if tGame == atGame then
@@ -1173,9 +1119,55 @@
 				end
 			end
 			if #T_FILTERED_GAMES > 0 then
-				local scrollIndex = N_SCROLL_INDEX
+				local nScrollIndex = N_SCROLL_INDEX
 				SortGames()
-				N_SCROLL_INDEX = scrollIndex
+				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
+				if #T_FILTERED_GAMES <= nSlotCount then
+					nScrollIndex = 1
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
+					nScrollIndex = nScrollIndex - 1
+				end
+				N_SCROLL_INDEX = nScrollIndex
+				PopulateSlots()
+			else
+				OnToggleHideGames()
+				OnClearFilter()
+			end
+		end
+		return bMoved
+	end
+--###########################################################################################################
+--                          -> Unhiding games
+--###########################################################################################################
+	function UnhideGame(atGame)
+		if not atGame[E_GAME_KEYS.HIDDEN] then
+			return false
+		end
+		atGame[E_GAME_KEYS.HIDDEN] = nil
+		local bMoved = false
+		if atGame[E_GAME_KEYS.NOT_INSTALLED] then
+			bMoved = MoveGameFromTo(atGame, T_HIDDEN_GAMES, T_NOT_INSTALLED_GAMES)
+		else
+			bMoved = MoveGameFromTo(atGame, T_HIDDEN_GAMES, T_GAMES)
+		end
+		if bMoved then
+			C_RESOURCES:WriteGames()
+			for i, tGame in ipairs(T_FILTERED_GAMES) do
+				if tGame == atGame then
+					table.remove(T_FILTERED_GAMES, i)
+					break
+				end
+			end
+			if #T_FILTERED_GAMES > 0 then
+				local nScrollIndex = N_SCROLL_INDEX
+				SortGames()
+				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
+				if #T_FILTERED_GAMES <= nSlotCount then
+					nScrollIndex = 1
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
+					nScrollIndex = nScrollIndex - 1
+				end
+				N_SCROLL_INDEX = nScrollIndex
 				PopulateSlots()
 			else
 				OnToggleUnhideGames()
@@ -1191,7 +1183,7 @@
 		atGame[E_GAME_KEYS.NOT_INSTALLED] = nil
 		for i, tNotInstalledGame in ipairs(T_NOT_INSTALLED_GAMES) do
 			if tNotInstalledGame == atGame then
-				table.insert(T_ALL_GAMES, table.remove(T_NOT_INSTALLED_GAMES, i))
+				table.insert(T_GAMES, table.remove(T_NOT_INSTALLED_GAMES, i))
 				return true
 			end
 		end
@@ -1201,7 +1193,6 @@
 --                          -> Bangs
 --###########################################################################################################
 	function ExecuteStartingBangs()
-		print("Executing starting bangs")
 		if T_SETTINGS[E_SETTING_KEYS.BANGS_STARTING] ~= nil
 		   and T_SETTINGS[E_SETTING_KEYS.BANGS_STARTING] ~= '' then
 			SKIN:Bang((T_SETTINGS[E_SETTING_KEYS.BANGS_STARTING]:gsub('`', '"')))
@@ -1209,11 +1200,10 @@
 	end
 
 	function ExecuteStoppingBangs()
-		print("Executing stopping bangs")
 		if T_RECENTLY_LAUNCHED_GAME[E_GAME_KEYS.IGNORES_BANGS] ~= true
 		   and T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING] ~= nil
 		   and T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING] ~= '' then
-		    -- The extra set of parentheses are used to just use the first return value of gsub
+			-- The extra set of parentheses are used to just use the first return value of gsub
 			SKIN:Bang((T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"')))
 		end
 	end
@@ -1222,7 +1212,7 @@
 --###########################################################################################################
 	function FilterBy(asPattern)
 		if asPattern == '' then
-			T_FILTERED_GAMES = ClearFilter(T_ALL_GAMES)
+			T_FILTERED_GAMES = ClearFilter(T_GAMES)
 			SortGames()
 			PopulateSlots()
 			return
@@ -1233,21 +1223,10 @@
 			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
 			local tTableOfGames = {}
-			for i, tGame in ipairs(T_ALL_GAMES) do
+			for i, tGame in ipairs(T_GAMES) do
 				table.insert(tTableOfGames, tGame)
 			end
-			if T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
-				for i, tGame in ipairs(T_HIDDEN_GAMES) do
-					if tGame[E_GAME_KEYS.NOT_INSTALLED] ~= true then
-						table.insert(tTableOfGames, tGame)
-					end
-				end
-			end
 			T_FILTERED_GAMES, sort = Filter(tTableOfGames, asPattern)
-			print(#T_FILTERED_GAMES)
-			for i, tGame in ipairs(T_FILTERED_GAMES) do
-				print(tGame[E_GAME_KEYS.NAME])
-			end
 		end
 		if sort then
 			SortGames()
@@ -1290,6 +1269,12 @@
 					table.insert(tResult, tGame)
 				end
 			end
+		elseif STRING:StartsWith(asPattern, 't') then --platform:true
+			for i, tGame in ipairs(atTable) do
+				if tGame[E_GAME_KEYS.PLATFORM] == anPlatform then
+					table.insert(tResult, tGame)
+				end
+			end
 		elseif STRING:StartsWith(asPattern, 'f') then --platform:false
 			for i, tGame in ipairs(atTable) do
 				if tGame[E_GAME_KEYS.PLATFORM] ~= anPlatform then
@@ -1326,13 +1311,13 @@
 		elseif STRING:StartsWith(asPattern, 'installed:') then
 			asPattern = asPattern:sub(11)
 			if STRING:StartsWith(asPattern, 't') then
-				for i, tGame in ipairs(atTable) do
+				for i, tGame in ipairs(T_ALL_GAMES) do
 					if tGame[E_GAME_KEYS.NOT_INSTALLED] ~= true then
 						table.insert(tResult, tGame)
 					end
 				end				
 			elseif STRING:StartsWith(asPattern, 'f') then
-				for i, tGame in ipairs(atTable) do
+				for i, tGame in ipairs(T_ALL_GAMES) do
 					if tGame[E_GAME_KEYS.NOT_INSTALLED] == true then
 						table.insert(tResult, tGame)
 					end
@@ -1341,11 +1326,13 @@
 		elseif STRING:StartsWith(asPattern, 'hidden:') then
 			asPattern = asPattern:sub(8)
 			if STRING:StartsWith(asPattern, 't') then
-				for i, tGame in ipairs(atTable) do
-					table.insert(tResult, tGame)
+				for i, tGame in ipairs(T_ALL_GAMES) do
+					if tGame[E_GAME_KEYS.HIDDEN] == true then
+						table.insert(tResult, tGame)
+					end
 				end
 			elseif STRING:StartsWith(asPattern, 'f') then
-				for i, tGame in ipairs(atTable) do
+				for i, tGame in ipairs(T_ALL_GAMES) do
 					if tGame[E_GAME_KEYS.HIDDEN] ~= true then
 						table.insert(tResult, tGame)
 					end
@@ -1355,12 +1342,6 @@
 			asPattern = asPattern:sub(7)
 			if STRING:StartsWith(asPattern, 'a') then
 				for i, tGame in ipairs(T_ALL_GAMES) do
-					table.insert(tResult, tGame)
-				end
-				for i, tGame in ipairs(T_NOT_INSTALLED_GAMES) do
-					table.insert(tResult, tGame)
-				end
-				for i, tGame in ipairs(T_HIDDEN_GAMES) do
 					table.insert(tResult, tGame)
 				end
 			end	
@@ -1374,15 +1355,6 @@
 					for i, tGame in ipairs(T_ALL_GAMES) do
 						table.insert(tAllGames, tGame)
 					end
-					for i, tGame in ipairs(T_NOT_INSTALLED_GAMES) do
-						table.insert(tAllGames, tGame)
-					end
-					if T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES] == true then
-						for i, tGame in ipairs(T_HIDDEN_GAMES) do
-							table.insert(tAllGames, tGame)
-						end
-					end
-					print(#tAllGames)
 					return tAllGames
 				end
 
@@ -1475,7 +1447,6 @@
 					--print(entry.score, entry.game[E_GAME_KEYS.NAME]) -- Debug
 					table.insert(tResult, entry.game)
 				end
-				print(#tResult)
 				return tResult, false
 			else
 				for i, tGame in ipairs(atTable) do
@@ -1678,6 +1649,18 @@
 		else
 			return false
 		end
+	end
+--###########################################################################################################
+--                          -> Misc
+--###########################################################################################################
+	function MoveGameFromTo(atGame, atFrom, atTo)
+		for i = 1, #atFrom do
+			if atFrom[i] == atGame then
+				table.insert(atTo, table.remove(atFrom, i))
+				return true
+			end
+		end
+		return false
 	end
 --###########################################################################################################
 --         -> Animations
