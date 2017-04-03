@@ -445,7 +445,7 @@
 	end
 
 	function Redraw()
-		print("Redraw")
+		--print("Redraw")
 		SKIN:Bang('[!Redraw]')
 		N_UPDATES_UNTIL_REDRAW = 124
 	end
@@ -935,7 +935,7 @@
 
 			Start = function (self, asProcessName)
 				SKIN:Bang(
-					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "160"]'
+					'[!SetOption "' .. self.sMeasureName .. '" "UpdateDivider" "63"]'
 					.. '[!SetOption "' .. self.sMeasureName .. '" "ProcessName" "' .. asProcessName .. '"]'
 					.. '[!UpdateMeasure "ProcessMonitor"]'
 				)
@@ -1090,7 +1090,6 @@
 					return false
 				end
 				self.bPlaying = true
-				print("Playing frame")
 				if #self.tQueue <= 0 then
 					self.bPlaying = false
 					return false
@@ -1129,15 +1128,12 @@
 					tAnimationSet.fFunction(tAnimationSet.tArguments)
 					tAnimationSet.tArguments.nFrames = tAnimationSet.tArguments.nFrames - 1
 				end
-				print("Played frame")
 				self.bPlaying = false
 				return true
 			end,
 
 			Push = function (self, atAnimationSet)
-				print("Pushing to queue")
 				table.insert(self.tQueue, atAnimationSet)
-				print("Pushed to queue")
 			end,
 
 			-- Animation functions
@@ -1484,7 +1480,6 @@
 			end,
 
 			PushSkinSlideIn = function (self)
-				print("Pushing skin slide in")
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
 				if nDir <= 0 then
 					nDir = -1
@@ -1501,11 +1496,9 @@
 						}
 					}
 				)
-				print("Pushed skin slide in")
 			end,
 
 			PushSkinSlideOut = function (self)
-				print("Pushing skin slide out")
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
 				if nDir <= 0 then
 					nDir = -1
@@ -1522,7 +1515,6 @@
 						}
 					}
 				)
-				print("Pushed skin slide out")
 			end,
 
 			SkinSlide = function (atArguments)
@@ -1557,7 +1549,6 @@
 					end
 				end
 				nNewPosition = nNewPosition * atArguments.nDirection
-				print(nNewPosition)
 				local sPositionOption = 'X'
 				if atArguments.bHorizontal then
 					sPositionOption = 'Y'
@@ -1664,38 +1655,38 @@
 		OnClearFilter()
 		SortGames()
 		PopulateSlots()
---		if not bInstalling then
---			T_RECENTLY_LAUNCHED_GAME = atGame
---			if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
---				-- Monitor the process defined in the manual override
---				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
---			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
---				-- Monitor the Steam Overlay process
---				C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
---			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
---				-- Monitor the default game process
---				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
---			else
---				-- Monitor the executable that the shortcut points to
---				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
---				local sProcessName = sProcessPath:reverse()
---				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
---				if sProcessName ~= nil then
---					sProcessName = sProcessName:reverse()
---					C_PROCESS_MONITOR:Start(sProcessName)
---				end
---			end
---			if atGame[E_GAME_KEYS.IGNORES_BANGS] ~= true then
---				ExecuteStartingBangs()
---			end
---		end
---		local tArguments = atGame[E_GAME_KEYS.ARGUMENTS]
---		if tArguments ~= nil then
---			sArguments = table.concat(tArguments, '" "')
---			SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
---		else
---			SKIN:Bang('["' .. sPath .. '"]')
---		end
+		if not bInstalling then
+			T_RECENTLY_LAUNCHED_GAME = atGame
+			if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+				-- Monitor the process defined in the manual override
+				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
+			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
+				-- Monitor the Steam Overlay process
+				C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
+			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
+				-- Monitor the default game process
+				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
+			else
+				-- Monitor the executable that the shortcut points to
+				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+				local sProcessName = sProcessPath:reverse()
+				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
+				if sProcessName ~= nil then
+					sProcessName = sProcessName:reverse()
+					C_PROCESS_MONITOR:Start(sProcessName)
+				end
+			end
+			if atGame[E_GAME_KEYS.IGNORES_BANGS] ~= true then
+				ExecuteStartingBangs()
+			end
+		end
+		local tArguments = atGame[E_GAME_KEYS.ARGUMENTS]
+		if tArguments ~= nil then
+			sArguments = table.concat(tArguments, '" "')
+			SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
+		else
+			SKIN:Bang('["' .. sPath .. '"]')
+		end
 		return true
 	end
 --###########################################################################################################

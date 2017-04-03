@@ -263,7 +263,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
-- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor. The toolbar and its enabler are moved to the bottom of the skin, if the skin is set to slide into view from below.
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added support for adding notes to a game.
 - Added support for adding tags to a game.
@@ -274,11 +274,10 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added a setting for making all games execute/ignore bangs.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added new filters.
-- Refactored GUI code.
 - Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 - Updated `Battle.net` to `Blizzard App` in the GUI.
 - Updated the setting title and tooltip for the paths to Blizzard games.
-- GUI optimizations.
+- Major GUI overhaul and optimizations.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
