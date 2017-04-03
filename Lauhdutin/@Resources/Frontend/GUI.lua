@@ -76,21 +76,25 @@
 	-- abAnimate: Whether or not to play an animation to unhide the skin
 		C_SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
-
-		else
-
+			if not C_SKIN.bVisible then
+				C_ANIMATIONS:PushSkinSlideIn()
+			end
 		end
 	end
 
 	function OnMouseLeaveSkin()
 	-- Called when the mouse cursor leaves the skin
 	-- abAnimate: Whether or not to play an animation to hide the skin
-		C_SCRIPT:SetUpdateDivider(-1)
-		C_SLOT_HIGHLIGHT:Hide(false)
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			C_SLOT_HIGHLIGHT:Hide(false)
+		end
 		C_TOOLBAR:Hide()
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
-			
+			if not C_TOOLBAR.bForciblyVisible then
+				C_ANIMATIONS:PushSkinSlideOut()
+			end
 		else
+			C_SCRIPT:SetUpdateDivider(-1)
 			Redraw()
 		end
 	end
@@ -127,15 +131,21 @@
 --###########################################################################################################
 	function OnMouseEnterToolbar(abForce)
 		abForce = abForce or false
-		C_SLOT_HIGHLIGHT:Hide()
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			C_SLOT_HIGHLIGHT:Hide()
+		end
 		C_TOOLBAR:Show(abForce)
 	end
 
 	function OnMouseLeaveToolbar(abForce)
 		abForce = abForce or false
 		C_TOOLBAR:Hide(abForce)
-		if C_SLOT_HIGHLIGHT:Update() then
-			C_SLOT_HIGHLIGHT:Show()
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			if C_SLOT_HIGHLIGHT:Update() then
+				if not C_TOOLBAR.bForciblyVisible then
+					C_SLOT_HIGHLIGHT:Show()
+				end
+			end
 		end
 	end
 
@@ -146,10 +156,14 @@
 		else
 			FilterBy(asPattern)
 		end
-		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Update()
-		end
 		C_TOOLBAR:Hide(true)
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			if C_SLOT_HIGHLIGHT:Update() then
+				if not C_TOOLBAR.bVisible then
+					C_SLOT_HIGHLIGHT:Show()
+				end
+			end
+		end
 		if #T_FILTERED_GAMES <= 0 then
 			OnShowStatus('No matches')
 		end
@@ -157,6 +171,13 @@
 
 	function OnDismissFilterInput()
 		C_TOOLBAR.bForciblyVisible = false
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			if C_SLOT_HIGHLIGHT:Update() then
+				if not C_TOOLBAR.bVisible then
+					C_SLOT_HIGHLIGHT:Show()
+				end
+			end
+		end
 	end
 
 	function OnClearFilter()
@@ -207,7 +228,9 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:MoveTo(anIndex)
 			if C_SLOT_HIGHLIGHT:Update() then
-				C_SLOT_HIGHLIGHT:Show(true)
+				if not C_TOOLBAR.bVisible then
+					C_SLOT_HIGHLIGHT:Show(true)
+				end
 			end
 		end
 		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
@@ -462,13 +485,13 @@
 		local sResourcesPath = SKIN:GetVariable('@')
 		JSON = dofile(sResourcesPath .. 'Dependencies\\json4lua\\json.lua')
 		STRING = dofile(sResourcesPath .. 'Frontend\\String.lua')
-		InitializeComponents(sResourcesPath)
-		T_SETTINGS = C_RESOURCES:ReadSettings()
 		InitializeEnums(sResourcesPath)
+		InitializeComponents(sResourcesPath)
 		InitializeStateVariables()
 		InitializeConstants()
 		C_TOOLBAR:UpdateSortingIcon()
 		C_TOOLBAR:Hide()
+		--C_TOOLBAR:MoveToBottom()
 		C_SLOT_HIGHLIGHT:Hide()
 		C_STATUS_MESSAGE:Show('Initializing...')
 		-- Start the Python backend script
@@ -477,14 +500,22 @@
 	end
 
 	function InitializeComponents(asResourcesPath)
+		C_SKIN = InitializeSkin()
 		C_SCRIPT = InitializeScript()
 		C_RESOURCES = InitializeResources(asResourcesPath)
+		T_SETTINGS = C_RESOURCES:ReadSettings()
 		C_TOOLBAR = InitializeToolbar()
 		C_STATUS_MESSAGE = InitializeStatusMessage()
 		C_SLOT_SUBMENU = InitializeSlotSubmenu()
 		C_PROCESS_MONITOR = InitializeProcessMonitor()
 		C_SLOT_HIGHLIGHT = InitializeSlotHighlight()
 		C_ANIMATIONS = InitializeAnimations()
+	end
+
+	function InitializeSkin()
+		return {
+			bVisible = true
+		}
 	end
 
 	function InitializeScript()
@@ -616,6 +647,12 @@
 				if abRedraw then
 					Redraw()
 				end
+			end,
+
+			MoveToBottom = function (self)
+				SKIN:Bang(
+					'[!SetOption "FilterInput" "Y" "' .. T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] - 50 .. '"]'
+				)
 			end
 		}
 	end
@@ -853,7 +890,9 @@
 				C_RESOURCES:WriteGames()
 				if #T_FILTERED_GAMES > 0 then
 					PopulateSlots()
-					C_SLOT_HIGHLIGHT:Update()
+					if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+						C_SLOT_HIGHLIGHT:Update()
+					end
 				else
 					OnApplyFilter('')
 				end
@@ -1030,7 +1069,7 @@
 					return false
 				end
 				self.bPlaying = true
-				--print("Playing frame")
+				print("Playing frame")
 				if #self.tQueue <= 0 then
 					self.bPlaying = false
 					return false
@@ -1038,13 +1077,17 @@
 				local tAnimationSet = nil
 				local bCancel = false
 				if #self.tQueue > 1 then
-					if self.tQueue[1].bMandatory then
-						tAnimationSet = self.tQueue[1]
+					if self.tQueue[1].tArguments.bMandatory then
+						if self.tQueue[1].tArguments.nFrames == 0 then
+							tAnimationSet = table.remove(self.tQueue, 1)
+						else
+							tAnimationSet = self.tQueue[1]
+						end
 					else
 						bCancel = true
 						tAnimationSet = table.remove(self.tQueue, 1)
 						tAnimationSet.tArguments.nFrames = 0
-						while #self.tQueue > 1 and not self.tQueue[1].bMandatory do
+						while #self.tQueue > 1 and not self.tQueue[1].tArguments.bMandatory do
 							table.remove(self.tQueue, 1)
 						end
 					end
@@ -1058,19 +1101,22 @@
 					return false
 				end
 				if bCancel then
-					tAnimationSet.tArguments.fReset(tAnimationSet.tArguments)
+					if tAnimationSet.tArguments.fReset then
+						tAnimationSet.tArguments.fReset(tAnimationSet.tArguments)
+					end
 				else
 					tAnimationSet.fFunction(tAnimationSet.tArguments)
 					tAnimationSet.tArguments.nFrames = tAnimationSet.tArguments.nFrames - 1
 				end
-				--print("Played frame")
+				print("Played frame")
 				self.bPlaying = false
 				return true
 			end,
 
 			Push = function (self, atAnimationSet)
-				--print("Pushing to queue")
+				print("Pushing to queue")
 				table.insert(self.tQueue, atAnimationSet)
+				print("Pushed to queue")
 			end,
 
 			-- Animation functions
@@ -1297,7 +1343,7 @@
 				end
 				self:Push(tAnimationSet)
 			end,
-
+			--     Zoom in
 			HoverZoomIn = function (atArguments)
 				local nFrame = 3 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
@@ -1334,7 +1380,7 @@
 					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
 				)
 			end,
-
+			--     Jiggle
 			HoverJiggle = function (atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
@@ -1352,7 +1398,7 @@
 				end
 				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
 			end,
-
+			--     Shake
 			HoverShake = function (atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
@@ -1413,6 +1459,108 @@
 					.. T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] .. '"]'
 					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]'
 					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
+				)
+			end,
+
+			PushSkinSlideIn = function (self)
+				print("Pushing skin slide in")
+				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
+				if nDir <= 0 then
+					nDir = -1
+				end
+				self:Push(
+					{
+						fFunction = self.SkinSlide,
+						tArguments = {
+							nFrames = 4,
+							bMandatory = true,
+							nDirection = nDir,
+							bIntoView = true,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+						}
+					}
+				)
+				print("Pushed skin slide in")
+			end,
+
+			PushSkinSlideOut = function (self)
+				print("Pushing skin slide out")
+				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
+				if nDir <= 0 then
+					nDir = -1
+				end
+				self:Push(
+					{
+						fFunction = self.SkinSlide,
+						tArguments = {
+							nFrames = 4,
+							bMandatory = true,
+							nDirection = nDir,
+							bIntoView = false,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+						}
+					}
+				)
+				print("Pushed skin slide out")
+			end,
+
+			SkinSlide = function (atArguments)
+				local nFrame = 4 - atArguments.nFrames + 1
+				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				if atArguments.bIntoView then
+					if nFrame == 1 then
+						C_SKIN.bVisible = true
+						nNewPosition = 0 - nNewPosition / 1.8
+					elseif nFrame == 2 then
+						nNewPosition = 0 - nNewPosition / 4.0
+					elseif nFrame == 3 then
+						nNewPosition = 0 - nNewPosition / 20.0
+					elseif nFrame == 4 then
+						nNewPosition = 0
+					else
+						return
+					end
+				else
+					if nFrame == 1 then
+						C_SKIN.bVisible = false
+						nNewPosition = 0 - nNewPosition / 20.0
+					elseif nFrame == 2 then
+						nNewPosition = 0 - nNewPosition / 4.0
+					elseif nFrame == 3 then
+						nNewPosition = 0 - nNewPosition / 1.8
+					elseif nFrame == 4 then
+						nNewPosition = 0 - nNewPosition
+					else
+						C_SCRIPT:SetUpdateDivider(-1)
+						return
+					end
+				end
+				nNewPosition = nNewPosition * atArguments.nDirection
+				print(nNewPosition)
+				local sPositionOption = 'X'
+				if atArguments.bHorizontal then
+					sPositionOption = 'Y'
+				end
+				for i = 1, tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) do
+					SKIN:Bang(
+						'[!SetOption "SlotText' .. i .. '" "' .. sPositionOption .. '" "'
+						.. nNewPosition .. '"]'
+						.. '[!SetOption "SlotBanner' .. i .. '" "' .. sPositionOption .. '" "'
+						.. nNewPosition .. '"]'
+					)
+				end
+				SKIN:Bang(
+					'[!SetOption "StatusMessage" "' .. sPositionOption .. '" "'
+					.. nNewPosition .. '"]'
+					.. '[!UpdateMeterGroup "Status"]'
+					.. '[!UpdateMeterGroup "Slots"]'
+					.. '[!SetOption "SlotHighlightBackground" "' .. sPositionOption .. '" "'
+					.. nNewPosition .. '"]'
+					.. '[!UpdateMeterGroup "SlotHighlight"]'
+					.. '[!SetOption "SlotsBackground" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
+					.. '[!UpdateMeter "SlotsBackground"]'
+					.. '[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
+					.. '[!UpdateMeter "ToolbarEnabler"]'
 				)
 			end
 		}
