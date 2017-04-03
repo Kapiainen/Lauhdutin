@@ -149,6 +149,11 @@
 		end
 	end
 
+	function OnStartInputtingFilter()
+		OnMouseEnterToolbar(true)
+		SKIN:Bang('[!CommandMeasure "FilterInput" "ExecuteBatch 1"]')
+	end
+
 	function OnApplyFilter(asPattern)
 		C_STATUS_MESSAGE:Hide()
 		if asPattern == '' then
