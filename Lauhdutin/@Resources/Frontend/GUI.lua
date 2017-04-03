@@ -134,6 +134,11 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Hide()
 		end
+		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
+			if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+				C_ANIMATIONS:PushHoverReset(1)
+			end
+		end
 		C_TOOLBAR:Show(abForce)
 	end
 
@@ -144,6 +149,18 @@
 			if C_SLOT_HIGHLIGHT:Update() then
 				if not C_TOOLBAR.bForciblyVisible then
 					C_SLOT_HIGHLIGHT:Show()
+				end
+			end
+		end
+		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
+			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+			if nAnimation > 0 and not C_TOOLBAR.bVisible then
+				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+					C_ANIMATIONS:PushHover(nAnimation, 1)
+				elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
+					C_ANIMATIONS:PushHover(nAnimation, 1)
+				elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+					C_ANIMATIONS:PushHover(nAnimation, 1)
 				end
 			end
 		end
@@ -239,7 +256,7 @@
 			end
 		end
 		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-		if nAnimation > 0 then
+		if nAnimation > 0 and not C_TOOLBAR.bVisible then
 			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
 				C_ANIMATIONS:PushHover(nAnimation, anIndex)
 			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
@@ -1309,8 +1326,10 @@
 		else
 			local tTableOfGames = {}
 			for i, tGame in ipairs(T_ALL_GAMES) do
-				if not tGame[E_GAME_KEYS.HIDDEN]
-				   or (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES]) then
+				if (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES])
+				   or (tGame[E_GAME_KEYS.NOT_INSTALLED]
+				   	  and T_SETTINGS[E_SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES])
+				   or (not tGame[E_GAME_KEYS.HIDDEN] and not tGame[E_GAME_KEYS.NOT_INSTALLED]) then
 					table.insert(tTableOfGames, tGame)
 				end
 			end
@@ -1441,10 +1460,7 @@
 				function get_all_games()
 					local tAllGames = {}
 					for i, tGame in ipairs(T_ALL_GAMES) do
-						if not tGame[E_GAME_KEYS.HIDDEN]
-						   or (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES]) then
-							table.insert(tAllGames, tGame)
-						end
+						table.insert(tAllGames, tGame)
 					end
 					return tAllGames
 				end
@@ -1455,6 +1471,18 @@
 						tResult = {tResult[math.random(1, #tResult)]}
 					end
 				else
+					function get_all_games()
+						local tAllGames = {}
+						for i, tGame in ipairs(T_ALL_GAMES) do
+							if (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES])
+							   or (tGame[E_GAME_KEYS.NOT_INSTALLED]
+							   	  and T_SETTINGS[E_SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES])
+							   or (not tGame[E_GAME_KEYS.HIDDEN] and not tGame[E_GAME_KEYS.NOT_INSTALLED]) then
+								table.insert(tAllGames, tGame)
+							end
+						end
+						return tAllGames
+					end
 					function get_all_games_from_platform(anPlatform)
 						local tAllGames = get_all_games()
 						local i = 1
@@ -2126,7 +2154,7 @@
 			end,
 
 			PushHoverReset = function (self, anSlotIndex)
-				if anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
+				if anSlotIndex < 1 or anSlotIndex > tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) then
 					return
 				end
 				self:Push(
@@ -2200,6 +2228,9 @@
 			SkinSlide = function (atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				if atArguments.bHorizontal then
+					nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+				end
 				if atArguments.bIntoView then
 					if nFrame == 1 then
 						C_SKIN.bVisible = true
@@ -2215,7 +2246,6 @@
 					end
 				else
 					if nFrame == 1 then
-						C_SKIN.bVisible = false
 						nNewPosition = 0 - nNewPosition / 20.0
 					elseif nFrame == 2 then
 						nNewPosition = 0 - nNewPosition / 4.0
@@ -2225,6 +2255,7 @@
 						nNewPosition = 0 - nNewPosition
 					else
 						C_SCRIPT:SetUpdateDivider(-1)
+						C_SKIN.bVisible = false
 						return
 					end
 				end
@@ -2236,7 +2267,7 @@
 				for i = 1, tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) do
 					SKIN:Bang(
 						'[!SetOption "SlotText' .. i .. '" "' .. sPositionOption .. '" "'
-						.. nNewPosition .. '"]'
+						.. nNewPosition + tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) / 2 .. '"]'
 						.. '[!SetOption "SlotBanner' .. i .. '" "' .. sPositionOption .. '" "'
 						.. nNewPosition .. '"]'
 					)

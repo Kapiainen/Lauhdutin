@@ -96,6 +96,9 @@ function Initialize()
 	if SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == nil then
 		SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] = false
 	end
+	if SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] == nil then
+		SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] = false
+	end
 	if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == nil then
 		--0 = disabled
 		--1 = from the left
@@ -288,6 +291,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Disabled"]')
+		end		
+		if SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] == true then
+			SKIN:Bang('[!SetOption "NotInstalledGamesStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "NotInstalledGamesStatus" "Text" "Disabled"]')
 		end
 		if SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] == true then
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
@@ -590,6 +598,11 @@ end
 
 function ToggleFuzzySearch()
 	SETTINGS[SETTING_KEYS.FUZZY_SEARCH] = not SETTINGS[SETTING_KEYS.FUZZY_SEARCH]
+	UpdateSettings()
+end
+
+function ToggleNotInstalledGames()
+	SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] = not SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES]
 	UpdateSettings()
 end
 

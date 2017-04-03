@@ -45,6 +45,7 @@ class SettingKeys():
     PYTHON_PATH = "python_path"
     SET_GAMES_TO_EXECUTE_BANGS = "set_games_to_execute_bangs"
     SHOW_HIDDEN_GAMES = "hidden_games"
+    SHOW_NOT_INSTALLED_GAMES = "installed_games"
     SLOT_BACKGROUND_COLOR = "slot_background_color"
     SLOT_COUNT = "slot_count"
     SLOT_HEIGHT = "slot_height"
