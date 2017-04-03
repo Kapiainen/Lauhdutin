@@ -179,7 +179,16 @@ Hidden games are not showed by default on filtering (except on `games:all` and `
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
 ## Bangs
-There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Multiple bangs can be executed by enclosing each bang in square brackets: 
+
+```[!ActivateConfig "SomeConfigName"][!Log "Starting a game"]```
+
+Multiple bangs can also be written on multiple lines:
+
+```
+[!ActivateConfig "SomeConfigName"]
+[!Log "Starting a game"]
+```
 
 This feature can be used to e.g. load and unload skins.
 
@@ -277,6 +286,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 - Updated `Battle.net` to `Blizzard App` in the GUI.
 - Updated the setting title and tooltip for the paths to Blizzard games.
+- Bangs are now edited via Notepad.
 - Major GUI overhaul and optimizations.
 
 **Version 2.6.0 - 2017/03/15:**
