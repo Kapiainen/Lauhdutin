@@ -30,3 +30,32 @@ class Platform():
     WINDOWS_SHORTCUT = 3
     WINDOWS_URL_SHORTCUT = 4
     BATTLENET = 5
+
+class SettingKeys():
+    ANIMATION_CLICK = "click_animation"
+    ANIMATION_HOVER = "hover_animation"
+    ANIMATION_SKIN_SLIDE_DIRECTION = "skin_slide_animation_direction"
+    BANGS_STARTING = "start_game_bang"
+    BANGS_STOPPING = "stop_game_bang"
+    BATTLENET_PATH = "battlenet_path"
+    EXECUTE_BANGS_BY_DEFAULT = "execute_bangs_by_default"
+    FUZZY_SEARCH = "fuzzy_search"
+    GOG_GALAXY_PATH = "galaxy_path"
+    ORIENTATION = "orientation"
+    PYTHON_PATH = "python_path"
+    SET_GAMES_TO_EXECUTE_BANGS = "set_games_to_execute_bangs"
+    SHOW_HIDDEN_GAMES = "hidden_games"
+    SLOT_BACKGROUND_COLOR = "slot_background_color"
+    SLOT_COUNT = "slot_count"
+    SLOT_HEIGHT = "slot_height"
+    SLOT_HIGHLIGHT = "slot_highlight"
+    SLOT_HIGHLIGHT_HOURS_PLAYED = "show_hours_played"
+    SLOT_HIGHLIGHT_PLATFORM = "show_platform"
+    SLOT_TEXT_COLOR = "slot_text_color"
+    SLOT_WIDTH = "slot_width"
+    SORT_STATE = "sortstate"
+    STEAM_ID64 = "steam_id64"
+    STEAM_PARSE_COMMUNITY_PROFILE = "parse_steam_community_profile"
+    STEAM_PATH = "steam_path"
+    STEAM_PERSONANAME = "steam_personaname"
+    STEAM_USERDATAID = "steam_userdataid"
