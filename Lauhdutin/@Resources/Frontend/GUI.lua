@@ -210,12 +210,33 @@
 				C_SLOT_HIGHLIGHT:Show(true)
 			end
 		end
+		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+		if nAnimation > 0 then
+			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+				C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
+				C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+				C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			end
+		end
 	end
 
 	function OnMouseLeaveSlot(anIndex)
 	-- Called when the mouse cursor leaves a slot
 	-- anIndex: The index of the slot in question (1-indexed)
 		--SLOT:Unhighlight(anIndex)
+		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+		if nAnimation > 0 then
+			C_ANIMATIONS:PushHoverReset(anIndex)
+			--if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			--elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
+			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			--elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			--end
+		end
 	end
 
 	function OnLeftClickSlot(anIndex)
@@ -1003,34 +1024,67 @@
 	function InitializeAnimations()
 		return {
 			tQueue = {},
+			bPlaying = false,
 
 			Pending = function (self)
 				return #self.tQueue > 0
 			end,
 
 			Play = function (self)
+				if self.bPlaying then
+					return false
+				end
+				self.bPlaying = true
 				print("Playing frame")
 				if #self.tQueue <= 0 then
+					self.bPlaying = false
 					return false
 				end
 				local tAnimationSet = nil
-				if #self.tQueue > 1 or self.tQueue[1].nFrames == 0 then
-				--if (#self.tQueue > 1 and not self.tQueue[1].bMandatory) or self.tQueue[1].nFrames == 0 then
+				--[[
+					1 entry
+						Play normally
+					More than 1 entry
+						Mandatory first
+							Play normally
+						Not mandatory first
+							Reset first
+							Discard until encounter a mandatory animation or only 1 left
+							
+				]]
+				local bCancel = false
+				if #self.tQueue > 1 then
+					if self.tQueue[1].bMandatory then
+						tAnimationSet = self.tQueue[1]
+					else
+						bCancel = true
+						tAnimationSet = table.remove(self.tQueue, 1)
+						tAnimationSet.nFrames = 0
+						while #self.tQueue > 1 and not self.tQueue[1].bMandatory do
+							table.remove(self.tQueue, 1)
+						end
+					end
+				elseif self.tQueue[1].nFrames == 0 then
 					tAnimationSet = table.remove(self.tQueue, 1)
-					tAnimationSet.nFrames = 0
 				else
 					tAnimationSet = self.tQueue[1]
 				end
 				if tAnimationSet == nil then
+					self.bPlaying = false
 					return false
 				end
-				if tAnimationSet.nFrames > 0 then
-					tAnimationSet.fFunction(tAnimationSet.nFrames, tAnimationSet.tArguments)
-					tAnimationSet.nFrames = tAnimationSet.nFrames - 1
+--				if tAnimationSet.nFrames > 0 then
+				if bCancel then
+					tAnimationSet.tArguments.fReset(tAnimationSet.tArguments)
 				else
-					tAnimationSet.fReset(tAnimationSet.tArguments)
+					tAnimationSet.fFunction(tAnimationSet.tArguments, tAnimationSet.nFrames)
+					tAnimationSet.nFrames = tAnimationSet.nFrames - 1
 				end
+--				else
+--					tAnimationSet.fReset(tAnimationSet.tArguments)
+--				end
 				print("Played frame")
+				self.bPlaying = false
 				return true
 			end,
 
@@ -1064,9 +1118,9 @@
 						tArguments = {
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
-							bHorizontal = false
-						},
-						fReset = self.ClickShiftReset
+							bHorizontal = false,
+							fReset = self.ClickShiftReset
+						}
 					},
 					{ -- Shift right
 						fFunction = self.ClickShift,
@@ -1074,9 +1128,9 @@
 						tArguments = {
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
-							bHorizontal = false
-						},
-						fReset = self.ClickShiftReset
+							bHorizontal = false,
+							fReset = self.ClickShiftReset
+						}
 					},
 					-- Horizontal orientation
 					{ -- Shrink
@@ -1088,9 +1142,9 @@
 						tArguments = {
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
-							bHorizontal = true
-						},
-						fReset = self.ClickShiftReset
+							bHorizontal = true,
+							fReset = self.ClickShiftReset
+						}
 					},
 					{ -- Shift left
 						fFunction = self.ClickShift,
@@ -1098,10 +1152,10 @@
 						tArguments = {
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
-							bHorizontal = true
-						},
-						fReset = self.ClickShiftReset
-					},
+							bHorizontal = true,
+							fReset = self.ClickShiftReset
+						}
+					}
 				}
 				local tAnimationSet = tAnimationSets[anType]
 				if not tAnimationSet then
@@ -1109,13 +1163,13 @@
 				end
 				tAnimationSet.tArguments.fAction = afAction
 				tAnimationSet.tArguments.tGame = atGame
-				print("Pushing " .. anType .. ' to ' .. anSlotIndex)
+				print("Pushing click " .. anType .. ' to slot ' .. anSlotIndex)
 				self:Push(tAnimationSet)
 			end,
 			--     Shift left
-			ClickShift = function (anFramesLeft, atArguments)
+			ClickShift = function (atArguments, anFramesLeft)
 				local nFrame = 4 - anFramesLeft + 1
-				print("Playing click shift left frame " .. nFrame)
+				print("Playing click shift frame " .. nFrame)
 				local nSlotIndex = atArguments.nSlotIndex
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				if nFrame == 1 then
@@ -1124,8 +1178,11 @@
 					nNewPosition = 0 - nNewPosition / 4.0
 				elseif nFrame == 3 then
 					nNewPosition = 0 - nNewPosition / 1.8
-				else
+				elseif nFrame == 4 then
 					nNewPosition = 0 - nNewPosition
+				else
+					atArguments.fReset(atArguments)
+					return
 				end
 				local sOption = 'X'
 				if atArguments.bHorizontal then
@@ -1140,7 +1197,7 @@
 			end,
 
 			ClickShiftReset = function (atArguments)
-				print("Playing click shift left reset frame")
+				print("Playing click shift reset frame")
 				local nSlotIndex = atArguments.nSlotIndex
 				local sOption = 'X'
 				if atArguments.bHorizontal then
@@ -1148,9 +1205,177 @@
 				end
 				atArguments.fAction(atArguments.tGame)
 				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "' .. 0 .. '"]'
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "0"]'
 					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
 				)
+				print("Played click shift reset frame")
+			end,
+
+			--   Hover
+			PushHover = function (self, anType, anSlotIndex)
+				if anType < 1 or anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
+					return
+				end
+				-- Restructure InitializeAnimations and move tAnimationSets out of the function declaration
+				local tAnimationSets = {
+					{ -- Zoom in
+						fFunction = self.HoverZoomIn,
+						nFrames = 3,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
+							fReset = self.HoverReset
+						}
+					},
+					{ -- Jiggle
+						fFunction = self.HoverJiggle,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
+							fReset = self.HoverReset
+						}
+					},
+					{ -- Shake
+						fFunction = self.HoverShake,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
+							fReset = self.HoverReset
+						}
+					}
+				}
+				local tAnimationSet = tAnimationSets[anType]
+				if not tAnimationSet then
+					return
+				end
+				print("Pushing hover " .. anType .. ' to slot ' .. anSlotIndex)
+				self:Push(tAnimationSet)
+			end,
+
+			HoverZoomIn = function (atArguments, anFramesLeft)
+				local nFrame = 3 - anFramesLeft + 1
+				print("Playing hover zoom in frame " .. nFrame)
+				local nSlotIndex = atArguments.nSlotIndex
+				local nSizeFactor = 1.0
+				if nFrame == 1 then
+					nSizeFactor = 1.05
+				elseif nFrame == 2 then
+					nSizeFactor = 1.10
+				elseif nFrame == 3 then
+					nSizeFactor = 1.15
+				else
+					return
+				end
+				local sPositionOption = 'X'
+				local sSizeOption = 'W'
+				local nPositionValue = 0
+				local nSizeValue = 1
+				if atArguments.bHorizontal then
+					sPositionOption = 'Y'
+					sSizeOption = 'H'
+					local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+					nPositionValue = 0 -((nSizeFactor * nSlotHeight) - nSlotHeight) / 2
+					nSizeValue = nSizeFactor * nSlotHeight
+				else
+					local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+					nPositionValue = 0 - ((nSizeFactor * nSlotWidth) - nSlotWidth) / 2
+					nSizeValue = nSizeFactor * nSlotWidth
+				end
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'
+					.. sPositionOption .. '" "' .. nPositionValue .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "'
+					.. sSizeOption .. '" "' .. nSizeValue .. '"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
+				)
+			end,
+
+			HoverJiggle = function (atArguments, anFramesLeft)
+				local nFrame = 4 - anFramesLeft + 1
+				print("Playing hover jiggle frame " .. nFrame)
+				local nSlotIndex = atArguments.nSlotIndex
+				local nSizeFactor = 1.0
+				if nFrame == 1 then
+					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "2"]')
+				elseif nFrame == 2 then
+					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]')
+				elseif nFrame == 3 then
+					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "-2"]')
+				elseif nFrame == 4 then
+					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]')
+				else
+					return
+				end
+				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
+			end,
+
+			HoverShake = function (atArguments, anFramesLeft)
+				local nFrame = 4 - anFramesLeft + 1
+				print("Playing hover shake frame " .. nFrame)
+				local nSlotIndex = atArguments.nSlotIndex
+				local sPositionOption = 'X'
+				if atArguments.bHorizontal then
+					sPositionOption = 'Y'
+				end
+				if nFrame == 1 then
+					SKIN:Bang(
+						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "-5"]'
+					)
+				elseif nFrame == 2 then
+					SKIN:Bang(
+						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "0"]'
+					)
+				elseif nFrame == 3 then
+					SKIN:Bang(
+						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "5"]'
+					)
+				elseif nFrame == 4 then
+					SKIN:Bang(
+						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "0"]'
+					)
+				else
+					return
+				end
+				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
+			end,
+
+			PushHoverReset = function (self, anSlotIndex)
+				if anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
+					return
+				end
+				print("Pushing hover reset to slot " .. anSlotIndex)
+				self:Push(
+					{
+						fFunction = self.HoverReset,
+						nFrames = 0,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
+							fReset = self.HoverReset
+						}
+					}
+				)
+			end,
+
+			HoverReset = function (atArguments, anFramesLeft)
+				print("Playing hover reset frame")
+				local nSlotIndex = atArguments.nSlotIndex
+				local sOption = 'X'
+				if atArguments.bHorizontal then
+					sOption = 'Y'
+				end
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "0"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "'
+					.. T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH] .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "'
+					.. T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
+				)
+				print("Played hover reset frame")
 			end
 		}
 	end
@@ -1225,38 +1450,38 @@
 		OnClearFilter()
 		SortGames()
 		PopulateSlots()
-		if not bInstalling then
-			T_RECENTLY_LAUNCHED_GAME = atGame
-			if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
-				-- Monitor the process defined in the manual override
-				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
-			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
-				-- Monitor the Steam Overlay process
-				C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
-			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
-				-- Monitor the default game process
-				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
-			else
-				-- Monitor the executable that the shortcut points to
-				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-				local sProcessName = sProcessPath:reverse()
-				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
-				if sProcessName ~= nil then
-					sProcessName = sProcessName:reverse()
-					C_PROCESS_MONITOR:Start(sProcessName)
-				end
-			end
-			if atGame[E_GAME_KEYS.IGNORES_BANGS] ~= true then
-				ExecuteStartingBangs()
-			end
-		end
-		local tArguments = atGame[E_GAME_KEYS.ARGUMENTS]
-		if tArguments ~= nil then
-			sArguments = table.concat(tArguments, '" "')
-			SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
-		else
-			SKIN:Bang('["' .. sPath .. '"]')
-		end
+--		if not bInstalling then
+--			T_RECENTLY_LAUNCHED_GAME = atGame
+--			if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+--				-- Monitor the process defined in the manual override
+--				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
+--			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
+--				-- Monitor the Steam Overlay process
+--				C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
+--			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
+--				-- Monitor the default game process
+--				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
+--			else
+--				-- Monitor the executable that the shortcut points to
+--				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+--				local sProcessName = sProcessPath:reverse()
+--				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
+--				if sProcessName ~= nil then
+--					sProcessName = sProcessName:reverse()
+--					C_PROCESS_MONITOR:Start(sProcessName)
+--				end
+--			end
+--			if atGame[E_GAME_KEYS.IGNORES_BANGS] ~= true then
+--				ExecuteStartingBangs()
+--			end
+--		end
+--		local tArguments = atGame[E_GAME_KEYS.ARGUMENTS]
+--		if tArguments ~= nil then
+--			sArguments = table.concat(tArguments, '" "')
+--			SKIN:Bang('["' .. sPath .. '" "' .. sArguments .. '"]')
+--		else
+--			SKIN:Bang('["' .. sPath .. '"]')
+--		end
 		return true
 	end
 --###########################################################################################################
