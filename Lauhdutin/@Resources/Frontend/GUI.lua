@@ -496,7 +496,9 @@
 		InitializeConstants()
 		C_TOOLBAR:UpdateSortingIcon()
 		C_TOOLBAR:Hide()
-		--C_TOOLBAR:MoveToBottom()
+		if tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) == 4 then
+			C_TOOLBAR:MoveToBottom()
+		end
 		C_SLOT_HIGHLIGHT:Hide()
 		C_STATUS_MESSAGE:Show('Initializing...')
 		-- Start the Python backend script
@@ -599,6 +601,7 @@
 		return {
 			bVisible = true,
 			bForciblyVisible = false,
+			bTopPosition = true,
 
 			Show = function (self, abForce)
 			-- 
@@ -655,8 +658,21 @@
 			end,
 
 			MoveToBottom = function (self)
+				self.bTopPosition = false
+				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
 				SKIN:Bang(
-					'[!SetOption "FilterInput" "Y" "' .. T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] - 50 .. '"]'
+					'[!SetOption "ToolbarEnabler" "Y" "' .. nSlotHeight - 1 .. '"]'
+					.. '[!UpdateMeter "ToolbarEnabler"]'
+					.. '[!SetOption "ToolbarBackground" "Y" "' .. nSlotHeight - 50 .. '"]'
+					.. '[!SetOption "ToolbarButtonSearch" "Y" "' .. nSlotHeight - 49 .. '"]'
+					.. '[!SetOption "ToolbarSeparator1" "Y" "' .. nSlotHeight - 45 .. '"]'
+					.. '[!SetOption "ToolbarButtonSort" "Y" "' .. nSlotHeight - 49 .. '"]'
+					.. '[!SetOption "ToolbarButtonSortReverseIndicator" "Y" "' .. nSlotHeight - 12 .. '"]'
+					.. '[!SetOption "ToolbarSeparator2" "Y" "' .. nSlotHeight - 45 .. '"]'
+					.. '[!SetOption "ToolbarButtonSettings" "Y" "' .. nSlotHeight - 49 .. '"]'
+					.. '[!UpdateMeterGroup "Toolbar"]'
+					.. '[!SetOption "FilterInput" "Y" "' .. nSlotHeight - 90 .. '"]'
+					.. '[!UpdateMeasure "FilterInput"]'
 				)
 			end
 		}
@@ -1567,6 +1583,13 @@
 					.. '[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
 					.. '[!UpdateMeter "ToolbarEnabler"]'
 				)
+				if not C_TOOLBAR.bTopPosition then
+					SKIN:Bang(
+						'[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "'
+						.. tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) - 1 .. '"]'
+						.. '[!UpdateMeter "ToolbarEnabler"]'
+					)
+				end
 			end
 		}
 	end
