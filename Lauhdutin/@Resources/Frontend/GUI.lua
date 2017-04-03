@@ -1545,10 +1545,22 @@
 			end
 		elseif STRING:StartsWith(asPattern, 'shortcuts:') then
 			asPattern = asPattern:sub(11)
-			for i, tGame in ipairs(atTable) do
-				if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] ~= nil
-				   and tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
-					table.insert(tResult, tGame)
+			if asPattern == '' then
+				for i, tGame in ipairs(atTable) do
+					if tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.WINDOWS_SHORTCUT
+					   or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.WINDOWS_URL_SHORTCUT then
+						table.insert(tResult, tGame)
+					end
+				end
+			else
+				for i, tGame in ipairs(atTable) do
+					if tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.WINDOWS_SHORTCUT
+					   or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.WINDOWS_URL_SHORTCUT then
+						if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] ~= nil
+						   and tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]:lower():find(asPattern) then
+							table.insert(tResult, tGame)
+						end
+					end
 				end
 			end
 		else
