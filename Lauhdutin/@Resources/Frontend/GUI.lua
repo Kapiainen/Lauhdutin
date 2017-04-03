@@ -2264,10 +2264,14 @@
 				if atArguments.bHorizontal then
 					sPositionOption = 'Y'
 				end
+				local nTextOffset = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH]) / 2
+				if atArguments.bHorizontal then
+					nTextOffset = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) / 2
+				end
 				for i = 1, tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) do
 					SKIN:Bang(
 						'[!SetOption "SlotText' .. i .. '" "' .. sPositionOption .. '" "'
-						.. nNewPosition + tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) / 2 .. '"]'
+						.. nNewPosition + nTextOffset .. '"]'
 						.. '[!SetOption "SlotBanner' .. i .. '" "' .. sPositionOption .. '" "'
 						.. nNewPosition .. '"]'
 					)
