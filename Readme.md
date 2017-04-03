@@ -173,7 +173,7 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
 
-Hidden games are not showed by default on filtering (except on `games:all` and `hidden:true` filters, that will always show hidden games), but can be enabled so that the filtering also shows hidden games.
+Games that are not currently installed or are set as hidden are not shown by default when filtering. There are settings for making each category of aforementioned games show up when filtering.
 
 ## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
