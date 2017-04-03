@@ -1308,8 +1308,11 @@
 			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
 			local tTableOfGames = {}
-			for i, tGame in ipairs(T_GAMES) do
-				table.insert(tTableOfGames, tGame)
+			for i, tGame in ipairs(T_ALL_GAMES) do
+				if not tGame[E_GAME_KEYS.HIDDEN]
+				   or (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES]) then
+					table.insert(tTableOfGames, tGame)
+				end
 			end
 			T_FILTERED_GAMES, sort = Filter(tTableOfGames, asPattern)
 		end
@@ -1438,7 +1441,10 @@
 				function get_all_games()
 					local tAllGames = {}
 					for i, tGame in ipairs(T_ALL_GAMES) do
-						table.insert(tAllGames, tGame)
+						if not tGame[E_GAME_KEYS.HIDDEN]
+						   or (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES]) then
+							table.insert(tAllGames, tGame)
+						end
 					end
 					return tAllGames
 				end
