@@ -23,6 +23,7 @@
 	--     b = boolean
 	--     c = component
 	--     e = enum
+	--     f = function
 	--     n = number
 	--     s = string
 	--     t = table
@@ -231,17 +232,28 @@
 		if tGame == nil then
 			return
 		end
-		if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-			if LaunchGame(tGame) then
-				Redraw()
+		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_CLICK]
+		if nAnimation > 0 then
+			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+				C_ANIMATIONS:PushClick(nAnimation, anIndex, LaunchGame, tGame)
+			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
+				C_ANIMATIONS:PushClick(nAnimation, anIndex, HideGame, tGame)
+			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+				C_ANIMATIONS:PushClick(nAnimation, anIndex, UnhideGame, tGame)
 			end
-		elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-			if HideGame(tGame) then
-				Redraw()
-			end
-		elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-			if UnhideGame(tGame) then
-				Redraw()
+		else
+			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+				if LaunchGame(tGame) then
+					Redraw()
+				end
+			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
+				if HideGame(tGame) then
+					Redraw()
+				end
+			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+				if UnhideGame(tGame) then
+					Redraw()
+				end
 			end
 		end
 	end
@@ -365,22 +377,11 @@
 --###########################################################################################################
 	function Update()
 	-- Called regularly (every ~16 ms) by Rainmeter when the mouse is on the skin
-		if #T_SLOT_ANIMATION_QUEUE > 0 then
-		-- If there are animations do play, then redraw
-			local nSlotIndex = 1
-			while nSlotIndex <= SETTINGS.SLOT_COUNT do
-				local tAnimation = SLOT_ANIMATION_QUEUE[nSlotIndex]
-				if tAnimation ~= nil then
-					if tAnimation.nFrame > 0 then
-						tAnimation.fAnimation(nSlotIndex, tAnimation.nFrame)
-						tAnimation.nFrame = tAnimation.nFrame - 1
-					else
-						SLOT_ANIMATION_QUEUE[nSlotIndex] = nil
-					end
-				end
-				nSlotIndex = nSlotIndex + 1
+		if C_ANIMATIONS:Pending() then
+		-- If there are animations to play, then play a frame and redraw
+			if C_ANIMATIONS:Play() then
+				Redraw()
 			end
-			Redraw()
 		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
 		-- If scroll index has changed, then redraw
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
@@ -467,6 +468,7 @@
 		C_SLOT_SUBMENU = InitializeSlotSubmenu()
 		C_PROCESS_MONITOR = InitializeProcessMonitor()
 		C_SLOT_HIGHLIGHT = InitializeSlotHighlight()
+		C_ANIMATIONS = InitializeAnimations()
 	end
 
 	function InitializeScript()
@@ -994,6 +996,172 @@
 				if abRedraw then
 					Redraw()
 				end
+			end
+		}
+	end
+
+	function InitializeAnimations()
+		return {
+			tQueue = {},
+
+			Pending = function (self)
+				return #self.tQueue > 0
+			end,
+
+			Play = function (self)
+				print("Playing frame")
+				if #self.tQueue <= 0 then
+					return false
+				end
+				local tAnimationSet = nil
+				if #self.tQueue > 1 or self.tQueue[1].nFrames == 0 then
+				--if (#self.tQueue > 1 and not self.tQueue[1].bMandatory) or self.tQueue[1].nFrames == 0 then
+					tAnimationSet = table.remove(self.tQueue, 1)
+				else
+					tAnimationSet = self.tQueue[1]
+				end
+				if tAnimationSet == nil then
+					return false
+				end
+				if tAnimationSet.nFrames > 0 then
+					tAnimationSet.fFunction(tAnimationSet.nFrames, tAnimationSet.tArguments)
+				else
+					tAnimationSet.fReset(tAnimationSet.tArguments)
+				end
+				tAnimationSet.nFrames = tAnimationSet.nFrames - 1
+				print("Played frame")
+				return true
+			end,
+
+			Push = function (self, atAnimationSet)
+				print("Pushing to queue")
+				table.insert(self.tQueue, atAnimationSet)
+					--{
+					--	fFunction = aFunction, -- Animation function that changes variables
+					--	nFrames = anFrames, -- Number of frames in the animation
+					--	tArguments = atArguments, -- Arguments passed to animation functions
+					--	fReset = aResetFunction -- Animation function that resets the objects
+					--}
+			end,
+
+			Pop = function (self)
+			-- Removes the most recent animation from the queue and returns it
+				if #self.tQueue > 0 then
+					return table.remove(self.tQueue, 1)
+				end
+				return nil
+			end,
+
+			Clear = function (self)
+			-- Clears the queue
+				self.tQueue = {}
+			end,
+
+			-- Animation functions
+			--   Click
+			PushClick = function (self, anType, anSlotIndex, afAction, atGame)
+				if anType < 1 or anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]
+				   or afAction == nil or atGame == nil then
+					return
+				end
+				local tAnimationSets = {
+					-- Vertical orientation
+					{ -- Shrink
+
+					},
+					{ -- Shift left
+						fFunction = self.ClickShift,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							nDirection = 1,
+							bHorizontal = false
+						},
+						fReset = self.ClickShiftReset
+					},
+					{ -- Shift right
+						fFunction = self.ClickShift,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							nDirection = -1,
+							bHorizontal = false
+						},
+						fReset = self.ClickShiftReset
+					},
+					-- Horizontal orientation
+					{ -- Shrink
+
+					},
+					{ -- Shift up
+						fFunction = self.ClickShift,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							nDirection = 1,
+							bHorizontal = true
+						},
+						fReset = self.ClickShiftReset
+					},
+					{ -- Shift left
+						fFunction = self.ClickShift,
+						nFrames = 4,
+						tArguments = {
+							nSlotIndex = anSlotIndex,
+							nDirection = -1,
+							bHorizontal = true
+						},
+						fReset = self.ClickShiftReset
+					},
+				}
+				local tAnimationSet = tAnimationSets[anType]
+				if not tAnimationSet then
+					return
+				end
+				tAnimationSet.tArguments.fAction = afAction
+				tAnimationSet.tArguments.tGame = atGame
+				print("Pushing " .. anType .. ' to ' .. anSlotIndex)
+				self:Push(tAnimationSet)
+			end,
+			--     Shift left
+			ClickShift = function (anFramesLeft, atArguments)
+				local nFrame = 4 - anFramesLeft + 1
+				print("Playing click shift left frame " .. nFrame)
+				local nSlotIndex = atArguments.nSlotIndex
+				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				if nFrame == 1 then
+					nNewPosition = 0 - nNewPosition / 20.0
+				elseif nFrame == 2 then
+					nNewPosition = 0 - nNewPosition / 4.0
+				elseif nFrame == 3 then
+					nNewPosition = 0 - nNewPosition / 1.8
+				else
+					nNewPosition = 0 - nNewPosition
+				end
+				local sOption = 'X'
+				if atArguments.bHorizontal then
+					sOption = 'Y'
+				end
+				nNewPosition = nNewPosition * atArguments.nDirection
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "'
+					.. nNewPosition .. '"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+				)
+			end,
+
+			ClickShiftReset = function (atArguments)
+				print("Playing click shift left reset frame")
+				local nSlotIndex = atArguments.nSlotIndex
+				local sOption = 'X'
+				if atArguments.bHorizontal then
+					sOption = 'Y'
+				end
+				atArguments.fAction(atArguments.tGame)
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "' .. 0 .. '"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+				)
 			end
 		}
 	end
@@ -1671,6 +1839,7 @@
 --###########################################################################################################
 --         -> Animations
 --###########################################################################################################
+
 --###########################################################################################################
 -- End of refactoring
 --###########################################################################################################
