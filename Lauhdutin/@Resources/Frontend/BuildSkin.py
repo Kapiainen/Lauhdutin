@@ -169,10 +169,10 @@ try:
                 "SolidColor=0,0,0,1",
                 "PreserveAspectRatio=2",
                 "DynamicVariables=1",
+                """LeftMouseUpAction=[!CommandMeasure LauhdutinScript "OnLeftClickSlot(%s)"]""" % i,
                 """MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "OnMiddleClickSlot(%s)"]""" % i,
                 """MouseOverAction=[!CommandMeasure LauhdutinScript "OnMouseEnterSlot(%s)"]""" % i,
                 """MouseLeaveAction=[!CommandMeasure LauhdutinScript "OnMouseLeaveSlot(%s)"]""" % i,
-                """LeftMouseUpAction=[!CommandMeasure LauhdutinScript "OnLeftClickSlot(%s)"]""" % i,
                 "Group=Slots",
                 "\n"
             ])

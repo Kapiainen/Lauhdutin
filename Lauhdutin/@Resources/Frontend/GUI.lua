@@ -226,16 +226,8 @@
 	-- Called when the mouse cursor leaves a slot
 	-- anIndex: The index of the slot in question (1-indexed)
 		--SLOT:Unhighlight(anIndex)
-		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-		if nAnimation > 0 then
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
 			C_ANIMATIONS:PushHoverReset(anIndex)
-			--if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			--elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			--elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-			--	C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			--end
 		end
 	end
 
@@ -255,6 +247,9 @@
 		end
 		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_CLICK]
 		if nAnimation > 0 then
+			if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+				C_ANIMATIONS:PushHoverReset(anIndex)
+			end
 			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
 				C_ANIMATIONS:PushClick(nAnimation, anIndex, LaunchGame, tGame)
 			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
@@ -1035,23 +1030,12 @@
 					return false
 				end
 				self.bPlaying = true
-				print("Playing frame")
+				--print("Playing frame")
 				if #self.tQueue <= 0 then
 					self.bPlaying = false
 					return false
 				end
 				local tAnimationSet = nil
-				--[[
-					1 entry
-						Play normally
-					More than 1 entry
-						Mandatory first
-							Play normally
-						Not mandatory first
-							Reset first
-							Discard until encounter a mandatory animation or only 1 left
-							
-				]]
 				local bCancel = false
 				if #self.tQueue > 1 then
 					if self.tQueue[1].bMandatory then
@@ -1079,13 +1063,13 @@
 					tAnimationSet.fFunction(tAnimationSet.tArguments)
 					tAnimationSet.tArguments.nFrames = tAnimationSet.tArguments.nFrames - 1
 				end
-				print("Played frame")
+				--print("Played frame")
 				self.bPlaying = false
 				return true
 			end,
 
 			Push = function (self, atAnimationSet)
-				print("Pushing to queue")
+				--print("Pushing to queue")
 				table.insert(self.tQueue, atAnimationSet)
 			end,
 
@@ -1099,7 +1083,13 @@
 				local tAnimationSets = {
 					-- Vertical orientation
 					{ -- Shrink
-
+						fFunction = self.ClickShrink,
+						tArguments = {
+							nFrames = 3,
+							nSlotIndex = anSlotIndex,
+							bHorizontal = false,
+							fReset = self.ClickShrinkReset
+						}
 					},
 					{ -- Shift left
 						fFunction = self.ClickShift,
@@ -1123,7 +1113,13 @@
 					},
 					-- Horizontal orientation
 					{ -- Shrink
-
+						fFunction = self.ClickShrink,
+						tArguments = {
+							nFrames = 3,
+							nSlotIndex = anSlotIndex,
+							bHorizontal = true,
+							fReset = self.ClickShrinkReset
+						}
 					},
 					{ -- Shift up
 						fFunction = self.ClickShift,
@@ -1152,13 +1148,76 @@
 				end
 				tAnimationSet.tArguments.fAction = afAction
 				tAnimationSet.tArguments.tGame = atGame
-				print("Pushing click " .. anType .. ' to slot ' .. anSlotIndex)
 				self:Push(tAnimationSet)
 			end,
-			--     Shift left
+			--     Shrink
+			ClickShrink = function (atArguments)
+				local nFrame = 3 - atArguments.nFrames + 1
+				local nSlotIndex = atArguments.nSlotIndex
+				local nSizeFactor = 1.0
+				if nFrame == 1 then
+					nSizeFactor = 1.0 / 1.8
+				elseif nFrame == 2 then
+					nSizeFactor = 1.0 / 4.0
+				elseif nFrame == 3 then
+					nSizeFactor = 1.0 / 20.0
+				else
+					atArguments.fReset(atArguments)
+					return
+				end
+				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+				local nX = 0
+				local nY = 0
+				local nW = 0
+				local nH = 0
+				if atArguments.bHorizontal then
+					nX = ((nSlotIndex - 1) * nSlotWidth) + (nSlotWidth - nSlotWidth * nSizeFactor) / 2
+					nY = (nSlotHeight - nSlotHeight * nSizeFactor) / 2
+					nW = nSlotWidth * nSizeFactor
+					nH = nSlotHeight * nSizeFactor
+				else
+					nX = (nSlotWidth - nSlotWidth * nSizeFactor) / 2
+					nY = ((nSlotIndex - 1) * nSlotHeight) + (nSlotHeight - nSlotHeight * nSizeFactor) / 2
+					nW = nSlotWidth * nSizeFactor
+					nH = nSlotHeight * nSizeFactor
+				end
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "X" "' .. nX .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "Y" "' .. nY .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "' .. nW .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "' .. nH .. '"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+				)
+			end,
+
+			ClickShrinkReset = function (atArguments)
+				local nSlotIndex = atArguments.nSlotIndex
+				local sOption = 'X'
+				if atArguments.bHorizontal then
+					sOption = 'Y'
+				end
+				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+				local nX = 0
+				local nY = 0
+				if atArguments.bHorizontal then
+					nX = (nSlotIndex - 1) * nSlotWidth
+				else
+					nY = (nSlotIndex - 1) * nSlotHeight
+				end
+				atArguments.fAction(atArguments.tGame)
+				SKIN:Bang(
+					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "X" "' .. nX .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "Y" "' .. nY .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "' .. nSlotWidth .. '"]'
+					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "' .. nSlotHeight .. '"]'
+					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+				)
+			end,
+			--     Shift
 			ClickShift = function (atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
-				print("Playing click shift frame " .. nFrame)
 				local nSlotIndex = atArguments.nSlotIndex
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				if nFrame == 1 then
@@ -1186,7 +1245,6 @@
 			end,
 
 			ClickShiftReset = function (atArguments)
-				print("Playing click shift reset frame")
 				local nSlotIndex = atArguments.nSlotIndex
 				local sOption = 'X'
 				if atArguments.bHorizontal then
@@ -1197,7 +1255,6 @@
 					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "0"]'
 					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
 				)
-				print("Played click shift reset frame")
 			end,
 
 			--   Hover
