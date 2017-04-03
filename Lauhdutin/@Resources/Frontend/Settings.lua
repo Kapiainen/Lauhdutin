@@ -1,6 +1,7 @@
 function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
-	SETTING_KEYS = dofile(SKIN:GetVariable('@') .. 'Frontend\\SettingsEnum.lua')
+	enums = dofile(SKIN:GetVariable('@') .. 'Frontend\\Enums.lua')
+	SETTING_KEYS = enums.SETTING_KEYS
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
 	EXECUTE_BANGS_SWITCH = false
@@ -236,10 +237,6 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BATTLENET_PATH] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.PYTHON_PATH]) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] ..'"]')
-		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STARTING]) .. '"]')
-		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STARTING] ..'"]')
-		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STOPPING]) .. '"]')
-		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STOPPING] ..'"]')
 		if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 			if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
@@ -487,15 +484,46 @@ function AcceptPythonPath(aPath)
 	UpdateSettings()
 end
 
-function AcceptStartGameBang(aPath)
-	SETTINGS[SETTING_KEYS.BANGS_STARTING] = aPath
-	UpdateSettings()
+function EditStartGameBang()
+	print("Edit start")
+	SKIN:Bang('"#Python#" "#@#Backend\\EditBangs.py" "#PROGRAMPATH#;" "#@#;" "true;" "OnFinishedEditingStartGameBang;" "#CURRENTCONFIG#;"')
+	--#Python#
 end
 
-function AcceptStopGameBang(aPath)
-	SETTINGS[SETTING_KEYS.BANGS_STOPPING] = aPath
-	UpdateSettings()
+function OnFinishedEditingStartGameBang()
+	print("On finished editing start")
+	local f = io.open(RESOURCES_PATH .. 'Temp\\bangs_temp.txt', 'r')
+	if f ~= nil then
+		contents = f:read('*a')
+		f:close()
+		SETTINGS[SETTING_KEYS.BANGS_STARTING] = contents
+	end
 end
+
+--function AcceptStartGameBang(aPath)
+--	SETTINGS[SETTING_KEYS.BANGS_STARTING] = aPath
+--	UpdateSettings()
+--end
+
+function EditStopGameBang()
+	print("Edit stop")
+	SKIN:Bang('"#Python#" "#@#Backend\\EditBangs.py" "#PROGRAMPATH#;" "#@#;" "false;" "OnFinishedEditingStopGameBang;" "#CURRENTCONFIG#;"')
+end
+
+function OnFinishedEditingStopGameBang()
+	print("On finished editing stop")
+	local f = io.open(RESOURCES_PATH .. 'Temp\\bangs_temp.txt', 'r')
+	if f ~= nil then
+		contents = f:read('*a')
+		f:close()
+		SETTINGS[SETTING_KEYS.BANGS_STOPPING] = contents
+	end
+end
+
+--function AcceptStopGameBang(aPath)
+--	SETTINGS[SETTING_KEYS.BANGS_STOPPING] = aPath
+--	UpdateSettings()
+--end
 
 function ToggleOrientation()
 	if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then

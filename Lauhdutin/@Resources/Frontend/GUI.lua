@@ -1796,7 +1796,6 @@
 		if T_RECENTLY_LAUNCHED_GAME[E_GAME_KEYS.IGNORES_BANGS] ~= true
 		   and T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING] ~= nil
 		   and T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING] ~= '' then
-			-- The extra set of parentheses are used to just use the first return value of gsub
 			SKIN:Bang((T_SETTINGS[E_SETTING_KEYS.BANGS_STOPPING]:gsub('`', '"')))
 		end
 	end
