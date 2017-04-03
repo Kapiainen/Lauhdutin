@@ -1059,12 +1059,12 @@
 					else
 						bCancel = true
 						tAnimationSet = table.remove(self.tQueue, 1)
-						tAnimationSet.nFrames = 0
+						tAnimationSet.tArguments.nFrames = 0
 						while #self.tQueue > 1 and not self.tQueue[1].bMandatory do
 							table.remove(self.tQueue, 1)
 						end
 					end
-				elseif self.tQueue[1].nFrames == 0 then
+				elseif self.tQueue[1].tArguments.nFrames == 0 then
 					tAnimationSet = table.remove(self.tQueue, 1)
 				else
 					tAnimationSet = self.tQueue[1]
@@ -1073,16 +1073,12 @@
 					self.bPlaying = false
 					return false
 				end
---				if tAnimationSet.nFrames > 0 then
 				if bCancel then
 					tAnimationSet.tArguments.fReset(tAnimationSet.tArguments)
 				else
-					tAnimationSet.fFunction(tAnimationSet.tArguments, tAnimationSet.nFrames)
-					tAnimationSet.nFrames = tAnimationSet.nFrames - 1
+					tAnimationSet.fFunction(tAnimationSet.tArguments)
+					tAnimationSet.tArguments.nFrames = tAnimationSet.tArguments.nFrames - 1
 				end
---				else
---					tAnimationSet.fReset(tAnimationSet.tArguments)
---				end
 				print("Played frame")
 				self.bPlaying = false
 				return true
@@ -1091,12 +1087,6 @@
 			Push = function (self, atAnimationSet)
 				print("Pushing to queue")
 				table.insert(self.tQueue, atAnimationSet)
-					--{
-					--	fFunction = aFunction, -- Animation function that changes variables
-					--	nFrames = anFrames, -- Number of frames in the animation
-					--	tArguments = atArguments, -- Arguments passed to animation functions
-					--	fReset = aResetFunction -- Animation function that resets the objects
-					--}
 			end,
 
 			-- Animation functions
@@ -1106,7 +1096,6 @@
 				   or afAction == nil or atGame == nil then
 					return
 				end
-				-- Restructure InitializeAnimations and move tAnimationSets out of the function declaration
 				local tAnimationSets = {
 					-- Vertical orientation
 					{ -- Shrink
@@ -1114,8 +1103,8 @@
 					},
 					{ -- Shift left
 						fFunction = self.ClickShift,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
 							bHorizontal = false,
@@ -1124,8 +1113,8 @@
 					},
 					{ -- Shift right
 						fFunction = self.ClickShift,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
 							bHorizontal = false,
@@ -1138,8 +1127,8 @@
 					},
 					{ -- Shift up
 						fFunction = self.ClickShift,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
 							bHorizontal = true,
@@ -1148,8 +1137,8 @@
 					},
 					{ -- Shift left
 						fFunction = self.ClickShift,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
 							bHorizontal = true,
@@ -1167,8 +1156,8 @@
 				self:Push(tAnimationSet)
 			end,
 			--     Shift left
-			ClickShift = function (atArguments, anFramesLeft)
-				local nFrame = 4 - anFramesLeft + 1
+			ClickShift = function (atArguments)
+				local nFrame = 4 - atArguments.nFrames + 1
 				print("Playing click shift frame " .. nFrame)
 				local nSlotIndex = atArguments.nSlotIndex
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
@@ -1216,12 +1205,11 @@
 				if anType < 1 or anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
 					return
 				end
-				-- Restructure InitializeAnimations and move tAnimationSets out of the function declaration
 				local tAnimationSets = {
 					{ -- Zoom in
 						fFunction = self.HoverZoomIn,
-						nFrames = 3,
 						tArguments = {
+							nFrames = 3,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
 							fReset = self.HoverReset
@@ -1229,8 +1217,8 @@
 					},
 					{ -- Jiggle
 						fFunction = self.HoverJiggle,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
 							fReset = self.HoverReset
@@ -1238,8 +1226,8 @@
 					},
 					{ -- Shake
 						fFunction = self.HoverShake,
-						nFrames = 4,
 						tArguments = {
+							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
 							fReset = self.HoverReset
@@ -1250,13 +1238,11 @@
 				if not tAnimationSet then
 					return
 				end
-				print("Pushing hover " .. anType .. ' to slot ' .. anSlotIndex)
 				self:Push(tAnimationSet)
 			end,
 
-			HoverZoomIn = function (atArguments, anFramesLeft)
-				local nFrame = 3 - anFramesLeft + 1
-				print("Playing hover zoom in frame " .. nFrame)
+			HoverZoomIn = function (atArguments)
+				local nFrame = 3 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
@@ -1292,9 +1278,8 @@
 				)
 			end,
 
-			HoverJiggle = function (atArguments, anFramesLeft)
-				local nFrame = 4 - anFramesLeft + 1
-				print("Playing hover jiggle frame " .. nFrame)
+			HoverJiggle = function (atArguments)
+				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
@@ -1311,9 +1296,8 @@
 				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
 			end,
 
-			HoverShake = function (atArguments, anFramesLeft)
-				local nFrame = 4 - anFramesLeft + 1
-				print("Playing hover shake frame " .. nFrame)
+			HoverShake = function (atArguments)
+				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local sPositionOption = 'X'
 				if atArguments.bHorizontal then
@@ -1345,12 +1329,11 @@
 				if anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
 					return
 				end
-				print("Pushing hover reset to slot " .. anSlotIndex)
 				self:Push(
 					{
 						fFunction = self.HoverReset,
-						nFrames = 0,
 						tArguments = {
+							nFrames = 0,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
 							fReset = self.HoverReset
@@ -1359,8 +1342,7 @@
 				)
 			end,
 
-			HoverReset = function (atArguments, anFramesLeft)
-				print("Playing hover reset frame")
+			HoverReset = function (atArguments)
 				local nSlotIndex = atArguments.nSlotIndex
 				local sOption = 'X'
 				if atArguments.bHorizontal then
@@ -1375,7 +1357,6 @@
 					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]'
 					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
 				)
-				print("Played hover reset frame")
 			end
 		}
 	end
