@@ -1017,6 +1017,7 @@
 				if #self.tQueue > 1 or self.tQueue[1].nFrames == 0 then
 				--if (#self.tQueue > 1 and not self.tQueue[1].bMandatory) or self.tQueue[1].nFrames == 0 then
 					tAnimationSet = table.remove(self.tQueue, 1)
+					tAnimationSet.nFrames = 0
 				else
 					tAnimationSet = self.tQueue[1]
 				end
@@ -1025,10 +1026,10 @@
 				end
 				if tAnimationSet.nFrames > 0 then
 					tAnimationSet.fFunction(tAnimationSet.nFrames, tAnimationSet.tArguments)
+					tAnimationSet.nFrames = tAnimationSet.nFrames - 1
 				else
 					tAnimationSet.fReset(tAnimationSet.tArguments)
 				end
-				tAnimationSet.nFrames = tAnimationSet.nFrames - 1
 				print("Played frame")
 				return true
 			end,
@@ -1044,19 +1045,6 @@
 					--}
 			end,
 
-			Pop = function (self)
-			-- Removes the most recent animation from the queue and returns it
-				if #self.tQueue > 0 then
-					return table.remove(self.tQueue, 1)
-				end
-				return nil
-			end,
-
-			Clear = function (self)
-			-- Clears the queue
-				self.tQueue = {}
-			end,
-
 			-- Animation functions
 			--   Click
 			PushClick = function (self, anType, anSlotIndex, afAction, atGame)
@@ -1064,6 +1052,7 @@
 				   or afAction == nil or atGame == nil then
 					return
 				end
+				-- Restructure InitializeAnimations and move tAnimationSets out of the function declaration
 				local tAnimationSets = {
 					-- Vertical orientation
 					{ -- Shrink
@@ -1839,7 +1828,16 @@
 --###########################################################################################################
 --         -> Animations
 --###########################################################################################################
-
+	-- Animations are made of AnimationSets, which contain:
+	--   - A function that performs the state updates for each frame.
+	--   - A number of frames left in the animation.
+	--   - A function that resets what the animation changed and potentially does other stuff
+	--     (e.g. calls a function passed to it).
+	--   - A table of arguments passed to the animation and reset functions.
+	-- AnimationSets are added to a queue, which is kept as short as possible. If an AnimationSet does not
+	-- have the 'bMandatory' field with a true value, then it is reset early and discarded from the queue
+	-- when the queue has more than 1 AnimationSet in it.
+	-- 
 --###########################################################################################################
 -- End of refactoring
 --###########################################################################################################
