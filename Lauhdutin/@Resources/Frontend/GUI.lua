@@ -523,19 +523,23 @@
 		JSON = dofile(sResourcesPath .. 'Dependencies\\json4lua\\json.lua')
 		STRING = dofile(sResourcesPath .. 'Frontend\\String.lua')
 		InitializeEnums(sResourcesPath)
-		InitializeComponents(sResourcesPath)
 		InitializeStateVariables()
 		InitializeConstants()
-		C_TOOLBAR:UpdateSortingIcon()
+		InitializeComponents(sResourcesPath)
 		C_TOOLBAR:Hide()
+		C_SLOT_HIGHLIGHT:Hide()
+		C_SLOT_SUBMENU:Hide()
+		if not T_SETTINGS then
+			SKIN:Bang('[!ActivateConfig "#CURRENTCONFIG#" "Settings.ini"]')
+			C_STATUS_MESSAGE:Show('Load Settings.ini and save...')
+			return
+		end
+		C_TOOLBAR:UpdateSortingIcon()
 		if tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) == 4 then
 			C_TOOLBAR:MoveToBottom()
 		end
-		C_SLOT_HIGHLIGHT:Hide()
 		C_STATUS_MESSAGE:Show('Initializing...')
-		-- Start the Python backend script
 		SKIN:Bang('["#Python#" "#@#Backend\\GetGames.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;"]')
-		--OnInitialized() -- Debug
 	end
 
 	function InitializeComponents(asResourcesPath)
@@ -1179,7 +1183,7 @@
 		T_SLOT_ANIMATION_QUEUE = {}
 		N_ACTION_STATE = 0
 		N_UPDATES_UNTIL_REDRAW = 124
-		N_LAST_DRAWN_SCROLL_INDEX = -1
+		N_LAST_DRAWN_SCROLL_INDEX = 1
 		N_SCROLL_INDEX = 1
 		T_GAMES = {}
 		T_FILTERED_GAMES = {}
