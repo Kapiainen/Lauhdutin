@@ -76,9 +76,7 @@
 	-- abAnimate: Whether or not to play an animation to unhide the skin
 		C_SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
-			if not C_SKIN.bVisible then
-				C_ANIMATIONS:PushSkinSlideIn()
-			end
+			C_ANIMATIONS:PushSkinSlideIn()
 		end
 	end
 
@@ -2269,7 +2267,7 @@
 			end,
 
 			PushSkinSlideIn = function (self)
-				if C_SKIN.bSkinAnimationPlaying then
+				if C_SKIN.bSkinAnimationPlaying or C_SKIN.bVisible then
 					return
 				end
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
@@ -2291,7 +2289,7 @@
 			end,
 
 			PushSkinSlideOut = function (self)
-				if C_SKIN.bSkinAnimationPlaying then
+				if C_SKIN.bSkinAnimationPlaying or not C_SKIN.bVisible then
 					return
 				end
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
