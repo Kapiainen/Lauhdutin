@@ -427,10 +427,6 @@
 --###########################################################################################################
 --                  -> Process monitoring
 --###########################################################################################################
-	function OnProcessStarted()
-		ExecuteStartingBangs()
-	end
-
 	function OnProcessTerminated()
 		C_PROCESS_MONITOR:Stop()
 		if T_RECENTLY_LAUNCHED_GAME == nil then
@@ -1238,27 +1234,27 @@
 		SortGames()
 		PopulateSlots()
 		if not bInstalling then
-			T_RECENTLY_LAUNCHED_GAME = atGame
-			if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
-				-- Monitor the process defined in the manual override
-				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
-			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
-				-- Monitor the Steam Overlay process
-				C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
-			elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
-				-- Monitor the default game process
-				C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
-			else
-				-- Monitor the executable that the shortcut points to
-				local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
-				local sProcessName = sProcessPath:reverse()
-				sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
-				if sProcessName ~= nil then
-					sProcessName = sProcessName:reverse()
-					C_PROCESS_MONITOR:Start(sProcessName)
-				end
-			end
 			if atGame[E_GAME_KEYS.IGNORES_BANGS] ~= true then
+				T_RECENTLY_LAUNCHED_GAME = atGame
+				if atGame[E_GAME_KEYS.PROCESS_OVERRIDE] ~= nil then
+					-- Monitor the process defined in the manual override
+					C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS_OVERRIDE])
+				elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM then
+					-- Monitor the Steam Overlay process
+					C_PROCESS_MONITOR:Start('GameOverlayUI.exe')
+				elseif atGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then
+					-- Monitor the default game process
+					C_PROCESS_MONITOR:Start(atGame[E_GAME_KEYS.PROCESS])
+				else
+					-- Monitor the executable that the shortcut points to
+					local sProcessPath = string.gsub(string.gsub(sPath, "\\", "/"), "//", "/")
+					local sProcessName = sProcessPath:reverse()
+					sProcessName = sProcessName:match("(exe%p[^\\/:%*?<>|]+)/")
+					if sProcessName ~= nil then
+						sProcessName = sProcessName:reverse()
+						C_PROCESS_MONITOR:Start(sProcessName)
+					end
+				end
 				ExecuteStartingBangs()
 			end
 		end
