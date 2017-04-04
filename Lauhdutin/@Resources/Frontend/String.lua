@@ -18,4 +18,8 @@ function STRING:Trim(asString)
 	return asString:match('^%s*(.-)%s*$')
 end
 
+function STRING:Split(asString, asPattern)
+	return asString:gmatch('([^' .. asPattern .. ']+)')
+end
+
 return STRING
