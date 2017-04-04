@@ -570,11 +570,16 @@
 					if nStarts == nil or nEnds == nil then
 						return false
 					end
-					local sSkinSettings = sRainmeterINI:sub(nStarts, nEnds)
-					local sCurrentZPos = sSkinSettings:match('AlwaysOnTop=(.-)\n')
-					self.nDefaultZPos = tonumber(sCurrentZPos)
+					local sConfigSettings = sRainmeterINI:sub(nStarts, nEnds)
+					for sLine in STRING:Split(sConfigSettings, '\n') do
+						nStarts, nEnds = sLine:find("AlwaysOnTop=")
+						if nStarts and nEnds then
+							self.nDefaultZPos = tonumber(sLine:sub(nEnds + 1))
+							return true
+						end
+					end
 				end
-				return true
+				return false
 			end,
 
 			SetZPos = function (self, anValue)
