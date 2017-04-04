@@ -168,7 +168,33 @@
 
 	function OnStartInputtingFilter()
 		OnMouseEnterToolbar(true)
+		if T_SETTINGS[E_SETTING_KEYS.ADJUST_ZPOS] then
+			if C_SKIN:UpdateDefaultZPos() then
+				C_SKIN:SetZPos(0)
+			end
+		end
 		SKIN:Bang('[!CommandMeasure "FilterInput" "ExecuteBatch 1"]')
+	end
+
+	function OnDismissFilterInput()
+		if T_SETTINGS[E_SETTING_KEYS.ADJUST_ZPOS] then
+			C_SKIN:ResetZPos()
+		end
+		C_TOOLBAR.bForciblyVisible = false
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			if C_SLOT_HIGHLIGHT:Update() then
+				if not C_TOOLBAR.bVisible then
+					C_SLOT_HIGHLIGHT:Show()
+				end
+			end
+		end
+	end
+
+	function OnFinishedInputtingFilter(asPattern)
+		if T_SETTINGS[E_SETTING_KEYS.ADJUST_ZPOS] then
+			C_SKIN:ResetZPos()
+		end
+		OnApplyFilter(asPattern)
 	end
 
 	function OnApplyFilter(asPattern)
@@ -188,17 +214,6 @@
 		end
 		if #T_FILTERED_GAMES <= 0 then
 			OnShowStatus('No matches')
-		end
-	end
-
-	function OnDismissFilterInput()
-		C_TOOLBAR.bForciblyVisible = false
-		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
-				if not C_TOOLBAR.bVisible then
-					C_SLOT_HIGHLIGHT:Show()
-				end
-			end
 		end
 	end
 
@@ -538,7 +553,41 @@
 
 	function InitializeSkin()
 		return {
-			bVisible = true
+			bVisible = true,
+			nDefaultZPos = nil,
+			sSettingsPath = SKIN:GetVariable('SETTINGSPATH', nil),
+			sConfig = SKIN:GetVariable('CURRENTCONFIG', nil),
+
+			UpdateDefaultZPos = function (self)
+				if self.sSettingsPath == nil then
+					return false
+				end
+				local f = io.open(self.sSettingsPath .. 'Rainmeter.ini', 'r')
+				if f ~= nil then
+					local sRainmeterINI = f:read('*a')
+					f:close()
+					local nStarts, nEnds = sRainmeterINI:find('%[' .. self.sConfig .. '%][^%[]+')
+					if nStarts == nil or nEnds == nil then
+						return false
+					end
+					local sSkinSettings = sRainmeterINI:sub(nStarts, nEnds)
+					local sCurrentZPos = sSkinSettings:match('AlwaysOnTop=(.-)\n')
+					self.nDefaultZPos = tonumber(sCurrentZPos)
+				end
+				return true
+			end,
+
+			SetZPos = function (self, anValue)
+				if anValue >= -2 and anValue <= 2 then
+					SKIN:Bang('[!ZPos "' .. anValue .. '"]')
+				end
+			end,
+
+			ResetZPos = function (self)
+				if self.nDefaultZPos ~= nil then
+					SKIN:Bang('[!ZPos "' .. self.nDefaultZPos .. '" ]')
+				end
+			end
 		}
 	end
 

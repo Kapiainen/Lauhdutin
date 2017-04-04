@@ -32,6 +32,7 @@ class Platform():
     BATTLENET = 5
 
 class SettingKeys():
+    ADJUST_ZPOS = "adjust_zpos"
     ANIMATION_CLICK = "click_animation"
     ANIMATION_HOVER = "hover_animation"
     ANIMATION_SKIN_SLIDE_DIRECTION = "skin_slide_animation_direction"

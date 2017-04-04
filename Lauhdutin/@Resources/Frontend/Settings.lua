@@ -119,6 +119,9 @@ function Initialize()
 	if SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] == nil then
 		SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] = true
 	end
+	if SETTINGS[SETTING_KEYS.ADJUST_ZPOS] == nil then
+		SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = true
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -316,6 +319,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS[SETTING_KEYS.ADJUST_ZPOS] == true then
+			SKIN:Bang('[!SetOption "AdjustZPosStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "AdjustZPosStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -627,6 +635,11 @@ function CycleSkinSlideAnimationDirection()
 			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 		end
 	end
+	UpdateSettings()
+end
+
+function ToggleAdjustZPos()
+	SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = not SETTINGS[SETTING_KEYS.ADJUST_ZPOS]
 	UpdateSettings()
 end
 

@@ -288,6 +288,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Updated the setting title and tooltip for the paths to Blizzard games.
 - Bangs are now edited via Notepad.
 - Major GUI overhaul and optimizations.
+- Added option for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
