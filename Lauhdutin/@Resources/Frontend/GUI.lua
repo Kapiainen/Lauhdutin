@@ -557,6 +557,7 @@
 			nDefaultZPos = nil,
 			sSettingsPath = SKIN:GetVariable('SETTINGSPATH', nil),
 			sConfig = SKIN:GetVariable('CURRENTCONFIG', nil),
+			bSkinAnimationPlaying = false,
 
 			UpdateDefaultZPos = function (self)
 				if self.sSettingsPath == nil then
@@ -2268,6 +2269,9 @@
 			end,
 
 			PushSkinSlideIn = function (self)
+				if C_SKIN.bSkinAnimationPlaying then
+					return
+				end
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
 				if nDir <= 0 then
 					nDir = -1
@@ -2287,6 +2291,9 @@
 			end,
 
 			PushSkinSlideOut = function (self)
+				if C_SKIN.bSkinAnimationPlaying then
+					return
+				end
 				local nDir = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) % 2
 				if nDir <= 0 then
 					nDir = -1
@@ -2313,6 +2320,7 @@
 				end
 				if atArguments.bIntoView then
 					if nFrame == 1 then
+						C_SKIN.bSkinAnimationPlaying = true
 						C_SKIN.bVisible = true
 						nNewPosition = 0 - nNewPosition / 1.8
 					elseif nFrame == 2 then
@@ -2322,10 +2330,12 @@
 					elseif nFrame == 4 then
 						nNewPosition = 0
 					else
+						C_SKIN.bSkinAnimationPlaying = false
 						return
 					end
 				else
 					if nFrame == 1 then
+						C_SKIN.bSkinAnimationPlaying = true
 						nNewPosition = 0 - nNewPosition / 20.0
 					elseif nFrame == 2 then
 						nNewPosition = 0 - nNewPosition / 4.0
@@ -2336,6 +2346,7 @@
 					else
 						C_SCRIPT:SetUpdateDivider(-1)
 						C_SKIN.bVisible = false
+						C_SKIN.bSkinAnimationPlaying = false
 						return
 					end
 				end
