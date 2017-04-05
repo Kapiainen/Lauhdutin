@@ -1093,30 +1093,25 @@
 								'[!SetOption "SlotHighlight" "ImageName" '
 								.. '"#@#Icons\\SlotHighlightInstall.png"]'
 							)
-							if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
-								if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] then
-									sHighlightMessage = tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]
-														.. ' - Install'
-								else
-									sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
-														.. ' - Install'
-								end
+							if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] then
+								sHighlightMessage = tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]
+													.. ' - Install'
+							else
+								sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+													.. ' - Install'
 							end
 						else
 							SKIN:Bang(
 								'[!SetOption "SlotHighlight" "ImageName" '
 								.. '"#@#Icons\\SlotHighlightNotInstalled.png"]'
 							)
-							if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] then
-								if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] then
-									sHighlightMessage = tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]
-														.. ' - Not installed'
-								else
-									sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
-														.. ' - Not installed'
-								end
+							if tGame[E_GAME_KEYS.PLATFORM_OVERRIDE] then
+								sHighlightMessage = tGame[E_GAME_KEYS.PLATFORM_OVERRIDE]
+													.. ' - Not installed'
+							else
+								sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+													.. ' - Not installed'
 							end
-							
 						end
 					else
 						SKIN:Bang(
