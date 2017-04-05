@@ -1,8 +1,13 @@
 function Initialize()
+	RESOURCES_PATH = SKIN:GetVariable('@')
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
 	enums = dofile(SKIN:GetVariable('@') .. 'Frontend\\Enums.lua')
+	STRING = dofile(RESOURCES_PATH .. 'Frontend\\String.lua')
+	POSITION = InitializeSkin()
+	POSITION:UpdateDefaultZPos()
+	POSITION:SetZPos(0)
 	SETTING_KEYS = enums.SETTING_KEYS
-	RESOURCES_PATH = SKIN:GetVariable('@')
+	
 	REBUILD_SWITCH = false
 	EXECUTE_BANGS_SWITCH = false
 	SAVING_SETTINGS = false
@@ -139,6 +144,9 @@ function WritePythonPath()
 end
 
 function Save()
+	if SAVING_SETTINGS then
+		return
+	end
 	SAVING_SETTINGS = true
 	if OLD_SETTINGS then
 		if OLD_SETTINGS[SETTING_KEYS.PYTHON_PATH] ~= SETTINGS[SETTING_KEYS.PYTHON_PATH] and SETTINGS[SETTING_KEYS.PYTHON_PATH] ~= '' then
@@ -206,11 +214,15 @@ function Exit()
 			end
 		end
 	end
+	if ReadSettings() == nil then
+		Save()
+	end
+	POSITION:ResetZPos()
 	if REBUILD_SWITCH then
 		SKIN:Bang('["#Python#" "#@#Frontend\\BuildSkin.py" "#PROGRAMPATH#;" "#@#;" "#CURRENTCONFIG#;" "#CURRENTFILE#;"]')
 	else
 		SKIN:Bang('[!ActivateConfig "#CURRENTCONFIG#" "Main.ini"]')
-	end	
+	end
 end
 
 function SelectTab(aNewTab, aOldTab)
@@ -772,4 +784,48 @@ function ParseVDFFile(asPath)
 		print('Error! Failure to parse' .. asPath)
 	end
 	return tResult
+end
+
+function InitializeSkin()
+	return {
+		nDefaultZPos = nil,
+		sSettingsPath = SKIN:GetVariable('SETTINGSPATH', nil),
+		sConfig = SKIN:GetVariable('CURRENTCONFIG', nil),
+
+		UpdateDefaultZPos = function (self)
+			if self.sSettingsPath == nil then
+				return false
+			end
+			local f = io.open(self.sSettingsPath .. 'Rainmeter.ini', 'r')
+			if f ~= nil then
+				local sRainmeterINI = f:read('*a')
+				f:close()
+				local nStarts, nEnds = sRainmeterINI:find('%[' .. self.sConfig .. '%][^%[]+')
+				if nStarts == nil or nEnds == nil then
+					return false
+				end
+				local sConfigSettings = sRainmeterINI:sub(nStarts, nEnds)
+				for sLine in STRING:Split(sConfigSettings, '\n') do
+					nStarts, nEnds = sLine:find("AlwaysOnTop=")
+					if nStarts and nEnds then
+						self.nDefaultZPos = tonumber(sLine:sub(nEnds + 1))
+						return true
+					end
+				end
+			end
+			return false
+		end,
+
+		SetZPos = function (self, anValue)
+			if anValue >= -2 and anValue <= 2 then
+				SKIN:Bang('[!ZPos "' .. anValue .. '"]')
+			end
+		end,
+
+		ResetZPos = function (self)
+			if self.nDefaultZPos ~= nil then
+				SKIN:Bang('[!ZPos "' .. self.nDefaultZPos .. '" ]')
+			end
+		end
+	}
 end
