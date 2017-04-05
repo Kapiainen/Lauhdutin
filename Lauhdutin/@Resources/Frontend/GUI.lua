@@ -832,7 +832,6 @@
 					)
 				end
 				SKIN:Bang(
-					--'[!SetVariable "SlotSubmenuIndex" "' .. anIndex .. '"]'
 					'[!UpdateMeterGroup "SlotSubmenu"]'
 				)
 				return true
@@ -2371,7 +2370,7 @@
 					.. '[!UpdateMeterGroup "Status"]'
 					.. '[!UpdateMeterGroup "Slots"]'
 					.. '[!SetOption "SlotHighlightBackground" "' .. sPositionOption .. '" "'
-					.. nNewPosition .. '"]'
+					.. nNewPosition + nTextOffset .. '"]'
 					.. '[!UpdateMeterGroup "SlotHighlight"]'
 					.. '[!SetOption "SlotsBackground" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
 					.. '[!UpdateMeter "SlotsBackground"]'
