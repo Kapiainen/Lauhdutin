@@ -1,6 +1,7 @@
 function Initialize()
 	JSON = dofile(SKIN:GetVariable('@') .. 'Dependencies\\json4lua\\json.lua')
-	SETTING_KEYS = dofile(SKIN:GetVariable('@') .. 'Frontend\\SettingsEnum.lua')
+	enums = dofile(SKIN:GetVariable('@') .. 'Frontend\\Enums.lua')
+	SETTING_KEYS = enums.SETTING_KEYS
 	RESOURCES_PATH = SKIN:GetVariable('@')
 	REBUILD_SWITCH = false
 	EXECUTE_BANGS_SWITCH = false
@@ -95,6 +96,9 @@ function Initialize()
 	if SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] == nil then
 		SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] = false
 	end
+	if SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] == nil then
+		SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] = false
+	end
 	if SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] == nil then
 		--0 = disabled
 		--1 = from the left
@@ -114,6 +118,9 @@ function Initialize()
 	end
 	if SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] == nil then
 		SETTINGS[SETTING_KEYS.SET_GAMES_TO_EXECUTE_BANGS] = true
+	end
+	if SETTINGS[SETTING_KEYS.ADJUST_ZPOS] == nil then
+		SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = true
 	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
@@ -236,10 +243,6 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BATTLENET_PATH] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.PYTHON_PATH]) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] ..'"]')
-		SKIN:Bang('[!SetOption "StartGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STARTING]) .. '"]')
-		SKIN:Bang('[!SetOption "StartGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STARTING] ..'"]')
-		SKIN:Bang('[!SetOption "StopGameBangStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.BANGS_STOPPING]) .. '"]')
-		SKIN:Bang('[!SetOption "StopGameBangInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BANGS_STOPPING] ..'"]')
 		if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 			if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] > #CLICK_ANIMATION_DESCRIPTIONS / 2 then
@@ -291,6 +294,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "HiddenGamesStatus" "Text" "Disabled"]')
+		end		
+		if SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] == true then
+			SKIN:Bang('[!SetOption "NotInstalledGamesStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "NotInstalledGamesStatus" "Text" "Disabled"]')
 		end
 		if SETTINGS[SETTING_KEYS.STEAM_PARSE_COMMUNITY_PROFILE] == true then
 			SKIN:Bang('[!SetOption "SteamProfileStatus" "Text" "Parse"]')
@@ -311,6 +319,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ExecuteIgnoreBangsStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS[SETTING_KEYS.ADJUST_ZPOS] == true then
+			SKIN:Bang('[!SetOption "AdjustZPosStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "AdjustZPosStatus" "Text" "Disabled"]')
 		end
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
@@ -487,15 +500,46 @@ function AcceptPythonPath(aPath)
 	UpdateSettings()
 end
 
-function AcceptStartGameBang(aPath)
-	SETTINGS[SETTING_KEYS.BANGS_STARTING] = aPath
-	UpdateSettings()
+function EditStartGameBang()
+	print("Edit start")
+	SKIN:Bang('"#Python#" "#@#Backend\\EditBangs.py" "#PROGRAMPATH#;" "#@#;" "true;" "OnFinishedEditingStartGameBang;" "#CURRENTCONFIG#;"')
+	--#Python#
 end
 
-function AcceptStopGameBang(aPath)
-	SETTINGS[SETTING_KEYS.BANGS_STOPPING] = aPath
-	UpdateSettings()
+function OnFinishedEditingStartGameBang()
+	print("On finished editing start")
+	local f = io.open(RESOURCES_PATH .. 'Temp\\bangs_temp.txt', 'r')
+	if f ~= nil then
+		contents = f:read('*a')
+		f:close()
+		SETTINGS[SETTING_KEYS.BANGS_STARTING] = contents
+	end
 end
+
+--function AcceptStartGameBang(aPath)
+--	SETTINGS[SETTING_KEYS.BANGS_STARTING] = aPath
+--	UpdateSettings()
+--end
+
+function EditStopGameBang()
+	print("Edit stop")
+	SKIN:Bang('"#Python#" "#@#Backend\\EditBangs.py" "#PROGRAMPATH#;" "#@#;" "false;" "OnFinishedEditingStopGameBang;" "#CURRENTCONFIG#;"')
+end
+
+function OnFinishedEditingStopGameBang()
+	print("On finished editing stop")
+	local f = io.open(RESOURCES_PATH .. 'Temp\\bangs_temp.txt', 'r')
+	if f ~= nil then
+		contents = f:read('*a')
+		f:close()
+		SETTINGS[SETTING_KEYS.BANGS_STOPPING] = contents
+	end
+end
+
+--function AcceptStopGameBang(aPath)
+--	SETTINGS[SETTING_KEYS.BANGS_STOPPING] = aPath
+--	UpdateSettings()
+--end
 
 function ToggleOrientation()
 	if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
@@ -565,6 +609,11 @@ function ToggleFuzzySearch()
 	UpdateSettings()
 end
 
+function ToggleNotInstalledGames()
+	SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES] = not SETTINGS[SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES]
+	UpdateSettings()
+end
+
 function ToggleHiddenGames()
 	SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES] = not SETTINGS[SETTING_KEYS.SHOW_HIDDEN_GAMES]
 	UpdateSettings()
@@ -586,6 +635,11 @@ function CycleSkinSlideAnimationDirection()
 			SETTINGS[SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] = 0
 		end
 	end
+	UpdateSettings()
+end
+
+function ToggleAdjustZPos()
+	SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = not SETTINGS[SETTING_KEYS.ADJUST_ZPOS]
 	UpdateSettings()
 end
 

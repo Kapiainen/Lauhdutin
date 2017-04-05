@@ -129,7 +129,6 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   - `true` = Show installed games.
   - `false` = Show games that are not installed (only Steam games are supported at the moment).
-  - `all` = All games are shown regardless of whether or not they are installed or not.
 
 - `hidden:<argument>`
 
@@ -146,8 +145,8 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<argument>` with one of the supported arguments:
 
-  - `true` = Show all games with a total played time above 0 hours.
-  - `false` = Show all games with a total played time equal to 0 hours.
+  - `true` = Show games with a total played time above 0 hours.
+  - `false` = Show games with a total played time equal to 0 hours.
 
 - `shortcuts:<argument>`
 
@@ -174,13 +173,22 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
 
-Hidden games are not showed by default on filtering (except on `games:all` and `hidden:true` filters, that will always show hidden games), but can be enabled so that the filtering also shows hidden games.
+Games that are not currently installed or are set as hidden are not shown by default when filtering. There are settings for making each category of aforementioned games show up when filtering.
 
 ## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
 ## Bangs
-There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Multiple bangs can be executed by enclosing each bang in square brackets: 
+
+```[!ActivateConfig "SomeConfigName"][!Log "Starting a game"]```
+
+Multiple bangs can also be written on multiple lines:
+
+```
+[!ActivateConfig "SomeConfigName"]
+[!Log "Starting a game"]
+```
 
 This feature can be used to e.g. load and unload skins.
 
@@ -264,7 +272,7 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
-- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor. The toolbar and its enabler are moved to the bottom of the skin, if the skin is set to slide into view from below.
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added support for adding notes to a game.
 - Added support for adding tags to a game.
@@ -275,11 +283,13 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added a setting for making all games execute/ignore bangs.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Added new filters.
-- Refactored GUI code.
 - Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 - Updated `Battle.net` to `Blizzard App` in the GUI.
 - Updated the setting title and tooltip for the paths to Blizzard games.
-- GUI optimizations.
+- Bangs are now edited via Notepad.
+- Major GUI overhaul and optimizations.
+- Added option for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
+- Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
