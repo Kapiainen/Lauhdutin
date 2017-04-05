@@ -428,6 +428,9 @@
 --                  -> Process monitoring
 --###########################################################################################################
 	function OnProcessTerminated()
+		if not C_PROCESS_MONITOR then
+			return
+		end
 		C_PROCESS_MONITOR:Stop()
 		if T_RECENTLY_LAUNCHED_GAME == nil then
 			return
@@ -449,6 +452,9 @@
 --###########################################################################################################
 	function Update()
 	-- Called regularly (every ~16 ms) by Rainmeter when the mouse is on the skin
+		if not C_ANIMATIONS then
+			return
+		end
 		if C_ANIMATIONS:Pending() then
 		-- If there are animations to play, then play a frame and redraw
 			if C_ANIMATIONS:Play() then
