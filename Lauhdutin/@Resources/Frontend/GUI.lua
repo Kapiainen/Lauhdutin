@@ -521,15 +521,13 @@
 		InitializeEnums(sResourcesPath)
 		InitializeStateVariables()
 		InitializeConstants()
-		InitializeComponents(sResourcesPath)
+		if not InitializeComponents(sResourcesPath) then
+			SKIN:Bang('[!ActivateConfig "#CURRENTCONFIG#" "Settings.ini"]')
+			return
+		end
 		C_TOOLBAR:Hide()
 		C_SLOT_HIGHLIGHT:Hide()
 		C_SLOT_SUBMENU:Hide()
-		if not T_SETTINGS then
-			SKIN:Bang('[!ActivateConfig "#CURRENTCONFIG#" "Settings.ini"]')
-			C_STATUS_MESSAGE:Show('Load Settings.ini and save...')
-			return
-		end
 		C_TOOLBAR:UpdateSortingIcon()
 		if tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) == 4 then
 			C_TOOLBAR:MoveToBottom()
@@ -545,12 +543,16 @@
 		C_SCRIPT = InitializeScript()
 		C_RESOURCES = InitializeResources(asResourcesPath)
 		T_SETTINGS = C_RESOURCES:ReadSettings()
+		if not T_SETTINGS then
+			return false
+		end
 		C_TOOLBAR = InitializeToolbar()
 		C_STATUS_MESSAGE = InitializeStatusMessage()
 		C_SLOT_SUBMENU = InitializeSlotSubmenu()
 		C_PROCESS_MONITOR = InitializeProcessMonitor()
 		C_SLOT_HIGHLIGHT = InitializeSlotHighlight()
 		C_ANIMATIONS = InitializeAnimations()
+		return true
 	end
 --###########################################################################################################
 --                                         -> Skin
