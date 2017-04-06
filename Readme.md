@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations).
+A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Blizzard App, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations). This skin can also be used as a general purpose launcher since it supports regular Windows shortcuts.
 
 ![ex](Docs/demo.gif)
 
@@ -85,13 +85,13 @@ Support includes:
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-### Battle.net
+### Blizzard App
 Support includes:
-- Acquire a list of games installed via Battle.net.
+- Acquire a list of games installed via Blizzard App.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III).
+Blizzard App support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
 ### Other platforms
 
@@ -110,7 +110,7 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   - `steam` = [Steam](http://store.steampowered.com/)
   - `galaxy` = [GOG Galaxy](https://www.gog.com/galaxy)
-  - `battlenet` = [Battle.net](http://eu.battle.net/en/)
+  - `blizzard` = [Blizzard App](http://eu.battle.net/en/)
 
   Replace `<argument>` with one of the supported arguments:
 
@@ -118,8 +118,8 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
   - `false` = Show all other games that were not installed via the platform.
   - `installed` = Show games installed via the platform.
   - `uninstalled` = Show games that are available via the platform, but not installed.
-  - `played` = Show both installed and uninstalled games that are available via the platform and have a total played time above 0 hours.
-  - `not played` = Show both installed and uninstalled games that are available via the platform and have a total played time equal to 0 hours.
+  - `played` = Show games that are available via the platform and have a total played time above 0 hours.
+  - `not played` = Show games that are available via the platform and have a total played time equal to 0 hours.
 
   All arguments might not work with all platforms.
 
@@ -160,12 +160,12 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<argument>` with one of the supported arguments:
 
-  - `all` = Show one random game (installed or uninstalled).
-  - `played` = Show one random game (installed or uninstalled) that has a total played time above 0 hours.
-  - `not played` = Show one random game (installed or uninstalled) that has a total played time equal to 0 hours.
-  - `steam` = Show one random game (installed or uninstalled) from Steam.
-  - `galaxy` = Show one random game (installed or uninstalled) from GOG Galaxy.
-  - `battlenet` = Show one random game (installed or uninstalled) from Battle.net.
+  - `all` = Show one random game.
+  - `played` = Show one random game that has a total played time above 0 hours.
+  - `not played` = Show one random game that has a total played time equal to 0 hours.
+  - `steam` = Show one random game from Steam.
+  - `galaxy` = Show one random game from GOG Galaxy.
+  - `blizzard` = Show one random game from Blizzard App.
   
   If no argument is provided, then one random game from the current list of games is shown.
 
@@ -173,7 +173,7 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 
   Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
 
-Games that are not currently installed or are set as hidden are not shown by default when filtering. There are settings for making each category of aforementioned games show up when filtering.
+Games that are not currently installed or are set as hidden are not shown by default when filtering, unless stated otherwise. There are settings for making each category of aforementioned games show up when filtering.
 
 ## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
@@ -290,7 +290,8 @@ Any deviations from the rules regarding adding platform support will most likely
 - Major GUI overhaul and optimizations.
 - Added option for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
 - Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
-- Added support for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App/Battle.net.
+- Added support for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
+- Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
