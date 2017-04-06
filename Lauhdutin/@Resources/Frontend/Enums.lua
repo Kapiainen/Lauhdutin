@@ -17,6 +17,8 @@ return {
 		SHOW_NOT_INSTALLED_GAMES = 'installed_games',
 		SLOT_BACKGROUND_COLOR = 'slot_background_color',
 		SLOT_COUNT = 'slot_count',
+		SLOT_ROWS_COLUMNS = 'slot_rows_columns',
+		SLOT_COUNT_PER_ROW_COLUMN = 'slot_count_per_row_column',
 		SLOT_HEIGHT = 'slot_height',
 		SLOT_HIGHLIGHT = 'slot_highlight',
 		SLOT_HIGHLIGHT_HOURS_PLAYED = 'show_hours_played',

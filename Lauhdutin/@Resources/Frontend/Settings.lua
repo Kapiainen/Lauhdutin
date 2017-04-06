@@ -16,14 +16,20 @@ function Initialize()
 	if SETTINGS == nil then
 		SETTINGS = {}
 	end
+	if SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] = 1
+	end
+	if SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] = 8
+	end
 	if SETTINGS[SETTING_KEYS.SLOT_COUNT] == nil then
-		SETTINGS[SETTING_KEYS.SLOT_COUNT] = 8
+		SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] * SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS]
 	end
 	if SETTINGS[SETTING_KEYS.SLOT_WIDTH] == nil then
-		SETTINGS[SETTING_KEYS.SLOT_WIDTH] = 310
+		SETTINGS[SETTING_KEYS.SLOT_WIDTH] = 321
 	end
 	if SETTINGS[SETTING_KEYS.SLOT_HEIGHT] == nil then
-		SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = 145
+		SETTINGS[SETTING_KEYS.SLOT_HEIGHT] = 150
 	end
 	if SETTINGS[SETTING_KEYS.SLOT_BACKGROUND_COLOR] == nil then
 		SETTINGS[SETTING_KEYS.SLOT_BACKGROUND_COLOR] = "0,0,0,196"
@@ -176,6 +182,7 @@ function Save()
 			WriteJSON(RESOURCES_PATH .. 'games.json', games)
 		end
 	end
+	SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] * SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN]
 	WriteSettings(SETTINGS)
 	SAVING_SETTINGS = false
 end
@@ -242,8 +249,10 @@ end
 
 function UpdateSettings()
 	if SETTINGS then
-		SKIN:Bang('[!SetOption "SlotCountStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_COUNT]) .. '"]')
-		SKIN:Bang('[!SetOption "SlotCountInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_COUNT] ..'"]')
+		SKIN:Bang('[!SetOption "SlotCountPerRowColumnStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN]) .. '"]')
+		SKIN:Bang('[!SetOption "SlotCountPerRowColumnInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] ..'"]')
+		SKIN:Bang('[!SetOption "SlotRowsColumnsStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS]) .. '"]')
+		SKIN:Bang('[!SetOption "SlotRowsColumnsInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] ..'"]')
 		SKIN:Bang('[!SetOption "SlotWidthStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_WIDTH]) .. '"]')
 		SKIN:Bang('[!SetOption "SlotWidthInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SLOT_WIDTH] ..'"]')
 		SKIN:Bang('[!SetOption "SlotHeightStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SLOT_HEIGHT]) .. '"]')
@@ -350,26 +359,45 @@ function UpdateSettings()
 	end
 end
 
-function IncrementSlotCount()
-	SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_COUNT] + 1
+function IncrementSlotCountPerRowColumn()
+	SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] = SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] + 1
 	UpdateSettings()
 end
 
-function DecrementSlotCount()
-	if SETTINGS[SETTING_KEYS.SLOT_COUNT] > 1 then
-		SETTINGS[SETTING_KEYS.SLOT_COUNT] = SETTINGS[SETTING_KEYS.SLOT_COUNT] - 1
+function DecrementSlotCountPerRowColumn()
+	if SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] > 1 then
+		SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] = SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] - 1
 		UpdateSettings()
 	end
 end
 
-function SetSlotCount(aValue)
+function SetSlotCountPerRowColumn(aValue)
 	local numVal = tonumber(aValue)
 	if numVal and numVal > 0 then
-		SETTINGS[SETTING_KEYS.SLOT_COUNT] = numVal
+		SETTINGS[SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN] = numVal
 		UpdateSettings()
 	end
 end
 
+function SetSlotRowsColumns(aValue)
+	local numVal = tonumber(aValue)
+	if numVal and numVal > 0 then
+		SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] = numVal
+		UpdateSettings()
+	end
+end
+
+function IncrementSlotRowsColumns()
+	SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] = SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] + 1
+	UpdateSettings()
+end
+
+function DecrementSlotRowsColumns()
+	if SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] > 1 then
+		SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] = SETTINGS[SETTING_KEYS.SLOT_ROWS_COLUMNS] - 1
+		UpdateSettings()
+	end
+end
 
 function IncrementSlotWidth()
 	SETTINGS[SETTING_KEYS.SLOT_WIDTH] = SETTINGS[SETTING_KEYS.SLOT_WIDTH] + 1
