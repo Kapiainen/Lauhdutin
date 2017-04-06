@@ -1379,7 +1379,7 @@
 				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
 				if #T_FILTERED_GAMES <= nSlotCount then
 					nScrollIndex = 1
-				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then -- TODO: replace '1' with nScrollStep
 					nScrollIndex = nScrollIndex - 1
 				end
 				N_SCROLL_INDEX = nScrollIndex
@@ -1419,7 +1419,7 @@
 				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
 				if #T_FILTERED_GAMES <= nSlotCount then
 					nScrollIndex = 1
-				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then -- TODO: replace '1' with nScrollStep
 					nScrollIndex = nScrollIndex - 1
 				end
 				N_SCROLL_INDEX = nScrollIndex
