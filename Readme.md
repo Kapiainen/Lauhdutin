@@ -292,6 +292,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
 - Added support for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
 - Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed.
+- Added reversed sorting icons and refactored relevant code.
 - Added sorting icon for score/ranking based sorting when using fuzzy search.
 
 **Version 2.6.0 - 2017/03/15:**
