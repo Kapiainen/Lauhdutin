@@ -451,7 +451,6 @@
 	end
 
 	function OnSteamProcessStarted()
-		print('Steam started')
 		if not C_SKIN then
 			return
 		end
@@ -459,7 +458,6 @@
 	end
 
 	function OnSteamProcessTerminated()
-		print('Steam terminated')
 		if not C_SKIN then
 			return
 		end
@@ -467,7 +465,6 @@
 	end
 
 	function OnBattlenetProcessStarted()
-		print('Battle.net started')
 		if not C_SKIN then
 			return
 		end
@@ -475,7 +472,6 @@
 	end
 
 	function OnBattlenetProcessTerminated()
-		print('Battle.net terminated')
 		if not C_SKIN then
 			return
 		end
