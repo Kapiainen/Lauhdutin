@@ -127,6 +127,9 @@ function Initialize()
 	if SETTINGS[SETTING_KEYS.ADJUST_ZPOS] == nil then
 		SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = true
 	end
+	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] == nil then
+		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] = true
+	end
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -286,6 +289,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Enabled"]')
 		else
 			SKIN:Bang('[!SetOption "ShowPlatformStatus" "Text" "Disabled"]')
+		end
+		if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] == true then
+			SKIN:Bang('[!SetOption "ShowPlatformRunningStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "ShowPlatformRunningStatus" "Text" "Disabled"]')
 		end
 		if SETTINGS[SETTING_KEYS.ANIMATION_CLICK] == 0 then
 			SKIN:Bang('[!SetOption "ClickAnimationStatus" "Text" "Disabled"]')
@@ -563,29 +571,22 @@ function ToggleOrientation()
 end
 
 function ToggleHighlighting()
-	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] == true then
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = false
-	else
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = true
-	end
+	SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT] = not SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT]
 	UpdateSettings()
 end
 
 function ToggleShowHoursPlayed()
-	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] == true then
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = false
-	else
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = true
-	end
+	SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED] = not SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_HOURS_PLAYED]
 	UpdateSettings()
 end
 
 function ToggleShowPlatform()
-	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] == true then
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = false
-	else
-		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = true
-	end
+	SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM] = not SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM]
+	UpdateSettings()
+end
+
+function ToggleShowPlatformRunning()
+	SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] = not SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING]
 	UpdateSettings()
 end
 

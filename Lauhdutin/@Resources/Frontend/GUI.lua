@@ -80,6 +80,10 @@
 		if abAnimate then
 			C_ANIMATIONS:PushSkinSlideIn()
 		end
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
+			SKIN:Bang('[!UpdateMeasure "SteamMonitor"]')
+			SKIN:Bang('[!UpdateMeasure "BattlenetMonitor"]')
+		end
 	end
 
 	function OnMouseLeaveSkin()
@@ -445,6 +449,38 @@
 		ExecuteStoppingBangs()
 		T_RECENTLY_LAUNCHED_GAME = nil
 	end
+
+	function OnSteamProcessStarted()
+		print('Steam started')
+		if not C_SKIN then
+			return
+		end
+		C_SKIN.bSteamRunning = true
+	end
+
+	function OnSteamProcessTerminated()
+		print('Steam terminated')
+		if not C_SKIN then
+			return
+		end
+		C_SKIN.bSteamRunning = false
+	end
+
+	function OnBattlenetProcessStarted()
+		print('Battle.net started')
+		if not C_SKIN then
+			return
+		end
+		C_SKIN.bBattlenetRunning = true
+	end
+
+	function OnBattlenetProcessTerminated()
+		print('Battle.net terminated')
+		if not C_SKIN then
+			return
+		end
+		C_SKIN.bBattlenetRunning = false
+	end
 --###########################################################################################################
 -- Private
 --###########################################################################################################
@@ -570,6 +606,8 @@
 			sSettingsPath = SKIN:GetVariable('SETTINGSPATH', nil),
 			sConfig = SKIN:GetVariable('CURRENTCONFIG', nil),
 			bSkinAnimationPlaying = false,
+			bSteamRunning = false,
+			bBattlenetRunning = false,
 
 			UpdateDefaultZPos = function (self)
 				if self.sSettingsPath == nil then
@@ -1086,6 +1124,22 @@
 						if tGame[E_GAME_KEYS.INVALID_PATH] then
 							sHighlightMessage = 'Invalid path'
 						end
+					elseif T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING]
+					   and tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
+					   and not C_SKIN.bSteamRunning then
+						SKIN:Bang(
+							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightError.png"]'
+						)
+						sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+											.. ' is not running'
+					elseif T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING]
+						   and tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET
+						   and not C_SKIN.bBattlenetRunning then
+						SKIN:Bang(
+							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightError.png"]'
+						)
+						sHighlightMessage = T_PLATFORM_DESCRIPTIONS[tGame[E_GAME_KEYS.PLATFORM] + 1]
+											.. ' is not running'
 					elseif tGame[E_GAME_KEYS.NOT_INSTALLED] then
 						if tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
 						   or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.BATTLENET then

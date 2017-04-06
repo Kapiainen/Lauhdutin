@@ -290,6 +290,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Major GUI overhaul and optimizations.
 - Added option for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
 - Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
+- Added support for showing whether or not a supported platform client is running in the slot highlight. Currently supports Steam and Blizzard App/Battle.net.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.

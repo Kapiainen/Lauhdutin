@@ -21,6 +21,7 @@ return {
 		SLOT_HIGHLIGHT = 'slot_highlight',
 		SLOT_HIGHLIGHT_HOURS_PLAYED = 'show_hours_played',
 		SLOT_HIGHLIGHT_PLATFORM = 'show_platform',
+		SLOT_HIGHLIGHT_PLATFORM_RUNNING = 'show_platform_running',
 		SLOT_TEXT_COLOR = 'slot_text_color',
 		SLOT_WIDTH = 'slot_width',
 		SORT_STATE = 'sortstate',
