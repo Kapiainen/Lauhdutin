@@ -1121,7 +1121,8 @@
 							sHighlightMessage = 'Invalid path'
 						end
 					elseif T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING]
-					   and tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
+					   and (tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM
+					   		or tGame[E_GAME_KEYS.PLATFORM] == E_PLATFORMS.STEAM_SHORTCUT)
 					   and not C_SKIN.bSteamRunning then
 						SKIN:Bang(
 							'[!SetOption "SlotHighlight" "ImageName" "#@#Icons\\SlotHighlightError.png"]'
