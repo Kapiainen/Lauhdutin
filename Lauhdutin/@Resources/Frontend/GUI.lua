@@ -1545,7 +1545,9 @@
 			tResult = FilterPlatform(atTable, asPattern, 'steam:', E_PLATFORMS.STEAM)
 		elseif STRING:StartsWith(asPattern, 'galaxy:') then
 			tResult = FilterPlatform(atTable, asPattern, 'galaxy:', E_PLATFORMS.GOG_GALAXY)
-		elseif STRING:StartsWith(asPattern, 'battlenet:') then
+		elseif STRING:StartsWith(asPattern, 'blizzard:') then
+			tResult = FilterPlatform(atTable, asPattern, 'blizzard:', E_PLATFORMS.BATTLENET)
+		elseif STRING:StartsWith(asPattern, 'battlenet:') then --Deprecate at some point
 			tResult = FilterPlatform(atTable, asPattern, 'battlenet:', E_PLATFORMS.BATTLENET)
 		elseif STRING:StartsWith(asPattern, 'tags:') then
 			asPattern = asPattern:sub(6)
