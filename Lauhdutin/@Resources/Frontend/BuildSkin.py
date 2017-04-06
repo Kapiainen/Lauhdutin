@@ -14,9 +14,11 @@ try:
         return None
 
     SETTINGS = read_json(os.path.join(RESOURCEPATH, "settings.json"))
-    SLOT_WIDTH = int(SETTINGS.get("slot_width", 418))
-    SLOT_HEIGHT = int(SETTINGS.get("slot_height", 195))
-    SLOT_COUNT = int(SETTINGS.get("slot_count", 6))
+    SLOT_WIDTH = int(SETTINGS.get("slot_width", 321))
+    SLOT_HEIGHT = int(SETTINGS.get("slot_height", 150))
+    SLOT_COUNT = int(SETTINGS.get("slot_count", 8))
+    SLOT_ROWS_COLUMNS = int(SETTINGS.get("slot_rows_columns", 1))
+    SLOT_COUNT_PER_ROW_COLUMN = int(SETTINGS.get("slot_count_per_row_column", 8))
     ORIENTATION = SETTINGS.get("orientation", "vertical")
     
     with open(os.path.join(RESOURCEPATH, "Frontend", "GameSlots.inc"), "w") as file:
@@ -24,15 +26,15 @@ try:
         contents = ["[Variables]"]
         if ORIENTATION == "vertical":
             contents.extend([
-                "ToolbarWidth=%s" % SLOT_WIDTH,
-                "SkinMaxWidth=%s" % SLOT_WIDTH,
-                "SkinMaxHeight=%s" % int(SLOT_HEIGHT * SLOT_COUNT)
+                "ToolbarWidth=%s" % int(SLOT_WIDTH * SLOT_ROWS_COLUMNS),
+                "SkinMaxWidth=%s" % int(SLOT_WIDTH * SLOT_ROWS_COLUMNS),
+                "SkinMaxHeight=%s" % int(SLOT_HEIGHT * SLOT_COUNT_PER_ROW_COLUMN)
             ])
         else:
             contents.extend([
-                "ToolbarWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                "SkinMaxWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                "SkinMaxHeight=%s" % SLOT_HEIGHT
+                "ToolbarWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT_PER_ROW_COLUMN),
+                "SkinMaxWidth=%s" % int(SLOT_WIDTH * SLOT_COUNT_PER_ROW_COLUMN),
+                "SkinMaxHeight=%s" % int(SLOT_HEIGHT * SLOT_ROWS_COLUMNS)
             ])
         contents.extend([
             "SlotWidth=%s" % SLOT_WIDTH,
@@ -51,7 +53,7 @@ try:
                     "X=0",
                     "Y=0",
                     "W=1",
-                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
+                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT_PER_ROW_COLUMN),
                     "SolidColor=0,0,0,1",
                     """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
                     "\n"
@@ -60,10 +62,10 @@ try:
                 contents.extend([
                     "[SkinEnabler]",
                     "Meter=Image",
-                    "X=%s" % int(SLOT_WIDTH - 1),
+                    "X=%s" % int(SLOT_WIDTH * SLOT_ROWS_COLUMNS - 1),
                     "Y=0",
                     "W=1",
-                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
+                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT_PER_ROW_COLUMN),
                     "SolidColor=0,0,0,1",
                     """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
                     "\n"
@@ -75,7 +77,7 @@ try:
                     "Meter=Image",
                     "X=0",
                     "Y=0",
-                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT_PER_ROW_COLUMN),
                     "H=1",
                     "SolidColor=0,0,0,1",
                     """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
@@ -86,8 +88,8 @@ try:
                     "[SkinEnabler]",
                     "Meter=Image",
                     "X=0",
-                    "Y=%s" % int(SLOT_HEIGHT - 1),
-                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                    "Y=%s" % int(SLOT_HEIGHT * SLOT_ROWS_COLUMNS - 1),
+                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT_PER_ROW_COLUMN),
                     "H=1",
                     "SolidColor=0,0,0,1",
                     """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
@@ -100,82 +102,77 @@ try:
             "Meter=Image",
             "X=0",
             "Y=0",
+            "W=#SkinMaxWidth#", 
+            "H=#SkinMaxHeight#",
             "SolidColor=#SlotBackgroundColor#"
         ])
-        if ORIENTATION == "vertical":
-            contents.extend([
-                "W=%s" % SLOT_WIDTH,
-                "H=%s" % int(SLOT_COUNT * SLOT_HEIGHT)
-            ])
-        else:
-            contents.extend([
-                "W=%s" % int(SLOT_COUNT * SLOT_WIDTH),
-                "H=%s" % SLOT_HEIGHT
-            ])
         contents.append("\n")
 
         # Slots
-        for i in range(1, SLOT_COUNT + 1):
-            # Game title
-            contents.extend([
-                "[SlotText%s]" % i,
-                "Meter=String",
-            ])
-            if ORIENTATION == "vertical":
+        nSlotNumber = 0
+        for nRowColumnIndex in range(0, SLOT_ROWS_COLUMNS):
+            for i in range(1, SLOT_COUNT_PER_ROW_COLUMN + 1):
+                nSlotNumber += 1
+                # Game title
                 contents.extend([
-                    "X=%s" % int(SLOT_WIDTH / 2),
-                    "Y=%s" % int((i - 1) * SLOT_HEIGHT + SLOT_HEIGHT / 2)
+                    "[SlotText%s]" % nSlotNumber,
+                    "Meter=String",
                 ])
-            else:
+                if ORIENTATION == "vertical":
+                    contents.extend([
+                        "X=%s" % int(SLOT_WIDTH / 2 + SLOT_WIDTH * nRowColumnIndex),
+                        "Y=%s" % int((i - 1) * SLOT_HEIGHT + SLOT_HEIGHT / 2)
+                    ])
+                else:
+                    contents.extend([
+                        "X=%s" % int((i - 1) * SLOT_WIDTH + SLOT_WIDTH / 2),
+                        "Y=%s" % int(SLOT_HEIGHT / 2 + SLOT_HEIGHT * nRowColumnIndex)
+                    ])
                 contents.extend([
-                    "X=%s" % int((i - 1) * SLOT_WIDTH + SLOT_WIDTH / 2),
-                    "Y=%s" % int(SLOT_HEIGHT / 2)
+                    "W=%s" % SLOT_WIDTH,
+                    "H=%s" % SLOT_HEIGHT,
+                    "Text=",
+                    "FontFace=Arial", 
+                    "FontSize=%s" % int(SLOT_WIDTH / 15),
+                    "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
+                    "StringAlign=CenterCenter",
+                    "StringEffect=Shadow",
+                    "ClipString=1",
+                    "AntiAlias=1",
+                    "DynamicVariables=1",
+                    "Group=Slots",
+                    "\n"
                 ])
-            contents.extend([
-                "W=%s" % SLOT_WIDTH,
-                "H=%s" % SLOT_HEIGHT,
-                "Text=",
-                "FontFace=Arial", 
-                "FontSize=%s" % int(SLOT_WIDTH / 15),
-                "FontColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
-                "StringAlign=CenterCenter",
-                "StringEffect=Shadow",
-                "ClipString=1",
-                "AntiAlias=1",
-                "DynamicVariables=1",
-                "Group=Slots",
-                "\n"
-            ])
 
-            # Game banner
-            contents.extend([
-                "[SlotBanner%s]" % i,
-                "Meter=Image",
-                "ImageName="
-            ])
-            if ORIENTATION == "vertical":
+                # Game banner
                 contents.extend([
-                    "X=0",
-                    "Y=%s" % int((i - 1) * SLOT_HEIGHT)
+                    "[SlotBanner%s]" % nSlotNumber,
+                    "Meter=Image",
+                    "ImageName="
                 ])
-            else:
+                if ORIENTATION == "vertical":
+                    contents.extend([
+                        "X=%s" % int(SLOT_WIDTH * nRowColumnIndex),
+                        "Y=%s" % int((i - 1) * SLOT_HEIGHT)
+                    ])
+                else:
+                    contents.extend([
+                        "X=%s" % int((i - 1) * SLOT_WIDTH),
+                        "Y=%s" % SLOT_HEIGHT * nRowColumnIndex
+                    ])
                 contents.extend([
-                    "X=%s" % int((i - 1) * SLOT_WIDTH),
-                    "Y=0"
+                    "W=%s" % SLOT_WIDTH,
+                    "H=%s" % SLOT_HEIGHT,
+                    "SolidColor=0,0,0,1",
+                    "PreserveAspectRatio=2",
+                    "DynamicVariables=1",
+                    """LeftMouseUpAction=[!CommandMeasure LauhdutinScript "OnLeftClickSlot(%s)"]""" % nSlotNumber,
+                    """MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "OnMiddleClickSlot(%s)"]""" % nSlotNumber,
+                    """MouseOverAction=[!CommandMeasure LauhdutinScript "OnMouseEnterSlot(%s)"]""" % nSlotNumber,
+                    """MouseLeaveAction=[!CommandMeasure LauhdutinScript "OnMouseLeaveSlot(%s)"]""" % nSlotNumber,
+                    "Group=Slots",
+                    "\n"
                 ])
-            contents.extend([
-                "W=%s" % SLOT_WIDTH,
-                "H=%s" % SLOT_HEIGHT,
-                "SolidColor=0,0,0,1",
-                "PreserveAspectRatio=2",
-                "DynamicVariables=1",
-                """LeftMouseUpAction=[!CommandMeasure LauhdutinScript "OnLeftClickSlot(%s)"]""" % i,
-                """MiddleMouseUpAction=[!CommandMeasure LauhdutinScript "OnMiddleClickSlot(%s)"]""" % i,
-                """MouseOverAction=[!CommandMeasure LauhdutinScript "OnMouseEnterSlot(%s)"]""" % i,
-                """MouseLeaveAction=[!CommandMeasure LauhdutinScript "OnMouseLeaveSlot(%s)"]""" % i,
-                "Group=Slots",
-                "\n"
-            ])
 
         # Game highlight
         contents.extend([

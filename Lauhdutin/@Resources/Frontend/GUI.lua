@@ -108,21 +108,25 @@
 	-- anDirection: Positive value -> Upwards, Negative value -> Downwards
 		local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
 		local nScrollIndex = N_SCROLL_INDEX
+		local nScrollStep = 1
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_ROWS_COLUMNS] > 1 then
+			nScrollStep = T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT_PER_ROW_COLUMN]
+		end
 		if #T_FILTERED_GAMES > nSlotCount then
 			if anDirection > 0 then
 				if nScrollIndex == 1 then
 					return
 				end
-				nScrollIndex = nScrollIndex - 1
+				nScrollIndex = nScrollIndex - nScrollStep
 				if nScrollIndex < 1 then
 					nScrollIndex = 1
 				end
 			elseif anDirection < 0 then
-				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
+				local nUpperLimit = #T_FILTERED_GAMES + nScrollStep - nSlotCount
 				if nScrollIndex == nUpperLimit then
 					return
 				end
-				nScrollIndex = nScrollIndex + 1
+				nScrollIndex = nScrollIndex + nScrollStep
 				if nScrollIndex > nUpperLimit then
 					nScrollIndex = nUpperLimit
 				end
@@ -1094,19 +1098,16 @@
 			bVisible = true,
 
 			MoveTo = function (self, anIndex)
-				self.nCurrentIndex = anIndex
-				if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
-					SKIN:Bang(
-						'[!SetOption "SlotHighlightBackground" "Y" "' .. (anIndex - 1)
-						* T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] .. '"]'
-					)
-				else
-					SKIN:Bang(
-						'[!SetOption "SlotHighlightBackground" "X" "' .. (anIndex - 1)
-						* T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH] .. '"]'
-					)
+				local mSlot = SKIN:GetMeter('SlotBanner' .. anIndex)
+				if mSlot == nil then
+					return
 				end
-				SKIN:Bang('[!UpdateMeterGroup "SlotHighlight"]')
+				self.nCurrentIndex = anIndex
+				SKIN:Bang(
+					'[!SetOption "SlotHighlightBackground" "X" "' .. mSlot:GetX() .. '"]'
+					.. '[!SetOption "SlotHighlightBackground" "Y" "' .. mSlot:GetY() .. '"]'
+					.. '[!UpdateMeterGroup "SlotHighlight"]'
+				)
 			end,
 
 			Update = function (self)
