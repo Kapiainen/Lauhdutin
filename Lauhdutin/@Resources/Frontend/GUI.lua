@@ -78,12 +78,16 @@
 	-- abAnimate: Whether or not to play an animation to unhide the skin
 		C_SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
+			PopulateSlots()
 			C_ANIMATIONS:PushSkinSlideIn()
 		end
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
-			SKIN:Bang('[!UpdateMeasure "SteamMonitor"]')
-			SKIN:Bang('[!UpdateMeasure "BattlenetMonitor"]')
-			PopulateSlots()
+			SKIN:Bang(
+				'[!SetOption "SteamMonitor" "UpdateDivider" "63"]'
+				.. '[!UpdateMeasure "SteamMonitor"]'
+				.. '[!SetOption "BattlenetMonitor" "UpdateDivider" "63"]'
+				.. '[!UpdateMeasure "BattlenetMonitor"]'
+			)
 		end
 	end
 
@@ -101,6 +105,14 @@
 		else
 			C_SCRIPT:SetUpdateDivider(-1)
 			Redraw()
+		end
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
+			SKIN:Bang(
+				'[!SetOption "SteamMonitor" "UpdateDivider" "-1"]'
+				.. '[!UpdateMeasure "SteamMonitor"]'
+				.. '[!SetOption "BattlenetMonitor" "UpdateDivider" "-1"]'
+				.. '[!UpdateMeasure "BattlenetMonitor"]'
+			)
 		end
 	end
 
@@ -298,10 +310,6 @@
 	function OnLeftClickSlot(anIndex)
 	-- Called when a slot is left-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
-		--C_PROCESS_MONITOR:Start()
-		--If EXECUTE
-		--If HIDE
-		--If UNHIDE
 		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
 			return
 		end
