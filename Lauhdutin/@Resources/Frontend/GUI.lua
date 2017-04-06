@@ -226,12 +226,11 @@
 	end
 
 	function OnCycleSorting()
-		B_REVERSE_SORT = false
-		SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
 		T_SETTINGS[E_SETTING_KEYS.SORT_STATE] = T_SETTINGS[E_SETTING_KEYS.SORT_STATE] + 1
 		if T_SETTINGS[E_SETTING_KEYS.SORT_STATE] > 2 then
 			T_SETTINGS[E_SETTING_KEYS.SORT_STATE] = 0
 		end
+		C_TOOLBAR.bReversedSorting = false
 		C_TOOLBAR:UpdateSortingIcon()
 		C_RESOURCES:WriteSettings()
 		SortGames()
@@ -243,12 +242,8 @@
 	end
 
 	function OnReverseSorting()
-		B_REVERSE_SORT = not B_REVERSE_SORT
-		if B_REVERSE_SORT then
-			SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
-		else
-			SKIN:Bang('[!HideMeter "ToolbarButtonSortReverseIndicator"]')
-		end
+		C_TOOLBAR:ToggleReverseSorting()
+		C_TOOLBAR:UpdateSortingIcon()
 		local tReversed = {}
 		for i, tGame in ipairs(T_FILTERED_GAMES) do
 			table.insert(tReversed, 1, tGame)
@@ -726,6 +721,7 @@
 			bVisible = true,
 			bForciblyVisible = false,
 			bTopPosition = true,
+			bReversedSorting = false,
 
 			Show = function (self, abForce)
 			-- 
@@ -740,9 +736,6 @@
 					self.bForciblyVisible = true
 				end
 				-- If reverse sort, then show appropriate icon
-				if B_REVERSE_SORT then
-					SKIN:Bang('[!ShowMeter "ToolbarButtonSortReverseIndicator"]')
-				end
 				SKIN:Bang('[!ShowMeterGroup Toolbar]')
 				Redraw()
 			end,
@@ -762,23 +755,39 @@
 					return
 				end
 				self.bVisible = false
-				SKIN:Bang(
-					'[!HideMeter "ToolbarButtonSortReverseIndicator"]'
-					.. '[!HideMeterGroup Toolbar]'
-				)
+				SKIN:Bang('[!HideMeterGroup Toolbar]')
 				Redraw()
 			end,
 
 			UpdateSortingIcon = function (self, abRedraw)
 				abRedraw = abRedraw or false
-				SKIN:Bang(
-					'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort'
-					.. T_SETTINGS[E_SETTING_KEYS.SORT_STATE] .. '.png"]'
-					.. '[!UpdateMeter "ToolbarButtonSort"]'
-				)
+				if self.bReversedSorting then
+					SKIN:Bang(
+						'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort'
+						.. T_SETTINGS[E_SETTING_KEYS.SORT_STATE] .. 'R.png"]'
+						.. '[!UpdateMeter "ToolbarButtonSort"]'
+					)
+				else
+					SKIN:Bang(
+						'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort'
+						.. T_SETTINGS[E_SETTING_KEYS.SORT_STATE] .. '.png"]'
+						.. '[!UpdateMeter "ToolbarButtonSort"]'
+					)
+				end
 				if abRedraw then
 					Redraw()
 				end
+			end,
+
+			ToggleReverseSorting = function (self)
+				self.bReversedSorting = not self.bReversedSorting
+			end,
+
+			SetScoreSortingIcon = function (self)
+				SKIN:Bang(
+					'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\SortScore.png"]'
+					.. '[!UpdateMeter "ToolbarButtonSort"]'
+				)
 			end,
 
 			MoveToBottom = function (self)
@@ -791,7 +800,6 @@
 					.. '[!SetOption "ToolbarButtonSearch" "Y" "' .. nSlotHeight - 49 .. '"]'
 					.. '[!SetOption "ToolbarSeparator1" "Y" "' .. nSlotHeight - 45 .. '"]'
 					.. '[!SetOption "ToolbarButtonSort" "Y" "' .. nSlotHeight - 49 .. '"]'
-					.. '[!SetOption "ToolbarButtonSortReverseIndicator" "Y" "' .. nSlotHeight - 12 .. '"]'
 					.. '[!SetOption "ToolbarSeparator2" "Y" "' .. nSlotHeight - 45 .. '"]'
 					.. '[!SetOption "ToolbarButtonSettings" "Y" "' .. nSlotHeight - 49 .. '"]'
 					.. '[!UpdateMeterGroup "Toolbar"]'
@@ -1260,7 +1268,6 @@
 		T_HIDDEN_GAMES = {}
 		T_NOT_INSTALLED_GAMES = {}
 		T_RECENTLY_LAUNCHED_GAME = nil
-		B_REVERSE_SORT = false
 	end
 --###########################################################################################################
 --                           -> Constants
@@ -1724,6 +1731,7 @@
 					--print(entry.score, entry.game[E_GAME_KEYS.NAME]) -- Debug
 					table.insert(tResult, entry.game)
 				end
+				C_TOOLBAR:SetScoreSortingIcon()
 				return tResult, false
 			else
 				for i, tGame in ipairs(atTable) do
@@ -1881,6 +1889,8 @@
 		elseif T_SETTINGS[E_SETTING_KEYS.SORT_STATE] == E_SORTING_STATES.HOURS_PLAYED then
 			table.sort(T_FILTERED_GAMES, SortHoursPlayed)
 		end
+		C_TOOLBAR.bReversedSorting = false
+		C_TOOLBAR:UpdateSortingIcon()
 		N_SCROLL_INDEX = 1
 	end
 
