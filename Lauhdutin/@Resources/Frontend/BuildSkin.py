@@ -43,56 +43,46 @@ try:
         contents.append("\n")
 
         # Sliver of skin that triggers animation when the mouse hovers over it
-        if ORIENTATION == "vertical":
-            if SETTINGS.get("skin_slide_animation_direction", 0) == 1: # From the right
-                contents.extend([
-                    "[SkinEnabler]",
-                    "Meter=Image",
-                    "X=0",
-                    "Y=0",
-                    "W=1",
-                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
-                    "SolidColor=0,0,0,1",
-                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
-                    "\n"
-                ])
-            elif SETTINGS.get("skin_slide_animation_direction", 0) == 2: # From the right
-                contents.extend([
-                    "[SkinEnabler]",
-                    "Meter=Image",
-                    "X=%s" % int(SLOT_WIDTH - 1),
-                    "Y=0",
-                    "W=1",
-                    "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
-                    "SolidColor=0,0,0,1",
-                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
-                    "\n"
-                ])
-        else:
-            if SETTINGS.get("skin_slide_animation_direction", 0) == 3: # From above
-                contents.extend([
-                    "[SkinEnabler]",
-                    "Meter=Image",
-                    "X=0",
-                    "Y=0",
-                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                    "H=1",
-                    "SolidColor=0,0,0,1",
-                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
-                    "\n"
-                ])
-            elif SETTINGS.get("skin_slide_animation_direction", 0) == 4: # From below
-                contents.extend([
-                    "[SkinEnabler]",
-                    "Meter=Image",
-                    "X=0",
-                    "Y=%s" % int(SLOT_HEIGHT - 1),
-                    "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                    "H=1",
-                    "SolidColor=0,0,0,1",
-                    """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
-                    "\n"
-                ])
+        if SETTINGS.get("skin_slide_animation_direction", 0) > 0:
+            contents.extend([
+                "[SkinEnabler]",
+                "Meter=Image",
+            ])
+            if ORIENTATION == "vertical":
+                if SETTINGS.get("skin_slide_animation_direction", 0) == 1: # From the right
+                    contents.extend([
+                        "X=0",
+                        "Y=0",
+                        "W=1",
+                        "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
+                    ])
+                elif SETTINGS.get("skin_slide_animation_direction", 0) == 2: # From the right
+                    contents.extend([
+                        "X=%s" % int(SLOT_WIDTH - 1),
+                        "Y=0",
+                        "W=1",
+                        "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),                        
+                    ])
+            else:
+                if SETTINGS.get("skin_slide_animation_direction", 0) == 3: # From above
+                    contents.extend([
+                        "X=0",
+                        "Y=0",
+                        "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                        "H=1",
+                    ])
+                elif SETTINGS.get("skin_slide_animation_direction", 0) == 4: # From below
+                    contents.extend([
+                        "X=0",
+                        "Y=%s" % int(SLOT_HEIGHT - 1),
+                        "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
+                        "H=1",
+                    ])
+            contents.extend([
+                "SolidColor=0,0,0,1",
+                """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
+                "\n"
+            ])
 
         # Slots background
         contents.extend([
@@ -112,6 +102,8 @@ try:
                 "W=%s" % int(SLOT_COUNT * SLOT_WIDTH),
                 "H=%s" % SLOT_HEIGHT
             ])
+        if SETTINGS.get("skin_slide_animation_direction", 0) <= 0:
+            contents.append("""MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(false)"]""")
         contents.append("\n")
 
         # Slots
