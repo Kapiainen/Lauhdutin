@@ -63,6 +63,10 @@
 		else
 			C_STATUS_MESSAGE:Show('No games to display')
 		end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
+			C_SCRIPT:SetUpdateDivider(1)
+			OnMouseLeaveSkin()
+		end
 	end
 --###########################################################################################################
 --                  -> Status update
@@ -76,13 +80,23 @@
 	function OnMouseEnterSkin(abAnimate)
 	-- Called when the mouse cursor enters the skin
 	-- abAnimate: Whether or not to play an animation to unhide the skin
-		C_SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
+			if C_SKIN.bVisible then
+				return
+			end
+			C_SCRIPT:SetUpdateDivider(1)
+			PopulateSlots()
 			C_ANIMATIONS:PushSkinSlideIn()
+		else
+			C_SCRIPT:SetUpdateDivider(1)
 		end
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
-			SKIN:Bang('[!UpdateMeasure "SteamMonitor"]')
-			SKIN:Bang('[!UpdateMeasure "BattlenetMonitor"]')
+			SKIN:Bang(
+				'[!SetOption "SteamMonitor" "UpdateDivider" "63"]'
+				.. '[!UpdateMeasure "SteamMonitor"]'
+				.. '[!SetOption "BattlenetMonitor" "UpdateDivider" "63"]'
+				.. '[!UpdateMeasure "BattlenetMonitor"]'
+			)
 		end
 	end
 
@@ -100,6 +114,14 @@
 		else
 			C_SCRIPT:SetUpdateDivider(-1)
 			Redraw()
+		end
+		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
+			SKIN:Bang(
+				'[!SetOption "SteamMonitor" "UpdateDivider" "-1"]'
+				.. '[!UpdateMeasure "SteamMonitor"]'
+				.. '[!SetOption "BattlenetMonitor" "UpdateDivider" "-1"]'
+				.. '[!UpdateMeasure "BattlenetMonitor"]'
+			)
 		end
 	end
 
@@ -133,6 +155,10 @@
 			end
 		end
 		N_SCROLL_INDEX = nScrollIndex
+	end
+
+	function OnSkinOutOfView()
+		UnloadSlots()
 	end
 --###########################################################################################################
 --                  -> Toolbar
@@ -297,10 +323,6 @@
 	function OnLeftClickSlot(anIndex)
 	-- Called when a slot is left-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
-		--C_PROCESS_MONITOR:Start()
-		--If EXECUTE
-		--If HIDE
-		--If UNHIDE
 		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
 			return
 		end
@@ -546,6 +568,19 @@
 		end
 		SKIN:Bang('[!UpdateMeterGroup Slots]')
 		return true
+	end
+
+	function UnloadSlots()
+		if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
+			return
+		end
+		local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
+		for i = 1, nSlotCount do
+			SKIN:Bang(
+				'[!SetOption "SlotBanner' .. i .. '" "ImageName" ""]'
+			)
+		end
+		SKIN:Bang('[!UpdateMeterGroup Slots]')
 	end
 --###########################################################################################################
 --         -> Initialization
@@ -2435,6 +2470,7 @@
 						C_SCRIPT:SetUpdateDivider(-1)
 						C_SKIN.bVisible = false
 						C_SKIN.bSkinAnimationPlaying = false
+						OnSkinOutOfView()
 						return
 					end
 				end
