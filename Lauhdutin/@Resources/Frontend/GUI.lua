@@ -63,6 +63,10 @@
 		else
 			C_STATUS_MESSAGE:Show('No games to display')
 		end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
+			C_SCRIPT:SetUpdateDivider(1)
+			OnMouseLeaveSkin()
+		end
 	end
 --###########################################################################################################
 --                  -> Status update
@@ -76,10 +80,15 @@
 	function OnMouseEnterSkin(abAnimate)
 	-- Called when the mouse cursor enters the skin
 	-- abAnimate: Whether or not to play an animation to unhide the skin
-		C_SCRIPT:SetUpdateDivider(1)
 		if abAnimate then
+			if C_SKIN.bVisible then
+				return
+			end
+			C_SCRIPT:SetUpdateDivider(1)
 			PopulateSlots()
 			C_ANIMATIONS:PushSkinSlideIn()
+		else
+			C_SCRIPT:SetUpdateDivider(1)
 		end
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
 			SKIN:Bang(
