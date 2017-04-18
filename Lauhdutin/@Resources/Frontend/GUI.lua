@@ -168,10 +168,9 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Hide()
 		end
-		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
-			if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
-				C_ANIMATIONS:PushHoverReset(1)
-			end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			C_ANIMATIONS:ResetSlotAnimation({nSlotIndex = C_SKIN.nMouseIndex})
+			--C_ANIMATIONS:PushHoverReset(C_SKIN.nMouseIndex)
 		end
 		C_TOOLBAR:Show(abForce)
 	end
@@ -180,22 +179,19 @@
 		abForce = abForce or false
 		C_TOOLBAR:Hide(abForce)
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+			C_SLOT_HIGHLIGHT:MoveTo()
 			if C_SLOT_HIGHLIGHT:Update() then
 				if not C_TOOLBAR.bForciblyVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
 			end
 		end
-		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
-			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-			if nAnimation > 0 and not C_TOOLBAR.bVisible then
-				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				end
+		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+		if nAnimation > 0 and not C_TOOLBAR.bVisible then
+			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE
+			   or N_ACTION_STATE == E_ACTION_STATES.HIDE
+			   or N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+				C_ANIMATIONS:PushHover(nAnimation, C_SKIN.nMouseIndex)
 			end
 		end
 	end
@@ -291,9 +287,10 @@
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
+		C_SKIN.nMouseIndex = anIndex
 		if not C_TOOLBAR.bVisible then
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-				C_SLOT_HIGHLIGHT:MoveTo(anIndex)
+				C_SLOT_HIGHLIGHT:MoveTo()
 				if C_SLOT_HIGHLIGHT:Update() then
 					C_SLOT_HIGHLIGHT:Show(true)
 				end
@@ -518,6 +515,9 @@
 			end
 			C_SLOT_SUBMENU:Hide(false)
 			if PopulateSlots() then
+				if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+					C_ANIMATIONS:UpdateHoverAnimation()
+				end
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 				Redraw()
 			end
@@ -636,6 +636,7 @@
 			bSkinAnimationPlaying = false,
 			bSteamRunning = false,
 			bBattlenetRunning = false,
+			nMouseIndex = -1,
 
 			UpdateDefaultZPos = function (self)
 				if self.sSettingsPath == nil then
@@ -1127,15 +1128,13 @@
 --###########################################################################################################
 	function InitializeSlotHighlight()
 		return {
-			nCurrentIndex = 0,
 			bVisible = true,
 
-			MoveTo = function (self, anIndex)
-				local mSlot = SKIN:GetMeter('SlotBanner' .. anIndex)
+			MoveTo = function (self)
+				local mSlot = SKIN:GetMeter('SlotBanner' .. C_SKIN.nMouseIndex)
 				if mSlot == nil then
 					return
 				end
-				self.nCurrentIndex = anIndex
 				SKIN:Bang(
 					'[!SetOption "SlotHighlightBackground" "X" "' .. mSlot:GetX(true) .. '"]'
 					.. '[!SetOption "SlotHighlightBackground" "Y" "' .. mSlot:GetY(true) .. '"]'
@@ -1148,7 +1147,7 @@
 					self:Hide()
 					return false
 				end
-				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + self.nCurrentIndex - 1]
+				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + C_SKIN.nMouseIndex - 1]
 				if tGame == nil then
 					self:Hide(true)
 					return false
@@ -2252,7 +2251,9 @@
 			end,
 			--   Hover
 			PushHover = function (self, anType, anSlotIndex)
-				if anType < 1 or anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
+				if anType < 1
+				   or anSlotIndex < 1
+				   or anSlotIndex > tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) then
 					return
 				end
 				local tAnimationSets = {
@@ -2396,6 +2397,15 @@
 							fReset = self.ResetSlotAnimation
 						}
 					}
+				)
+			end,
+
+			UpdateHoverAnimation = function (self)
+				local mBanner = SKIN:GetMeter('SlotBanner' .. C_SKIN.nMouseIndex)
+				local sBannerPath = mBanner:GetOption('ImageName')
+				SKIN:Bang(
+					'[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
 			-- Skin slide animation
