@@ -291,22 +291,20 @@
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:MoveTo(anIndex)
-			if C_SLOT_HIGHLIGHT:Update() then
-				if not C_TOOLBAR.bVisible then
+		if not C_TOOLBAR.bVisible then
+			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+				C_SLOT_HIGHLIGHT:MoveTo(anIndex)
+				if C_SLOT_HIGHLIGHT:Update() then
 					C_SLOT_HIGHLIGHT:Show(true)
 				end
 			end
-		end
-		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-		if nAnimation > 0 and not C_TOOLBAR.bVisible then
-			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+			if nAnimation > 0 then
+				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE
+				   or N_ACTION_STATE == E_ACTION_STATES.HIDE
+				   or N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+					C_ANIMATIONS:PushHover(nAnimation, anIndex)
+				end
 			end
 		end
 	end
