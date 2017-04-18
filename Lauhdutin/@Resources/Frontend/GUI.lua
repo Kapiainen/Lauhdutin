@@ -2246,7 +2246,7 @@
 
 			ClickReset = function (self, atArguments)
 				atArguments.fAction(atArguments.tGame)
-				self.ResetSlotAnimation(atArguments)
+				self:ResetSlotAnimation(atArguments)
 			end,
 			--   Hover
 			PushHover = function (self, anType, anSlotIndex)
