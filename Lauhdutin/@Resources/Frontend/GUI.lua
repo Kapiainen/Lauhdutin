@@ -2058,16 +2058,16 @@
 				local nH = mBanner:GetH()
 				local sBannerPath = mBanner:GetOption('ImageName')
 				SKIN:Bang(
-					'[!SetOption "CutoutBackground" "Shape2" '
-					.. '"Rectangle ' .. nX .. ',' .. nY .. ',' .. nW .. ',' .. nH .. '"]'
-					.. '[!UpdateMeter "CutoutBackground"]'
-					.. '[!SetOption "SlotAnimation" "W" "' .. nW ..'"]'
+					'[!SetOption "SlotAnimation" "W" "' .. nW ..'"]'
 					.. '[!SetOption "SlotAnimation" "H" "' .. nH .. '"]'
 					.. '[!SetOption "SlotAnimation" "X" "' .. nX .. '"]'
 					.. '[!SetOption "SlotAnimation" "Y" "' .. nY .. '"]'
 					.. '[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
-					.. '[!UpdateMeter "SlotAnimation"]'
+					.. '[!SetOption "CutoutBackground" "Shape2" '
+					.. '"Rectangle ' .. nX .. ',' .. nY .. ',' .. nW .. ',' .. nH .. '"]'
 					.. '[!SetOption "SlotBanner' .. atArguments.nSlotIndex .. '" "ImageAlpha" "0"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
+					.. '[!UpdateMeter "CutoutBackground"]'
 					.. '[!UpdateMeter "SlotBanner' .. atArguments.nSlotIndex .. '"]'
 				)
 			end,
@@ -2079,11 +2079,11 @@
 					.. '[!SetOption "SlotAnimation" "X" "-1"]'
 					.. '[!SetOption "SlotAnimation" "Y" "-1"]'
 					.. '[!SetOption "SlotAnimation" "ImageName" ""]'
-					.. '[!UpdateMeter "SlotAnimation"]'
 					.. '[!SetOption "CutoutBackground" "Shape2" "Rectangle 0,0,0,0"]'
-					.. '[!UpdateMeter "CutoutBackground"]'
-					.. '[!SetOption "SlotBanner' .. atArguments.nSlotIndex .. '" "ImageAlpha" "100"]'
+					.. '[!SetOption "SlotBanner' .. atArguments.nSlotIndex .. '" "ImageAlpha" "255"]'
 					.. '[!UpdateMeter "SlotBanner' .. atArguments.nSlotIndex .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
+					.. '[!UpdateMeter "CutoutBackground"]'
 				)
 			end,
 
