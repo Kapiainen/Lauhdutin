@@ -39,7 +39,7 @@ try:
         contents.extend([
             "SlotWidth=%s" % SLOT_WIDTH,
             "SlotHeight=%s" % SLOT_HEIGHT,
-            "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,196"),
+            "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,255"),
             "SlotTextColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255")
         ])
         contents.append("\n")
@@ -96,19 +96,35 @@ try:
             "H=#SkinMaxHeight#",
             "SolidColor=#SlotBackgroundColor#"
         ])
-        if ORIENTATION == "vertical":
-            contents.extend([
-                "W=%s" % SLOT_WIDTH,
-                "H=%s" % int(SLOT_COUNT * SLOT_HEIGHT)
-            ])
-        else:
-            contents.extend([
-                "W=%s" % int(SLOT_COUNT * SLOT_WIDTH),
-                "H=%s" % SLOT_HEIGHT
-            ])
         if SETTINGS.get("skin_slide_animation_direction", 0) <= 0:
             contents.append("""MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(false)"]""")
         contents.append("\n")
+
+        # Slot animation meter (e.g. hover, click)
+        contents.extend([
+            "[SlotAnimation]",
+            "Meter=Image",
+            "ImageName=",
+            "X=-1",
+            "Y=-1",
+            "W=0",
+            "H=0",
+            "SolidColor=0,0,0,1",
+            "PreserveAspectRatio=2",
+            "\n"
+        ])
+
+        # Cutout background
+        contents.extend([
+            "[CutoutBackground]",
+            "Meter=Shape",
+            "X=0",
+            "Y=0",
+            "Shape=Rectangle 0,0,#SkinMaxWidth#,#SkinMaxHeight# | Fill Color #SlotBackgroundColor#",
+            "Shape2=Rectangle 0,0,0,0",
+            "Shape3=Combine Shape | XOR Shape2",
+            "\n"
+        ])
 
         # Slots
         nSlotNumber = 0
@@ -120,16 +136,34 @@ try:
                     "[SlotText%s]" % nSlotNumber,
                     "Meter=String",
                 ])
-                if ORIENTATION == "vertical":
-                    contents.extend([
-                        "X=%s" % int(SLOT_WIDTH / 2 + SLOT_WIDTH * nRowColumnIndex),
-                        "Y=%s" % int((i - 1) * SLOT_HEIGHT + SLOT_HEIGHT / 2)
-                    ])
-                else:
-                    contents.extend([
-                        "X=%s" % int((i - 1) * SLOT_WIDTH + SLOT_WIDTH / 2),
-                        "Y=%s" % int(SLOT_HEIGHT / 2 + SLOT_HEIGHT * nRowColumnIndex)
-                    ])
+                if i == 1: # 1st slot in a row/column
+                    if nSlotNumber == 1: # 1st slot in the 1st row/column
+                        contents.extend([
+                            "X=%sr" % int(SLOT_WIDTH / 2),
+                            "Y=%sr" % int(SLOT_HEIGHT / 2)
+                        ])
+                    else: # 1st slot in the 2nd-nth row/cooumn
+                        if ORIENTATION == "vertical":
+                            contents.extend([
+                                "X=%sR" % int(SLOT_WIDTH / 2),
+                                "Y=%sR" % int(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_HEIGHT + SLOT_HEIGHT / 2)
+                            ])
+                        else:
+                            contents.extend([
+                                "X=%sR" % int(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_WIDTH + SLOT_WIDTH / 2),
+                                "Y=%sR" % int(SLOT_HEIGHT / 2)
+                            ])
+                else: # 2nd-nth slot in a row/column
+                    if ORIENTATION == "vertical":
+                        contents.extend([
+                            "X=%sR" % int(0 - SLOT_WIDTH / 2),
+                            "Y=%sR" % int(SLOT_HEIGHT / 2)
+                        ])
+                    else:
+                        contents.extend([
+                            "X=%sR" % int(SLOT_WIDTH / 2),
+                            "Y=%sR" % int(0 - SLOT_HEIGHT / 2)
+                        ])
                 contents.extend([
                     "W=%s" % SLOT_WIDTH,
                     "H=%s" % SLOT_HEIGHT,
@@ -150,19 +184,9 @@ try:
                 contents.extend([
                     "[SlotBanner%s]" % nSlotNumber,
                     "Meter=Image",
-                    "ImageName="
-                ])
-                if ORIENTATION == "vertical":
-                    contents.extend([
-                        "X=%s" % int(SLOT_WIDTH * nRowColumnIndex),
-                        "Y=%s" % int((i - 1) * SLOT_HEIGHT)
-                    ])
-                else:
-                    contents.extend([
-                        "X=%s" % int((i - 1) * SLOT_WIDTH),
-                        "Y=%s" % SLOT_HEIGHT * nRowColumnIndex
-                    ])
-                contents.extend([
+                    "ImageName=",
+                    "X=%sr" % int(0 - SLOT_WIDTH / 2),
+                    "Y=%sr" % int(0 - SLOT_HEIGHT / 2),
                     "W=%s" % SLOT_WIDTH,
                     "H=%s" % SLOT_HEIGHT,
                     "SolidColor=0,0,0,1",
