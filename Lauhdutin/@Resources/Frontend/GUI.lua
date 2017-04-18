@@ -170,7 +170,6 @@
 		end
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
 			C_ANIMATIONS:ResetSlotAnimation({nSlotIndex = C_SKIN.nMouseIndex})
-			--C_ANIMATIONS:PushHoverReset(C_SKIN.nMouseIndex)
 		end
 		C_TOOLBAR:Show(abForce)
 	end
