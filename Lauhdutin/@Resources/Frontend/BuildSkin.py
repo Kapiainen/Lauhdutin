@@ -46,41 +46,40 @@ try:
         contents.append("\n")
 
         # Sliver of skin that triggers animation when the mouse hovers over it
-        if SETTINGS.get("skin_slide_animation_direction", 0) > 0:
+        SKIN_ANIMATION = SETTINGS.get("skin_slide_animation_direction", 0)
+        if SKIN_ANIMATION > 0:
             contents.extend([
                 "[SkinEnabler]",
                 "Meter=Image",
             ])
-            if ORIENTATION == "vertical":
-                if SETTINGS.get("skin_slide_animation_direction", 0) == 1: # From the right
-                    contents.extend([
-                        "X=0",
-                        "Y=0",
-                        "W=1",
-                        "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),
-                    ])
-                elif SETTINGS.get("skin_slide_animation_direction", 0) == 2: # From the right
-                    contents.extend([
-                        "X=%s" % int(SLOT_WIDTH - 1),
-                        "Y=0",
-                        "W=1",
-                        "H=%s" % int(SLOT_HEIGHT * SLOT_COUNT),                        
-                    ])
-            else:
-                if SETTINGS.get("skin_slide_animation_direction", 0) == 3: # From above
-                    contents.extend([
-                        "X=0",
-                        "Y=0",
-                        "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                        "H=1",
-                    ])
-                elif SETTINGS.get("skin_slide_animation_direction", 0) == 4: # From below
-                    contents.extend([
-                        "X=0",
-                        "Y=%s" % int(SLOT_HEIGHT - 1),
-                        "W=%s" % int(SLOT_WIDTH * SLOT_COUNT),
-                        "H=1",
-                    ])
+            if SKIN_ANIMATION == 1: # From the left
+                contents.extend([
+                    "X=0",
+                    "Y=0",
+                    "W=1",
+                    "H=#SkinMaxHeight#"
+                ])
+            elif SKIN_ANIMATION == 2: # From the right
+                contents.extend([
+                    "X=(#SkinMaxWidth# - 1)",
+                    "Y=0",
+                    "W=1",
+                    "H=#SkinMaxHeight#"
+                ])
+            elif SKIN_ANIMATION == 3: # From above
+                contents.extend([
+                    "X=0",
+                    "Y=0",
+                    "W=#SkinMaxWidth#",
+                    "H=1"
+                ])
+            elif SKIN_ANIMATION == 4: # From below
+                contents.extend([
+                    "X=0",
+                    "Y=(#SkinMaxHeight# - 1)",
+                    "W=#SkinMaxWidth#",
+                    "H=1"
+                ])
             contents.extend([
                 "SolidColor=0,0,0,1",
                 """MouseOverAction=[!CommandMeasure "LauhdutinScript" "OnMouseEnterSkin(true)"]""",
