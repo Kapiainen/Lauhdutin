@@ -178,8 +178,8 @@
 		abForce = abForce or false
 		C_TOOLBAR:Hide(abForce)
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:MoveTo()
-			if C_SLOT_HIGHLIGHT:Update() then
+			C_SLOT_HIGHLIGHT:MoveTo(C_SKIN.nMouseIndex)
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bForciblyVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
@@ -211,7 +211,7 @@
 		end
 		C_TOOLBAR.bForciblyVisible = false
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
@@ -235,7 +235,7 @@
 		end
 		C_TOOLBAR:Hide(true)
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
@@ -261,7 +261,7 @@
 		SortGames()
 		PopulateSlots()
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Update()
+			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
 		Redraw()
 	end
@@ -276,7 +276,7 @@
 		T_FILTERED_GAMES = tReversed
 		PopulateSlots()
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Update()
+			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
 		Redraw()
 	end
@@ -289,8 +289,8 @@
 		C_SKIN.nMouseIndex = anIndex
 		if not C_TOOLBAR.bVisible then
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-				C_SLOT_HIGHLIGHT:MoveTo()
-				if C_SLOT_HIGHLIGHT:Update() then
+				C_SLOT_HIGHLIGHT:MoveTo(C_SKIN.nMouseIndex)
+				if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 					C_SLOT_HIGHLIGHT:Show(true)
 				end
 			end
@@ -510,12 +510,12 @@
 		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
 		-- If scroll index has changed, then redraw
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-				C_SLOT_HIGHLIGHT:Update()
+				C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 			end
 			C_SLOT_SUBMENU:Hide(false)
 			if PopulateSlots() then
 				if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
-					C_ANIMATIONS:UpdateHoverAnimation()
+					C_ANIMATIONS:UpdateHoverAnimation(C_SKIN.nMouseIndex)
 				end
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 				Redraw()
@@ -1084,7 +1084,7 @@
 				if #T_FILTERED_GAMES > 0 then
 					PopulateSlots()
 					if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-						C_SLOT_HIGHLIGHT:Update()
+						C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 					end
 				else
 					OnApplyFilter('')
@@ -1129,8 +1129,8 @@
 		return {
 			bVisible = true,
 
-			MoveTo = function (self)
-				local mSlot = SKIN:GetMeter('SlotBanner' .. C_SKIN.nMouseIndex)
+			MoveTo = function (self, anIndex)
+				local mSlot = SKIN:GetMeter('SlotBanner' .. anIndex)
 				if mSlot == nil then
 					return
 				end
@@ -1141,12 +1141,12 @@
 				)
 			end,
 
-			Update = function (self)
+			Update = function (self, anIndex)
 				if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
 					self:Hide()
 					return false
 				end
-				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + C_SKIN.nMouseIndex - 1]
+				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + anIndex - 1]
 				if tGame == nil then
 					self:Hide(true)
 					return false
@@ -2399,8 +2399,8 @@
 				)
 			end,
 
-			UpdateHoverAnimation = function (self)
-				local mBanner = SKIN:GetMeter('SlotBanner' .. C_SKIN.nMouseIndex)
+			UpdateHoverAnimation = function (self, anIndex)
+				local mBanner = SKIN:GetMeter('SlotBanner' .. anIndex)
 				local sBannerPath = mBanner:GetOption('ImageName')
 				SKIN:Bang(
 					'[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
