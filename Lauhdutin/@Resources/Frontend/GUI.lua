@@ -832,18 +832,17 @@
 
 			MoveToBottom = function (self)
 				self.bTopPosition = false
-				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
 				SKIN:Bang(
-					'[!SetOption "ToolbarEnabler" "Y" "' .. nSlotHeight - 1 .. '"]'
+					'[!SetOption "ToolbarEnabler" "Y" "(#SkinMaxHeight# - 1)"]'
 					.. '[!UpdateMeter "ToolbarEnabler"]'
-					.. '[!SetOption "ToolbarBackground" "Y" "' .. nSlotHeight - 50 .. '"]'
-					.. '[!SetOption "ToolbarButtonSearch" "Y" "' .. nSlotHeight - 49 .. '"]'
-					.. '[!SetOption "ToolbarSeparator1" "Y" "' .. nSlotHeight - 45 .. '"]'
-					.. '[!SetOption "ToolbarButtonSort" "Y" "' .. nSlotHeight - 49 .. '"]'
-					.. '[!SetOption "ToolbarSeparator2" "Y" "' .. nSlotHeight - 45 .. '"]'
-					.. '[!SetOption "ToolbarButtonSettings" "Y" "' .. nSlotHeight - 49 .. '"]'
+					.. '[!SetOption "ToolbarBackground" "Y" "(#SkinMaxHeight# - 50)"]'
+					.. '[!SetOption "ToolbarButtonSearch" "Y" "(#SkinMaxHeight# - 49)"]'
+					.. '[!SetOption "ToolbarSeparator1" "Y" "(#SkinMaxHeight# - 45)"]'
+					.. '[!SetOption "ToolbarButtonSort" "Y" "(#SkinMaxHeight# - 49)"]'
+					.. '[!SetOption "ToolbarSeparator2" "Y" "(#SkinMaxHeight# - 45)"]'
+					.. '[!SetOption "ToolbarButtonSettings" "Y" "(#SkinMaxHeight# - 49)"]'
 					.. '[!UpdateMeterGroup "Toolbar"]'
-					.. '[!SetOption "FilterInput" "Y" "' .. nSlotHeight - 90 .. '"]'
+					.. '[!SetOption "FilterInput" "Y" "(#SkinMaxHeight# - 90)"]'
 					.. '[!UpdateMeasure "FilterInput"]'
 				)
 			end
@@ -2050,6 +2049,9 @@
 			end,
 
 			PrepareSlotAnimation = function (self, atArguments)
+				if atArguments.nSlotIndex <= 1 then
+					return
+				end
 				local mBanner = SKIN:GetMeter('SlotBanner' .. atArguments.nSlotIndex)
 				local nX = mBanner:GetX(true)
 				self.nSlotX = nX
@@ -2074,6 +2076,9 @@
 			end,
 
 			ResetSlotAnimation = function (self, atArguments)
+				if atArguments.nSlotIndex <= 1 then
+					return
+				end
 				SKIN:Bang(
 					'[!SetOption "SlotAnimation" "W" "0"]'
 					.. '[!SetOption "SlotAnimation" "H" "0"]'
@@ -2400,7 +2405,7 @@
 							bMandatory = true,
 							nDirection = nDir,
 							bIntoView = true,
-							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+							bHorizontal = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) > 2
 						}
 					}
 				)
@@ -2422,7 +2427,7 @@
 							bMandatory = true,
 							nDirection = nDir,
 							bIntoView = false,
-							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+							bHorizontal = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) > 2
 						}
 					}
 				)
@@ -2461,7 +2466,7 @@
 					elseif nFrame == 3 then
 						nDivider = 1.8
 					elseif nFrame == 4 then
-						nDivider = 1.0
+						nDivider = 0.9
 					else
 						C_SCRIPT:SetUpdateDivider(-1)
 						C_SKIN.bVisible = false
@@ -2495,10 +2500,7 @@
 					.. '[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
 				)
 				if not C_TOOLBAR.bTopPosition then
-					SKIN:Bang(
-						'[!SetOption "ToolbarEnabler" "Y" '
-						.. '"' .. tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) - 1 .. '"]'
-					)
+					SKIN:Bang('[!SetOption "ToolbarEnabler" "Y" "(#SkinMaxHeight# - 1)"]')
 				end
 				SKIN:Bang('[!UpdateMeter "ToolbarEnabler"]')
 			end
