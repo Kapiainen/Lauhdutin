@@ -106,6 +106,9 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Hide(false)
 		end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			C_ANIMATIONS:PushHoverReset(C_SKIN.nMouseIndex)
+		end
 		C_TOOLBAR:Hide()
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
 			if not C_TOOLBAR.bForciblyVisible then
