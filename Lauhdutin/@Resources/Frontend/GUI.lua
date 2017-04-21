@@ -2093,7 +2093,6 @@
 					return
 				end
 				local tAnimationSets = {
-					-- Vertical orientation
 					{ -- Shrink
 						fFunction = self.ClickShrink,
 						tArguments = {
@@ -2122,17 +2121,6 @@
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
 							bHorizontal = false,
-							fPrepare = self.PrepareSlotAnimation,
-							fReset = self.ClickReset
-						}
-					},
-					-- Horizontal orientation
-					{ -- Shrink
-						fFunction = self.ClickShrink,
-						tArguments = {
-							nFrames = 3,
-							nSlotIndex = anSlotIndex,
-							bHorizontal = true,
 							fPrepare = self.PrepareSlotAnimation,
 							fReset = self.ClickReset
 						}
