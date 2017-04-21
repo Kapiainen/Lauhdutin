@@ -2159,7 +2159,6 @@
 			--     Shrink
 			ClickShrink = function (self, atArguments)
 				local nFrame = 3 - atArguments.nFrames + 1
-				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
 					atArguments.fPrepare(self, atArguments)
@@ -2174,35 +2173,21 @@
 				end
 				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
-				local nX = 0
-				local nY = 0
-				local nW = 0
-				local nH = 0
-				if atArguments.bHorizontal then
-					nX = ((nSlotIndex - 1) * nSlotWidth) + (nSlotWidth - nSlotWidth * nSizeFactor) / 2
-					nY = (nSlotHeight - nSlotHeight * nSizeFactor) / 2
-					nW = nSlotWidth * nSizeFactor
-					nH = nSlotHeight * nSizeFactor
-				else
-					nX = (nSlotWidth - nSlotWidth * nSizeFactor) / 2
-					nY = ((nSlotIndex - 1) * nSlotHeight) + (nSlotHeight - nSlotHeight * nSizeFactor) / 2
-					nW = nSlotWidth * nSizeFactor
-					nH = nSlotHeight * nSizeFactor
-				end
-				nX = self.nSlotX + nX
-				nY = self.nSlotY + nY
+				local nWidth = nSlotWidth * nSizeFactor
+				local nHeight = nSlotHeight * nSizeFactor
+				local nX = (nSlotWidth - nWidth) / 2 + self.nSlotX
+				local nY = (nSlotHeight - nHeight) / 2 + self.nSlotY
 				SKIN:Bang(
 					'[!SetOption "SlotAnimation" "X" "' .. nX .. '"]'
 					.. '[!SetOption "SlotAnimation" "Y" "' .. nY .. '"]'
-					.. '[!SetOption "SlotAnimation" "W" "' .. nW .. '"]'
-					.. '[!SetOption "SlotAnimation" "H" "' .. nH .. '"]'
+					.. '[!SetOption "SlotAnimation" "W" "' .. nWidth .. '"]'
+					.. '[!SetOption "SlotAnimation" "H" "' .. nHeight .. '"]'
 					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
 			--     Shift
 			ClickShift = function (self, atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
-				local nSlotIndex = atArguments.nSlotIndex
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				if nFrame == 1 then
 					atArguments.fPrepare(self, atArguments)
