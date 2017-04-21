@@ -2049,7 +2049,7 @@
 			end,
 
 			PrepareSlotAnimation = function (self, atArguments)
-				if atArguments.nSlotIndex <= 1 then
+				if atArguments.nSlotIndex < 1 then
 					return
 				end
 				local mBanner = SKIN:GetMeter('SlotBanner' .. atArguments.nSlotIndex)
@@ -2076,7 +2076,7 @@
 			end,
 
 			ResetSlotAnimation = function (self, atArguments)
-				if atArguments.nSlotIndex <= 1 then
+				if atArguments.nSlotIndex < 1 then
 					return
 				end
 				SKIN:Bang(
