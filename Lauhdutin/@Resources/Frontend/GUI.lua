@@ -106,6 +106,9 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Hide(false)
 		end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			C_ANIMATIONS:PushHoverReset(C_SKIN.nMouseIndex)
+		end
 		C_TOOLBAR:Hide()
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION] > 0 then
 			if not C_TOOLBAR.bForciblyVisible then
@@ -144,7 +147,7 @@
 					nScrollIndex = 1
 				end
 			elseif anDirection < 0 then
-				local nUpperLimit = #T_FILTERED_GAMES + nScrollStep - nSlotCount
+				local nUpperLimit = #T_FILTERED_GAMES + 1 - nSlotCount
 				if nScrollIndex == nUpperLimit then
 					return
 				end
@@ -168,10 +171,8 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Hide()
 		end
-		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
-			if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
-				C_ANIMATIONS:PushHoverReset(1)
-			end
+		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+			C_ANIMATIONS:ResetSlotAnimation({nSlotIndex = C_SKIN.nMouseIndex})
 		end
 		C_TOOLBAR:Show(abForce)
 	end
@@ -180,22 +181,19 @@
 		abForce = abForce or false
 		C_TOOLBAR:Hide(abForce)
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
+			C_SLOT_HIGHLIGHT:MoveTo(C_SKIN.nMouseIndex)
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bForciblyVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
 			end
 		end
-		if T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'vertical' then
-			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-			if nAnimation > 0 and not C_TOOLBAR.bVisible then
-				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-					C_ANIMATIONS:PushHover(nAnimation, 1)
-				end
+		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+		if nAnimation > 0 and not C_TOOLBAR.bVisible then
+			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE
+			   or N_ACTION_STATE == E_ACTION_STATES.HIDE
+			   or N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+				C_ANIMATIONS:PushHover(nAnimation, C_SKIN.nMouseIndex)
 			end
 		end
 	end
@@ -216,7 +214,7 @@
 		end
 		C_TOOLBAR.bForciblyVisible = false
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
@@ -240,7 +238,7 @@
 		end
 		C_TOOLBAR:Hide(true)
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			if C_SLOT_HIGHLIGHT:Update() then
+			if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 				if not C_TOOLBAR.bVisible then
 					C_SLOT_HIGHLIGHT:Show()
 				end
@@ -266,7 +264,7 @@
 		SortGames()
 		PopulateSlots()
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Update()
+			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
 		Redraw()
 	end
@@ -281,7 +279,7 @@
 		T_FILTERED_GAMES = tReversed
 		PopulateSlots()
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Update()
+			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
 		Redraw()
 	end
@@ -291,22 +289,21 @@
 	function OnMouseEnterSlot(anIndex)
 	-- Called when the mouse cursor enters a slot
 	-- anIndex: The index of the slot in question (1-indexed)
-		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:MoveTo(anIndex)
-			if C_SLOT_HIGHLIGHT:Update() then
-				if not C_TOOLBAR.bVisible then
+		C_SKIN.nMouseIndex = anIndex
+		if not C_TOOLBAR.bVisible then
+			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
+				C_SLOT_HIGHLIGHT:MoveTo(C_SKIN.nMouseIndex)
+				if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
 					C_SLOT_HIGHLIGHT:Show(true)
 				end
 			end
-		end
-		local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
-		if nAnimation > 0 and not C_TOOLBAR.bVisible then
-			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
-			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-				C_ANIMATIONS:PushHover(nAnimation, anIndex)
+			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
+			if nAnimation > 0 then
+				if N_ACTION_STATE == E_ACTION_STATES.EXECUTE
+				   or N_ACTION_STATE == E_ACTION_STATES.HIDE
+				   or N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+					C_ANIMATIONS:PushHover(nAnimation, anIndex)
+				end
 			end
 		end
 	end
@@ -516,10 +513,13 @@
 		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
 		-- If scroll index has changed, then redraw
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-				C_SLOT_HIGHLIGHT:Update()
+				C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 			end
 			C_SLOT_SUBMENU:Hide(false)
 			if PopulateSlots() then
+				if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+					C_ANIMATIONS:UpdateHoverAnimation(C_SKIN.nMouseIndex)
+				end
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 				Redraw()
 			end
@@ -638,6 +638,7 @@
 			bSkinAnimationPlaying = false,
 			bSteamRunning = false,
 			bBattlenetRunning = false,
+			nMouseIndex = -1,
 
 			UpdateDefaultZPos = function (self)
 				if self.sSettingsPath == nil then
@@ -831,18 +832,17 @@
 
 			MoveToBottom = function (self)
 				self.bTopPosition = false
-				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
 				SKIN:Bang(
-					'[!SetOption "ToolbarEnabler" "Y" "' .. nSlotHeight - 1 .. '"]'
+					'[!SetOption "ToolbarEnabler" "Y" "(#SkinMaxHeight# - 1)"]'
 					.. '[!UpdateMeter "ToolbarEnabler"]'
-					.. '[!SetOption "ToolbarBackground" "Y" "' .. nSlotHeight - 50 .. '"]'
-					.. '[!SetOption "ToolbarButtonSearch" "Y" "' .. nSlotHeight - 49 .. '"]'
-					.. '[!SetOption "ToolbarSeparator1" "Y" "' .. nSlotHeight - 45 .. '"]'
-					.. '[!SetOption "ToolbarButtonSort" "Y" "' .. nSlotHeight - 49 .. '"]'
-					.. '[!SetOption "ToolbarSeparator2" "Y" "' .. nSlotHeight - 45 .. '"]'
-					.. '[!SetOption "ToolbarButtonSettings" "Y" "' .. nSlotHeight - 49 .. '"]'
+					.. '[!SetOption "ToolbarBackground" "Y" "(#SkinMaxHeight# - 50)"]'
+					.. '[!SetOption "ToolbarButtonSearch" "Y" "(#SkinMaxHeight# - 49)"]'
+					.. '[!SetOption "ToolbarSeparator1" "Y" "(#SkinMaxHeight# - 45)"]'
+					.. '[!SetOption "ToolbarButtonSort" "Y" "(#SkinMaxHeight# - 49)"]'
+					.. '[!SetOption "ToolbarSeparator2" "Y" "(#SkinMaxHeight# - 45)"]'
+					.. '[!SetOption "ToolbarButtonSettings" "Y" "(#SkinMaxHeight# - 49)"]'
 					.. '[!UpdateMeterGroup "Toolbar"]'
-					.. '[!SetOption "FilterInput" "Y" "' .. nSlotHeight - 90 .. '"]'
+					.. '[!SetOption "FilterInput" "Y" "(#SkinMaxHeight# - 90)"]'
 					.. '[!UpdateMeasure "FilterInput"]'
 				)
 			end
@@ -1086,7 +1086,7 @@
 				if #T_FILTERED_GAMES > 0 then
 					PopulateSlots()
 					if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-						C_SLOT_HIGHLIGHT:Update()
+						C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 					end
 				else
 					OnApplyFilter('')
@@ -1129,7 +1129,6 @@
 --###########################################################################################################
 	function InitializeSlotHighlight()
 		return {
-			nCurrentIndex = 0,
 			bVisible = true,
 
 			MoveTo = function (self, anIndex)
@@ -1137,20 +1136,19 @@
 				if mSlot == nil then
 					return
 				end
-				self.nCurrentIndex = anIndex
 				SKIN:Bang(
-					'[!SetOption "SlotHighlightBackground" "X" "' .. mSlot:GetX() .. '"]'
-					.. '[!SetOption "SlotHighlightBackground" "Y" "' .. mSlot:GetY() .. '"]'
+					'[!SetOption "SlotHighlightBackground" "X" "' .. mSlot:GetX(true) .. '"]'
+					.. '[!SetOption "SlotHighlightBackground" "Y" "' .. mSlot:GetY(true) .. '"]'
 					.. '[!UpdateMeterGroup "SlotHighlight"]'
 				)
 			end,
 
-			Update = function (self)
+			Update = function (self, anIndex)
 				if T_FILTERED_GAMES == nil or #T_FILTERED_GAMES <= 0 then
 					self:Hide()
 					return false
 				end
-				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + self.nCurrentIndex - 1]
+				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + anIndex - 1]
 				if tGame == nil then
 					self:Hide(true)
 					return false
@@ -1992,6 +1990,8 @@
 		return {
 			tQueue = {},
 			bPlaying = false,
+			nSlotX = 0,
+			nSlotY = 0,
 
 			Pending = function (self)
 				return #self.tQueue > 0
@@ -2034,10 +2034,10 @@
 				end
 				if bCancel then
 					if tAnimationSet.tArguments.fReset then
-						tAnimationSet.tArguments.fReset(tAnimationSet.tArguments)
+						tAnimationSet.tArguments.fReset(self, tAnimationSet.tArguments)
 					end
-				else
-					tAnimationSet.fFunction(tAnimationSet.tArguments)
+				elseif tAnimationSet.fFunction ~= nil then
+					tAnimationSet.fFunction(self, tAnimationSet.tArguments)
 					tAnimationSet.tArguments.nFrames = tAnimationSet.tArguments.nFrames - 1
 				end
 				self.bPlaying = false
@@ -2048,6 +2048,51 @@
 				table.insert(self.tQueue, atAnimationSet)
 			end,
 
+			PrepareSlotAnimation = function (self, atArguments)
+				if atArguments.nSlotIndex < 1 then
+					return
+				end
+				local mBanner = SKIN:GetMeter('SlotBanner' .. atArguments.nSlotIndex)
+				local nX = mBanner:GetX(true)
+				self.nSlotX = nX
+				local nY = mBanner:GetY(true)
+				self.nSlotY = nY
+				local nW = mBanner:GetW()
+				local nH = mBanner:GetH()
+				local sBannerPath = mBanner:GetOption('ImageName')
+				SKIN:Bang(
+					'[!SetOption "SlotAnimation" "W" "' .. nW ..'"]'
+					.. '[!SetOption "SlotAnimation" "H" "' .. nH .. '"]'
+					.. '[!SetOption "SlotAnimation" "X" "' .. nX .. '"]'
+					.. '[!SetOption "SlotAnimation" "Y" "' .. nY .. '"]'
+					.. '[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
+					.. '[!SetOption "CutoutBackground" "Shape2" '
+					.. '"Rectangle ' .. nX .. ',' .. nY .. ',' .. nW .. ',' .. nH .. '"]'
+					.. '[!SetOption "SlotBanner' .. atArguments.nSlotIndex .. '" "ImageAlpha" "0"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
+					.. '[!UpdateMeter "CutoutBackground"]'
+					.. '[!UpdateMeter "SlotBanner' .. atArguments.nSlotIndex .. '"]'
+				)
+			end,
+
+			ResetSlotAnimation = function (self, atArguments)
+				if atArguments.nSlotIndex < 1 then
+					return
+				end
+				SKIN:Bang(
+					'[!SetOption "SlotAnimation" "W" "0"]'
+					.. '[!SetOption "SlotAnimation" "H" "0"]'
+					.. '[!SetOption "SlotAnimation" "X" "-1"]'
+					.. '[!SetOption "SlotAnimation" "Y" "-1"]'
+					.. '[!SetOption "SlotAnimation" "ImageName" ""]'
+					.. '[!SetOption "CutoutBackground" "Shape2" "Rectangle 0,0,0,0"]'
+					.. '[!SetOption "SlotBanner' .. atArguments.nSlotIndex .. '" "ImageAlpha" "255"]'
+					.. '[!UpdateMeter "SlotBanner' .. atArguments.nSlotIndex .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
+					.. '[!UpdateMeter "CutoutBackground"]'
+				)
+			end,
+
 			-- Animation functions
 			--   Click
 			PushClick = function (self, anType, anSlotIndex, afAction, atGame)
@@ -2056,14 +2101,14 @@
 					return
 				end
 				local tAnimationSets = {
-					-- Vertical orientation
 					{ -- Shrink
 						fFunction = self.ClickShrink,
 						tArguments = {
 							nFrames = 3,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = false,
-							fReset = self.ClickShrinkReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ClickReset
 						}
 					},
 					{ -- Shift left
@@ -2073,7 +2118,8 @@
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
 							bHorizontal = false,
-							fReset = self.ClickShiftReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ClickReset
 						}
 					},
 					{ -- Shift right
@@ -2083,17 +2129,8 @@
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
 							bHorizontal = false,
-							fReset = self.ClickShiftReset
-						}
-					},
-					-- Horizontal orientation
-					{ -- Shrink
-						fFunction = self.ClickShrink,
-						tArguments = {
-							nFrames = 3,
-							nSlotIndex = anSlotIndex,
-							bHorizontal = true,
-							fReset = self.ClickShrinkReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ClickReset
 						}
 					},
 					{ -- Shift up
@@ -2103,7 +2140,8 @@
 							nSlotIndex = anSlotIndex,
 							nDirection = 1,
 							bHorizontal = true,
-							fReset = self.ClickShiftReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ClickReset
 						}
 					},
 					{ -- Shift left
@@ -2113,7 +2151,8 @@
 							nSlotIndex = anSlotIndex,
 							nDirection = -1,
 							bHorizontal = true,
-							fReset = self.ClickShiftReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ClickReset
 						}
 					}
 				}
@@ -2126,76 +2165,40 @@
 				self:Push(tAnimationSet)
 			end,
 			--     Shrink
-			ClickShrink = function (atArguments)
+			ClickShrink = function (self, atArguments)
 				local nFrame = 3 - atArguments.nFrames + 1
-				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
+					atArguments.fPrepare(self, atArguments)
 					nSizeFactor = 1.0 / 1.8
 				elseif nFrame == 2 then
 					nSizeFactor = 1.0 / 4.0
 				elseif nFrame == 3 then
 					nSizeFactor = 1.0 / 20.0
 				else
-					atArguments.fReset(atArguments)
+					atArguments.fReset(self, atArguments)
 					return
 				end
 				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
-				local nX = 0
-				local nY = 0
-				local nW = 0
-				local nH = 0
-				if atArguments.bHorizontal then
-					nX = ((nSlotIndex - 1) * nSlotWidth) + (nSlotWidth - nSlotWidth * nSizeFactor) / 2
-					nY = (nSlotHeight - nSlotHeight * nSizeFactor) / 2
-					nW = nSlotWidth * nSizeFactor
-					nH = nSlotHeight * nSizeFactor
-				else
-					nX = (nSlotWidth - nSlotWidth * nSizeFactor) / 2
-					nY = ((nSlotIndex - 1) * nSlotHeight) + (nSlotHeight - nSlotHeight * nSizeFactor) / 2
-					nW = nSlotWidth * nSizeFactor
-					nH = nSlotHeight * nSizeFactor
-				end
+				local nWidth = nSlotWidth * nSizeFactor
+				local nHeight = nSlotHeight * nSizeFactor
+				local nX = (nSlotWidth - nWidth) / 2 + self.nSlotX
+				local nY = (nSlotHeight - nHeight) / 2 + self.nSlotY
 				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "X" "' .. nX .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "Y" "' .. nY .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "' .. nW .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "' .. nH .. '"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
-				)
-			end,
-
-			ClickShrinkReset = function (atArguments)
-				local nSlotIndex = atArguments.nSlotIndex
-				local sOption = 'X'
-				if atArguments.bHorizontal then
-					sOption = 'Y'
-				end
-				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
-				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
-				local nX = 0
-				local nY = 0
-				if atArguments.bHorizontal then
-					nX = (nSlotIndex - 1) * nSlotWidth
-				else
-					nY = (nSlotIndex - 1) * nSlotHeight
-				end
-				atArguments.fAction(atArguments.tGame)
-				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "X" "' .. nX .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "Y" "' .. nY .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "' .. nSlotWidth .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "' .. nSlotHeight .. '"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+					'[!SetOption "SlotAnimation" "X" "' .. nX .. '"]'
+					.. '[!SetOption "SlotAnimation" "Y" "' .. nY .. '"]'
+					.. '[!SetOption "SlotAnimation" "W" "' .. nWidth .. '"]'
+					.. '[!SetOption "SlotAnimation" "H" "' .. nHeight .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
 			--     Shift
-			ClickShift = function (atArguments)
+			ClickShift = function (self, atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
-				local nSlotIndex = atArguments.nSlotIndex
 				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
 				if nFrame == 1 then
+					atArguments.fPrepare(self, atArguments)
 					nNewPosition = 0 - nNewPosition / 20.0
 				elseif nFrame == 2 then
 					nNewPosition = 0 - nNewPosition / 4.0
@@ -2204,37 +2207,33 @@
 				elseif nFrame == 4 then
 					nNewPosition = 0 - nNewPosition
 				else
-					atArguments.fReset(atArguments)
+					atArguments.fReset(self, atArguments)
 					return
 				end
 				local sOption = 'X'
 				if atArguments.bHorizontal then
 					sOption = 'Y'
+					nNewPosition = nNewPosition * atArguments.nDirection + self.nSlotY
+				else
+					nNewPosition = nNewPosition * atArguments.nDirection + self.nSlotX
 				end
-				nNewPosition = nNewPosition * atArguments.nDirection
+				
 				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "'
+					'[!SetOption "SlotAnimation" "' .. sOption .. '" "'
 					.. nNewPosition .. '"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
 
-			ClickShiftReset = function (atArguments)
-				local nSlotIndex = atArguments.nSlotIndex
-				local sOption = 'X'
-				if atArguments.bHorizontal then
-					sOption = 'Y'
-				end
+			ClickReset = function (self, atArguments)
 				atArguments.fAction(atArguments.tGame)
-				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "0"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex .. '"]'
-				)
+				self:ResetSlotAnimation(atArguments)
 			end,
-
 			--   Hover
 			PushHover = function (self, anType, anSlotIndex)
-				if anType < 1 or anSlotIndex < 1 or anSlotIndex > T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT] then
+				if anType < 1
+				   or anSlotIndex < 1
+				   or anSlotIndex > tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) then
 					return
 				end
 				local tAnimationSets = {
@@ -2244,7 +2243,8 @@
 							nFrames = 3,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
-							fReset = self.HoverReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ResetSlotAnimation
 						}
 					},
 					{ -- Jiggle
@@ -2253,7 +2253,8 @@
 							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
-							fReset = self.HoverReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ResetSlotAnimation
 						}
 					},
 					{ -- Shake
@@ -2262,7 +2263,8 @@
 							nFrames = 4,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
-							fReset = self.HoverReset
+							fPrepare = self.PrepareSlotAnimation,
+							fReset = self.ResetSlotAnimation
 						}
 					}
 				}
@@ -2273,11 +2275,12 @@
 				self:Push(tAnimationSet)
 			end,
 			--     Zoom in
-			HoverZoomIn = function (atArguments)
+			HoverZoomIn = function (self, atArguments)
 				local nFrame = 3 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
+					atArguments.fPrepare(self, atArguments)
 					nSizeFactor = 1.05
 				elseif nFrame == 2 then
 					nSizeFactor = 1.10
@@ -2286,75 +2289,78 @@
 				else
 					return
 				end
-				local sPositionOption = 'X'
-				local sSizeOption = 'W'
-				local nPositionValue = 0
-				local nSizeValue = 1
-				if atArguments.bHorizontal then
-					sPositionOption = 'Y'
-					sSizeOption = 'H'
-					local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
-					nPositionValue = 0 -((nSizeFactor * nSlotHeight) - nSlotHeight) / 2
-					nSizeValue = nSizeFactor * nSlotHeight
-				else
-					local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
-					nPositionValue = 0 - ((nSizeFactor * nSlotWidth) - nSlotWidth) / 2
-					nSizeValue = nSizeFactor * nSlotWidth
-				end
+				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+				local nY = self.nSlotY -((nSizeFactor * nSlotHeight) - nSlotHeight) / 2
+				local nH = nSizeFactor * nSlotHeight
+				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				local nX = self.nSlotX - ((nSizeFactor * nSlotWidth) - nSlotWidth) / 2
+				local nW = nSizeFactor * nSlotWidth
 				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'
-					.. sPositionOption .. '" "' .. nPositionValue .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "'
-					.. sSizeOption .. '" "' .. nSizeValue .. '"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
+					'[!SetOption "SlotAnimation" "X" "' .. nX .. '"]'
+					.. '[!SetOption "SlotAnimation" "W" "' .. nW .. '"]'
+					.. '[!SetOption "SlotAnimation" "Y" "' .. nY .. '"]'
+					.. '[!SetOption "SlotAnimation" "H" "' .. nH .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
 			--     Jiggle
-			HoverJiggle = function (atArguments)
+			HoverJiggle = function (self, atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local nSizeFactor = 1.0
 				if nFrame == 1 then
-					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "2"]')
+					atArguments.fPrepare(self, atArguments)
+					SKIN:Bang('[!SetOption "SlotAnimation" "ImageRotate" "2"]')
 				elseif nFrame == 2 then
-					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]')
+					SKIN:Bang('[!SetOption "SlotAnimation" "ImageRotate" "0"]')
 				elseif nFrame == 3 then
-					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "-2"]')
+					SKIN:Bang('[!SetOption "SlotAnimation" "ImageRotate" "-2"]')
 				elseif nFrame == 4 then
-					SKIN:Bang('[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]')
+					SKIN:Bang('[!SetOption "SlotAnimation" "ImageRotate" "0"]')
 				else
+					atArguments.fReset(self, atArguments)
 					return
 				end
-				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
+				SKIN:Bang('[!UpdateMeter "SlotAnimation"]')
 			end,
 			--     Shake
-			HoverShake = function (atArguments)
+			HoverShake = function (self, atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
 				local nSlotIndex = atArguments.nSlotIndex
 				local sPositionOption = 'X'
+				local nPositionValue = self.nSlotX
 				if atArguments.bHorizontal then
 					sPositionOption = 'Y'
+					nPositionValue = self.nSlotY
 				end
 				if nFrame == 1 then
+					atArguments.fPrepare(self, atArguments)
+					nPositionValue = nPositionValue - 5
 					SKIN:Bang(
-						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "-5"]'
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 2 then
 					SKIN:Bang(
-						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "0"]'
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 3 then
+					nPositionValue = nPositionValue + 5
 					SKIN:Bang(
-						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "5"]'
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 4 then
 					SKIN:Bang(
-						'[!SetOption "SlotBanner' .. nSlotIndex .. '" "'.. sPositionOption .. '" "0"]'
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						.. '"' .. nPositionValue .. '"]'
 					)
 				else
+					atArguments.fReset(self, atArguments)
 					return
 				end
-				SKIN:Bang('[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]')
+				SKIN:Bang('[!UpdateMeter "SlotAnimation"]')
 			end,
 
 			PushHoverReset = function (self, anSlotIndex)
@@ -2368,29 +2374,21 @@
 							nFrames = 0,
 							nSlotIndex = anSlotIndex,
 							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal',
-							fReset = self.HoverReset
+							fReset = self.ResetSlotAnimation
 						}
 					}
 				)
 			end,
 
-			HoverReset = function (atArguments)
-				local nSlotIndex = atArguments.nSlotIndex
-				local sOption = 'X'
-				if atArguments.bHorizontal then
-					sOption = 'Y'
-				end
+			UpdateHoverAnimation = function (self, anIndex)
+				local mBanner = SKIN:GetMeter('SlotBanner' .. anIndex)
+				local sBannerPath = mBanner:GetOption('ImageName')
 				SKIN:Bang(
-					'[!SetOption "SlotBanner' .. nSlotIndex .. '" "' .. sOption .. '" "0"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "W" "'
-					.. T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH] .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "H" "'
-					.. T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT] .. '"]'
-					.. '[!SetOption "SlotBanner' .. nSlotIndex .. '" "ImageRotate" "0"]'
-					.. '[!UpdateMeter "SlotBanner' .. nSlotIndex ..'"]'
+					'[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
+					.. '[!UpdateMeter "SlotAnimation"]'
 				)
 			end,
-
+			-- Skin slide animation
 			PushSkinSlideIn = function (self)
 				if C_SKIN.bSkinAnimationPlaying or C_SKIN.bVisible then
 					return
@@ -2407,7 +2405,7 @@
 							bMandatory = true,
 							nDirection = nDir,
 							bIntoView = true,
-							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+							bHorizontal = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) > 2
 						}
 					}
 				)
@@ -2429,27 +2427,30 @@
 							bMandatory = true,
 							nDirection = nDir,
 							bIntoView = false,
-							bHorizontal = T_SETTINGS[E_SETTING_KEYS.ORIENTATION] == 'horizontal'
+							bHorizontal = tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) > 2
 						}
 					}
 				)
 			end,
 
-			SkinSlide = function (atArguments)
+			SkinSlide = function (self, atArguments)
 				local nFrame = 4 - atArguments.nFrames + 1
-				local nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
+				local nNewPosition = 0
 				if atArguments.bHorizontal then
-					nNewPosition = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
+					nNewPosition = 0 - tonumber(SKIN:GetVariable('SkinMaxHeight'))
+				else
+					nNewPosition = 0 - tonumber(SKIN:GetVariable('SkinMaxWidth'))
 				end
+				local nDivider = 1.0
 				if atArguments.bIntoView then
 					if nFrame == 1 then
 						C_SKIN.bSkinAnimationPlaying = true
 						C_SKIN.bVisible = true
-						nNewPosition = 0 - nNewPosition / 1.8
+						nDivider = 1.8
 					elseif nFrame == 2 then
-						nNewPosition = 0 - nNewPosition / 4.0
+						nDivider = 4.0
 					elseif nFrame == 3 then
-						nNewPosition = 0 - nNewPosition / 20.0
+						nDivider = 20.0
 					elseif nFrame == 4 then
 						nNewPosition = 0
 					else
@@ -2459,13 +2460,13 @@
 				else
 					if nFrame == 1 then
 						C_SKIN.bSkinAnimationPlaying = true
-						nNewPosition = 0 - nNewPosition / 20.0
+						nDivider = 20.0
 					elseif nFrame == 2 then
-						nNewPosition = 0 - nNewPosition / 4.0
+						nDivider = 4.0
 					elseif nFrame == 3 then
-						nNewPosition = 0 - nNewPosition / 1.8
+						nDivider = 1.8
 					elseif nFrame == 4 then
-						nNewPosition = 0 - nNewPosition
+						nDivider = 0.9
 					else
 						C_SCRIPT:SetUpdateDivider(-1)
 						C_SKIN.bVisible = false
@@ -2474,43 +2475,34 @@
 						return
 					end
 				end
-				nNewPosition = nNewPosition * atArguments.nDirection
+				nNewPosition = nNewPosition * atArguments.nDirection / nDivider
 				local sPositionOption = 'X'
+				local nTextOffset = 0
 				if atArguments.bHorizontal then
 					sPositionOption = 'Y'
-				end
-				local nTextOffset = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH]) / 2
-				if atArguments.bHorizontal then
 					nTextOffset = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) / 2
+				else
+					nTextOffset = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH]) / 2
 				end
-				for i = 1, tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT]) do
-					SKIN:Bang(
-						'[!SetOption "SlotText' .. i .. '" "' .. sPositionOption .. '" "'
-						.. nNewPosition + nTextOffset .. '"]'
-						.. '[!SetOption "SlotBanner' .. i .. '" "' .. sPositionOption .. '" "'
-						.. nNewPosition .. '"]'
-					)
-				end
+				nTextOffset = nTextOffset * atArguments.nDirection / nDivider
 				SKIN:Bang(
-					'[!SetOption "StatusMessage" "' .. sPositionOption .. '" "'
-					.. nNewPosition + nTextOffset .. '"]'
-					.. '[!UpdateMeterGroup "Status"]'
-					.. '[!UpdateMeterGroup "Slots"]'
-					.. '[!SetOption "SlotHighlightBackground" "' .. sPositionOption .. '" "'
-					.. nNewPosition .. '"]'
-					.. '[!UpdateMeterGroup "SlotHighlight"]'
-					.. '[!SetOption "SlotsBackground" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
+					'[!SetOption "SlotsBackground" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
 					.. '[!UpdateMeter "SlotsBackground"]'
+					.. '[!SetOption "CutoutBackground" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
+					.. '[!UpdateMeter "CutoutBackground"]'
+					.. '[!UpdateMeterGroup "Slots"]'
+					.. '[!SetOption "StatusMessage" "' .. sPositionOption .. '" '
+					.. '"' .. nTextOffset .. '"]'
+					.. '[!UpdateMeterGroup "Status"]'
+					.. '[!SetOption "SlotHighlightBackground" "' .. sPositionOption .. '" '
+					.. '"' .. nNewPosition .. '"]'
+					.. '[!UpdateMeterGroup "SlotHighlight"]'
 					.. '[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "' .. nNewPosition .. '"]'
-					.. '[!UpdateMeter "ToolbarEnabler"]'
 				)
 				if not C_TOOLBAR.bTopPosition then
-					SKIN:Bang(
-						'[!SetOption "ToolbarEnabler" "' .. sPositionOption .. '" "'
-						.. tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT]) - 1 .. '"]'
-						.. '[!UpdateMeter "ToolbarEnabler"]'
-					)
+					SKIN:Bang('[!SetOption "ToolbarEnabler" "Y" "(#SkinMaxHeight# - 1)"]')
 				end
+				SKIN:Bang('[!UpdateMeter "ToolbarEnabler"]')
 			end
 		}
 	end
