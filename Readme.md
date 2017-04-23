@@ -287,6 +287,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added setting for making all games execute/ignore bangs.
 - Added setting for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
 - Added setting for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
+- Added setting for number of slots per row/column.
 - Updated the setting title and tooltip for the paths to Blizzard games.
 - Updated settings menu so that bangs are now edited via Notepad.
 - Added new filters.
