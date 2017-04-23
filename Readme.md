@@ -272,29 +272,31 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 **Version 2.7.0 - YYYY/MM/DD:**
+- Major GUI overhaul and optimizations.
+- Added support for multiple rows/columns of slots.
 - Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor. The toolbar and its enabler are moved to the bottom of the skin, if the skin is set to slide into view from below.
-- Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
+- Added sorting icon for score/ranking based sorting when using fuzzy search.
+- Added support for automatically (un)loading banners when skin animations are used and the skin is (not) visible in order to reduce the memory footprint.
+- Updated `Battle.net` to `Blizzard App` in the GUI.
+- Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for adding notes to a game.
 - Added support for adding tags to a game.
 - Added support for defining which process to monitor for each game.
 - Added support for toggling whether or not a game executes bangs.
-- Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added setting for whether or not new games execute bangs by default.
-- Added a setting for making all games execute/ignore bangs.
-- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
-- Added new filters.
-- Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
-- Updated `Battle.net` to `Blizzard App` in the GUI.
+- Added setting for making all games execute/ignore bangs.
+- Added setting for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
+- Added setting for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
+- Added setting for number of slots per row/column.
 - Updated the setting title and tooltip for the paths to Blizzard games.
-- Bangs are now edited via Notepad.
-- Major GUI overhaul and optimizations.
-- Added option for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
-- Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
-- Added support for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
-- Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed.
+- Updated settings menu so that bangs are now edited via Notepad.
+- Added new filters.
+- Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed, if necessary.
 - Added reversed sorting icons and refactored relevant code.
-- Added sorting icon for score/ranking based sorting when using fuzzy search.
-- Added support for automatically (un)loading banners when skin animations are used and the skin is (not) visible in order to minimize the memory footprint.
+- Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
+- Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
