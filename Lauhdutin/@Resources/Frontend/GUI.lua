@@ -601,7 +601,7 @@
 		C_SLOT_HIGHLIGHT:Hide()
 		C_SLOT_SUBMENU:Hide()
 		C_TOOLBAR:UpdateSortingIcon()
-		if tonumber(T_SETTINGS[E_SETTING_KEYS.ANIMATION_SKIN_SLIDE_DIRECTION]) == 4 then
+		if tonumber(T_SETTINGS[E_SETTING_KEYS.TOOLBAR_POSITION]) == 1 then
 			C_TOOLBAR:MoveToBottom()
 		end
 		C_STATUS_MESSAGE:Show('Initializing...')

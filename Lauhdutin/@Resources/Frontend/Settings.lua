@@ -135,6 +135,13 @@ function Initialize()
 	if SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] == nil then
 		SETTINGS[SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] = true
 	end
+	if SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] == nil then
+		SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] = 0
+	end
+	TOOOLBAR_POSITION_DESCRIPTIONS = {
+		"Top",
+		"Bottom"
+	}
 	SKIN:Bang('[!HideMeterGroup "Paths"]')
 	UpdateSettings()
 end
@@ -341,6 +348,7 @@ function UpdateSettings()
 		else
 			SKIN:Bang('[!SetOption "AdjustZPosStatus" "Text" "Disabled"]')
 		end
+		SKIN:Bang('[!SetOption "ToolbarPositionStatus" "Text" "' .. TOOOLBAR_POSITION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] + 1] .. '"]')
 		SKIN:Bang('[!Update]')
 		SKIN:Bang('[!Redraw]')
 	end
@@ -646,6 +654,14 @@ end
 
 function ToggleAdjustZPos()
 	SETTINGS[SETTING_KEYS.ADJUST_ZPOS] = not SETTINGS[SETTING_KEYS.ADJUST_ZPOS]
+	UpdateSettings()
+end
+
+function CycleToolbarPosition()
+	SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] = SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] + 1
+	if SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] > 1 then
+		SETTINGS[SETTING_KEYS.TOOLBAR_POSITION] = 0
+	end
 	UpdateSettings()
 end
 

@@ -274,7 +274,7 @@ Any deviations from the rules regarding adding platform support will most likely
 **Version 2.7.0 - YYYY/MM/DD:**
 - Major GUI overhaul and optimizations.
 - Added support for multiple rows/columns of slots.
-- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor. The toolbar and its enabler are moved to the bottom of the skin, if the skin is set to slide into view from below.
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
 - Added sorting icon for score/ranking based sorting when using fuzzy search.
 - Added support for automatically (un)loading banners when skin animations are used and the skin is (not) visible in order to reduce the memory footprint.
 - Updated `Battle.net` to `Blizzard App` in the GUI.
@@ -288,6 +288,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added setting for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
 - Added setting for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
 - Added setting for number of slots per row/column.
+- Added setting for determining the position of the toolbar and which edge to touch to make the toolbar visible.
 - Updated the setting title and tooltip for the paths to Blizzard games.
 - Updated settings menu so that bangs are now edited via Notepad.
 - Added new filters.

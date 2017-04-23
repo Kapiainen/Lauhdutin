@@ -64,3 +64,4 @@ class SettingKeys():
     STEAM_PATH = "steam_path"
     STEAM_PERSONANAME = "steam_personaname"
     STEAM_USERDATAID = "steam_userdataid"
+    TOOLBAR_POSITION = "toolbar_position"

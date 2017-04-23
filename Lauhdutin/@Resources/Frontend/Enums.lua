@@ -31,7 +31,8 @@ return {
 		STEAM_PARSE_COMMUNITY_PROFILE = 'parse_steam_community_profile',
 		STEAM_PATH = 'steam_path',
 		STEAM_PERSONANAME = 'steam_personaname',
-		STEAM_USERDATAID = 'steam_userdataid'
+		STEAM_USERDATAID = 'steam_userdataid',
+		TOOLBAR_POSITION = 'toolbar_position'
 	},
 	INITIALIZATION_STATES = {
 		UNINITIALIZED = 0,
