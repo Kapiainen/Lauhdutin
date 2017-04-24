@@ -896,12 +896,13 @@
 				end
 				local mBanner = SKIN:GetMeter('SlotBanner' .. anIndex)
 				local nSlotWidth = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_WIDTH])
-				local nX = mBanner:GetX(true) + (nSlotWidth - nSlotWidth / 1.1) / 2
+				local nX = mBanner:GetX(true)
 				local nSlotHeight = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_HEIGHT])
-				local nY = mBanner:GetY(true) + (nSlotHeight - nSlotHeight / 1.1) / 2
+				local nY = mBanner:GetY(true)
 				SKIN:Bang(
-					'[!SetOption "SlotSubmenuBackground" "X" "' .. nX .. '"]'
-					.. '[!SetOption "SlotSubmenuBackground" "Y"' .. nY .. '"]'
+					'[!SetOption "SlotSubmenuBackground" "X" "' .. nX + (nSlotWidth - nSlotWidth / 1.1) / 2 .. '"]'
+					.. '[!SetOption "SlotSubmenuBackground" "Y"' .. nY + (nSlotHeight - nSlotHeight / 1.1) / 2 .. '"]'
+					.. '[!SetOption "SlotSubmenuIcon1" "X" "(' .. nX .. ' + #SlotWidth# / 6 - 15)"]'
 				)
 				if tGame[E_GAME_KEYS.IGNORES_BANGS] then
 					SKIN:Bang(
