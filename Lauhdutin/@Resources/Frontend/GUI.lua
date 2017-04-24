@@ -863,8 +863,8 @@
 					'[!SetOption "StatusMessage" "Text" "' .. asMessage .. '"]'
 					.. '[!UpdateMeterGroup "Status"]'
 					.. '[!ShowMeterGroup "Status"]'
-					.. '[!Redraw]'
 				)
+				Redraw()
 			end,
 
 			Hide = function (self)
@@ -875,8 +875,8 @@
 				end
 				SKIN:Bang(
 					'[!HideMeterGroup "Status"]'
-					.. '[!Redraw]'
 				)
+				Redraw()
 			end
 		}
 	end
