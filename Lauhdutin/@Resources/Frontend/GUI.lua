@@ -2029,13 +2029,16 @@
 					return
 				end
 				local mBanner = SKIN:GetMeter('SlotBanner' .. atArguments.nSlotIndex)
+				local sBannerPath = mBanner:GetOption('ImageName')
+				if not sBannerPath or sBannerPath == '' then
+					return
+				end
 				local nX = mBanner:GetX(true)
 				self.nSlotX = nX
 				local nY = mBanner:GetY(true)
 				self.nSlotY = nY
 				local nW = mBanner:GetW()
 				local nH = mBanner:GetH()
-				local sBannerPath = mBanner:GetOption('ImageName')
 				SKIN:Bang(
 					'[!SetOption "SlotAnimation" "W" "' .. nW ..'"]'
 					.. '[!SetOption "SlotAnimation" "H" "' .. nH .. '"]'
