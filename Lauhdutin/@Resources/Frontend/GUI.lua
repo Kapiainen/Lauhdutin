@@ -507,9 +507,7 @@
 		end
 		if C_ANIMATIONS:Pending() then
 		-- If there are animations to play, then play a frame and redraw
-			if C_ANIMATIONS:Play() then
-				Redraw()
-			end
+			C_ANIMATIONS:Play()
 		elseif N_LAST_DRAWN_SCROLL_INDEX ~= N_SCROLL_INDEX then
 		-- If scroll index has changed, then redraw
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
@@ -521,20 +519,13 @@
 					C_ANIMATIONS:UpdateHoverAnimation(C_SKIN.nMouseIndex)
 				end
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
-				Redraw()
 			end
-		elseif N_UPDATES_UNTIL_REDRAW > 0 then
-			N_UPDATES_UNTIL_REDRAW = N_UPDATES_UNTIL_REDRAW - 1
-		elseif N_UPDATES_UNTIL_REDRAW <= 0 then
-		-- Redraw once every second that the mouse is on the skin
-			Redraw()
 		end
 	end
 
 	function Redraw()
 		--print("Redraw")
 		SKIN:Bang('[!Redraw]')
-		N_UPDATES_UNTIL_REDRAW = 124
 	end
 
 	function PopulateSlots()
@@ -1280,7 +1271,6 @@
 	function InitializeStateVariables()
 		T_SLOT_ANIMATION_QUEUE = {}
 		N_ACTION_STATE = 0
-		N_UPDATES_UNTIL_REDRAW = 124
 		N_LAST_DRAWN_SCROLL_INDEX = 1
 		N_SCROLL_INDEX = 1
 		T_GAMES = {}
