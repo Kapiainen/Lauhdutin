@@ -2326,31 +2326,27 @@
 				local nSlotIndex = atArguments.nSlotIndex
 				local sPositionOption = 'X'
 				local nPositionValue = self.nSlotX
-				if atArguments.bHorizontal then
-					sPositionOption = 'Y'
-					nPositionValue = self.nSlotY
-				end
 				if nFrame == 1 then
 					atArguments.fPrepare(self, atArguments)
 					nPositionValue = nPositionValue - 5
 					SKIN:Bang(
-						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. '" '
 						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 2 then
 					SKIN:Bang(
-						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. '" '
 						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 3 then
 					nPositionValue = nPositionValue + 5
 					SKIN:Bang(
-						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. '" '
 						.. '"' .. nPositionValue .. '"]'
 					)
 				elseif nFrame == 4 then
 					SKIN:Bang(
-						'[!SetOption "SlotAnimation" "'.. sPositionOption .. ' '
+						'[!SetOption "SlotAnimation" "'.. sPositionOption .. '" '
 						.. '"' .. nPositionValue .. '"]'
 					)
 				else
