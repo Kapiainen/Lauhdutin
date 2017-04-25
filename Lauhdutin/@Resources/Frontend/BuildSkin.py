@@ -39,8 +39,8 @@ try:
         contents.extend([
             "SlotWidth=%s" % SLOT_WIDTH,
             "SlotHeight=%s" % SLOT_HEIGHT,
-            "SlotBackgroundColor=%s" % SETTINGS.get("slot_background_color", "0,0,0,255"),
-            "SlotTextColor=%s" % SETTINGS.get("slot_text_color", "255,255,255,255"),
+            "SlotBackgroundColor=0,0,0,255",
+            "SlotTextColor=255,255,255,255",
             "ToolbarBackgroundColor=0,0,0,196"
         ])
         contents.append("\n")
