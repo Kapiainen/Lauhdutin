@@ -938,7 +938,7 @@
 			end,
 
 			StartEditingNotes = function (self)
-				local tGame = self:_GetGame()
+				local tGame = self:GetGame()
 				if tGame == nil then
 					return
 				end
@@ -965,7 +965,7 @@
 			end,
 
 			StartEditingTags = function (self)
-				local tGame = self:_GetGame()
+				local tGame = self:GetGame()
 				if tGame == nil then
 					return
 				end
@@ -991,7 +991,7 @@
 			end,
 
 			ToggleBangs = function (self)
-				local tGame = self:_GetGame()
+				local tGame = self:GetGame()
 				if tGame == nil then
 					return
 				end
@@ -1005,7 +1005,7 @@
 			end,
 
 			StartEditingProcessOverride = function (self)
-				local tGame = self:_GetGame()
+				local tGame = self:GetGame()
 				if tGame == nil then
 					return
 				end
@@ -1035,7 +1035,7 @@
 			end,
 
 			ToggleVisibility = function (self)
-				local tGame = self:_GetGame()
+				local tGame = self:GetGame()
 				if tGame == nil then
 					return
 				end
