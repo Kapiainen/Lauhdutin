@@ -63,7 +63,7 @@ or
 - If you are using a Python path that differs from the default value, then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\PythonPath.inc` either!
 - If you are using custom icons (not referring to game banners), then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\Icons` either!
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
-- Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
+- Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild skin**.
 
 # Features
 
