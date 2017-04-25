@@ -1061,12 +1061,30 @@
 				end
 				C_RESOURCES:WriteGames()
 				if #T_FILTERED_GAMES > 0 then
-					PopulateSlots()
+					if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+						C_ANIMATIONS:ResetSlotAnimation({nSlotIndex = self.nCurrentIndex})
+						PopulateSlots()
+						C_ANIMATIONS:PushHover(
+							T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER],
+							C_SKIN.nMouseIndex
+						)
+					else
+						PopulateSlots()
+					end
 					if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 						C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 					end
 				else
-					OnApplyFilter('')
+					if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
+						C_ANIMATIONS:ResetSlotAnimation({nSlotIndex = self.nCurrentIndex})
+						OnApplyFilter('')
+						C_ANIMATIONS:PushHover(
+							T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER],
+							C_SKIN.nMouseIndex
+						)
+					else
+						OnApplyFilter('')
+					end
 				end
 				self:Hide(true)
 			end,
