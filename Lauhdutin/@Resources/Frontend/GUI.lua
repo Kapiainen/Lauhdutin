@@ -2485,7 +2485,7 @@
 					.. '[!UpdateMeter "CutoutBackground"]'
 					.. '[!UpdateMeterGroup "Slots"]'
 					.. '[!SetOption "StatusMessage" "' .. sPositionOption .. '" '
-					.. '"' .. nTextOffset .. '"]'
+					.. '"' .. nNewPosition + nTextOffset .. '"]'
 					.. '[!UpdateMeterGroup "Status"]'
 					.. '[!SetOption "SlotHighlightBackground" "' .. sPositionOption .. '" '
 					.. '"' .. nNewPosition .. '"]'
