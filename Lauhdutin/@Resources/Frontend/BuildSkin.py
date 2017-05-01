@@ -1,5 +1,5 @@
 # Python environment
-import sys, os, subprocess, json
+import sys, os, subprocess, json, math
 
 try:
     RAINMETERPATH = os.path.join(sys.argv[1][:-1], "Rainmeter.exe")
@@ -19,7 +19,7 @@ try:
     SLOT_COUNT = int(SETTINGS.get("slot_count", 8))
     SLOT_ROWS_COLUMNS = int(SETTINGS.get("slot_rows_columns", 1))
     SLOT_COUNT_PER_ROW_COLUMN = int(SETTINGS.get("slot_count_per_row_column", 8))
-    ORIENTATION = SETTINGS.get("orientation", "vertical")
+    ORIENTATION = SETTINGS.get("orientation", "vertical").lower()
     
     with open(os.path.join(RESOURCEPATH, "Frontend", "GameSlots.inc"), "w") as file:
         # Variables section
@@ -139,30 +139,30 @@ try:
                 if i == 1: # 1st slot in a row/column
                     if nSlotNumber == 1: # 1st slot in the 1st row/column
                         contents.extend([
-                            "X=%sr" % int(SLOT_WIDTH / 2),
-                            "Y=%sr" % int(SLOT_HEIGHT / 2)
+                            "X=%sr" % math.floor(SLOT_WIDTH / 2),
+                            "Y=%sr" % math.floor(SLOT_HEIGHT / 2)
                         ])
                     else: # 1st slot in the 2nd-nth row/cooumn
                         if ORIENTATION == "vertical":
                             contents.extend([
-                                "X=%sR" % int(SLOT_WIDTH / 2),
-                                "Y=%sR" % int(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_HEIGHT + SLOT_HEIGHT / 2)
+                                "X=%sR" % math.floor(SLOT_WIDTH / 2),
+                                "Y=%sR" % math.floor(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_HEIGHT + SLOT_HEIGHT / 2)
                             ])
                         else:
                             contents.extend([
-                                "X=%sR" % int(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_WIDTH + SLOT_WIDTH / 2),
-                                "Y=%sR" % int(SLOT_HEIGHT / 2)
+                                "X=%sR" % math.floor(0 - SLOT_COUNT_PER_ROW_COLUMN * SLOT_WIDTH + SLOT_WIDTH / 2),
+                                "Y=%sR" % math.floor(SLOT_HEIGHT / 2)
                             ])
                 else: # 2nd-nth slot in a row/column
                     if ORIENTATION == "vertical":
                         contents.extend([
-                            "X=%sR" % int(0 - SLOT_WIDTH / 2),
-                            "Y=%sR" % int(SLOT_HEIGHT / 2)
+                            "X=%sR" % math.floor(0 - SLOT_WIDTH / 2),
+                            "Y=%sR" % math.floor(SLOT_HEIGHT / 2)
                         ])
                     else:
                         contents.extend([
-                            "X=%sR" % int(SLOT_WIDTH / 2),
-                            "Y=%sR" % int(0 - SLOT_HEIGHT / 2)
+                            "X=%sR" % math.floor(SLOT_WIDTH / 2),
+                            "Y=%sR" % math.floor(0 - SLOT_HEIGHT / 2)
                         ])
                 contents.extend([
                     "W=%s" % SLOT_WIDTH,
@@ -185,8 +185,8 @@ try:
                     "[SlotBanner%s]" % nSlotNumber,
                     "Meter=Image",
                     "ImageName=",
-                    "X=%sr" % int(0 - SLOT_WIDTH / 2),
-                    "Y=%sr" % int(0 - SLOT_HEIGHT / 2),
+                    "X=%sr" % math.ceil(0 - SLOT_WIDTH / 2),
+                    "Y=%sr" % math.ceil(0 - SLOT_HEIGHT / 2),
                     "W=%s" % SLOT_WIDTH,
                     "H=%s" % SLOT_HEIGHT,
                     "SolidColor=0,0,0,1",
