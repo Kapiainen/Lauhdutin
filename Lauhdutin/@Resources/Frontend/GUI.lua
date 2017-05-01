@@ -418,11 +418,34 @@
 			SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
 			N_ACTION_STATE = E_ACTION_STATES.EXECUTE
 		else
-			SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Stop hiding games"]')
-			if N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-				SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Start unhiding games"]')
+			local nGamesBefore = #T_FILTERED_GAMES
+			if nGamesBefore > 0 then
+				local tVisibleGamesOnly = {}
+				for i, tGame in ipairs(T_FILTERED_GAMES) do
+					if tGame[E_GAME_KEYS.HIDDEN] ~= true then
+						table.insert(tVisibleGamesOnly, tGame)
+					end
+				end
+				local nGamesAfter = #tVisibleGamesOnly
+				if nGamesAfter > 0 then
+					if nGamesBefore ~= nGamesAfter then
+						T_FILTERED_GAMES = tVisibleGamesOnly
+						N_SCROLL_INDEX = 1
+						PopulateSlots()
+					end
+				else
+					OnApplyFilter('hidden:false')
+				end
+			else
+				OnApplyFilter('hidden:false')
 			end
-			N_ACTION_STATE = E_ACTION_STATES.HIDE
+			if #T_FILTERED_GAMES > 0 then
+				SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Stop hiding games"]')
+				if N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
+					SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Start unhiding games"]')
+				end
+				N_ACTION_STATE = E_ACTION_STATES.HIDE
+			end
 		end
 	end
 
@@ -431,11 +454,34 @@
 			SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Start unhiding games"]')
 			N_ACTION_STATE = E_ACTION_STATES.EXECUTE
 		else
-			SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Stop unhiding games"]')
-			if N_ACTION_STATE == E_ACTION_STATES.HIDE then
-				SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
+			local nGamesBefore = #T_FILTERED_GAMES
+			if nGamesBefore > 0 then
+				local tHiddenGamesOnly = {}
+				for i, tGame in ipairs(T_FILTERED_GAMES) do
+					if tGame[E_GAME_KEYS.HIDDEN] == true then
+						table.insert(tHiddenGamesOnly, tGame)
+					end
+				end
+				local nGamesAfter = #tHiddenGamesOnly
+				if nGamesAfter > 0 then
+					if nGamesBefore ~= nGamesAfter then
+						T_FILTERED_GAMES = tHiddenGamesOnly
+						N_SCROLL_INDEX = 1
+						PopulateSlots()
+					end
+				else
+					OnApplyFilter('hidden:true')
+				end
+			else
+				OnApplyFilter('hidden:true')
 			end
-			N_ACTION_STATE = E_ACTION_STATES.UNHIDE
+			if #T_FILTERED_GAMES > 0 then
+				SKIN:Bang('[!SetVariable "TitleToggleUnhideGames" "Stop unhiding games"]')
+				if N_ACTION_STATE == E_ACTION_STATES.HIDE then
+					SKIN:Bang('[!SetVariable "TitleToggleHideGames" "Start hiding games"]')
+				end
+				N_ACTION_STATE = E_ACTION_STATES.UNHIDE
+			end
 		end
 	end
 
@@ -1406,7 +1452,7 @@
 				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
 				if #T_FILTERED_GAMES <= nSlotCount then
 					nScrollIndex = 1
-				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then -- TODO: replace '1' with nScrollStep
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
 					nScrollIndex = nScrollIndex - 1
 				end
 				N_SCROLL_INDEX = nScrollIndex
@@ -1446,7 +1492,7 @@
 				local nSlotCount = tonumber(T_SETTINGS[E_SETTING_KEYS.SLOT_COUNT])
 				if #T_FILTERED_GAMES <= nSlotCount then
 					nScrollIndex = 1
-				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then -- TODO: replace '1' with nScrollStep
+				elseif nScrollIndex > #T_FILTERED_GAMES + 1 - nSlotCount then
 					nScrollIndex = nScrollIndex - 1
 				end
 				N_SCROLL_INDEX = nScrollIndex
@@ -1498,10 +1544,10 @@
 			PopulateSlots()
 			return
 		end
-		local sort = true
+		local bSort = true
 		asPattern = asPattern:lower()
 		if STRING:StartsWith(asPattern, '+') then
-			T_FILTERED_GAMES, sort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
+			T_FILTERED_GAMES, bSort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
 		else
 			local tTableOfGames = {}
 			for i, tGame in ipairs(T_ALL_GAMES) do
@@ -1512,9 +1558,9 @@
 					table.insert(tTableOfGames, tGame)
 				end
 			end
-			T_FILTERED_GAMES, sort = Filter(tTableOfGames, asPattern)
+			T_FILTERED_GAMES, bSort = Filter(tTableOfGames, asPattern)
 		end
-		if sort then
+		if bSort then
 			SortGames()
 		else
 			N_SCROLL_INDEX = 1
