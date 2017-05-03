@@ -12,6 +12,7 @@ class VDFKeys():
     NAME = "name"
     USERCONFIG = "userconfig"
     USERLOCALCONFIGSTORE = "userlocalconfigstore"
+    USERROAMINGCONFIGSTORE = "userroamingconfigstore"
     SOFTWARE = "software"
     VALVE = "valve"
     STEAM = "steam"
@@ -183,9 +184,13 @@ class Steam():
             os.path.join(a_path, "userdata", a_userdataid, "7", "remote",
                          "sharedconfig.vdf"))
         keys = [
-            VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE,
+            VDFKeys.SOFTWARE, VDFKeys.VALVE,
             VDFKeys.STEAM, VDFKeys.APPS
         ]
+        if VDFKeys.USERROAMINGCONFIGSTORE in shared_config:
+            keys.insert(0, VDFKeys.USERROAMINGCONFIGSTORE)
+        elif VDFKeys.USERLOCALCONFIGSTORE in shared_config:
+            keys.insert(0, VDFKeys.USERLOCALCONFIGSTORE)
         while keys:
             if not shared_config:
                 print("\t\tFailed to process 'sharedconfig.vdf'")
@@ -201,9 +206,13 @@ class Steam():
             os.path.join(a_path, "userdata", a_userdataid, "config",
                          "localconfig.vdf"))
         keys = [
-            VDFKeys.USERLOCALCONFIGSTORE, VDFKeys.SOFTWARE, VDFKeys.VALVE,
+            VDFKeys.SOFTWARE, VDFKeys.VALVE,
             VDFKeys.STEAM, VDFKeys.APPS
         ]
+        if VDFKeys.USERROAMINGCONFIGSTORE in local_config:
+            keys.insert(0, VDFKeys.USERROAMINGCONFIGSTORE)
+        elif VDFKeys.USERLOCALCONFIGSTORE in local_config:
+            keys.insert(0, VDFKeys.USERLOCALCONFIGSTORE)
         while keys:
             if not local_config:
                 print("\t\tFailed to process 'localconfig.vdf'")

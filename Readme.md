@@ -297,6 +297,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
+- Fixed a bug that caused `sharedconfig.vdf` and `localconfig.vdf` files to not be processed successfully on some systems.
 - Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 
 **Version 2.6.0 - 2017/03/15:**
