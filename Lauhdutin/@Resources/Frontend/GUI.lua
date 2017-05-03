@@ -104,7 +104,7 @@
 	-- Called when the mouse cursor leaves the skin
 	-- abAnimate: Whether or not to play an animation to hide the skin
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
-			C_SLOT_HIGHLIGHT:Hide(false)
+			C_SLOT_HIGHLIGHT:Hide()
 		end
 		if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
 			C_ANIMATIONS:PushHoverReset(C_SKIN.nMouseIndex)
@@ -116,7 +116,6 @@
 			end
 		else
 			C_SCRIPT:SetUpdateDivider(-1)
-			Redraw()
 		end
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT_PLATFORM_RUNNING] then
 			SKIN:Bang(
@@ -266,7 +265,6 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
-		Redraw()
 	end
 
 	function OnReverseSorting()
@@ -281,7 +279,6 @@
 		if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 			C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 		end
-		Redraw()
 	end
 --###########################################################################################################
 --                  -> Slot
@@ -294,7 +291,7 @@
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 				C_SLOT_HIGHLIGHT:MoveTo(C_SKIN.nMouseIndex)
 				if C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex) then
-					C_SLOT_HIGHLIGHT:Show(true)
+					C_SLOT_HIGHLIGHT:Show()
 				end
 			end
 			local nAnimation = T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER]
@@ -341,17 +338,11 @@
 			end
 		else
 			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
-				if LaunchGame(tGame) then
-					Redraw()
-				end
+				LaunchGame(tGame)
 			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
-				if HideGame(tGame) then
-					Redraw()
-				end
+				HideGame(tGame)
 			elseif N_ACTION_STATE == E_ACTION_STATES.UNHIDE then
-				if UnhideGame(tGame) then
-					Redraw()
-				end
+				UnhideGame(tGame)
 			end
 		end
 	end
@@ -360,7 +351,7 @@
 	-- Called when a slot is middle-mouse clicked
 	-- anIndex: The index of the slot in question (1-indexed)
 		if C_SLOT_SUBMENU:MoveTo(anIndex) then
-			C_SLOT_SUBMENU:Show(true)
+			C_SLOT_SUBMENU:Show()
 		end
 	end
 --###########################################################################################################
@@ -368,12 +359,12 @@
 --###########################################################################################################
 	function OnMiddleClickSlotSubmenu()
 	-- Called when the slot submenu is middle-mouse clicked
-		C_SLOT_SUBMENU:Hide(true)
+		C_SLOT_SUBMENU:Hide()
 	end
 
 	function OnMouseLeaveSlotSubmenu()
 	-- Called when the mouse cursor leaves the slot submenu
-		C_SLOT_SUBMENU:Hide(true)
+		C_SLOT_SUBMENU:Hide()
 	end
 
 	function OnStartEditingNotes()
@@ -507,9 +498,7 @@
 		T_RECENTLY_LAUNCHED_GAME[E_GAME_KEYS.HOURS_TOTAL] = hoursPlayed
 														  + T_RECENTLY_LAUNCHED_GAME[E_GAME_KEYS.HOURS_TOTAL]
 		C_RESOURCES:WriteGames()
-		if PopulateSlots() then
-			Redraw()
-		end
+		PopulateSlots()
 		ExecuteStoppingBangs()
 		T_RECENTLY_LAUNCHED_GAME = nil
 	end
@@ -559,7 +548,7 @@
 			if T_SETTINGS[E_SETTING_KEYS.SLOT_HIGHLIGHT] then
 				C_SLOT_HIGHLIGHT:Update(C_SKIN.nMouseIndex)
 			end
-			C_SLOT_SUBMENU:Hide(false)
+			C_SLOT_SUBMENU:Hide()
 			if PopulateSlots() then
 				if T_SETTINGS[E_SETTING_KEYS.ANIMATION_HOVER] > 0 then
 					C_ANIMATIONS:UpdateHoverAnimation(C_SKIN.nMouseIndex)
@@ -567,11 +556,6 @@
 				N_LAST_DRAWN_SCROLL_INDEX = N_SCROLL_INDEX
 			end
 		end
-	end
-
-	function Redraw()
-		--print("Redraw")
-		SKIN:Bang('[!Redraw]')
 	end
 
 	function PopulateSlots()
@@ -814,7 +798,6 @@
 				end
 				-- If reverse sort, then show appropriate icon
 				SKIN:Bang('[!ShowMeterGroup Toolbar]')
-				Redraw()
 			end,
 
 			Hide = function (self, abForce)
@@ -833,11 +816,9 @@
 				end
 				self.bVisible = false
 				SKIN:Bang('[!HideMeterGroup Toolbar]')
-				Redraw()
 			end,
 
-			UpdateSortingIcon = function (self, abRedraw)
-				abRedraw = abRedraw or false
+			UpdateSortingIcon = function (self)
 				if self.bReversedSorting then
 					SKIN:Bang(
 						'[!SetOption "ToolbarButtonSort" "ImageName" "#@#Icons\\Sort'
@@ -850,9 +831,6 @@
 						.. T_SETTINGS[E_SETTING_KEYS.SORT_STATE] .. '.png"]'
 						.. '[!UpdateMeter "ToolbarButtonSort"]'
 					)
-				end
-				if abRedraw then
-					Redraw()
 				end
 			end,
 
@@ -901,7 +879,6 @@
 					.. '[!UpdateMeterGroup "Status"]'
 					.. '[!ShowMeterGroup "Status"]'
 				)
-				Redraw()
 			end,
 
 			Hide = function (self)
@@ -913,7 +890,6 @@
 				SKIN:Bang(
 					'[!HideMeterGroup "Status"]'
 				)
-				Redraw()
 			end
 		}
 	end
@@ -965,22 +941,14 @@
 				return true
 			end,
 
-			Show = function (self, abRedraw)
-				abRedraw = abRedraw or false
+			Show = function (self)
 				self.bVisible = true
 				SKIN:Bang('[!ShowMeterGroup "SlotSubmenu"]')
-				if abRedraw then
-					Redraw()
-				end
 			end,
 
-			Hide = function (self, abRedraw)
-				abRedraw = abRedraw or false
+			Hide = function (self)
 				self.bVisible = false
 				SKIN:Bang('[!HideMeterGroup "SlotSubmenu"]')
-				if abRedraw then
-					Redraw()
-				end
 			end,
 
 			StartEditingNotes = function (self)
@@ -1290,28 +1258,20 @@
 				return true
 			end,
 
-			Show = function (self, abRedraw)
-				abRedraw = abRedraw or false
+			Show = function (self)
 				if self.bVisible then
 					return
 				end
 				self.bVisible = true
 				SKIN:Bang('[!ShowMeterGroup "SlotHighlight"]')
-				if abRedraw then
-					Redraw()
-				end
 			end,
 
-			Hide = function (self, abRedraw)
-				abRedraw = abRedraw or false
+			Hide = function (self)
 				if not self.bVisible then
 					return
 				end
 				self.bVisible = false
 				SKIN:Bang('[!HideMeterGroup "SlotHighlight"]')
-				if abRedraw then
-					Redraw()
-				end
 			end
 		}
 	end
