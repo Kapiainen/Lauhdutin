@@ -2055,7 +2055,7 @@
 				local mBanner = SKIN:GetMeter('SlotBanner' .. atArguments.nSlotIndex)
 				local sBannerPath = mBanner:GetOption('ImageName')
 				if not sBannerPath or sBannerPath == '' then
-					return
+					sBannerPath = '#@#Banners\\blank.png'
 				end
 				local nX = mBanner:GetX(true)
 				self.nSlotX = nX
@@ -2382,10 +2382,17 @@
 			UpdateHoverAnimation = function (self, anIndex)
 				local mBanner = SKIN:GetMeter('SlotBanner' .. anIndex)
 				local sBannerPath = mBanner:GetOption('ImageName')
-				SKIN:Bang(
-					'[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
-					.. '[!UpdateMeter "SlotAnimation"]'
-				)
+				if not sBannerPath or sBannerPath == '' then
+					SKIN:Bang(
+						'[!SetOption "SlotAnimation" "ImageName" "#@#Banners\\blank.png"]'
+						.. '[!UpdateMeter "SlotAnimation"]'
+					)
+				else
+					SKIN:Bang(
+						'[!SetOption "SlotAnimation" "ImageName" "' .. sBannerPath .. '"]'
+						.. '[!UpdateMeter "SlotAnimation"]'
+					)
+				end
 			end,
 			-- Skin slide animation
 			PushSkinSlideIn = function (self)
