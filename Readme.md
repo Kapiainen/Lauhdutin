@@ -1,6 +1,6 @@
 Lauhdutin
 ==
-A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Battle.net, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations).
+A Rainmeter skin for aggregating games from different platforms and then launching them. Supports Steam, GOG Galaxy, Blizzard App, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of a slot, animations). This skin can also be used as a general purpose launcher since it supports regular Windows shortcuts.
 
 ![ex](Docs/demo.gif)
 
@@ -10,10 +10,15 @@ A Rainmeter skin for aggregating games from different platforms and then launchi
  - [Requirements](#requirements)
  - [Installing](#installing)
  - [Updating](#updating)
- - [Supported platforms](#supported-platforms)
- - [Filtering](#filtering)
- - [Bangs](#bangs)
- - [Animations](#animations)
+ - [Features](#features)
+   - [Supported platforms](#supported-platforms)
+   - [Filtering](#filtering)
+   - [Sorting](#sorting)
+   - [Bangs](#bangs)
+   - [Notes](#notes)
+   - [Manual process override](#manual-process-override)
+   - [Highlighting](#highlighting)
+   - [Animations](#animations)
  - [Reporting issues](#reporting-issues)
  - [Contributing](#contributing)
  - [Changelog](#changelog)
@@ -58,65 +63,132 @@ or
 - If you are using a Python path that differs from the default value, then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\PythonPath.inc` either!
 - If you are using custom icons (not referring to game banners), then do not remove `\Rainmeter\Skins\Lauhdutin\@Resources\Icons` either!
 - Extract the latest version of Lauhdutin over the old version's remaining barebones folder. Do not overwrite `PythonPath.inc`, if you left it intact when removing files and folders. Do not overwrite any custom icons you may have been using either, if you were using custom icons for e.g. showing how games are being sorted.
-- Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild**.
+- Load **Settings.ini** in Rainmeter, click **Save**, click **Exit**, right-click on the skin, go to **Custom skin actions**, and click on **Rebuild skin**.
 
-# Supported platforms
+# Features
 
-## Steam
+## Supported platforms
+
+### Steam
 Support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
 - Launch the games that were found by the features described above.
 - Install Steam games that are not currently installed.
+- Automatically copy custom grid images assigned in Steam as banners.
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played that is tracked by Steam into Lauhdutin's corresponding system.
 
-## GOG Galaxy
+### GOG Galaxy
 Support includes:
 - Acquire a list of games installed via GOG Galaxy.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-## Battle.net
+### Blizzard App
 Support includes:
-- Acquire a list of games installed via Battle.net.
+- Acquire a list of games installed via Blizzard App.
 - Launch games that were found.
 - Automatically download banners for games that were found.
 
-Battle.net support does not include support for classic games (e.g. Diablo II, Warcraft III) at the moment. Support could be added for such games, if someone who owns a copy, which was purchased through Battle.net, could provide me with the following info or submit a pull request:
-- The name of the game's folder.
-- The path to the executable relative to the root of the game folder (e.g. `D:\Games\Some game\bin\game.exe` would become `\bin\game.exe`)
+Blizzard App support does not include support for classic games (e.g. Diablo II, Warcraft III).
 
-## Other platforms
+### Other platforms
 
 Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\Rainmeter\Skins\Lauhdutin\@Resources\Shortcuts` (banners can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\Banners\Shortcuts` with the same name as the shortcut).
 
-# Filtering
-The list of games can be narrowed down by applying a filter. A filter can just be the name, or a part of the name, of one or more games. There are also special filters:
+## Filtering
+The list of games can be narrowed down by applying a filter. Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
 
-- `steam:` followed by `true` or `false`. If `true`, then only show games installed via Steam. If `false`, then show all other games that were not installed via Steam.
+- `<search string>`
 
-- `galaxy:` followed by `true` or `false`. If `true`, then only show games installed via GOG Galaxy. If `false`, then show all other games that were not installed via GOG Galaxy.
+  Replace `<search string>` with whatever would be a (partial) match with a game's name. If fuzzy search is enabled, then games will be ranked based on multiple factors (e.g. how many characters in `<search string>` match characters in a game's name, if characters in `<search string>` match the first letter of words in a game's name).
 
-- `battlenet:` followed by `true` or `false`. If `true`, then only show games installed via Battle.net. If `false`, then show all other games that were not installed via Battle.net.
+- `<platform>:<argument>`
 
-- `installed:` followed by `true` or `false`.  If `true`, then only show are installed. If `false`, then show games that are not installed (only Steam games are supported at the moment).
+  Replace `<platform>` with one of the supported platforms:
 
-- `hidden:` followed by `true` or `false`. If `true`, then only show games that are hidden.
+  - `steam` = [Steam](http://store.steampowered.com/)
+  - `galaxy` = [GOG Galaxy](https://www.gog.com/galaxy)
+  - `blizzard` = [Blizzard App](http://eu.battle.net/en/)
 
-- `tags:` followed by a value (e.g. `tags:rogue-like`). Supports tags assigned in *Steam*.
+  Replace `<argument>` with one of the supported arguments:
 
-- `+` followed by a filter (e.g. `+bin` or `+tags:rogue-like`).
+  - `all` = Show both installed and uninstalled games that are available via the platform.
+  - `false` = Show all other games that were not installed via the platform.
+  - `installed` = Show games installed via the platform.
+  - `uninstalled` = Show games that are available via the platform, but not installed.
+  - `played` = Show games that are available via the platform and have a total played time above 0 hours.
+  - `not played` = Show games that are available via the platform and have a total played time equal to 0 hours.
 
-Filters can be applied by left-clicking on the magnifying glass in the toolbar, which becomes visible when you nudge the top of the skin. Filters can be removed by either right-clicking on the magnifying glass or by applying a blank filter.
+  All arguments might not work with all platforms.
 
-A fuzzy search algorithm is used by default, but can be disabled so that the filtering works like in versions up to 2.5.0. Fuzzy search scores each possible result based on several factors (e.g. the distance of the first matching character from the beginning of the string or a word in that string). This algorithm allows e.g. searching for `boi` and getting `The Binding Of Isaac` as one of the top results since all three letters in the search pattern are present in the result as the first letters of words and thus are likely to form a common abbreviation.
+- `installed:<argument>`
 
-# Sorting
+  Replace `<argument>` with one of the supported arguments:
+
+  - `true` = Show installed games.
+  - `false` = Show games that are not installed (only Steam games are supported at the moment).
+
+- `hidden:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+  
+  - `true` = Show only games that are hidden.
+  - `false` = Show only games that are not hidden.
+
+- `games:all`
+
+  Show all games regardless of whether or not the game is installed, uninstalled, or hidden.
+
+- `played:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+
+  - `true` = Show games with a total played time above 0 hours.
+  - `false` = Show games with a total played time equal to 0 hours.
+
+- `shortcuts:<argument>`
+
+  Replace `<argument>` with the (partial) name of a folder in `\Lauhdutin\@Resources\Shortcuts` to show the shortcuts in that folder.
+
+- `tags:<argument>`
+
+  Replace `<argument>` with a (partial) match to a tag that is assigned to a game. Tags can be assigned by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Tags*, and editing the text file that is opened in Notepad (one tag per line). Tags/categories assigned in Steam are also supported.
+
+- `random:<argument>`
+
+  Replace `<argument>` with one of the supported arguments:
+
+  - `all` = Show one random game.
+  - `played` = Show one random game that has a total played time above 0 hours.
+  - `not played` = Show one random game that has a total played time equal to 0 hours.
+  - `steam` = Show one random game from Steam.
+  - `galaxy` = Show one random game from GOG Galaxy.
+  - `blizzard` = Show one random game from Blizzard App.
+  
+  If no argument is provided, then one random game from the current list of games is shown.
+
+- `+<filter>`
+
+  Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
+
+Games that are not currently installed or are set as hidden are not shown by default when filtering, unless stated otherwise. There are settings for making each category of aforementioned games show up when filtering.
+
+## Sorting
 The icon in the middle of the toolbar shows and controls the sorting mode. Left-clicking on this icon will cycle through the different sorting modes (alphabetically, most recently played, and total hours played). Right-clicking on this icon will reverse the order of the current list of sorted games.
 
-# Bangs
-There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Double, `"`, and single, `'`, quotation marks have to be replaced with grave accents (or backticks), ``` ` ```! Multiple bangs can be executed by enclosing each bang in square brackets (e.g. ```[!ActivateConfig `SomeConfigName`][!Log `Starting a game`]```).
+## Bangs
+There are settings for executing [bangs](https://docs.rainmeter.net/manual/bangs/) under specific circumstances. Multiple bangs can be executed by enclosing each bang in square brackets: 
+
+```[!ActivateConfig "SomeConfigName"][!Log "Starting a game"]```
+
+Multiple bangs can also be written on multiple lines:
+
+```
+[!ActivateConfig "SomeConfigName"]
+[!Log "Starting a game"]
+```
 
 This feature can be used to e.g. load and unload skins.
 
@@ -128,13 +200,21 @@ Currently supported events that can be used to trigger the execution of bangs:
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running.
 
-# Highlighting
+Games can be excempted from executing bangs by middle-mouse clicking on the slot that contains the game and then clicking on the button labeled *Bangs*.
+
+## Notes
+Notes can be added to a game by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Notes*, and editing the text file that is opened in Notepad.
+
+## Manual process override
+In some circumstances it may be necessary or desirable to monitor a process other than the default one (e.g. Steam Overlay in the case of Steam games). This can be done by middle-mouse clicking on a slot that contains a game, clicking on the button labeled *Process*, and typing in the name of the process in the input field that is opened at the top of the skin. Inputting a blank value will remove the override. Process names can be found in the Windows Task Manager (<kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>ESC</kbd>).
+
+## Highlighting
 
 If highlighting is enabled, then additional contextual information can be shown when the mouse cursor is hovered over a slot ([animated example](Docs/Highlighting.gif)). There are some settings for toggling certain pieces of information (e.g. platform, hours played).
 
-# Animations
+## Animations
 
-## Clicking
+### Clicking
 One of these animations can be played when a slot is left-clicked ([animated example](Docs/ClickAnimations.gif)):
 
 - Shift left
@@ -145,7 +225,7 @@ One of these animations can be played when a slot is left-clicked ([animated exa
 
 Click animations can be disabled completely.
 
-## Hovering
+### Hovering
 One of these animations can be played when the mouse cursor hovers over a slot ([animated example](Docs/HoverAnimations.gif)): 
 
 - Zoom in
@@ -154,7 +234,10 @@ One of these animations can be played when the mouse cursor hovers over a slot (
 
 Hover animations can be disabled completely.
 
-Note that some animations may not work properly if the slot's aspect ratio differs significantly from the banner's aspect ratio. This can be an issue e.g. with the `Zoom in` hover animation when the skin is in horizontal mode.
+### Skin
+The entire skin can be made to slide into and out of view when placed along an edge of a monitor ([animated example](Docs/SkinAnimation.gif)). There is a setting that can be used to determine which direction the skin slides into and out of view. A 1 px wide/tall invisible sliver is placed along the corresponding edge of the skin when this feature is enabled and hovering the mouse cursor on this sliver makes the skin slide into view.
+
+Skin animations can be disabled completely.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
@@ -165,11 +248,13 @@ If there is no previously submitted issue that matches your issue, then submit a
 
 # Contributing
 
-Fork [this](https://github.com/Kapiainen/Lauhdutin) repository, make your changes, and submit a pull request with a summary of the changes you've made.
+Fork [this](https://github.com/Kapiainen/Lauhdutin) repository (preferrably the `development` branch), make your changes, and submit a pull request to the `development` branch with a summary of the changes you've made.
 
 Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
 
 Try to keep the number of dependencies, which cannot be included in the skin or are not a part of a default Windows installation, to a minimum.
+
+[List of contributors](Contributors.md)
 
 ## Graphical user interface changes
 Try to keep draw calls to a minimum by, for example:
@@ -186,6 +271,35 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
+**Version 2.7.0 - 2017/05/15:**
+- Major GUI overhaul and optimizations.
+- Added support for multiple rows/columns of slots.
+- Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
+- Added sorting icon for score/ranking based sorting when using fuzzy search.
+- Added support for automatically (un)loading banners when skin animations are used and the skin is (not) visible in order to reduce the memory footprint.
+- Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
+- Added support for adding notes to a game.
+- Added support for adding tags to a game.
+- Added support for defining which process to monitor for each game.
+- Added support for toggling whether or not a game executes bangs.
+- Added setting for whether or not new games execute bangs by default.
+- Added setting for making all games execute/ignore bangs.
+- Added setting for having the skin adjust its position on the z-axis automatically when inputting text to filter games.
+- Added setting for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
+- Added setting for number of slots per row/column.
+- Added setting for determining the position of the toolbar and which edge to touch to make the toolbar visible.
+- Added new filters.
+- Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed, if necessary.
+- Added reversed sorting icons and refactored relevant code.
+- Added support for using custom grid images assigned in Steam to native Steam games and non-Steam shortcuts.
+- Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
+- Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
+- Fixed a bug that caused `sharedconfig.vdf` and `localconfig.vdf` files to not be processed successfully on some systems.
+- Updated `Battle.net` to `Blizzard App` in the GUI.
+- Updated the setting title and tooltip for the paths to Blizzard games.
+- Updated the settings menu so that bangs are now edited via Notepad.
+- Updated the backend so that Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
+
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
 - Added setting for toggling fuzzy search.
