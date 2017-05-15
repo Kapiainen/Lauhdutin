@@ -271,13 +271,12 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
-**Version 2.7.0 - YYYY/MM/DD:**
+**Version 2.7.0 - 2017/05/15:**
 - Major GUI overhaul and optimizations.
 - Added support for multiple rows/columns of slots.
 - Added animations for sliding the entire skin into and out of view along any of the four edges of a monitor.
 - Added sorting icon for score/ranking based sorting when using fuzzy search.
 - Added support for automatically (un)loading banners when skin animations are used and the skin is (not) visible in order to reduce the memory footprint.
-- Updated `Battle.net` to `Blizzard App` in the GUI.
 - Added a menu, which can be accessed by middle-mouse clicking on a slot, to provide access to features and settings on a game-by-game basis.
 - Added support for adding notes to a game.
 - Added support for adding tags to a game.
@@ -289,8 +288,6 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added setting for showing in the slot highlight if a supported platform client is not running. Currently supports Steam and Blizzard App.
 - Added setting for number of slots per row/column.
 - Added setting for determining the position of the toolbar and which edge to touch to make the toolbar visible.
-- Updated the setting title and tooltip for the paths to Blizzard games.
-- Updated settings menu so that bangs are now edited via Notepad.
 - Added new filters.
 - Added `blizzard:<argument>` filter. The old `battlenet:<argument>` filter is still available, but has been deprecated and will eventually be removed, if necessary.
 - Added reversed sorting icons and refactored relevant code.
@@ -298,7 +295,10 @@ Any deviations from the rules regarding adding platform support will most likely
 - Added support for one level of subfolders in Windows shortcuts. The name of the subfolder that contains the shortcut is shown as the platform.
 - Fixed a bug that could cause the Python backend to raise an exception when generating the final list of games.
 - Fixed a bug that caused `sharedconfig.vdf` and `localconfig.vdf` files to not be processed successfully on some systems.
-- Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
+- Updated `Battle.net` to `Blizzard App` in the GUI.
+- Updated the setting title and tooltip for the paths to Blizzard games.
+- Updated the settings menu so that bangs are now edited via Notepad.
+- Updated the backend so that Steam games/programs, which exist locally despite not appearing on the Steam community profile, are now hidden by default rather than ignored completely.
 
 **Version 2.6.0 - 2017/03/15:**
 - Added fuzzy search.
