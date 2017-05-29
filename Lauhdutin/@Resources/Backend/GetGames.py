@@ -220,7 +220,7 @@ try:
 
         set_skin_status("Downloading...")
         print("Downloading banners for %d games from supported platforms..." %
-              (len(steam_games) + len(galaxy_games)))
+              (len(steam_games) + len(galaxy_games) + len(battlenet_games)))
         banner_downloader = BannerDownloader(ResourcePath)
         banner_downloader.process(all_games)
 
