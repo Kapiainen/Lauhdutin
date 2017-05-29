@@ -271,6 +271,9 @@ There are a few rules that **must** be followed when adding support for addition
 Any deviations from the rules regarding adding platform support will most likely result in a rejected pull request.
 
 # Changelog
+**Version 2.7.1 - 2017/05/29:**
+- Updated to support GOG Galaxy 1.2.x.
+
 **Version 2.7.0 - 2017/05/15:**
 - Major GUI overhaul and optimizations.
 - Added support for multiple rows/columns of slots.
