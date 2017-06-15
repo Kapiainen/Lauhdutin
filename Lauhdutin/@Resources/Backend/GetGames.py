@@ -17,19 +17,6 @@ def set_skin_status(a_message=""):
         ],
         shell=False)
 
-
-#    subprocess.call(
-#        [
-#            RainmeterPath, "!SetOption", "StatusMessage", "Text", a_message,
-#            Config
-#        ],
-#        shell=False)
-#    subprocess.call(
-#        [RainmeterPath, "!UpdateMeterGroup", "Status", Config], shell=False)
-#    subprocess.call(
-#        [RainmeterPath, "!ShowMeterGroup", "Status", Config], shell=False)
-#    subprocess.call([RainmeterPath, "!Redraw", Config], shell=False)
-
 minimum_major_version = 3
 minimum_minor_version = 5
 if not (sys.version_info.major >= minimum_major_version and
