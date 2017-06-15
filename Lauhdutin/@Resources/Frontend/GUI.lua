@@ -1019,6 +1019,11 @@
 			end,
 
 			StartEditingProcessOverride = function (self)
+				if T_SETTINGS[E_SETTING_KEYS.ADJUST_ZPOS] then
+					if C_SKIN:UpdateDefaultZPos() then
+						C_SKIN:SetZPos(0)
+					end
+				end
 				local tGame = self:GetGame()
 				if tGame == nil then
 					return
@@ -1036,6 +1041,9 @@
 			end,
 
 			FinishedEditingProcessOverride = function (self, asProcessName)
+				if T_SETTINGS[E_SETTING_KEYS.ADJUST_ZPOS] then
+					C_SKIN:ResetZPos()
+				end
 				local tGame = T_FILTERED_GAMES[N_SCROLL_INDEX + self.nCurrentIndex - 1]
 				if tGame == nil then
 					return
