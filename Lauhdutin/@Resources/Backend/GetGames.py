@@ -205,11 +205,12 @@ try:
             if not game_new.get(GameKeys.HOURS_TOTAL, None):
                 game_new[GameKeys.HOURS_TOTAL] = 0.0
 
-        set_skin_status("Downloading...")
+        set_skin_status("Downloading banners...")
         print("Downloading banners for %d games from supported platforms..." %
               (len(steam_games) + len(galaxy_games) + len(battlenet_games)))
         banner_downloader = BannerDownloader(ResourcePath)
-        banner_downloader.process(all_games)
+        for status in banner_downloader.process(all_games):
+            set_skin_status("Downloading banners...#CRLF#%d%%" % status)
 
         # Daily backups - Adjust the list immediately below to keep more or fewer daily backups.
         backup_paths = [

@@ -1,5 +1,5 @@
 # Python environment
-import os, urllib.request, time, shutil
+import os, urllib.request, time, shutil, math
 # Back-end
 from Enums import GameKeys
 
@@ -16,7 +16,12 @@ class BannerDownloader:
                 os.makedirs(dirPath)
 
     def process(self, a_game_dicts):
+        total_count = len(a_game_dicts)
+        processed_count = 0
+        status = 0
+        yield status
         for game_dict in a_game_dicts:
+            processed_count += 1
             if (game_dict.get(GameKeys.BANNER_URL, None) != None and
                     game_dict.get(GameKeys.BANNER_PATH, None) != None):
                 file_path = os.path.join(self.banners_path,
@@ -40,3 +45,7 @@ class BannerDownloader:
                             game_dict[GameKeys.BANNER_ERROR] = True
                 else:  # Banner already exists on filesystem
                     del game_dict[GameKeys.BANNER_URL]
+            new_status = math.floor(processed_count / total_count * 10)
+            if status != new_status:
+                status = new_status
+                yield status * 10
