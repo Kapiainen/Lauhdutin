@@ -239,7 +239,9 @@ try:
                 for backup_path in backup_paths:
                     if os.path.exists(backup_path):
                         backup_count += 1
-                if backup_count >= len(backup_paths) - 1:
+                    else:
+                        break
+                if backup_count >= len(backup_paths):
                     os.remove(backup_paths[-1])
                     backup_count = len(backup_paths) - 1
                 while backup_count > 0:
