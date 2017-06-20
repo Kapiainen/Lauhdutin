@@ -129,7 +129,7 @@ class GOGGalaxy:
         for gameID, gameDict in self.index.items():
             for key, value in gameDict.items():
                 self.result[gameID][key] = value
-        if os.path.isfile(self.galaxyDB):
+        if os.path.isfile(self.galaxyDB): # GOG Galaxy >= 1.2.x
             print("\tConnecting to 'galaxy.db'...")
             con = sqlite3.connect(self.galaxyDB)
             cur = con.cursor()
@@ -140,7 +140,7 @@ class GOGGalaxy:
             for gameID, gameDict in self.galaxy.items():
                 for key, value in gameDict.items():
                     self.result[gameID][key] = value
-        else:
+        else: # GOG Galaxy < 1.2.x
             print("\t'%s' does not exist..." % self.galaxyDB)
             if os.path.isfile(self.productdetailsDB):
                 print("\tConnecting to 'productdetails.db'...")
