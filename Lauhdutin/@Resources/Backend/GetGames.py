@@ -75,12 +75,14 @@ try:
         set_skin_status("Processing...")
         # Windows shortcuts (.lnk) in @Resources\Shortcuts
         print("Processing Windows shortcuts...")
+        set_skin_status("Processing Windows shortcuts...")
         windows_shortcuts = WindowsShortcuts(ResourcePath)
         windows_shortcuts_games = windows_shortcuts.get_games()
 
         # Battle.net games (classic games are not supported at the moment)
         if settings.get("battlenet_path", None):
             print("Processing Battle.net games...")
+            set_skin_status("Processing Battle.net games...")
             battlenet = Battlenet(settings["battlenet_path"], ResourcePath)
             battlenet_games = battlenet.get_games()
         else:
@@ -89,6 +91,7 @@ try:
         # Steam games
         if settings.get("steam_path", None):
             print("Processing Steam games...")
+            set_skin_status("Processing Steam games...")
             steamID64 = ""
             if settings.get("parse_steam_community_profile", True):
                 steamID64 = settings.get("steam_id64", "")
@@ -106,6 +109,7 @@ try:
         if settings.get("galaxy_path", None):
             # GOG Galaxy games
             print("Processing GOG Galaxy games...")
+            set_skin_status("Processing GOG Galaxy games...")
             galaxy = GOGGalaxy(settings["galaxy_path"])
             galaxy_games = galaxy.get_games()
         else:
@@ -113,6 +117,7 @@ try:
 
         # Merge game dictionaries into one list
         print("Generating master list of games...")
+        set_skin_status("Generating master list of games...")
         all_games = []
         if windows_shortcuts_games:
             for game_key, game_dict in windows_shortcuts_games.items():
@@ -138,6 +143,7 @@ try:
         print(
             "Comparing new master list of games with old master list of games..."
         )
+        set_skin_status("Comparing new and old master lists...")
         all_games_old = read_json(os.path.join(ResourcePath, "games.json"))
         if all_games_old:
             for game_new in all_games:
@@ -229,12 +235,14 @@ try:
                 previous_games_master_list = read_json(games_path)
                 if previous_games_master_list:
                     print("Making a new daily backup...")
+                    set_skin_status("Making a new daily backup...")
                     write_json(backup_paths[0], previous_games_master_list)
         else:
             current_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
             latest_backup_date = time.strftime('%Y-%m-%d', time.localtime(os.path.getmtime(backup_paths[0])))
             if current_date != latest_backup_date:
                 print("Making a new daily backup...")
+                set_skin_status("Making a new daily backup...")
                 backup_count = 0
                 for backup_path in backup_paths:
                     if os.path.exists(backup_path):
@@ -252,6 +260,7 @@ try:
                 print("A daily backup has already been made today (%s)..." % latest_backup_date)
 
         print("Writing master list of %d games to disk..." % len(all_games))
+        set_skin_status("Writing master list of %d games to disk..." % len(all_games))
         write_json(os.path.join(ResourcePath, "games.json"), all_games)
 
         temp_dir_path = os.path.join(ResourcePath, "Temp")
