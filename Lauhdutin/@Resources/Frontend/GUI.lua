@@ -1516,6 +1516,41 @@
 		asPattern = asPattern:lower()
 		if STRING:StartsWith(asPattern, '+') then
 			T_FILTERED_GAMES, bSort = Filter(T_FILTERED_GAMES, asPattern:sub(2))
+		elseif STRING:StartsWith(asPattern, '*') then
+			local tTableOfGames = {}
+			local tTableOfGames2 = {}
+			for i, tGame in ipairs(T_FILTERED_GAMES) do
+				table.insert(tTableOfGames, tGame)
+			end
+			tTableOfGames2 = Filter(T_ALL_GAMES, asPattern:sub(2))
+			for i, tGame1 in ipairs(tTableOfGames) do
+				for j, tGame2 in ipairs(tTableOfGames2) do
+					if tGame1 == tGame2 then
+						table.remove(tTableOfGames2, j)
+					end
+				end
+			end
+			for i, tGame in ipairs(tTableOfGames2) do
+				table.insert(tTableOfGames, tGame)
+			end
+			T_FILTERED_GAMES = tTableOfGames
+			SortGames()
+		elseif STRING:StartsWith(asPattern, '-') then
+			local tTableOfGames = {}
+			local tTableOfGames2 = {}
+			for i, tGame in ipairs(T_FILTERED_GAMES) do
+				table.insert(tTableOfGames, tGame)
+			end
+			tTableOfGames2 = Filter(T_ALL_GAMES, asPattern:sub(2))
+			for i, tGame1 in ipairs(tTableOfGames2) do
+				for j, tGame2 in ipairs(tTableOfGames) do
+					if tGame2 == tGame1 then
+						table.remove(tTableOfGames, j)
+					end
+				end
+			end
+			T_FILTERED_GAMES = tTableOfGames
+			SortGames()
 		else
 			local tTableOfGames = {}
 			for i, tGame in ipairs(T_ALL_GAMES) do
