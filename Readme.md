@@ -172,6 +172,14 @@ The list of games can be narrowed down by applying a filter. Filters can be appl
 - `+<filter>`
 
   Replace `<filter>` with one of the filters described above to further filter the current set of filtered games.
+  
+- `*<filter>`
+
+  Replace `<filter>` with one of the filters described above to add to the current set of filtered games the games of the new filter.
+  
+- `-<filter>`
+
+  Replace `<filter>` with one of the filters described above to remove to the current set of filtered games the games of the new filter.
 
 Games that are not currently installed or are set as hidden are not shown by default when filtering, unless stated otherwise. There are settings for making each category of aforementioned games show up when filtering.
 
