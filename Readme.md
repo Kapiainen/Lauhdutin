@@ -274,6 +274,7 @@ Any deviations from the rules regarding adding platform support will most likely
 **Version 2.8.0 - 2017/MM/DD:**
 - Added daily backups of *games.json*.
 - Added z-position adjustment when editing a game's process name.
+- Added more status messages when initializing the skin.
 - Updated the status messages for downloading banners to include the progress in percent.
 - Updated the debug status message for the number of banners to download to include Blizzard games.
 - Updated GOG Galaxy support.
