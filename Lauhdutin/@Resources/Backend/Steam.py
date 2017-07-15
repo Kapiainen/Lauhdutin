@@ -119,9 +119,13 @@ class Steam():
         result = {}
         vdf = VDF()
         libraries = self.get_libraries(self.steam_path)
-        shared_config = self.get_shared_config(self.steam_path,
-                                               self.userdataid)
-        local_config = self.get_local_config(self.steam_path, self.userdataid)
+        if self.userdataid != "":
+            shared_config = self.get_shared_config(self.steam_path,
+                                                   self.userdataid)
+            local_config = self.get_local_config(self.steam_path, self.userdataid)
+        else:
+            print("\tA Steam account has not been chosen...")
+            return result
         # Steam community profile
         game_definitions = None
         if (self.steamid64 and self.steamid64 != ""):
@@ -183,6 +187,10 @@ class Steam():
         shared_config = self.vdf.open(
             os.path.join(a_path, "userdata", a_userdataid, "7", "remote",
                          "sharedconfig.vdf"))
+        if not shared_config:
+            print("\t\tFailed to parse 'sharedconfig.vdf'...")
+            print("\t\tTags defined in Steam might not be available...")
+            return None
         keys = [
             VDFKeys.SOFTWARE, VDFKeys.VALVE,
             VDFKeys.STEAM, VDFKeys.APPS
@@ -193,7 +201,7 @@ class Steam():
             keys.insert(0, VDFKeys.USERLOCALCONFIGSTORE)
         while keys:
             if not shared_config:
-                print("\t\tFailed to process 'sharedconfig.vdf'")
+                print("\t\tFailed to process 'sharedconfig.vdf'...")
                 shared_config = None
                 break
             shared_config = shared_config.get(keys[0])
@@ -205,6 +213,10 @@ class Steam():
         local_config = self.vdf.open(
             os.path.join(a_path, "userdata", a_userdataid, "config",
                          "localconfig.vdf"))
+        if not local_config:
+            print("\t\tFailed to parse 'localconfig.vdf'...")
+            print("\t\tTimestamps for when games were most recently played might not be up-to-date...")
+            return None
         keys = [
             VDFKeys.SOFTWARE, VDFKeys.VALVE,
             VDFKeys.STEAM, VDFKeys.APPS
@@ -215,7 +227,7 @@ class Steam():
             keys.insert(0, VDFKeys.USERLOCALCONFIGSTORE)
         while keys:
             if not local_config:
-                print("\t\tFailed to process 'localconfig.vdf'")
+                print("\t\tFailed to process 'localconfig.vdf'...")
                 local_config = None
                 break
             local_config = local_config.get(keys[0])
