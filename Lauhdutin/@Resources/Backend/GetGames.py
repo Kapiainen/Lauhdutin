@@ -70,6 +70,21 @@ try:
         with open(a_path, "w") as f:
             json.dump(a_json, f, indent=2)
 
+    def validate_games(a_games):
+        validated_games = []
+        keys = [
+            GameKeys.NAME,
+            GameKeys.PLATFORM,
+            GameKeys.PATH,
+        ]
+        for game in a_games:
+            for key in keys:
+                if game.get(key, None) == None:
+                    print("Rejected game: %s" % game)
+                    continue
+            validated_games.append(game)
+        return validated_games
+
     settings = read_json(os.path.join(ResourcePath, "settings.json"))
     if settings:
         set_skin_status("Processing...")
@@ -138,6 +153,8 @@ try:
         if galaxy_games:
             for game_key, game_dict in galaxy_games.items():
                 all_games.append(game_dict)
+
+        all_games = validate_games(all_games)
 
         print("Found %d games..." % len(all_games))
         print(
