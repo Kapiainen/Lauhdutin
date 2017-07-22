@@ -279,6 +279,7 @@ Any deviations from the rules regarding adding platform support will most likely
 - Updated the debug status message for the number of banners to download to include Blizzard games.
 - Updated Steam support with more error messages.
 - Implemented a workaround for displaying exception messages with single quotation marks.
+- Fixed a bug that caused a thin black outline around slots when a hover animation was played. Requires that the skin is rebuilt for the change to take effect.
 
 **Version 2.7.1 - 2017/05/29:**
 - Updated to support GOG Galaxy 1.2.x.

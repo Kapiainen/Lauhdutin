@@ -120,8 +120,8 @@ try:
             "Meter=Shape",
             "X=0",
             "Y=0",
-            "Shape=Rectangle 0,0,#SkinMaxWidth#,#SkinMaxHeight# | Fill Color #SlotBackgroundColor#",
-            "Shape2=Rectangle 0,0,0,0",
+            "Shape=Rectangle 0,0,#SkinMaxWidth#,#SkinMaxHeight# | Fill Color #SlotBackgroundColor# | StrokeWidth 0",
+            "Shape2=Rectangle 0,0,0,0 | StrokeWidth 0",
             "Shape3=Combine Shape | XOR Shape2",
             "\n"
         ])
