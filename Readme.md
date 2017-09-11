@@ -19,6 +19,7 @@ A Rainmeter skin for aggregating games from different platforms and then launchi
    - [Manual process override](#manual-process-override)
    - [Highlighting](#highlighting)
    - [Animations](#animations)
+   - [Sound](#sound)
  - [Reporting issues](#reporting-issues)
  - [Contributing](#contributing)
  - [Changelog](#changelog)
@@ -238,6 +239,10 @@ Hover animations can be disabled completely.
 The entire skin can be made to slide into and out of view when placed along an edge of a monitor ([animated example](Docs/SkinAnimation.gif)). There is a setting that can be used to determine which direction the skin slides into and out of view. A 1 px wide/tall invisible sliver is placed along the corresponding edge of the skin when this feature is enabled and hovering the mouse cursor on this sliver makes the skin slide into view.
 
 Skin animations can be disabled completely.
+
+## Sound
+
+If sound on click is enabled and a sound file path is defined, a sound will be played when a game is executed.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
