@@ -9,7 +9,7 @@ try:
 
     root = Tk()
     root.withdraw()
-    path = filedialog.askopenfile(initialdir=InitialDir)
+    path = filedialog.askopenfilename(initialdir=InitialDir)
 
     subprocess.call(
         [
