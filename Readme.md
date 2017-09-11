@@ -242,7 +242,7 @@ Skin animations can be disabled completely.
 
 ## Sound
 
-If sound on click is enabled and a sound file path is defined, a sound will be played when a game is executed.
+If sound on click is enabled and a sound file path is defined, that sound will be played when a game is executed.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
