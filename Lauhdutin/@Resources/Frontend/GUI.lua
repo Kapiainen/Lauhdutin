@@ -330,6 +330,9 @@
 				C_ANIMATIONS:PushHoverReset(anIndex)
 			end
 			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+				if T_SETTINGS[E_SETTING_KEYS.SOUND_CLICK] == true then
+				SKIN:Bang('[Play "' .. T_SETTINGS[E_SETTING_KEYS.SOUND_PATH] .. '"]')
+				end
 				C_ANIMATIONS:PushClick(nAnimation, anIndex, LaunchGame, tGame)
 			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
 				C_ANIMATIONS:PushClick(nAnimation, anIndex, HideGame, tGame)
@@ -338,6 +341,9 @@
 			end
 		else
 			if N_ACTION_STATE == E_ACTION_STATES.EXECUTE then
+				if T_SETTINGS[E_SETTING_KEYS.SOUND_CLICK] == true then
+				SKIN:Bang('[Play "' .. T_SETTINGS[E_SETTING_KEYS.SOUND_PATH] .. '"]')
+				end
 				LaunchGame(tGame)
 			elseif N_ACTION_STATE == E_ACTION_STATES.HIDE then
 				HideGame(tGame)
