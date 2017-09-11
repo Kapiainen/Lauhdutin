@@ -100,6 +100,12 @@ function Initialize()
 		"Jiggle",
 		"Shake"
 	}
+	if SETTINGS[SETTING_KEYS.SOUND_CLICK] == nil then
+		SETTINGS[SETTING_KEYS.SOUND_CLICK] = false
+	end
+	if SETTINGS[SETTING_KEYS.SOUND_PATH] == nil then
+		SETTINGS[SETTING_KEYS.SOUND_PATH] = ""
+	end
 	if SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == nil then
 		SETTINGS[SETTING_KEYS.FUZZY_SEARCH] = true
 	end
@@ -273,6 +279,8 @@ function UpdateSettings()
 		SKIN:Bang('[!SetOption "BattlenetPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.BATTLENET_PATH] ..'"]')
 		SKIN:Bang('[!SetOption "PythonPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.PYTHON_PATH]) .. '"]')
 		SKIN:Bang('[!SetOption "PythonPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.PYTHON_PATH] ..'"]')
+		SKIN:Bang('[!SetOption "SoundPathStatus" "Text" "' .. tostring(SETTINGS[SETTING_KEYS.SOUND_PATH]) .. '"]')
+		SKIN:Bang('[!SetOption "SoundPathInput" "DefaultValue" "' .. SETTINGS[SETTING_KEYS.SOUND_PATH] ..'"]')
 		if SETTINGS[SETTING_KEYS.ORIENTATION] == 'vertical' then
 			SKIN:Bang('[!SetOption "SkinOrientationStatus" "Text" "Vertical"]')
 		else
@@ -307,6 +315,11 @@ function UpdateSettings()
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "Disabled"]')
 		else
 			SKIN:Bang('[!SetOption "HoverAnimationStatus" "Text" "' .. HOVER_ANIMATION_DESCRIPTIONS[SETTINGS[SETTING_KEYS.ANIMATION_HOVER]] .. '"]')
+		end
+		if SETTINGS[SETTING_KEYS.SOUND_CLICK] == true then
+			SKIN:Bang('[!SetOption "PlaySoundClickStatus" "Text" "Enabled"]')
+		else
+			SKIN:Bang('[!SetOption "PlaySoundClickStatus" "Text" "Disabled"]')
 		end
 		if SETTINGS[SETTING_KEYS.FUZZY_SEARCH] == true then
 			SKIN:Bang('[!SetOption "FuzzySearchStatus" "Text" "Enabled"]')
@@ -626,6 +639,20 @@ function CycleHoverAnimation()
 	if SETTINGS[SETTING_KEYS.ANIMATION_HOVER] > #HOVER_ANIMATION_DESCRIPTIONS then
 		SETTINGS[SETTING_KEYS.ANIMATION_HOVER] = 0
 	end
+	UpdateSettings()
+end
+
+function TogglePlaySoundClick()
+	SETTINGS[SETTING_KEYS.SOUND_CLICK] = not SETTINGS[SETTING_KEYS.SOUND_CLICK]
+	UpdateSettings()
+end
+
+function RequestSoundPath()
+	SKIN:Bang('"#Python#" "#@#Frontend\\GenericFilePathDialog.py" "#PROGRAMPATH#;" "AcceptSoundPath;" "' .. SETTINGS[SETTING_KEYS.SOUND_PATH] .. '"; "#CURRENTCONFIG#;"')
+end
+
+function AcceptSoundPath(aPath)
+	SETTINGS[SETTING_KEYS.SOUND_PATH] = aPath
 	UpdateSettings()
 end
 

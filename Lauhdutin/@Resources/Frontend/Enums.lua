@@ -4,6 +4,8 @@ return {
 		ANIMATION_CLICK = 'click_animation',
 		ANIMATION_HOVER = 'hover_animation',
 		ANIMATION_SKIN_SLIDE_DIRECTION = 'skin_slide_animation_direction',
+		SOUND_CLICK = 'sound_click',
+		SOUND_PATH = 'sound_path',
 		BANGS_STARTING = 'start_game_bang',
 		BANGS_STOPPING = 'stop_game_bang',
 		BATTLENET_PATH = 'battlenet_path',
