@@ -225,14 +225,14 @@ try:
         banner_downloader.process(all_games)
 
         # Daily backups - Adjust the list immediately below to keep more or fewer daily backups.
-        i = 0
+        i = 1
         backups = 5
         backup_paths = []
-        while i < backups:
-            if i < 9:
-                backup_number = "0%s" % (i + 1)
+        while i <= backups:
+            if i < 10:
+                backup_number = "0%s" % (i)
             else:
-                backup_number = "%s" % (i + 1)
+                backup_number = "%s" % (i)
             backup = os.path.join(ResourcePath, "games_daily_backup_%s.json") % (backup_number)
             backup_paths.append(backup)
             i += 1
