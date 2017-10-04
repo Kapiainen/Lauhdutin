@@ -234,13 +234,17 @@ try:
             set_skin_status("Downloading banners...#CRLF#%d%%" % status)
 
         # Daily backups - Adjust the list immediately below to keep more or fewer daily backups.
-        backup_paths = [
-            os.path.join(ResourcePath, "games_daily_backup_01.json"),
-            os.path.join(ResourcePath, "games_daily_backup_02.json"),
-            os.path.join(ResourcePath, "games_daily_backup_03.json"),
-            os.path.join(ResourcePath, "games_daily_backup_04.json"),
-            os.path.join(ResourcePath, "games_daily_backup_05.json")
-        ]
+        i = 1
+        backups = 5
+        backup_paths = []
+        while i <= backups:
+            if i < 10:
+                backup_number = "0%s" % (i)
+            else:
+                backup_number = "%s" % (i)
+            backup = os.path.join(ResourcePath, "games_daily_backup_%s.json") % (backup_number)
+            backup_paths.append(backup)
+            i += 1
         if not os.path.exists(backup_paths[0]):
             games_path = os.path.join(ResourcePath, "games.json")
             if os.path.exists(games_path):
