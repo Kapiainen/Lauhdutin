@@ -145,6 +145,18 @@ try:
         )
         set_skin_status("Comparing new and old master lists...")
         all_games_old = read_json(os.path.join(ResourcePath, "games.json"))
+        if not all_games_old:
+            i = 1
+            backups = 5
+            while i <= backups:
+                if all_games_old:
+                    break
+                else:
+                    if i < 10:
+                        all_games_old = read_json(os.path.join(ResourcePath, "games_daily_backup_0%s.json") % (i)) 
+                    else:
+                        all_games_old = read_json(os.path.join(ResourcePath, "games_daily_backup_%s.json") % (i))
+                i += 1
         if all_games_old:
             for game_new in all_games:
                 i = 0
