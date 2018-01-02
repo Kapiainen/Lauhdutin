@@ -1801,14 +1801,26 @@
 				--print("== " .. asPattern .. " ==") -- Debug
 				for i, entry in ipairs(tRankings) do
 					--print(entry.score, entry.game[E_GAME_KEYS.NAME]) -- Debug
-					table.insert(tResult, entry.game)
+					if (entry.game[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES])
+					    or not entry.game[E_GAME_KEYS.HIDDEN] then
+						if (entry.game[E_GAME_KEYS.NOT_INSTALLED] and T_SETTINGS[E_SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES])
+					    	    or not entry.game[E_GAME_KEYS.NOT_INSTALLED] then
+							table.insert(tResult, entry.game)
+						end
+					end
 				end
 				C_TOOLBAR:SetScoreSortingIcon()
 				return tResult, false
 			else
 				for i, tGame in ipairs(atTable) do
 					if tGame[E_GAME_KEYS.NAME]:lower():find(asPattern) then
-						table.insert(tResult, tGame)
+						if (tGame[E_GAME_KEYS.HIDDEN] and T_SETTINGS[E_SETTING_KEYS.SHOW_HIDDEN_GAMES])
+					   	    or not tGame[E_GAME_KEYS.HIDDEN] then
+							if (tGame[E_GAME_KEYS.NOT_INSTALLED] and T_SETTINGS[E_SETTING_KEYS.SHOW_NOT_INSTALLED_GAMES])
+					    	    	    or not tGame[E_GAME_KEYS.NOT_INSTALLED] then
+								table.insert(tResult, tGame)
+							end
+						end
 					end
 				end
 			end
