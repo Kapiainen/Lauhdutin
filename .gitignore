@@ -1,16 +1,6 @@
-__pycache__
-Lauhdutin.sublime-workspace
 Releases
-Lauhdutin/@Resources/Backend/__pycache__
-Lauhdutin/@Resources/Cache
-Lauhdutin/@Resources/Frontend/__pycache__
-Lauhdutin/@Resources/Banners/Battle.net
-Lauhdutin/@Resources/Banners/GOG Galaxy
-Lauhdutin/@Resources/Banners/Steam
-Lauhdutin/@Resources/Banners/Steam shortcuts
-Lauhdutin/@Resources/Banners/Shortcuts
-Lauhdutin/@Resources/Shortcuts
-Lauhdutin/@Resources/games.json
-Lauhdutin/@Resources/games_backup.json
-Lauhdutin/@Resources/settings.json
-Lauhdutin/@Resources/Temp
+dist/@Resources/cache
+dist/@Resources/Shortcuts
+dist/@Resources/sqlite3.exe
+dist/@Resources/*.json
+*.sublime-workspace
