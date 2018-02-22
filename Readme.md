@@ -80,9 +80,9 @@ Support includes:
 
 Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
 
-### Other platforms
+### Other platforms and regular Windows shortcuts
 
-Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\@Resources\Shortcuts`. Banners should be placed in the same folder with the same name as the shortcut (e.g. `SomeGame.lnk` and `SomeGame.jpg`).
+Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\@Resources\Shortcuts`. Shortcuts can be placed in a subfolder with the aforementioned folder. The name of the subfolder will then be used as an override for the name of the platform, which can be used e.g. for filtering purposes.
 
 ## Context menu actions
 
