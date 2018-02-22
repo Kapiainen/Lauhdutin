@@ -13,6 +13,7 @@ TODO: Replace with a static image
  - [Features](#features)
    - [Supported platforms](#supported-platforms)
    - [Games](#games)
+   - [Banners](#banners)
    - [Searching](#searching)
    - [Sorting](#sorting)
    - [Filtering](#filtering)
@@ -26,17 +27,17 @@ TODO: Replace with a static image
  - [License](#license)
 
 # Requirements
-Developed with the following software in mind:
  - [Rainmeter 4.0 or later](https://www.rainmeter.net/)
+ - Windows Script Host 5.8 or later
+   - Should be included by default in all versions of Windows that are supported by Rainmeter 4.0 and later.
 
 # Installing
 - Install Rainmeter, if you do not already have it.
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
-- Extract the **Lauhdutin** folder and place it in `\Rainmeter\Skins`.
+- Extract the contents of the release archive to `\Rainmeter\Skins\Lauhdutin`.
 - Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Close** button.
 - Load **Main.ini**, which should now detect games based on your settings.
 - Windows shortcuts (.lnk and .url files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder. This folder can also be opened via a context option in the main config or via the settings page for Windows shortcuts.
-- Banners for Windows shortcuts can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut.
 
 # Updating
 ## 2.x.x to 3.x.x
@@ -101,7 +102,7 @@ Stop monitoring the game and execute bangs, if they are enabled and any bangs ar
 
 ### Start/stop hiding/unhiding/removing games
 
-These context actions change what left-clicking on a game does. This can be used to hide/unhide/remove multiple games quickly without having to go through the game window (see [Games](#games)) for each individual game.
+These context actions change what left-clicking on a game does. This can be used to hide/unhide/remove multiple games quickly without having to go through the Game window (see [Games](#games)) for each individual game.
 
 ## Games
 
@@ -120,6 +121,18 @@ Some details can also be modified:
 - Assign tags for filtering purposes. Some tags may have been assigned via the game's platform, which is indicated by a `*`, and cannot be altered via Lauhdutin.
 - Set the game to ignore global and platform-specific bangs.
 - Assign starting and/or stopping bangs.
+
+# Banners
+
+Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
+
+Custom banners for other platforms can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\cache\<platform name here>`. If there is no existing banner to replace, then the name to use for the banner will depend on the platform:
+- **Steam**: Use the game's AppID, which can e.g. be found in the URL of the game's Steam store page. The AppID can also be found by inspecting the game's path in the Game window (see [Games](#games)).
+- **Steam (shortcuts for non-Steam games)**: Use the ID is generated based on the path to the game's executable and its name in your Steam library. The ID can also be found by inspecting the game's path in the Game window (see [Games](#games)).
+- **Blizzard Battle.net**: Use the name of the game's folder (e.g. `Hearthstone.jpg` if the game's folder is called `Hearthstone`).
+- **GOG Galaxy**: Use the game's ID, which can be found by inspecting the game's path in the Game window (see [Games](#games)) when launching GOG Galaxy games via the client.
+
+If the skin fails to download a banner for a game from a platform that supports automatic downloading of banners, then a file with the extension `.failedToDownload` can be found instead where the banner should be. Removing this file will cause the skin to make another attempt to download the banner the next time that the skin is refreshed.
 
 ## Searching
 
