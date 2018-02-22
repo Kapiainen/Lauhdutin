@@ -29,7 +29,7 @@ do
         }),
         Settings.FolderPathSpinner({
           title = LOCALIZATION:get('setting_battlenet_paths_title', 'Paths'),
-          tooltip = LOCALIZATION:get('setting_battlenet_paths_description', 'Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in \'D:\\Blizzard games\\Hearthstone\', then the path that you give should be \'D:\\Blizzard games\'.\nEdit a path and input an empty string to remove that path.'),
+          tooltip = LOCALIZATION:get('setting_battlenet_paths_description', '""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""'),
           index = 1,
           getValues = function(self)
             local values

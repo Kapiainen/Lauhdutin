@@ -98,6 +98,7 @@ do
       _class_0.__parent.__init(self)
       self.title = 'Steam'
       updateUsers()
+      local steamClientPathDescription = LOCALIZATION:get('setting_steam_client_path_description', 'This should be the folder that contains the Steam client executable.')
       self.settings = {
         Settings.Boolean({
           title = LOCALIZATION:get('setting_steam_enabled_title', 'Enabled'),
@@ -112,14 +113,14 @@ do
         }),
         Settings.FolderPath({
           title = LOCALIZATION:get('setting_steam_client_path_title', 'Client path'),
-          tooltip = LOCALIZATION:get('setting_steam_client_path_description', 'This should be the folder that contains \'Steam.exe\'.'),
+          tooltip = steamClientPathDescription,
           getValue = function(self)
             return COMPONENTS.SETTINGS:getSteamPath()
           end,
           setValue = function(self, path)
             return COMPONENTS.SETTINGS:setSteamPath(path)
           end,
-          dialogTitle = 'Select the folder containing \'Steam.exe\''
+          dialogTitle = steamClientPathDescription
         }),
         Settings.Spinner({
           title = LOCALIZATION:get('setting_steam_account_title', 'Account'),

@@ -61,6 +61,7 @@ class Steam extends Page
 		super()
 		@title = 'Steam'
 		updateUsers()
+		steamClientPathDescription = LOCALIZATION\get('setting_steam_client_path_description', 'This should be the folder that contains the Steam client executable.')
 		@settings = {
 			Settings.Boolean({
 				title: LOCALIZATION\get('setting_steam_enabled_title', 'Enabled')
@@ -73,12 +74,12 @@ class Steam extends Page
 			})
 			Settings.FolderPath({
 				title: LOCALIZATION\get('setting_steam_client_path_title', 'Client path')
-				tooltip: LOCALIZATION\get('setting_steam_client_path_description', 'This should be the folder that contains \'Steam.exe\'.')
+				tooltip: steamClientPathDescription
 				getValue: () =>
 					return COMPONENTS.SETTINGS\getSteamPath()
 				setValue: (path) =>
 					return COMPONENTS.SETTINGS\setSteamPath(path)
-				dialogTitle: 'Select the folder containing \'Steam.exe\''
+				dialogTitle: steamClientPathDescription
 			})
 			Settings.Spinner({
 				title: LOCALIZATION\get('setting_steam_account_title', 'Account')

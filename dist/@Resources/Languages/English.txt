@@ -75,7 +75,7 @@ setting_bangs_stopping_title	Stopping bangs
 setting_battlenet_add_path	Add path...
 setting_battlenet_enabled_description	If enabled, then games installed via the Blizzard Battle.net client will be included.
 setting_battlenet_enabled_title	Enabled
-setting_battlenet_paths_description	Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in \'D:\\Blizzard games\\Hearthstone\', then the path that you give should be \'D:\\Blizzard games\'.\nEdit a path and input an empty string to remove that path.
+setting_battlenet_paths_description	""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
 setting_battlenet_starting_bangs_title	Starting bangs
@@ -85,8 +85,8 @@ setting_gog_galaxy_client_path_description	The folder that contains the GOG Gala
 setting_gog_galaxy_client_path_title	Client path
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_enabled_title	Enabled
-setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client\'s overlay to be used and for the client to track the amount of time played.
-setting_gog_galaxy_indirect_launch_title	Indirect launch
+setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
+setting_gog_galaxy_indirect_launch_title	Launch via client
 setting_gog_galaxy_program_data_path_description	The path where the GOG Galaxy client stores some of its data.
 setting_gog_galaxy_program_data_path_title	ProgramData path
 setting_gog_galaxy_starting_bangs_description	These Rainmeter bangs are executed just before any GOG Galaxy game launches.
@@ -157,7 +157,7 @@ setting_slots_width_description	The width of each slot in pixels.
 setting_slots_width_title	Slot width
 setting_steam_account_description	Choose the Steam account whose games to get.
 setting_steam_account_title	Account
-setting_steam_client_path_description	This should be the folder that contains \'Steam.exe\'.
+setting_steam_client_path_description	This should be the folder that contains the Steam client executable.
 setting_steam_client_path_title	Client path
 setting_steam_community_profile_description	If enabled, then the Steam community profile will be downloaded and parsed to get:\n- All games associated with the chosen account even if not installed at the moment.\n- The total hours played of each game associated with the chosen account.\n\nRequires the Steam community profile to be public.
 setting_steam_community_profile_title	Parse community profile

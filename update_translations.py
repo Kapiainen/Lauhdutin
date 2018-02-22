@@ -2,7 +2,7 @@ import os
 import re
 
 version = "version 1"
-pattern = re.compile(r"LOCALIZATION\\get\('(.+?)',\s*'(.+?)'\)")
+pattern = re.compile(r"LOCALIZATION\\get\('(.+?)',\s*['\"](.+?)['\"]\)")
 
 print("\nUpdating translation file...")
 cwd = os.getcwd()

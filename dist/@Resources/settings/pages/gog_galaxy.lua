@@ -33,7 +33,7 @@ do
           setValue = function(self, path)
             return COMPONENTS.SETTINGS:setGOGGalaxyClientPath(path)
           end,
-          dialogTitle = 'Select the folder containing \'GalaxyClient.exe\''
+          dialogTitle = "Select the folder containing 'GalaxyClient.exe'"
         }),
         Settings.FolderPath({
           title = LOCALIZATION:get('setting_gog_galaxy_program_data_path_title', 'ProgramData path'),
@@ -46,8 +46,8 @@ do
           end
         }),
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_gog_galaxy_indirect_launch_title', 'Indirect launch'),
-          tooltip = LOCALIZATION:get('setting_gog_galaxy_indirect_launch_description', 'If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client\'s overlay to be used and for the client to track the amount of time played.'),
+          title = LOCALIZATION:get('setting_gog_galaxy_indirect_launch_title', 'Launch via client'),
+          tooltip = LOCALIZATION:get('setting_gog_galaxy_indirect_launch_description', "If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played."),
           toggle = function(self)
             COMPONENTS.SETTINGS:toggleGOGGalaxyIndirectLaunch()
             return true
