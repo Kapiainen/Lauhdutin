@@ -36,8 +36,9 @@ class Property
 		@update = args.update
 
 class Slot
-	new: (index) =>
+	new: (index, maxValueStringLength) =>
 		@index = index
+		@maxValueStringLength = maxValueStringLength
 
 	populate: (property) =>
 		@property = property
@@ -47,10 +48,17 @@ class Slot
 		if @property
 			@property.value = @property\update() if @property.update ~= nil
 			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
-			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.value)))
+			value = utility.replaceUnsupportedChars(@property.value)
+			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, value))
+			if value\len() > @maxValueStringLength
+				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipText" "%s"]')\format(@index, value))
+				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "0"]')\format(@index))
+			else
+				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]')\format(@index))
 			return
 		SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" ""]')\format(@index))
 		SKIN\Bang(('[!SetOption "Slot%dValue" "Text" ""]')\format(@index))
+		SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]')\format(@index))
 
 	hasAction: () => return @property.action ~= nil
 
@@ -98,7 +106,9 @@ export Initialize = () ->
 					STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
 				for tag in *game\getPlatformTags()
 					STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-			COMPONENTS.SLOTS = [Slot(i) for i = 1, STATE.NUM_SLOTS]
+			valueMeter = SKIN\GetMeter('Slot1Value')
+			maxValueStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
+			COMPONENTS.SLOTS = [Slot(i, maxValueStringLength) for i = 1, STATE.NUM_SLOTS]
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()

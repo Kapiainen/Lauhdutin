@@ -63,11 +63,19 @@ do
           self.property.value = self.property:update()
         end
         SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(self.property.title)))
-        SKIN:Bang(('[!SetOption "Slot%dValue" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(self.property.value)))
+        local value = utility.replaceUnsupportedChars(self.property.value)
+        SKIN:Bang(('[!SetOption "Slot%dValue" "Text" "%s"]'):format(self.index, value))
+        if value:len() > self.maxValueStringLength then
+          SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipText" "%s"]'):format(self.index, value))
+          SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "0"]'):format(self.index))
+        else
+          SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]'):format(self.index))
+        end
         return 
       end
       SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" ""]'):format(self.index))
-      return SKIN:Bang(('[!SetOption "Slot%dValue" "Text" ""]'):format(self.index))
+      SKIN:Bang(('[!SetOption "Slot%dValue" "Text" ""]'):format(self.index))
+      return SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]'):format(self.index))
     end,
     hasAction = function(self)
       return self.property.action ~= nil
@@ -81,8 +89,9 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, index)
+    __init = function(self, index, maxValueStringLength)
       self.index = index
+      self.maxValueStringLength = maxValueStringLength
     end,
     __base = _base_0,
     __name = "Slot"
@@ -168,11 +177,13 @@ Initialize = function()
         STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
       end
     end
+    local valueMeter = SKIN:GetMeter('Slot1Value')
+    local maxValueStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
     do
       local _accum_0 = { }
       local _len_0 = 1
       for i = 1, STATE.NUM_SLOTS do
-        _accum_0[_len_0] = Slot(i)
+        _accum_0[_len_0] = Slot(i, maxValueStringLength)
         _len_0 = _len_0 + 1
       end
       COMPONENTS.SLOTS = _accum_0
