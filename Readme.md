@@ -2,9 +2,7 @@ Lauhdutin
 ==
 A Rainmeter skin for aggregating games from different platforms and launching them. Supports Steam, GOG Galaxy, Blizzard Battle.net, and regular Windows shortcuts. Games are presented as a scrollable list that can be filtered and sorted in multiple ways. There are a variety of settings that allow you to customize the appearance of the skin (e.g. orientation, number of slots, dimensions of slots, animations). This skin can also be used as a general purpose launcher since it supports regular Windows shortcuts.
 
-TODO: Replace with a static image
-
-![ex](Docs/demo.gif)
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-main-window.jpg)
 
 # Contents
  - [Requirements](#requirements)
@@ -111,6 +109,8 @@ Games are presented in slots, which can be interacted with. Slots can have an ov
 - Left-clicking a slot launches the game shown in the slot. Can be configured to require double-clicking.
 - Middle-clicking a slot shows details about the game in a separate window.
 
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-game-window.jpg)
+
 The window for game details (see above) can be used to view various details about the game. Platforms with a `*` next to them usually indicates a platform override as described in the [Other platforms](#other-platforms) sub-section of the [Supported platforms](#supported-platforms) section. Non-Steam game shortcuts, which also use a platform override to indicate that the game itself is not actually a native Steam game and as such may have comparatively limited support, are the exception to this rule.
 
 Some details can also be modified:
@@ -136,6 +136,8 @@ If the skin fails to download a banner for a game from a platform that supports 
 
 ## Searching
 
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-search-window.jpg)
+
 The button on the left-hand side of the toolbar is for searching for games based on the title. Searching uses fuzzy matching, which means that you do not need to input the exact same title as the game you are looking for. Titles are instead compared to the input and given a score. Using just the initials of a game's title should be enough to place it at the top of the list of results in many cases (e.g. `wtno` for `Wolfenstein: The New Order`).
 
 - Left-clicking the button searches all games.
@@ -144,6 +146,8 @@ The button on the left-hand side of the toolbar is for searching for games based
 
 ## Sorting
 
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-sort-window.jpg)
+
 The button in the middle of the toolbar shows and controls the sorting mode.
 
 - Left-clicking this button brings up a window where you can select the sorting mode.
@@ -151,6 +155,8 @@ The button in the middle of the toolbar shows and controls the sorting mode.
 - Right-clicking the button will reverse the order of the current list of sorted games.
 
 ## Filtering
+
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-filter-window.jpg)
 
 The list of games can be narrowed down by applying a filter. Filters can be applied by clicking on the filter button, which is on the right-hand side of the toolbar.
 
