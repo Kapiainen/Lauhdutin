@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems": [
+		{
+			"name": "Compile files",
+			"shell_cmd": "$project_path\\compile_src.bat",
+		}
+	]
+}
