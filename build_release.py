@@ -3,9 +3,10 @@ import os
 import zipfile
 import subprocess
 
+current_working_directory = os.getcwd()
+
 def parse_gitignore(root_path):
-	print("\n  Processing .gitignore")
-	current_working_directory = os.getcwd()
+	print("\n  Processing .gitignore...")
 	gitignore_path = os.path.join(current_working_directory, ".gitignore")
 	if os.path.isfile(gitignore_path):
 		gitignore = []
@@ -50,7 +51,7 @@ def main(root_path, releases_path, version):
 	author_name = "Kapiainen"
 	print("\nGenerating release: '%s - %s'" % (release_name, version))
 	folders_to_ignore, files_to_ignore, file_patterns_to_ignore = parse_gitignore(root_path)
-	print("\n  Gathering stuff to include in the release")
+	print("\n  Gathering stuff to include in the release...")
 	files_to_pack = []
 	for root, dirs, files in os.walk(root_path):
 		skip = False
@@ -70,7 +71,6 @@ def main(root_path, releases_path, version):
 				skip = False
 				for pattern in file_patterns_to_ignore:
 					folder_path, extension = pattern.split("*")
-					#print(path, folder_path, extension, path.find(folder_path), path.endswith(extension))
 					if path.find(folder_path) >= 0 and path.endswith(extension):
 						skip = True
 						break
@@ -91,7 +91,6 @@ def main(root_path, releases_path, version):
 		print("\n  'zlib' module could not be imported!")
 		print("  Generating uncompressed archive instead...")
 		compression_type = zipfile.ZIP_STORED
-	current_working_directory = os.getcwd()
 	readme_path = os.path.join(current_working_directory, "Readme.md")
 	license_path = os.path.join(current_working_directory, "License.md")
 	contributors_path = os.path.join(current_working_directory, "Contributors.md")
@@ -103,14 +102,21 @@ def main(root_path, releases_path, version):
 			release_archive.write(file, os.path.relpath(file, root_path))
 	print("\nSuccessfully generated the release!")
 
-root_path = os.path.join(os.getcwd(), "dist")
-releases_path = os.path.join(os.getcwd(), "Releases")
+root_path = os.path.join(current_working_directory, "dist")
+releases_path = os.path.join(current_working_directory, "Releases")
 if not os.path.isdir(releases_path):
 	os.makedirs(releases_path)
-translation_updater = subprocess.Popen(["python", os.path.join(os.getcwd(), "update_translations.py")], cwd=os.getcwd())
-translation_updater.wait()
-if translation_updater.returncode == 0:
-	main(root_path, releases_path, "3.0.0")#input("Enter release version: "))
+# Compile source files
+compiler = subprocess.Popen([os.path.join(current_working_directory, "compile_src.bat")], cwd=current_working_directory)
+compiler.wait()
+if compiler.returncode == 0:
+	# Update translation file
+	translation_updater = subprocess.Popen(["python", os.path.join(current_working_directory, "update_translations.py")], cwd=current_working_directory)
+	translation_updater.wait()
+	if translation_updater.returncode == 0:
+		main(root_path, releases_path, input("Enter release version: "))
+	else:
+		print("Failed to update the translation file!")
 else:
-	print("Failed to update the translation file!")
+	print("Failed to compile source files")
 input("\nPress a key to exit...")

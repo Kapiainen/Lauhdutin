@@ -4,6 +4,7 @@ import re
 version = "version 1"
 pattern = re.compile(r"LOCALIZATION\\get\('(.+?)',\s*'(.+?)'\)")
 
+print("\nUpdating translation file...")
 cwd = os.getcwd()
 translations = {}
 for root, dirs, files in os.walk(os.path.join(cwd, "src")):
