@@ -256,16 +256,14 @@ If there is no previously submitted issue that matches your issue, then submit a
 
 # Contributing
 
-Fork [this](https://github.com/Kapiainen/Lauhdutin) repository (preferrably the `development` branch), make your changes, and submit a pull request to the `development` branch with a summary of the changes you've made.
+Fork [this](https://github.com/Kapiainen/Lauhdutin) repository (preferrably the `development-v3` branch), make your changes, and submit a pull request to the `development-v3` branch with a summary of the changes you've made.
 
-Try to include tests and mock data for those tests. These tests should preferrably be integrated into the build system that is used to generate releases.
-
-Try to keep the number of dependencies, which cannot be included in the skin or are not a part of a default Windows installation, to a minimum.
+Try to keep the number of dependencies, which cannot be included with the skin or are not a part of a default Windows installation, to a minimum.
 
 [List of contributors](Contributors.md)
 
 ## Graphical user interface changes
-Try to keep draw calls to a minimum by, for example:
+Try to keep draw calls to a minimum by for example:
 - Not overriding the skin-wide `DefaultUpdateDivider=-1` option, if possible.
 - Executing the `!Redraw` bang only when necessary (e.g. update all meter options prior to a draw call instead of setting a few options, drawing, setting the rest of the options, and drawing again).
 
