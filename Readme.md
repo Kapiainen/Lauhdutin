@@ -225,6 +225,8 @@ Skin animations can be disabled completely.
 
 # Localization
 
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-localization.jpg)
+
 This skin supports localization, though it is somewhat limited. The default language is English, but additional languages can be added by copying `English.txt`, which can be found in `@Resources\Languages`, and translating the strings. The name of the file is the name of the language in the settings window. The first line of the file should be the version of the localization system:
 
 ```
