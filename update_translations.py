@@ -23,4 +23,4 @@ lines.sort()
 lines.insert(0, version)
 with open(os.path.join(cwd, "dist", "@Resources", "Languages", "English.txt"), "w", encoding="utf8") as f:
 	f.write("\n".join(lines) + "\n")
-print("Done!")
+print("Successfully updated the translation file!")
