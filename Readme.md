@@ -259,11 +259,8 @@ Any deviations from the rules regarding adding platform support will most likely
 
 # Changelog
 
-## TODO: Update month and day
-
 **Version 3.0.0 - 2018/MM/DD:**
-- Rewritten in MoonScript/Lua.
-- Game detection is now implemented using MoonScript/Lua, VBScript, and batch files.
+- Rewritten in MoonScript/Lua, VBScript, and batch files.
 
 **Version 2.7.1 - 2017/05/29:**
 - Updated to support GOG Galaxy 1.2.x.
