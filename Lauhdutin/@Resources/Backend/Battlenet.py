@@ -79,6 +79,11 @@ class Battlenet():
                 "path": "battlenet://WoW",
                 "process": "Wow-64.exe",
                 "process32": "Wow.exe"
+            },
+            "destiny 2": {
+                "title": "Destiny 2",
+                "path": "battlenet://DST2",
+                "process": "destiny2.exe" # No 32-bit executable
             }
         }
         self.supported_classic_games = {}
