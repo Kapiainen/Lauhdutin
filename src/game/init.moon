@@ -271,7 +271,7 @@ createProperties = (game, platform) ->
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_path', 'Path')
-			value: ('""%s""')\format(path)
+			value: ('""%s""')\format(game\getPath())
 			:action
 		})
 	)

@@ -369,7 +369,7 @@ createProperties = function(game, platform)
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('game_path', 'Path'),
-    value = ('""%s""'):format(path),
+    value = ('""%s""'):format(game:getPath()),
     action = action
   }))
   action = nil
