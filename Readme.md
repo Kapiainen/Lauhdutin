@@ -82,7 +82,7 @@ Blizzard Battle.net support does not currently include support for classic games
 
 ### Other platforms and regular Windows shortcuts
 
-Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\@Resources\Shortcuts`. Shortcuts can be placed in a subfolder with the aforementioned folder. The name of the subfolder will then be used as an override for the name of the platform, which can be used e.g. for filtering purposes.
+Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\@Resources\Shortcuts`. Shortcuts can be placed in a subfolder in `\@Resources\Shortcuts`. The name of the subfolder will then be used as an override for the name of the platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
 
 ## Context menu actions
 
