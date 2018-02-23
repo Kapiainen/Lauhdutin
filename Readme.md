@@ -124,7 +124,7 @@ Some details can also be modified:
 - Set the game to ignore global and platform-specific bangs.
 - Assign starting and/or stopping bangs.
 
-# Banners
+## Banners
 
 Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
 
@@ -225,7 +225,7 @@ A delay can also be added to triggering the animation that reveals the skin. Thi
 
 Skin animations can be disabled completely.
 
-# Localization
+## Localization
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-localization.jpg)
 
