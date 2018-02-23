@@ -1,5 +1,6 @@
 Releases
 dist/@Resources/cache
+dist/@Resources/Languages
 dist/@Resources/Shortcuts
 dist/@Resources/sqlite3.exe
 dist/@Resources/*.json
