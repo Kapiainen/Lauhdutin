@@ -167,7 +167,7 @@ do
           title = LOCALIZATION:get('setting_slots_width_title', 'Slot width'),
           tooltip = LOCALIZATION:get('setting_slots_width_description', 'The width of each slot in pixels.'),
           defaultValue = COMPONENTS.SETTINGS:getLayoutWidth(),
-          minValue = 160,
+          minValue = 144,
           maxValue = 1280,
           onValueChanged = function(self, value)
             return COMPONENTS.SETTINGS:setLayoutWidth(value)
@@ -177,7 +177,7 @@ do
           title = LOCALIZATION:get('setting_slots_height_title', 'Slot height'),
           tooltip = LOCALIZATION:get('setting_slots_height_description', 'The height of each slot in pixels.'),
           defaultValue = COMPONENTS.SETTINGS:getLayoutHeight(),
-          minValue = 75,
+          minValue = 48,
           maxValue = 600,
           onValueChanged = function(self, value)
             return COMPONENTS.SETTINGS:setLayoutHeight(value)
