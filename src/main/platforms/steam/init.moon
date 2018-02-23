@@ -194,12 +194,17 @@ class Steam extends Platform
 
 	getBanner: (appID) =>
 		banner = @getBannerPath(appID)
-		bannerURL = nil
-		unless banner
-			banner = io.joinPaths(@cachePath, appID .. '.jpg')
-			bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
-		log(bannerURL) if bannerURL
-		return banner, bannerURL
+		return banner, nil if banner -- Found an existing copy in the skin's cache
+		for extension in *@bannerExtensions
+			gridBannerPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\grid\\', appID .. extension)
+			cacheBannerPath = io.joinPaths(@cachePath, appID .. extension)
+			if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath)
+				io.copyFile(gridBannerPath, cacheBannerPath, false)
+				banner = @getBannerPath(appID)
+				return banner, nil if banner -- Found a custom banner that was assigned via Steam's grid view
+		banner = io.joinPaths(@cachePath, appID .. '.jpg')
+		bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
+		return banner, bannerURL -- Download the game's banner
 
 	getPath: (appID) => return ('steam://rungameid/%s')\format(appID)
 

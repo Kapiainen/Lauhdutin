@@ -223,14 +223,24 @@ do
     end,
     getBanner = function(self, appID)
       local banner = self:getBannerPath(appID)
-      local bannerURL = nil
-      if not (banner) then
-        banner = io.joinPaths(self.cachePath, appID .. '.jpg')
-        bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
+      if banner then
+        return banner, nil
       end
-      if bannerURL then
-        log(bannerURL)
+      local _list_0 = self.bannerExtensions
+      for _index_0 = 1, #_list_0 do
+        local extension = _list_0[_index_0]
+        local gridBannerPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\grid\\', appID .. extension)
+        local cacheBannerPath = io.joinPaths(self.cachePath, appID .. extension)
+        if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath) then
+          io.copyFile(gridBannerPath, cacheBannerPath, false)
+          banner = self:getBannerPath(appID)
+          if banner then
+            return banner, nil
+          end
+        end
       end
+      banner = io.joinPaths(self.cachePath, appID .. '.jpg')
+      local bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
       return banner, bannerURL
     end,
     getPath = function(self, appID)
