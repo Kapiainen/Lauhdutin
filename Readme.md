@@ -143,18 +143,18 @@ If the skin fails to download a banner for a game from a platform that supports 
 The button on the left-hand side of the toolbar is for searching for games based on the title. Searching uses fuzzy matching, which means that you do not need to input the exact same title as the game you are looking for. Titles are instead compared to the input and given a score. Using just the initials of a game's title should be enough to place it at the top of the list of results in many cases (e.g. `wtno` for `Wolfenstein: The New Order`).
 
 - Left-clicking the button searches all games.
-- Middle-clicking the button searches the current set of games, which might be the result of applying various filters.
+- Middle-clicking the button searches the current list of games, which might be the result of applying various filters.
 - Right-clicking the button clears all filters and resets the list of games.
 
 ## Sorting
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-sort-window.jpg)
 
-The button in the middle of the toolbar shows and controls the sorting mode.
+The button in the middle of the toolbar controls the sorting mode.
 
 - Left-clicking this button brings up a window where you can select the sorting mode.
 - Middle-clicking the button cycles through the different sorting modes.
-- Right-clicking the button will reverse the order of the current list of sorted games.
+- Right-clicking the button will reverse the order of the current list of games.
 
 ## Filtering
 
@@ -163,7 +163,7 @@ The button in the middle of the toolbar shows and controls the sorting mode.
 The list of games can be narrowed down by applying a filter. Filters can be applied by clicking on the filter button, which is on the right-hand side of the toolbar.
 
 - Left-clicking the button will apply the filter to all games.
-- Middle-clicking the button will apply the filter to the current set of games and can be used to further narrow down the set of games by applying multiple filters.
+- Middle-clicking the button will apply the filter to the current list of games and can be used to further narrow down the list of games by applying multiple filters.
 - Right-clicking the button is a shortcut for clearing all filters.
 
 A new window with a list of filters will show up and you can choose the filter to apply.
