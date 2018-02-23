@@ -7,8 +7,12 @@
 	],
 	"build_systems": [
 		{
-			"name": "Compile files",
-			"shell_cmd": "$project_path\\compile_src.bat",
+			"name": "Compile all files",
+			"shell_cmd": "$project_path\\compile_src.bat"
+		},
+		{
+			"name": "Compile modified or missing files",
+			"cmd": ["python", "$project_path\\partial_compile.py", "$project_path"]
 		}
 	]
 }
