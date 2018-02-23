@@ -249,7 +249,9 @@ do
       assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
       self.platformID = args.platformID
       self.platformOverride = args.platformOverride
-      self.banner = args.banner
+      if args.banner ~= nil and io.fileExists(args.banner) then
+        self.banner = args.banner
+      end
       self.bannerURL = args.bannerURL
       self.process = args.process or self:_parseProcess(self.path)
       self.processOverride = args.processOverride

@@ -9,7 +9,8 @@ class Game
 		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
 		@platformID = args.platformID
 		@platformOverride = args.platformOverride
-		@banner = args.banner
+		if args.banner ~= nil and io.fileExists(args.banner)
+			@banner = args.banner
 		@bannerURL = args.bannerURL
 		@process = args.process or @_parseProcess(@path)
 		@processOverride = args.processOverride
