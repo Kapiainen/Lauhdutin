@@ -216,7 +216,7 @@ createProperties = function()
     local platformID = platform:getPlatformID()
     for _index_1 = 1, #games do
       local game = games[_index_1]
-      if game:getPlatformID() == platformID then
+      if game:getPlatformID() == platformID and game:getPlatformOverride() == nil then
         numGames = numGames + 1
       end
     end
@@ -294,15 +294,16 @@ createProperties = function()
     if #skinTags > 0 or #platformTags > 0 then
       gamesWithTags = gamesWithTags + 1
     end
+    local combinedTags = { }
     for _index_1 = 1, #skinTags do
       local tag = skinTags[_index_1]
-      if tags[tag] == nil then
-        tags[tag] = 0
-      end
-      tags[tag] = tags[tag] + 1
+      combinedTags[tag] = true
     end
     for _index_1 = 1, #platformTags do
       local tag = platformTags[_index_1]
+      combinedTags[tag] = true
+    end
+    for tag, _ in pairs(combinedTags) do
       if tags[tag] == nil then
         tags[tag] = 0
       end

@@ -124,7 +124,7 @@ createProperties = () ->
 		numGames = 0
 		platformID = platform\getPlatformID()
 		for game in *games
-			if game\getPlatformID() == platformID
+			if game\getPlatformID() == platformID and game\getPlatformOverride() == nil
 				numGames += 1
 		numGames = numGamesPattern\format(numGames)
 		table.insert(platformProperties, Property({
@@ -177,11 +177,12 @@ createProperties = () ->
 		skinTags = game\getTags()
 		platformTags = game\getPlatformTags()
 		gamesWithTags += 1 if #skinTags > 0 or #platformTags > 0
+		combinedTags = {}
 		for tag in *skinTags
-			if tags[tag] == nil
-				tags[tag] = 0
-			tags[tag] += 1
+			combinedTags[tag] = true
 		for tag in *platformTags
+			combinedTags[tag] = true
+		for tag, _ in pairs(combinedTags)
 			if tags[tag] == nil
 				tags[tag] = 0
 			tags[tag] += 1
