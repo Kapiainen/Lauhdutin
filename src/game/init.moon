@@ -112,6 +112,7 @@ export Initialize = () ->
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
+			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')()\getBannerExtensions(), '|')\gsub('%.', '')
 			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
 			SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
 			SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -136,23 +137,22 @@ updateBanner = (game) ->
 		SKIN\Bang('[!SetOption "Banner" "ImageName" "#@#game\\gfx\\blank.png"]')
 		SKIN\Bang(('[!SetOption "BannerMissing" "Text" "%s"]')\format(LOCALIZATION\get('game_no_banner', 'No banner')))
 		expectedBanner = game\getExpectedBanner()
-		extensions = table.concat(require('main.platforms.platform')()\getBannerExtensions(), '|')\gsub('%.', '')
 		tooltip = switch game\getPlatformID()
 			when ENUMS.PLATFORM_IDS.SHORTCUTS
 				platformOverride = game\getPlatformOverride()
 				if platformOverride ~= nil
-					('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, extensions)
+					('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 				else
-					('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, extensions)
+					('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 			when ENUMS.PLATFORM_IDS.STEAM
 				if game\getPlatformOverride()
-					('\\@Resources\\cache\\steam_shortcuts\\%s.%s')\format(expectedBanner, extensions)
+					('\\@Resources\\cache\\steam_shortcuts\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 				else
-					('\\@Resources\\cache\\steam\\%s.%s')\format(expectedBanner, extensions)
+					('\\@Resources\\cache\\steam\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 			when ENUMS.PLATFORM_IDS.BATTLENET
-				('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, extensions)
+				('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 			when ENUMS.PLATFORM_IDS.GOG_GALAXY
-				('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, extensions)
+				('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
 		SKIN\Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]')\format(tooltip))
 		SKIN\Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
 
