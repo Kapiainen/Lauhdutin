@@ -93,11 +93,13 @@ def main(root_path, releases_path, version):
 		compression_type = zipfile.ZIP_STORED
 	readme_path = os.path.join(current_working_directory, "Readme.md")
 	license_path = os.path.join(current_working_directory, "License.md")
+	changelog_path = os.path.join(current_working_directory, "Changelog.md")
 	contributors_path = os.path.join(current_working_directory, "Contributors.md")
 	english_translation_path = os.path.join(current_working_directory, "translations", "English.txt")
 	with zipfile.ZipFile(os.path.join(releases_path, "%s - %s" % (release_name, version)) + ".zip", mode="w", compression=compression_type) as release_archive:
 		release_archive.write(readme_path, "Readme.md")
 		release_archive.write(license_path, "License.md")
+		release_archive.write(changelog_path, "Changelog.md")
 		release_archive.write(contributors_path, "Contributors.md")
 		release_archive.write(english_translation_path, os.path.join("@Resources", "Languages", "English.txt"))
 		for file in files_to_pack:
