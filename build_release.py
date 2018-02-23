@@ -32,7 +32,7 @@ def parse_gitignore(root_path):
 			elif os.path.isfile(path):
 				print("      File:", line)
 				files_to_ignore.append(path)
-			elif path.find("*."):
+			elif path.find("*.") >= 0:
 				print("      File pattern:", line)
 				file_patterns_to_ignore.append(path)
 			else:
@@ -94,29 +94,36 @@ def main(root_path, releases_path, version):
 	readme_path = os.path.join(current_working_directory, "Readme.md")
 	license_path = os.path.join(current_working_directory, "License.md")
 	contributors_path = os.path.join(current_working_directory, "Contributors.md")
+	english_translation_path = os.path.join(current_working_directory, "translations", "English.txt")
 	with zipfile.ZipFile(os.path.join(releases_path, "%s - %s" % (release_name, version)) + ".zip", mode="w", compression=compression_type) as release_archive:
 		release_archive.write(readme_path, "Readme.md")
 		release_archive.write(license_path, "License.md")
 		release_archive.write(contributors_path, "Contributors.md")
+		release_archive.write(english_translation_path, os.path.join("@Resources", "Languages", "English.txt"))
 		for file in files_to_pack:
 			release_archive.write(file, os.path.relpath(file, root_path))
 	print("\nSuccessfully generated the release!")
 
-root_path = os.path.join(current_working_directory, "dist")
-releases_path = os.path.join(current_working_directory, "Releases")
-if not os.path.isdir(releases_path):
-	os.makedirs(releases_path)
-# Compile source files
-compiler = subprocess.Popen([os.path.join(current_working_directory, "compile_src.bat")], cwd=current_working_directory)
-compiler.wait()
-if compiler.returncode == 0:
-	# Update translation file
-	translation_updater = subprocess.Popen(["python", os.path.join(current_working_directory, "update_translations.py")], cwd=current_working_directory)
-	translation_updater.wait()
-	if translation_updater.returncode == 0:
-		main(root_path, releases_path, input("Enter release version: "))
+try:
+	root_path = os.path.join(current_working_directory, "dist")
+	releases_path = os.path.join(current_working_directory, "Releases")
+	if not os.path.isdir(releases_path):
+		os.makedirs(releases_path)
+	# Compile source files
+	compiler = subprocess.Popen([os.path.join(current_working_directory, "compile_src.bat")], cwd=current_working_directory)
+	compiler.wait()
+	if compiler.returncode == 0:
+		# Update translation file
+		translation_updater = subprocess.Popen(["python", os.path.join(current_working_directory, "update_translations.py")], cwd=current_working_directory)
+		translation_updater.wait()
+		if translation_updater.returncode == 0:
+			main(root_path, releases_path, input("Enter release version: "))
+		else:
+			print("Failed to update the translation file!")
 	else:
-		print("Failed to update the translation file!")
-else:
-	print("Failed to compile source files")
-input("\nPress a key to exit...")
+		print("Failed to compile source files!")
+except:
+	import traceback
+	traceback.print_exc()
+
+input("\nPress enter to exit...")
