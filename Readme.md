@@ -10,13 +10,11 @@ A Rainmeter skin for aggregating games from different platforms and launching th
  - [Updating](#updating)
  - [Features](#features)
    - [Supported platforms](#supported-platforms)
-   - [Games](#games)
+   - [Context menu actions](#context-menu-actions)
    - [Banners](#banners)
-   - [Searching](#searching)
-   - [Sorting](#sorting)
-   - [Filtering](#filtering)
+   - [Games](#games)
+   - [Toolbar](#toolbar)
    - [Bangs](#bangs)
-   - [Context actions](#context-actions)
    - [Animations](#animations)
    - [Localization](#localization)
  - [Reporting issues](#reporting-issues)
@@ -106,7 +104,17 @@ Stop monitoring the game and execute bangs, if they are enabled and any bangs ar
 
 These context actions change what left-clicking on a game does. This can be used to hide/unhide/remove multiple games quickly without having to go through the Game window (see [Games](#games)) for each individual game.
 
+## Banners
+
+Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
+
+Custom banners for other platforms can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\cache\<platform name here>`. If there is no existing banner to replace, then the name to use for the banner will depend on the platform. The expected name and supported file formats can be found by inspecting the game in question via the Game window (see [Games](#games)) and hovering the mouse over the section where the banner is usually shown. Clicking on the banner section opens either the banner or the folder where the banner should be.
+
+If the skin fails to download a banner for a game from a platform that supports automatic downloading of banners, then a file with the extension `.failedToDownload` can be found where the banner should be. Removing this file will cause the skin to make another attempt to download the banner the next time that the skin is refreshed.
+
 ## Games
+
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-main-window.jpg)
 
 Games are presented in slots, which can be interacted with. Slots can have an overlay, which is shown when the mouse is hovered over the slot, to show context-sensitive information (e.g. if the game's platform is running, the action that will be taken when left-clicked).
 
@@ -126,15 +134,16 @@ Some details can also be modified:
 - Set the game to ignore global and platform-specific bangs.
 - Assign starting and/or stopping bangs.
 
-## Banners
+## Toolbar
 
-Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
+![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-toolbar.jpg)
 
-Custom banners for other platforms can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\cache\<platform name here>`. If there is no existing banner to replace, then the name to use for the banner will depend on the platform. The expected name and supported file formats can be found by inspecting the game in question via the Game window (see [Games](#games)) and hovering the mouse over the section where the banner is usually shown. Clicking on the banner section opens either the banner or the folder where the banner should be.
+The toolbar, which can be made visible by hovering the mouse over the top or bottom edge (configurable), has three buttons (left-to-right):
+- [Search](#search)
+- [Sort](#sort)
+- [Filter](#filter)
 
-If the skin fails to download a banner for a game from a platform that supports automatic downloading of banners, then a file with the extension `.failedToDownload` can be found instead where the banner should be. Removing this file will cause the skin to make another attempt to download the banner the next time that the skin is refreshed.
-
-## Searching
+### Search
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-search-window.jpg)
 
@@ -142,19 +151,19 @@ The button on the left-hand side of the toolbar is for searching for games based
 
 - Left-clicking the button searches all games.
 - Middle-clicking the button searches the current list of games, which might be the result of applying various filters.
-- Right-clicking the button clears all filters and resets the list of games.
+- Right-clicking the button clears all filters and resets the list of games and can be used to instantly go to the beginning of the list of games.
 
-## Sorting
+### Sort
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-sort-window.jpg)
 
 The button in the middle of the toolbar controls the sorting mode.
 
 - Left-clicking this button brings up a window where you can select the sorting mode.
-- Middle-clicking the button cycles through the different sorting modes.
-- Right-clicking the button will reverse the order of the current list of games.
+- Middle-clicking the button is a shortcut for cycling through the different sorting modes.
+- Right-clicking the button reverses the order of the current list of games.
 
-## Filtering
+### Filter
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-filter-window.jpg)
 
