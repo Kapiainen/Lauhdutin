@@ -33,18 +33,18 @@ A Rainmeter skin for aggregating games from different platforms and launching th
 - Install Rainmeter, if you do not already have it.
 - Download a [release](https://github.com/Kapiainen/Lauhdutin/releases).
 - Extract the contents of the release archive to `\Rainmeter\Skins\Lauhdutin`.
-- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking (hover over the title of a setting for more information about the setting), click the **Save** button, and finally click the **Close** button.
+- Load **Settings.ini**, adjust the various settings (e.g. path to Steam) to your liking, click the **Save** button, and finally click the **Close** button.
 - Load **Main.ini**, which should now detect games based on your settings.
-- Windows shortcuts (.lnk and .url files) can be added to the `\Lauhdutin\@Resources\Shortcuts` folder. This folder can also be opened via a context option in the main config or via the settings page for Windows shortcuts.
 
 # Updating
+
 ## 2.x.x to 3.x.x
 
 If you are using the previous major version (2.x.x) of Lauhdutin, then you may be able to migrate your settings and/or games to the new major version (3.x.x). Settings and games from version 2.7.1 should be possible to migrate with a minimal amount of issues though some may arise from e.g. changes in the folder structure.
 
 Copy `games.json` and `settings.json` from the `@Resources` folder of the old version of Lauhdutin and paste them in the `@Resources` folder of the new version of Lauhdutin. Load **Main.ini**.
 
-## 3.x.x
+## 3.x.x to 3.y.y
 
 The various files that store e.g. settings or games now include a version number that is used to implement the migration of files between versions, which should allow for major changes in the structures of such files without loss of data.
 
@@ -57,7 +57,7 @@ The various files that store e.g. settings or games now include a version number
 Support includes:
 - Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
-- Launch games that were found by the previous points.
+- Launch games via the Steam client.
 - Install Steam games that are not currently installed.
 - Automatically copy custom grid images assigned in Steam as banners.
 - Automatically download banners for Steam games that were found.
@@ -80,9 +80,11 @@ Support includes:
 
 Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
 
-### Other platforms and regular Windows shortcuts
+### Windows shortcuts and other platforms
 
-Additional platforms may receive similar support in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing a shortcut in `\@Resources\Shortcuts`. Shortcuts can be placed in a subfolder in `\@Resources\Shortcuts`. The name of the subfolder will then be used as an override for the name of the platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
+Windows shortcuts (.lnk and .url files) can be added to the `\@Resources\Shortcuts` folder. This folder can also be opened via a context option in the main config or via the settings page for Windows shortcuts.
+
+Additional platforms might be supported in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing shortcuts for them in `\@Resources\Shortcuts`. If the shortcuts are placed in a subfolder, then the name of the subfolder will then be used as an override for the name of the games' platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
 
 ## Context menu actions
 
@@ -191,7 +193,7 @@ Currently supported events that can be used to trigger the execution of bangs:
 
 The stopping bang can also be executed manually via the context menu, if the skin fails to automatically execute it when a game stops running or if a game fails to start at all.
 
-Games can be excempted from executing global and platform-specific bangs via the game window (see [Games](#games)).
+Games can be exempted from executing global and platform-specific bangs via the game window (see [Games](#games)).
 
 ## Animations
 
@@ -227,25 +229,23 @@ Skin animations can be disabled completely.
 
 ![example](https://github.com/Kapiainen/Lauhdutin/wiki/images/image-localization.jpg)
 
-This skin supports localization, though it is somewhat limited. The default language is English, but additional languages can be added by copying `English.txt`, which can be found in `@Resources\Languages`, and translating the strings. The name of the file is the name of the language in the settings window. The first line of the file should be the version of the localization system:
+Example of a Finnish translation implemented with the included localization system.
+
+This skin supports localization, though it is somewhat limited. The default language is English, but additional languages can be added by copying `English.txt`, which can be found in `@Resources\Languages`, and translating the strings. The name of the file is also the name of the language in the settings window. The first line of the file should be the version of the localization system:
 
 ```
 version N
 ```
 
-Subsequent lines are the keys and values separated by a tab character:
-
-```
-key value
-```
+Subsequent lines consist of a key-value pair that is separated by a tab character.
 
 The localization system makes use of Lua's string formatting capabilities to insert values from variables (e.g. game title, hours played).
 
 Newlines must be escaped, i.e. `\n`, if a translation is supposed to span multiple lines.
 
-Some characters might not be supported and will simply be omitted by the skin. The currently supported character sets should be enough for many languages, which use the Latin alphabet. If you encounter issues with some characters, then please create an issue on the GitHub repo. Additional character sets can hopefully be supported in the future, but Unicode support seems to be limited due to the Lua 5.1 runtime environment.
+Some characters might not be supported and will simply be omitted by the skin. The currently supported character sets should be enough for many languages that use the Latin alphabet. If you encounter issues with some characters, then please create an issue on the GitHub repo. Additional character sets can hopefully be supported in the future, but Unicode support seems to be limited due to the Lua 5.1 runtime environment.
 
-Only the English translation file is included in each release archive. Additional translation files can be submitted afterwards. Updated translation files, or up-to-date translation files from a previous release, will be added to the release as optional downloads.
+Only the English translation file is included in each release archive. Additional translation files can be submitted afterwards. Updated translation files, or up-to-date translation files from a previous release, for additional languages will be added to the release as optional downloads.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
