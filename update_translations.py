@@ -22,6 +22,6 @@ for key, value in translations.items():
 	lines.append(key + "\t" + value)
 lines.sort()
 lines.insert(0, version)
-with open(os.path.join(cwd, "dist", "@Resources", "Languages", "English.txt"), "w", encoding="utf8") as f:
+with open(os.path.join(cwd, "translations", "English.txt"), "w", encoding="utf8") as f:
 	f.write("\n".join(lines) + "\n")
 print("Successfully updated the translation file!")
