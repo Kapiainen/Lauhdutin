@@ -794,6 +794,7 @@ export OnBannerDownloadFinished = () ->
 			bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game\getBanner())
 			os.rename(downloadedPath, bannerPath)
 			game\setBannerURL(nil)
+			game\setExpectedBanner(nil)
 			startDownloadingBanner()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

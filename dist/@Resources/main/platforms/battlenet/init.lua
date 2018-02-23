@@ -110,6 +110,9 @@ do
           end
           args.platformID = self.platformID
           args.banner = self:getBannerPath(args.title)
+          if not (args.banner) then
+            args.expectedBanner = args.title
+          end
           table.insert(games, args)
           _continue_0 = true
         until true

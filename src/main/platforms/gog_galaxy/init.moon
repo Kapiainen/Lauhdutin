@@ -86,9 +86,11 @@ class GOGGalaxy extends Platform
 			exePath = (info.playTasks[1].path\gsub('//', '\\'))
 			banner = @getBannerPath(productID)
 			bannerURL = nil
+			expectedBanner = nil
 			unless banner
 				bannerURL = bannerURLs[productID]
 				banner = io.joinPaths(@cachePath, productID .. bannerURL\reverse()\match('^([^%.]+%.)')\reverse())
+				expectedBanner = productID
 			path = nil
 			if @indirectLaunch
 				path = ('"%s" "/command=runGame" "/gameId=%s"')\format(@clientPath, productID)
@@ -97,6 +99,7 @@ class GOGGalaxy extends Platform
 			table.insert(games, {
 				:banner
 				:bannerURL
+				:expectedBanner
 				title: titles[productID]
 				:path
 				platformID: @platformID

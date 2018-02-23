@@ -129,12 +129,32 @@ updateBanner = (game) ->
 	path = game\getBanner()
 	if path
 		path = io.joinPaths(STATE.PATHS.RESOURCES, path)
-		SKIN\Bang('[!SetOption "BannerMissing" "Text" ""]')
 		SKIN\Bang(('[!SetOption "Banner" "ImageName" "%s"]')\format(path))
-
+		SKIN\Bang('[!SetOption "BannerMissing" "Text" ""]')
+		SKIN\Bang('[!SetOption "BannerMissing" "ToolTipHidden" "1"]')
 	else
 		SKIN\Bang('[!SetOption "Banner" "ImageName" "#@#game\\gfx\\blank.png"]')
 		SKIN\Bang(('[!SetOption "BannerMissing" "Text" "%s"]')\format(LOCALIZATION\get('game_no_banner', 'No banner')))
+		expectedBanner = game\getExpectedBanner()
+		extensions = table.concat(require('main.platforms.platform')()\getBannerExtensions(), '|')\gsub('%.', '')
+		tooltip = switch game\getPlatformID()
+			when ENUMS.PLATFORM_IDS.SHORTCUTS
+				platformOverride = game\getPlatformOverride()
+				if platformOverride ~= nil
+					('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, extensions)
+				else
+					('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, extensions)
+			when ENUMS.PLATFORM_IDS.STEAM
+				if game\getPlatformOverride()
+					('\\@Resources\\cache\\steam_shortcuts\\%s.%s')\format(expectedBanner, extensions)
+				else
+					('\\@Resources\\cache\\steam\\%s.%s')\format(expectedBanner, extensions)
+			when ENUMS.PLATFORM_IDS.BATTLENET
+				('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, extensions)
+			when ENUMS.PLATFORM_IDS.GOG_GALAXY
+				('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, extensions)
+		SKIN\Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]')\format(tooltip))
+		SKIN\Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
 
 updateScrollbar = () ->
 	STATE.MAX_SCROLL_INDEX = #STATE.PROPERTIES - STATE.NUM_SLOTS + 1
@@ -518,6 +538,25 @@ export OpenBanner = () ->
 			path = SKIN\GetMeter('Banner')\GetOption('ImageName')
 			if path ~= nil and path ~= '' and path\match('@Resources\\game\\gfx\\') == nil
 				SKIN\Bang(('"%s"')\format(path))
+			else
+				game = STATE.GAME
+				path = switch game\getPlatformID()
+					when ENUMS.PLATFORM_IDS.SHORTCUTS
+						platformOverride = game\getPlatformOverride()
+						if platformOverride ~= nil
+							('Shortcuts\\%s\\')\format(platformOverride)
+						else
+							'Shortcuts\\'
+					when ENUMS.PLATFORM_IDS.STEAM
+						if game\getPlatformOverride()
+							'cache\\steam_shortcuts\\'
+						else
+							'cache\\steam\\'
+					when ENUMS.PLATFORM_IDS.BATTLENET
+						'cache\\battlenet\\'
+					when ENUMS.PLATFORM_IDS.GOG_GALAXY
+						'cache\\gog_galaxy\\'
+				SKIN\Bang(('"#@#%s"')\format(path))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

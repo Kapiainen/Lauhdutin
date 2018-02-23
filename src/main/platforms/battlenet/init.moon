@@ -85,6 +85,8 @@ class Battlenet extends Platform
 					continue
 			args.platformID = @platformID
 			args.banner = @getBannerPath(args.title)
+			unless args.banner
+				args.expectedBanner = args.title
 			table.insert(games, args)
 		for args in *games
 			table.insert(@games, Game(args))

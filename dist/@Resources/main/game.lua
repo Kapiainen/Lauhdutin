@@ -72,6 +72,12 @@ do
         end
       end
     end,
+    getExpectedBanner = function(self)
+      return self.expectedBanner
+    end,
+    setExpectedBanner = function(self, str)
+      self.expectedBanner = str
+    end,
     getBannerURL = function(self)
       return self.bannerURL
     end,
@@ -252,6 +258,7 @@ do
       if args.banner ~= nil and io.fileExists(args.banner) then
         self.banner = args.banner
       end
+      self.expectedBanner = args.expectedBanner
       self.bannerURL = args.bannerURL
       self.process = args.process or self:_parseProcess(self.path)
       self.processOverride = args.processOverride

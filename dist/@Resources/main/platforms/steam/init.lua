@@ -282,6 +282,7 @@ do
         local appID = self:generateAppID(title, ('"%s"'):format(game:match('"(.-)"')))
         local path = ('steam://rungameid/%s'):format(appID)
         local banner = self:getBannerPath(appID, shortcutsBannerPath)
+        local expectedBanner = nil
         if not (banner) then
           local _list_0 = self.bannerExtensions
           for _index_0 = 1, #_list_0 do
@@ -294,6 +295,9 @@ do
             end
           end
           banner = self:getBannerPath(appID)
+        end
+        if not (banner) then
+          expectedBanner = appID
         end
         local process
         if game:match('AllowOverlay') then
@@ -316,6 +320,7 @@ do
           path = path,
           process = process,
           banner = banner,
+          expectedBanner = expectedBanner,
           platformOverride = self.name,
           platformTags = tags,
           platformID = self.platformID
@@ -355,6 +360,12 @@ do
           local lines = file:splitIntoLines()
           local vdf = utility.parseVDF(lines)
           local banner, bannerURL = self:getBanner(appID)
+          local expectedBanner
+          if banner ~= nil then
+            expectedBanner = nil
+          else
+            expectedBanner = appID
+          end
           local hoursPlayed = nil
           if self.communityProfileGames ~= nil and self.communityProfileGames[appID] ~= nil then
             hoursPlayed = self.communityProfileGames[appID].hoursPlayed
@@ -366,6 +377,7 @@ do
             platformID = self.platformID,
             banner = banner,
             bannerURL = bannerURL,
+            expectedBanner = expectedBanner,
             hoursPlayed = hoursPlayed,
             lastPlayed = self:getLastPlayed(appID),
             platformTags = self:getTags(appID),
@@ -386,12 +398,19 @@ do
               break
             end
             local banner, bannerURL = self:getBanner(appID)
+            local expectedBanner
+            if banner ~= nil then
+              expectedBanner = nil
+            else
+              expectedBanner = appID
+            end
             games[appID] = {
               title = game.title,
               path = ('steam://rungameid/%s'):format(appID),
               platformID = self.platformID,
               banner = banner,
               bannerURL = bannerURL,
+              expectedBanner = expectedBanner,
               hoursPlayed = game.hoursPlayed,
               lastPlayed = self:getLastPlayed(appID),
               platformTags = self:getTags(appID),

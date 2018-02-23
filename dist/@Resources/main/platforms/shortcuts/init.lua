@@ -46,10 +46,14 @@ do
           platformOverride = nil
         end
         local banner = nil
+        local expectedBanner = nil
         if platformOverride ~= nil then
           banner = self:getBannerPath(title, ('Shortcuts\\%s'):format(platformOverride))
         else
           banner = self:getBannerPath(title, 'Shortcuts')
+        end
+        if not (banner) then
+          expectedBanner = title
         end
         local path = ('"%s"'):format(table.remove(lines, 1):match('^	Target=(.-)$'))
         local arguments = table.remove(lines, 1)
@@ -65,6 +69,7 @@ do
         table.insert(games, {
           title = title,
           banner = banner,
+          expectedBanner = expectedBanner,
           path = path,
           platformOverride = platformOverride,
           platformID = self.platformID

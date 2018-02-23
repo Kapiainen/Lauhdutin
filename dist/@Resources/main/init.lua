@@ -1057,6 +1057,7 @@ OnBannerDownloadFinished = function()
     local bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game:getBanner())
     os.rename(downloadedPath, bannerPath)
     game:setBannerURL(nil)
+    game:setExpectedBanner(nil)
     return startDownloadingBanner()
   end)
   if not (success) then

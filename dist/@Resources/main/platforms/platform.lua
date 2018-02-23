@@ -36,6 +36,9 @@ do
         end
       end
       return nil
+    end,
+    getBannerExtensions = function(self)
+      return self.bannerExtensions
     end
   }
   _base_0.__index = _base_0

@@ -68,9 +68,11 @@ do
         local exePath = (info.playTasks[1].path:gsub('//', '\\'))
         local banner = self:getBannerPath(productID)
         local bannerURL = nil
+        local expectedBanner = nil
         if not (banner) then
           bannerURL = bannerURLs[productID]
           banner = io.joinPaths(self.cachePath, productID .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
+          expectedBanner = productID
         end
         local path = nil
         if self.indirectLaunch then
@@ -81,6 +83,7 @@ do
         table.insert(games, {
           banner = banner,
           bannerURL = bannerURL,
+          expectedBanner = expectedBanner,
           title = titles[productID],
           path = path,
           platformID = self.platformID,

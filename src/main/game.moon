@@ -11,6 +11,7 @@ class Game
 		@platformOverride = args.platformOverride
 		if args.banner ~= nil and io.fileExists(args.banner)
 			@banner = args.banner
+		@expectedBanner = args.expectedBanner
 		@bannerURL = args.bannerURL
 		@process = args.process or @_parseProcess(@path)
 		@processOverride = args.processOverride
@@ -75,6 +76,10 @@ class Game
 		else
 			path = path\trim()
 			@banner = if path == '' the nil else path
+
+	getExpectedBanner: () => return @expectedBanner
+
+	setExpectedBanner: (str) => @expectedBanner = str
 
 	getBannerURL: () => return @bannerURL
 

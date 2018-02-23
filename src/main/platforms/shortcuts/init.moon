@@ -42,10 +42,13 @@ class Shortcuts extends Platform
 				when 2 then parts[1]
 				else nil
 			banner = nil
+			expectedBanner = nil
 			if platformOverride ~= nil
 				banner = @getBannerPath(title, ('Shortcuts\\%s')\format(platformOverride))
 			else
 				banner = @getBannerPath(title, 'Shortcuts')
+			unless banner
+				expectedBanner = title
 			path = ('"%s"')\format(table.remove(lines, 1)\match('^	Target=(.-)$'))
 			arguments = table.remove(lines, 1)
 			arguments = arguments\match('^	Arguments=(.-)$') if arguments
@@ -56,6 +59,7 @@ class Shortcuts extends Platform
 			table.insert(games, {
 				:title
 				:banner
+				:expectedBanner
 				:path
 				:platformOverride
 				platformID: @platformID

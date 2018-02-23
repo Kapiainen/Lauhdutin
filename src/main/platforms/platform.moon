@@ -28,4 +28,6 @@ class Platform
 			return path if io.fileExists(path)
 		return nil
 
+	getBannerExtensions: () => return @bannerExtensions
+
 return Platform

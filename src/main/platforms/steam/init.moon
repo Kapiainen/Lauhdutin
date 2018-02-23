@@ -224,6 +224,7 @@ class Steam extends Platform
 			appID = @generateAppID(title, ('"%s"')\format(game\match('"(.-)"')))
 			path = ('steam://rungameid/%s')\format(appID)
 			banner = @getBannerPath(appID, shortcutsBannerPath)
+			expectedBanner = nil
 			unless banner
 				for extension in *@bannerExtensions
 					gridBannerPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\grid\\', appID .. extension)
@@ -232,6 +233,8 @@ class Steam extends Platform
 						io.copyFile(gridBannerPath, cacheBannerPath, false)
 						break
 				banner = @getBannerPath(appID)
+			unless banner
+				expectedBanner = appID
 			process = if game\match('AllowOverlay') then 'GameOverlayUI.exe' else nil
 			tags = {}
 			tagsString = game\match('tags|(.+)')
@@ -244,6 +247,7 @@ class Steam extends Platform
 				:path
 				:process
 				:banner
+				:expectedBanner
 				platformOverride: @name
 				platformTags: tags
 				platformID: @platformID
@@ -269,6 +273,7 @@ class Steam extends Platform
 			lines = file\splitIntoLines()
 			vdf = utility.parseVDF(lines)
 			banner, bannerURL = @getBanner(appID)
+			expectedBanner = if banner ~= nil then nil else appID
 			hoursPlayed = nil
 			if @communityProfileGames ~= nil and @communityProfileGames[appID] ~= nil
 				hoursPlayed = @communityProfileGames[appID].hoursPlayed
@@ -279,6 +284,7 @@ class Steam extends Platform
 				platformID: @platformID
 				:banner
 				:bannerURL
+				:expectedBanner
 				:hoursPlayed
 				lastPlayed: @getLastPlayed(appID)
 				platformTags: @getTags(appID)
@@ -290,12 +296,14 @@ class Steam extends Platform
 			for appID, game in pairs(@communityProfileGames)
 				continue if games[appID] ~= nil
 				banner, bannerURL = @getBanner(appID)
+				expectedBanner = if banner ~= nil then nil else appID
 				games[appID] = {
 					title: game.title
 					path: ('steam://rungameid/%s')\format(appID)
 					platformID: @platformID
 					:banner
 					:bannerURL
+					:expectedBanner
 					hoursPlayed: game.hoursPlayed
 					lastPlayed: @getLastPlayed(appID)
 					platformTags: @getTags(appID)
