@@ -17,6 +17,7 @@ A Rainmeter skin for aggregating games from different platforms and launching th
    - [Bangs](#bangs)
    - [Animations](#animations)
    - [Localization](#localization)
+   - [Daily backups](#daily-backups)
  - [Reporting issues](#reporting-issues)
  - [Contributing](#contributing)
  - [Changelog](#changelog)
@@ -253,6 +254,10 @@ Newlines must be escaped, i.e. `\n`, if a translation is supposed to span multip
 Some characters might not be supported and will simply be omitted by the skin. The currently supported character sets should be enough for many languages that use the Latin alphabet. If you encounter issues with some characters, then please create an issue on the GitHub repo. Additional character sets can hopefully be supported in the future, but Unicode support seems to be limited due to the Lua 5.1 runtime environment.
 
 Only the English translation file is included in each release archive. Additional translation files can be submitted afterwards. Updated translation files, or up-to-date translation files from a previous release, for additional languages will be added to the release as optional downloads.
+
+## Daily backups
+
+The skin maintains a set of daily backups of `\@Resources\games.json`, which is where all of the information (e.g. last played, tags, notes) about the detected games are stored. The number of backups to keep can be adjusted, but once that number has been reached then the oldest backup is deleted in order to make room for a new backup. Deleting `\@Resources\games.json` while there is at least one backup will cause the skin to automatically fall back on the most recent backup. This feature will hopefully reduce issues arising from data corruption, misclicks, or letting someone else use your computer.
 
 # Reporting issues
 If you encounter an issue while trying to use Lauhdutin, then please read through the readme in case there is an explanation on how to deal with the issue.
