@@ -130,11 +130,7 @@ Some details can also be modified:
 
 Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
 
-Custom banners for other platforms can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\cache\<platform name here>`. If there is no existing banner to replace, then the name to use for the banner will depend on the platform:
-- **Steam**: Use the game's AppID, which can e.g. be found in the URL of the game's Steam store page. The AppID can also be found by inspecting the game's path in the Game window (see [Games](#games)).
-- **Steam (shortcuts for non-Steam games)**: Use the ID is generated based on the path to the game's executable and its name in your Steam library. The ID can also be found by inspecting the game's path in the Game window (see [Games](#games)).
-- **Blizzard Battle.net**: Use the name of the game's folder (e.g. `Hearthstone.jpg` if the game's folder is called `Hearthstone`).
-- **GOG Galaxy**: Use the game's ID, which can be found by inspecting the game's path in the Game window (see [Games](#games)) when launching GOG Galaxy games via the client.
+Custom banners for other platforms can be placed in `\Rainmeter\Skins\Lauhdutin\@Resources\cache\<platform name here>`. If there is no existing banner to replace, then the name to use for the banner will depend on the platform. The expected name and supported file formats can be found by inspecting the game in question via the Game window (see [Games](#games)) and hovering the mouse over the section where the banner is usually shown. Clicking on the banner section opens either the banner or the folder where the banner should be.
 
 If the skin fails to download a banner for a game from a platform that supports automatic downloading of banners, then a file with the extension `.failedToDownload` can be found instead where the banner should be. Removing this file will cause the skin to make another attempt to download the banner the next time that the skin is refreshed.
 
