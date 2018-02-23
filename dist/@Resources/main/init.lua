@@ -789,6 +789,9 @@ OnLeftClickSlot = function(index)
   end
   local success, err = pcall(function()
     local game = COMPONENTS.SLOTS:leftClick(index)
+    if not (game) then
+      return 
+    end
     local action
     local _exp_0 = STATE.LEFT_CLICK_ACTION
     if ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME == _exp_0 then

@@ -584,6 +584,7 @@ export OnLeftClickSlot = (index) ->
 	success, err = pcall(
 		() ->
 			game = COMPONENTS.SLOTS\leftClick(index)
+			return unless game
 			action = switch STATE.LEFT_CLICK_ACTION
 				when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME then launchGame
 				when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame
