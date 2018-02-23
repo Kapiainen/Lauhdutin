@@ -51,10 +51,10 @@ main_context_title_start_unhiding_games	Start unhiding games
 main_context_title_stop_hiding_games	Stop hiding games
 main_context_title_stop_removing_games	Stop removing games
 main_context_title_stop_unhiding_games	Stop unhiding games
+main_no_games	No games to show
 main_status_detecting_games	Detecting games
 main_status_detecting_platform_games	Detecting %s games
 main_status_n_banners_to_download	%d banners left to download
-main_status_no_games	No games to show
 overlay_already_hidden	Already hidden
 overlay_already_visible	Already visible
 overlay_hide	Hide

@@ -154,8 +154,7 @@ updateSlots = () ->
 				COMPONENTS.STATUS\hide()
 				COMPONENTS.SLOTS\update()
 			else
-				-- TODO: Figure out how to handle status messages when the skin is hidden by the skin animation.
-				--COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_no_games', 'No games to show'))
+				SKIN\Bang(('[!SetOption "Slot1Text" "Text" "%s"]')\format(LOCALIZATION\get('main_no_games', 'No games to show')))
 				COMPONENTS.SLOTS\update()
 				COMPONENTS.ANIMATIONS\resetSlots()
 	)
