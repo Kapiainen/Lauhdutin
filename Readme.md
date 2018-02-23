@@ -28,6 +28,8 @@ A Rainmeter skin for aggregating games from different platforms and launching th
  - [Rainmeter 4.0 or later](https://www.rainmeter.net/)
  - Windows Script Host 5.8 or later
    - Should be included by default in all versions of Windows that are supported by Rainmeter 4.0 and later.
+ - [SQLite3 command-line tool](http://www.sqlite.org/download.html)
+   - Required for GOG Galaxy support.
 
 # Installing
 - Install Rainmeter, if you do not already have it.
