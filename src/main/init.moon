@@ -152,7 +152,6 @@ updateSlots = () ->
 				else
 					STATE.SCROLL_INDEX = 1
 			if COMPONENTS.SLOTS\populate(STATE.GAMES, STATE.SCROLL_INDEX)
-				COMPONENTS.STATUS\hide()
 				COMPONENTS.SLOTS\update()
 			else
 				SKIN\Bang(('[!SetOption "Slot1Text" "Text" "%s"]')\format(LOCALIZATION\get('main_no_games', 'No games to show')))
