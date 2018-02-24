@@ -324,7 +324,7 @@ export Handshake = (stack, appliedFilters) ->
 			filterStack = json.decode(appliedFilters)
 			if stack
 				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_current_title', 'Filter (current games)')))
-				library = require('main.library')(COMPONENTS.SETTINGS, false)
+				library = require('shared.library')(COMPONENTS.SETTINGS, false)
 				platformsEnabledStatus = {}
 				temp = {}
 				for platform in *platforms

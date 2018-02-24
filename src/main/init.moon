@@ -216,7 +216,7 @@ export Initialize = () ->
 			COMPONENTS.ANIMATIONS = require('main.animations')()
 			STATE.NUM_SLOTS = COMPONENTS.SETTINGS\getLayoutRows() * COMPONENTS.SETTINGS\getLayoutColumns()
 			COMPONENTS.SLOTS = require('main.slots')(COMPONENTS.SETTINGS)
-			COMPONENTS.LIBRARY = require('main.library')(COMPONENTS.SETTINGS)
+			COMPONENTS.LIBRARY = require('shared.library')(COMPONENTS.SETTINGS)
 			COMPONENTS.PROCESS = require('main.process')()
 			detectGames()
 	)

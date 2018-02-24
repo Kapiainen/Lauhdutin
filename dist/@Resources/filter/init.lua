@@ -460,7 +460,7 @@ Handshake = function(stack, appliedFilters)
     local filterStack = json.decode(appliedFilters)
     if stack then
       SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_current_title', 'Filter (current games)')))
-      local library = require('main.library')(COMPONENTS.SETTINGS, false)
+      local library = require('shared.library')(COMPONENTS.SETTINGS, false)
       local platformsEnabledStatus = { }
       local temp = { }
       for _index_0 = 1, #platforms do
