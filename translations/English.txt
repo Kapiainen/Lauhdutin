@@ -8,6 +8,7 @@ button_label_save	Save
 filter_back_button_title	Back
 filter_clear_filters	Clear filters
 filter_from_platform	Is on platform
+filter_has_no_tags	Has no tags
 filter_has_tag	Has tag
 filter_is_hidden	Is hidden
 filter_is_uninstalled	Is not installed
