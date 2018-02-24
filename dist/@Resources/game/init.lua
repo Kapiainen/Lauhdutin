@@ -209,38 +209,39 @@ end
 local updateBanner
 updateBanner = function(game)
   local path = game:getBanner()
-  if path then
-    path = io.joinPaths(STATE.PATHS.RESOURCES, path)
-    SKIN:Bang(('[!SetOption "Banner" "ImageName" "%s"]'):format(path))
-    SKIN:Bang('[!SetOption "BannerMissing" "Text" ""]')
-    return SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "1"]')
-  else
+  if not (path) then
     SKIN:Bang('[!SetOption "Banner" "ImageName" "#@#game\\gfx\\blank.png"]')
     SKIN:Bang(('[!SetOption "BannerMissing" "Text" "%s"]'):format(LOCALIZATION:get('game_no_banner', 'No banner')))
     local expectedBanner = game:getExpectedBanner()
-    local tooltip
-    local _exp_0 = game:getPlatformID()
-    if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
-      local platformOverride = game:getPlatformOverride()
-      if platformOverride ~= nil then
-        tooltip = ('\\@Resources\\Shortcuts\\%s\\%s.%s'):format(platformOverride, expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
-      else
-        tooltip = ('\\@Resources\\Shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+    if expectedBanner then
+      local tooltip
+      local _exp_0 = game:getPlatformID()
+      if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
+        local platformOverride = game:getPlatformOverride()
+        if platformOverride ~= nil then
+          tooltip = ('\\@Resources\\Shortcuts\\%s\\%s.%s'):format(platformOverride, expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        else
+          tooltip = ('\\@Resources\\Shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        end
+      elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
+        if game:getPlatformOverride() then
+          tooltip = ('\\@Resources\\cache\\steam_shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        else
+          tooltip = ('\\@Resources\\cache\\steam\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        end
+      elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
+        tooltip = ('\\@Resources\\cache\\battlenet\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+      elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+        tooltip = ('\\@Resources\\cache\\gog_galaxy\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
       end
-    elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
-      if game:getPlatformOverride() then
-        tooltip = ('\\@Resources\\cache\\steam_shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
-      else
-        tooltip = ('\\@Resources\\cache\\steam\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
-      end
-    elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
-      tooltip = ('\\@Resources\\cache\\battlenet\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
-    elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-      tooltip = ('\\@Resources\\cache\\gog_galaxy\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+      SKIN:Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]'):format(tooltip))
+      SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
+      return 
     end
-    SKIN:Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]'):format(tooltip))
-    return SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
   end
+  SKIN:Bang(('[!SetOption "Banner" "ImageName" "#@#%s"]'):format(path))
+  SKIN:Bang('[!SetOption "BannerMissing" "Text" ""]')
+  return SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "1"]')
 end
 local updateScrollbar
 updateScrollbar = function()
