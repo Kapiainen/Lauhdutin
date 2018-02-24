@@ -20,6 +20,8 @@ export STATE = {
 	PROPERTIES: nil
 	FILTER_TYPE: nil
 	ARGUMENTS: {}
+	NUM_GAMES_PATTERN: ''
+	BACK_BUTTON_TITLE: ''
 }
 
 COMPONENTS = {
@@ -94,6 +96,8 @@ export Initialize = () ->
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
+			STATE.NUM_GAMES_PATTERN = LOCALIZATION\get('game_number_of_games', '%d games')
+			STATE.BACK_BUTTON_TITLE = LOCALIZATION\get('filter_back_button_title', 'Back')
 			Game = require('main.game')
 			STATE.SCROLL_INDEX = 1
 			COMPONENTS.SLOTS = [Slot(i) for i = 1, STATE.NUM_SLOTS]
@@ -113,22 +117,18 @@ sortPropertiesByTitle = (a, b) ->
 	return true if a.title\lower() < b.title\lower()
 	return false
 
-createProperties = (games, platforms, stack, filterStack) ->
-	properties = {}
-	backButtonTitle = LOCALIZATION\get('filter_back_button_title', 'Back')
-	numGamesPattern = LOCALIZATION\get('game_number_of_games', '%d games')
+createPlatformProperties = (games, platforms) ->
 	platformProperties = {}
 	for platform in *platforms
-		numGames = 0
+		platformGames = 0
 		platformID = platform\getPlatformID()
 		for game in *games
 			if game\getPlatformID() == platformID and game\getPlatformOverride() == nil
-				numGames += 1
-		if numGames > 0
-			numGames = numGamesPattern\format(numGames)
+				platformGames += 1
+		if platformGames > 0
 			table.insert(platformProperties, Property({
 				title: platform\getName()
-				value: numGames
+				value: STATE.NUM_GAMES_PATTERN\format(platformGames)
 				arguments: {
 					platformID: platformID
 				}
@@ -143,149 +143,154 @@ createProperties = (games, platforms, stack, filterStack) ->
 				platformOverrides[platformOverride].numGames += 1
 	for platformOverride, params in pairs(platformOverrides)
 		if params.numGames > 0
-			numGames = numGamesPattern\format(params.numGames)
 			table.insert(platformProperties, Property({
 				title: platformOverride .. '*'
-				value: numGames
+				value: STATE.NUM_GAMES_PATTERN\format(params.numGames)
 				arguments: {
 					platformID: params.platformID
 					platformOverride: platformOverride
 				}
 			}))
 	table.sort(platformProperties, sortPropertiesByTitle)
-	table.insert(platformProperties, 1, Property({
-		title: backButtonTitle
-		value: ' '
-		properties: properties
-	}))
-	if #games > 0
-		numGames = numGamesPattern\format(#games)
-		table.insert(properties,
-			Property({
-				title: LOCALIZATION\get('filter_from_platform', 'Is on platform')
-				value: numGames
-				enum: ENUMS.FILTER_TYPES.PLATFORM
-				properties: platformProperties
-			})
-		)
-	skipTags = false
-	for f in *filterStack
-		if f.filter == ENUMS.FILTER_TYPES.NO_TAGS or f.filter == ENUMS.FILTER_TYPES.TAG
-			skipTags = true
-			break
+	return Property({
+		title: LOCALIZATION\get('filter_from_platform', 'Is on platform')
+		value: STATE.NUM_GAMES_PATTERN\format(#games)
+		enum: ENUMS.FILTER_TYPES.PLATFORM
+		properties: platformProperties
+	})
+
+createTagProperties = (games, filterStack) ->
 	tags = {}
 	gamesWithTags = 0
-	hiddenGames = 0
-	uninstalledGames = 0
 	for game in *games
-		hiddenGames += 1 unless game\isVisible()
-		uninstalledGames += 1 unless game\isInstalled()
 		skinTags = game\getTags()
 		platformTags = game\getPlatformTags()
-		gamesWithTags += 1 if #skinTags > 0 or #platformTags > 0
-		unless skipTags
-			combinedTags = {}
-			for tag in *skinTags
-				combinedTags[tag] = true
-			for tag in *platformTags
-				combinedTags[tag] = true
-			for tag, _ in pairs(combinedTags)
-				if tags[tag] == nil
-					tags[tag] = 0
-				tags[tag] += 1
-	unless skipTags
-		if #games - gamesWithTags > 0
-			numGames = numGamesPattern\format(#games - gamesWithTags)
-			table.insert(properties,
-				Property({
-					title: LOCALIZATION\get('filter_has_no_tags', 'Has no tags')
-					value: numGames
-					enum: ENUMS.FILTER_TYPES.NO_TAGS
-					arguments: {
-						state: true
-					}
-				})
-			)
-		tagProperties = {}
-		for tag, numGames in pairs(tags)
-			if numGames > 0
-				numGames = numGamesPattern\format(numGames)
-				table.insert(tagProperties, Property({
-					title: tag
-					value: numGames
-					arguments: {
-						tag: tag
-					}
+		gamesWithTags += 1 if (#skinTags > 0 or #platformTags > 0)
+		combinedTags = {}
+		for tag in *skinTags
+			combinedTags[tag] = true
+		for tag in *platformTags
+			combinedTags[tag] = true
+		for tag, _ in pairs(combinedTags)
+			skip = false
+			for f in *filterStack
+				if f.filter == ENUMS.FILTER_TYPES.TAG and f.args.tag == tag
+					skip = true
+					break
+			continue if skip
+			if tags[tag] == nil
+				tags[tag] = 0
+			tags[tag] += 1
+	return nil, gamesWithTags if gamesWithTags < 1
+	tagProperties = {}
+	for tag, numGames in pairs(tags)
+		if numGames > 0
+			table.insert(tagProperties, Property({
+				title: tag
+				value: STATE.NUM_GAMES_PATTERN\format(numGames)
+				arguments: {
+					tag: tag
+				}
+			}))
+	return nil, gamesWithTags if #tagProperties < 1
+	table.sort(tagProperties, sortPropertiesByTitle)
+	return Property({
+		title: LOCALIZATION\get('filter_has_tag', 'Has tag')
+		value: STATE.NUM_GAMES_PATTERN\format(gamesWithTags)
+		enum: ENUMS.FILTER_TYPES.TAG
+		properties: tagProperties
+	}), gamesWithTags
+
+createHasNoTagsProperty = (numGames) ->
+	return Property({
+		title: LOCALIZATION\get('filter_has_no_tags', 'Has no tags')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.NO_TAGS
+		arguments: {
+			state: true
+		}
+	})
+
+createHiddenProperty = (numGames) ->
+	return Property({
+		title: LOCALIZATION\get('filter_is_hidden', 'Is hidden')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.HIDDEN
+		arguments: {
+			state: true
+		}
+	})
+
+createUninstalledProperty = (numGames) ->
+	return Property({
+		title: LOCALIZATION\get('filter_is_uninstalled', 'Is not installed')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.UNINSTALLED
+		arguments: {
+			state: true
+		}
+	})
+
+createClearProperty = () ->
+	return Property({
+		title: LOCALIZATION\get('filter_clear_filters', 'Clear filters')
+		value: ' '
+		enum: ENUMS.FILTER_TYPES.NONE
+	})
+
+createCancelProperty = () ->
+	return Property({
+		title: LOCALIZATION\get('button_label_cancel', 'Cancel')
+		value: ' '
+		action: () =>
+			SKIN\Bang('[!DeactivateConfig]')
+	})
+
+createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filterStack) ->
+	properties = {}
+	if #hiddenGames > 0
+		table.insert(properties, createHiddenProperty(#hiddenGames))
+	if #uninstalledGames > 0
+		table.insert(properties, createUninstalledProperty(#uninstalledGames))
+	if #games > 0
+		skipPlatforms = false
+		skipTags = false
+		skipNoTags = false
+		for f in *filterStack
+			switch f.filter
+				when ENUMS.FILTER_TYPES.PLATFORM
+					skipPlatforms = true
+				when ENUMS.FILTER_TYPES.NO_TAGS
+					skipTags = true
+				when ENUMS.FILTER_TYPES.TAG
+					skipNoTags = true
+		unless skipPlatforms
+			platformsProperty = createPlatformProperties(games, platforms)
+			if platformsProperty
+				table.insert(platformsProperty.properties, 1, Property({
+					title: STATE.BACK_BUTTON_TITLE
+					value: ' '
+					properties: properties
 				}))
-		table.sort(tagProperties, sortPropertiesByTitle)
-		table.insert(tagProperties, 1, Property({
-			title: backButtonTitle
-			value: ' '
-			properties: properties
-		}))
-		if gamesWithTags > 0
-			numGames = numGamesPattern\format(gamesWithTags)
-			table.insert(properties,
-				Property({
-					title: LOCALIZATION\get('filter_has_tag', 'Has tag')
-					value: numGames
-					enum: ENUMS.FILTER_TYPES.TAG
-					properties: tagProperties
-				})
-			)
-	skipHidden = false
-	for f in *filterStack
-		if f.filter == ENUMS.FILTER_TYPES.HIDDEN
-			skipHidden = true
-			break
-	unless skipHidden
-		if hiddenGames > 0
-			numGames = numGamesPattern\format(hiddenGames)
-			table.insert(properties,
-				Property({
-					title: LOCALIZATION\get('filter_is_hidden', 'Is hidden')
-					value: numGames
-					enum: ENUMS.FILTER_TYPES.HIDDEN
-					arguments: {
-						state: true
-					}
-				})
-			)
-	skipUninstalled = false
-	for f in *filterStack
-		if f.filter == ENUMS.FILTER_TYPES.UNINSTALLED
-			skipUninstalled = true
-			break
-	unless skipUninstalled
-		if uninstalledGames > 0
-			numGames = numGamesPattern\format(uninstalledGames)
-			table.insert(properties,
-				Property({
-					title: LOCALIZATION\get('filter_is_uninstalled', 'Is not installed')
-					value: numGames
-					enum: ENUMS.FILTER_TYPES.UNINSTALLED
-					arguments: {
-						state: true
-					}
-				})
-			)
+				table.insert(properties, platformsProperty)
+		gamesWithTags = 0
+		unless skipTags
+			tagsProperty, gamesWithTags = createTagProperties(games, filterStack)
+			if tagsProperty
+				table.insert(tagsProperty.properties, 1, Property({
+					title: STATE.BACK_BUTTON_TITLE
+					value: ' '
+					properties: properties
+				}))
+				table.insert(properties, tagsProperty)
+		unless skipNoTags
+			numGamesWithoutTags = #games - gamesWithTags
+			if numGamesWithoutTags > 0
+				table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags))
 	table.sort(properties, sortPropertiesByTitle)
 	unless stack
-		table.insert(properties, 1,
-			Property({
-				title: LOCALIZATION\get('filter_clear_filters', 'Clear filters')
-				value: ' '
-				enum: ENUMS.FILTER_TYPES.NONE
-			})
-		)
-	table.insert(properties, 1,
-		Property({
-			title: LOCALIZATION\get('button_label_cancel', 'Cancel')
-			value: ' '
-			action: () =>
-				SKIN\Bang('[!DeactivateConfig]')
-		})
-	)
+		table.insert(properties, 1, createClearProperty())
+	table.insert(properties, 1, createCancelProperty())
 	return properties
 
 updateScrollbar = () ->
@@ -313,6 +318,8 @@ export Handshake = (stack, appliedFilters) ->
 			STATE.STACK = stack
 			platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
 			games = nil
+			hiddenGames = {}
+			uninstalledGames = {}
 			appliedFilters = appliedFilters\gsub('|', '"')
 			filterStack = json.decode(appliedFilters)
 			if stack
@@ -328,15 +335,31 @@ export Handshake = (stack, appliedFilters) ->
 				temp = nil
 				library\finalize(platformsEnabledStatus)
 				games = library\get()
+				showHiddenGames = false
+				showUninstalledGames = false
 				for f in *filterStack
+					if f.filter == ENUMS.FILTER_TYPES.HIDDEN and f.args.state == true
+						showHiddenGames = true
+					elseif f.filter == ENUMS.FILTER_TYPES.UNINSTALLED and f.args.state == true
+						showUninstalledGames = true
 					f.args.games = games
 					library\filter(f.filter, f.args)
 					games = library\get()
+				for i = #games, 1, -1
+					if not games[i]\isVisible() and not showHiddenGames
+						table.insert(hiddenGames, table.remove(games, i))
+					elseif not games[i]\isInstalled() and not (showUninstalledGames or showHiddenGames)
+						table.insert(uninstalledGames, table.remove(games, i))
 			else
 				platforms = [platform for platform in *platforms when platform\isEnabled()]
 				games = io.readJSON('games.json')
 				games = [Game(args) for args in *games.games]
-			STATE.PROPERTIES = createProperties(games, platforms, stack, filterStack)
+				for i = #games, 1, -1
+					if not games[i]\isVisible()
+						table.insert(hiddenGames, table.remove(games, i))
+					elseif not games[i]\isInstalled()
+						table.insert(uninstalledGames, table.remove(games, i))
+			STATE.PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack)
 			updateScrollbar()
 			updateSlots()
 			if COMPONENTS.SETTINGS\getCenterOnMonitor()
@@ -376,7 +399,6 @@ export MouseOver = (index) ->
 export MouseLeave = (index) ->
 	return if index < 1
 	return unless COMPONENTS.SLOTS
-	--return unless COMPONENTS.SLOTS[index]\hasAction()
 	if index == 0
 		STATE.HIGHLIGHTED_SLOT_INDEX = 0
 		for i = index, STATE.NUM_SLOTS
