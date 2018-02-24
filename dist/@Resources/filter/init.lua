@@ -409,9 +409,9 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
   end
   table.sort(properties, sortPropertiesByTitle)
   if not (stack) then
-    table.insert(properties, 1, createClearProperty())
+    table.insert(properties, createClearProperty())
   end
-  table.insert(properties, 1, createCancelProperty())
+  table.insert(properties, createCancelProperty())
   return properties
 end
 local updateScrollbar

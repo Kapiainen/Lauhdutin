@@ -289,8 +289,8 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 				table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags))
 	table.sort(properties, sortPropertiesByTitle)
 	unless stack
-		table.insert(properties, 1, createClearProperty())
-	table.insert(properties, 1, createCancelProperty())
+		table.insert(properties, createClearProperty())
+	table.insert(properties, createCancelProperty())
 	return properties
 
 updateScrollbar = () ->
