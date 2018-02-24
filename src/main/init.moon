@@ -170,6 +170,10 @@ onInitialized = () ->
 	STATE.GAMES = COMPONENTS.LIBRARY\get()
 	updateSlots()
 	STATE.INITIALIZED = true
+	animationType = COMPONENTS.SETTINGS\getSkinSlideAnimation()
+	if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE
+		COMPONENTS.ANIMATIONS\pushSkinSlide(animationType, false)
+		setUpdateDivider(1)
 	COMPONENTS.PROCESS\update()
 	log('Skin initialized')
 
