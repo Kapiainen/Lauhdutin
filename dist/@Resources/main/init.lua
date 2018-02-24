@@ -1,4 +1,5 @@
 local utility = nil
+local json = nil
 local Game = nil
 LOCALIZATION = nil
 STATE = {
@@ -235,6 +236,7 @@ Initialize = function()
     Game = require('main.game')
     utility = require('shared.utility')
     utility.createJSONHelpers()
+    json = require('lib.json')
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
@@ -642,7 +644,12 @@ HandshakeFilter = function()
     return 
   end
   local success, err = pcall(function()
-    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Filter"]'):format(tostring(STATE.STACK_NEXT_FILTER)))
+    local stack = tostring(STATE.STACK_NEXT_FILTER)
+    local appliedFilters = '[]'
+    if STATE.STACK_NEXT_FILTER then
+      appliedFilters = json.encode(COMPONENTS.LIBRARY:getFilterStack()):gsub('"', '|')
+    end
+    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s, \'%s\')" "#ROOTCONFIG#\\Filter"]'):format(stack, appliedFilters))
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -654,32 +661,15 @@ Filter = function(filterType, stack, arguments)
   end
   local success, err = pcall(function()
     log('Filter', filterType, type(filterType), stack, type(stack), arguments)
-    local temp = { }
-    for key, value in arguments:gmatch('|([^:]+):([^|]+)') do
-      temp[key] = value
-    end
-    local games
+    arguments = arguments:gsub('|', '"')
+    arguments = json.decode(arguments)
     if stack then
-      games = STATE.GAMES
+      arguments.games = STATE.GAMES
     else
-      games = nil
+      arguments.games = nil
     end
-    local args = {
-      games = games,
-      stack = stack
-    }
-    local _exp_0 = filterType
-    if ENUMS.FILTER_TYPES.PLATFORM == _exp_0 then
-      args.platformID = tonumber(temp.platformID)
-      args.platformOverride = temp.platformOverride
-    elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
-      args.tag = temp.tag
-    elseif ENUMS.FILTER_TYPES.HIDDEN == _exp_0 then
-      args.state = true
-    elseif ENUMS.FILTER_TYPES.UNINSTALLED == _exp_0 then
-      args.state = true
-    end
-    COMPONENTS.LIBRARY:filter(filterType, args)
+    arguments.stack = stack
+    COMPONENTS.LIBRARY:filter(filterType, arguments)
     STATE.GAMES = COMPONENTS.LIBRARY:get()
     STATE.SCROLL_INDEX = 1
     return updateSlots()

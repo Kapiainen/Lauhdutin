@@ -58,14 +58,22 @@ migrators = {
 }
 
 class Library
-	new: (settings) =>
+	new: (settings, regularMode = true) =>
+	-- regularMode is true, if the instance of Library is being created for the main config
+	-- regularMode should be false in all other cases (e.g. in the filter config)
 		@version = 1
-		@numBackups = settings\getNumberOfBackups()
 		@path = 'games.json'
-		@backupFilePattern = 'games_backup_%d.json'
-		@games = {}
-		@oldGames = @load()
-		@currentGameID = 0
+		if regularMode
+			@numBackups = settings\getNumberOfBackups()
+			@backupFilePattern = 'games_backup_%d.json'
+			@games = {}
+			@oldGames = @load()
+			@currentGameID = 0
+		else
+			games = io.readJSON(@path)
+			@games = [Game(args) for args in *games.games]
+			@oldGames = {}
+		@filterStack = {}
 		@processedGames = nil
 
 	createBackup: (path) =>
@@ -248,6 +256,11 @@ class Library
 		if args ~= nil and args.stack == true
 			assert(type(args.games) == 'table', '"Library.filter" expected "args.games" to be a table.')
 			gamesToProcess = args.games
+			args.games = nil
+			table.insert(@filterStack, {
+				:filter
+				:args
+			})
 		else
 			gamesToProcess = {}
 			for game in *@games
@@ -257,10 +270,18 @@ class Library
 				elseif not game\isInstalled()
 					continue unless filter == ENUMS.FILTER_TYPES.UNINSTALLED
 				table.insert(gamesToProcess, game)
+			if filter == ENUMS.FILTER_TYPES.NONE
+				@filterStack = {}
+			else
+				@filterStack = {{
+					:filter
+					:args
+				}}
 		games = nil
 		switch filter
 			when ENUMS.FILTER_TYPES.NONE
 				games = gamesToProcess
+				@filterStack = {}
 			when ENUMS.FILTER_TYPES.TITLE
 				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
 				assert(type(args.input) == 'string', '"Library.filter" expected "args.input" to be a string.')
@@ -301,10 +322,20 @@ class Library
 				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
 				state = args.state
 				games = [game for game in *gamesToProcess when game\isInstalled() ~= state]
+			when ENUMS.FILTER_TYPES.NO_TAGS
+				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+				state = args.state
+				if state
+					games = [game for game in *gamesToProcess when #game\getTags() == 0 and #game\getPlatformTags() == 0]
+				else
+					games = [game for game in *gamesToProcess when #game\getTags() > 0 or #game\getPlatformTags() > 0]
 			else
 				assert(nil, 'Unknown filter type.')
 		assert(type(games) == 'table', '"Library.filter" expected "games" to be a table.')
 		@processedGames = games
+
+	getFilterStack: () => return @filterStack
 
 	get: () =>
 		@filter(ENUMS.FILTER_TYPES.NONE, nil) if @processedGames == nil

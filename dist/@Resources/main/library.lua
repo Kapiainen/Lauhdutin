@@ -328,6 +328,11 @@ do
       if args ~= nil and args.stack == true then
         assert(type(args.games) == 'table', '"Library.filter" expected "args.games" to be a table.')
         gamesToProcess = args.games
+        args.games = nil
+        table.insert(self.filterStack, {
+          filter = filter,
+          args = args
+        })
       else
         gamesToProcess = { }
         local _list_0 = self.games
@@ -357,11 +362,22 @@ do
             break
           end
         end
+        if filter == ENUMS.FILTER_TYPES.NONE then
+          self.filterStack = { }
+        else
+          self.filterStack = {
+            {
+              filter = filter,
+              args = args
+            }
+          }
+        end
       end
       local games = nil
       local _exp_0 = filter
       if ENUMS.FILTER_TYPES.NONE == _exp_0 then
         games = gamesToProcess
+        self.filterStack = { }
       elseif ENUMS.FILTER_TYPES.TITLE == _exp_0 then
         assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
         assert(type(args.input) == 'string', '"Library.filter" expected "args.input" to be a string.')
@@ -470,11 +486,45 @@ do
           end
           games = _accum_0
         end
+      elseif ENUMS.FILTER_TYPES.NO_TAGS == _exp_0 then
+        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        local state = args.state
+        if state then
+          do
+            local _accum_0 = { }
+            local _len_0 = 1
+            for _index_0 = 1, #gamesToProcess do
+              local game = gamesToProcess[_index_0]
+              if #game:getTags() == 0 and #game:getPlatformTags() == 0 then
+                _accum_0[_len_0] = game
+                _len_0 = _len_0 + 1
+              end
+            end
+            games = _accum_0
+          end
+        else
+          do
+            local _accum_0 = { }
+            local _len_0 = 1
+            for _index_0 = 1, #gamesToProcess do
+              local game = gamesToProcess[_index_0]
+              if #game:getTags() > 0 or #game:getPlatformTags() > 0 then
+                _accum_0[_len_0] = game
+                _len_0 = _len_0 + 1
+              end
+            end
+            games = _accum_0
+          end
+        end
       else
         assert(nil, 'Unknown filter type.')
       end
       assert(type(games) == 'table', '"Library.filter" expected "games" to be a table.')
       self.processedGames = games
+    end,
+    getFilterStack = function(self)
+      return self.filterStack
     end,
     get = function(self)
       if self.processedGames == nil then
@@ -497,14 +547,34 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, settings)
+    __init = function(self, settings, regularMode)
+      if regularMode == nil then
+        regularMode = true
+      end
       self.version = 1
-      self.numBackups = settings:getNumberOfBackups()
       self.path = 'games.json'
-      self.backupFilePattern = 'games_backup_%d.json'
-      self.games = { }
-      self.oldGames = self:load()
-      self.currentGameID = 0
+      if regularMode then
+        self.numBackups = settings:getNumberOfBackups()
+        self.backupFilePattern = 'games_backup_%d.json'
+        self.games = { }
+        self.oldGames = self:load()
+        self.currentGameID = 0
+      else
+        local games = io.readJSON(self.path)
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          local _list_0 = games.games
+          for _index_0 = 1, #_list_0 do
+            local args = _list_0[_index_0]
+            _accum_0[_len_0] = Game(args)
+            _len_0 = _len_0 + 1
+          end
+          self.games = _accum_0
+        end
+        self.oldGames = { }
+      end
+      self.filterStack = { }
       self.processedGames = nil
     end,
     __base = _base_0,

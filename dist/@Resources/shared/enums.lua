@@ -11,7 +11,8 @@ ENUMS = {
     PLATFORM = 3,
     TAG = 4,
     HIDDEN = 5,
-    UNINSTALLED = 6
+    UNINSTALLED = 6,
+    NO_TAGS = 7
   },
   SORTING_TYPES = {
     ALPHABETICALLY = 1,

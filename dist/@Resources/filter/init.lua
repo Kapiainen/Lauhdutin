@@ -1,4 +1,5 @@
 local utility = nil
+local json = nil
 LOCALIZATION = nil
 STATE = {
   PATHS = {
@@ -79,10 +80,8 @@ do
         STATE.FILTER_TYPE = self.property.enum
       end
       if self.property.arguments ~= nil then
-        local _list_0 = self.property.arguments
-        for _index_0 = 1, #_list_0 do
-          local arg = _list_0[_index_0]
-          STATE.ARGUMENTS[arg[1]] = arg[2]
+        for key, value in pairs(self.property.arguments) do
+          STATE.ARGUMENTS[key] = value
         end
       end
       if self.property.properties ~= nil then
@@ -93,11 +92,10 @@ do
         self.property:action()
         return true
       end
-      local argument = ''
-      for key, value in pairs(STATE.ARGUMENTS) do
-        argument = argument .. ('|%s:%s'):format(key, tostring(value))
-      end
-      SKIN:Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]'):format(STATE.FILTER_TYPE, tostring(STATE.STACK), argument))
+      local filter = STATE.FILTER_TYPE
+      local stack = tostring(STATE.STACK)
+      local arguments = json.encode(STATE.ARGUMENTS):gsub('"', '|')
+      SKIN:Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]'):format(filter, stack, arguments))
       return false
     end
   }
@@ -135,6 +133,7 @@ Initialize = function()
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
+    json = require('lib.json')
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -169,46 +168,11 @@ sortPropertiesByTitle = function(a, b)
   return false
 end
 local createProperties
-createProperties = function()
+createProperties = function(games, platforms, stack, filterStack)
+  print('filterStack', filterStack, #filterStack)
   local properties = { }
   local backButtonTitle = LOCALIZATION:get('filter_back_button_title', 'Back')
   local numGamesPattern = LOCALIZATION:get('game_number_of_games', '%d games')
-  local games = io.readJSON('games.json')
-  do
-    local _accum_0 = { }
-    local _len_0 = 1
-    local _list_0 = games.games
-    for _index_0 = 1, #_list_0 do
-      local args = _list_0[_index_0]
-      _accum_0[_len_0] = Game(args)
-      _len_0 = _len_0 + 1
-    end
-    games = _accum_0
-  end
-  local platforms
-  do
-    local _accum_0 = { }
-    local _len_0 = 1
-    local _list_0 = require('main.platforms')
-    for _index_0 = 1, #_list_0 do
-      local Platform = _list_0[_index_0]
-      _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
-      _len_0 = _len_0 + 1
-    end
-    platforms = _accum_0
-  end
-  do
-    local _accum_0 = { }
-    local _len_0 = 1
-    for _index_0 = 1, #platforms do
-      local platform = platforms[_index_0]
-      if platform:isEnabled() then
-        _accum_0[_len_0] = platform
-        _len_0 = _len_0 + 1
-      end
-    end
-    platforms = _accum_0
-  end
   local platformProperties = { }
   for _index_0 = 1, #platforms do
     local platform = platforms[_index_0]
@@ -220,17 +184,16 @@ createProperties = function()
         numGames = numGames + 1
       end
     end
-    numGames = numGamesPattern:format(numGames)
-    table.insert(platformProperties, Property({
-      title = platform:getName(),
-      value = numGames,
-      arguments = {
-        {
-          'platformID',
-          platformID
+    if numGames > 0 then
+      numGames = numGamesPattern:format(numGames)
+      table.insert(platformProperties, Property({
+        title = platform:getName(),
+        value = numGames,
+        arguments = {
+          platformID = platformID
         }
-      }
-    }))
+      }))
+    end
   end
   local platformOverrides = { }
   for _index_0 = 1, #games do
@@ -248,21 +211,17 @@ createProperties = function()
     end
   end
   for platformOverride, params in pairs(platformOverrides) do
-    local numGames = numGamesPattern:format(params.numGames)
-    table.insert(platformProperties, Property({
-      title = platformOverride .. '*',
-      value = numGames,
-      arguments = {
-        {
-          'platformID',
-          params.platformID
-        },
-        {
-          'platformOverride',
-          platformOverride
+    if params.numGames > 0 then
+      local numGames = numGamesPattern:format(params.numGames)
+      table.insert(platformProperties, Property({
+        title = platformOverride .. '*',
+        value = numGames,
+        arguments = {
+          platformID = params.platformID,
+          platformOverride = platformOverride
         }
-      }
-    }))
+      }))
+    end
   end
   table.sort(platformProperties, sortPropertiesByTitle)
   table.insert(platformProperties, 1, Property({
@@ -270,13 +229,23 @@ createProperties = function()
     value = ' ',
     properties = properties
   }))
-  local numGames = numGamesPattern:format(#games)
-  table.insert(properties, Property({
-    title = LOCALIZATION:get('filter_from_platform', 'Is on platform'),
-    value = numGames,
-    enum = ENUMS.FILTER_TYPES.PLATFORM,
-    properties = platformProperties
-  }))
+  if #games > 0 then
+    local numGames = numGamesPattern:format(#games)
+    table.insert(properties, Property({
+      title = LOCALIZATION:get('filter_from_platform', 'Is on platform'),
+      value = numGames,
+      enum = ENUMS.FILTER_TYPES.PLATFORM,
+      properties = platformProperties
+    }))
+  end
+  local skipTags = false
+  for _index_0 = 1, #filterStack do
+    local f = filterStack[_index_0]
+    if f.filter == ENUMS.FILTER_TYPES.NO_TAGS or f.filter == ENUMS.FILTER_TYPES.TAG then
+      skipTags = true
+      break
+    end
+  end
   local tags = { }
   local gamesWithTags = 0
   local hiddenGames = 0
@@ -294,67 +263,116 @@ createProperties = function()
     if #skinTags > 0 or #platformTags > 0 then
       gamesWithTags = gamesWithTags + 1
     end
-    local combinedTags = { }
-    for _index_1 = 1, #skinTags do
-      local tag = skinTags[_index_1]
-      combinedTags[tag] = true
-    end
-    for _index_1 = 1, #platformTags do
-      local tag = platformTags[_index_1]
-      combinedTags[tag] = true
-    end
-    for tag, _ in pairs(combinedTags) do
-      if tags[tag] == nil then
-        tags[tag] = 0
+    if not (skipTags) then
+      local combinedTags = { }
+      for _index_1 = 1, #skinTags do
+        local tag = skinTags[_index_1]
+        combinedTags[tag] = true
       end
-      tags[tag] = tags[tag] + 1
+      for _index_1 = 1, #platformTags do
+        local tag = platformTags[_index_1]
+        combinedTags[tag] = true
+      end
+      for tag, _ in pairs(combinedTags) do
+        if tags[tag] == nil then
+          tags[tag] = 0
+        end
+        tags[tag] = tags[tag] + 1
+      end
     end
   end
-  local tagProperties = { }
-  for tag, numGames in pairs(tags) do
-    numGames = numGamesPattern:format(numGames)
-    table.insert(tagProperties, Property({
-      title = tag,
-      value = numGames,
-      arguments = {
-        {
-          'tag',
-          tag
+  if not (skipTags) then
+    if #games - gamesWithTags > 0 then
+      local numGames = numGamesPattern:format(#games - gamesWithTags)
+      table.insert(properties, Property({
+        title = LOCALIZATION:get('filter_has_no_tags', 'Has no tags'),
+        value = numGames,
+        enum = ENUMS.FILTER_TYPES.NO_TAGS,
+        arguments = {
+          state = true
         }
-      }
+      }))
+    end
+    local tagProperties = { }
+    for tag, numGames in pairs(tags) do
+      if numGames > 0 then
+        numGames = numGamesPattern:format(numGames)
+        table.insert(tagProperties, Property({
+          title = tag,
+          value = numGames,
+          arguments = {
+            tag = tag
+          }
+        }))
+      end
+    end
+    table.sort(tagProperties, sortPropertiesByTitle)
+    table.insert(tagProperties, 1, Property({
+      title = backButtonTitle,
+      value = ' ',
+      properties = properties
+    }))
+    if gamesWithTags > 0 then
+      local numGames = numGamesPattern:format(gamesWithTags)
+      table.insert(properties, Property({
+        title = LOCALIZATION:get('filter_has_tag', 'Has tag'),
+        value = numGames,
+        enum = ENUMS.FILTER_TYPES.TAG,
+        properties = tagProperties
+      }))
+    end
+  end
+  local skipHidden = false
+  for _index_0 = 1, #filterStack do
+    local f = filterStack[_index_0]
+    if f.filter == ENUMS.FILTER_TYPES.HIDDEN then
+      skipHidden = true
+      break
+    end
+  end
+  if not (skipHidden) then
+    if hiddenGames > 0 then
+      local numGames = numGamesPattern:format(hiddenGames)
+      table.insert(properties, Property({
+        title = LOCALIZATION:get('filter_is_hidden', 'Is hidden'),
+        value = numGames,
+        enum = ENUMS.FILTER_TYPES.HIDDEN,
+        arguments = {
+          state = true
+        }
+      }))
+    end
+  end
+  local skipUninstalled = false
+  for _index_0 = 1, #filterStack do
+    local f = filterStack[_index_0]
+    print(f.filter, f.args.state)
+    if f.filter == ENUMS.FILTER_TYPES.UNINSTALLED then
+      skipUninstalled = true
+      break
+    end
+  end
+  if not (skipUninstalled) then
+    if uninstalledGames > 0 then
+      local numGames = numGamesPattern:format(uninstalledGames)
+      table.insert(properties, Property({
+        title = LOCALIZATION:get('filter_is_uninstalled', 'Is not installed'),
+        value = numGames,
+        enum = ENUMS.FILTER_TYPES.UNINSTALLED,
+        arguments = {
+          state = true
+        }
+      }))
+    end
+  end
+  table.sort(properties, sortPropertiesByTitle)
+  if not (stack) then
+    table.insert(properties, 1, Property({
+      title = LOCALIZATION:get('filter_clear_filters', 'Clear filters'),
+      value = ' ',
+      enum = ENUMS.FILTER_TYPES.NONE
     }))
   end
-  table.sort(tagProperties, sortPropertiesByTitle)
-  table.insert(tagProperties, 1, Property({
-    title = backButtonTitle,
-    value = ' ',
-    properties = properties
-  }))
-  numGames = numGamesPattern:format(gamesWithTags)
-  table.insert(properties, Property({
-    title = LOCALIZATION:get('filter_has_tag', 'Has tag'),
-    value = numGames,
-    enum = ENUMS.FILTER_TYPES.TAG,
-    properties = tagProperties
-  }))
-  numGames = numGamesPattern:format(hiddenGames)
-  table.insert(properties, Property({
-    title = LOCALIZATION:get('filter_is_hidden', 'Is hidden'),
-    value = numGames,
-    enum = ENUMS.FILTER_TYPES.HIDDEN
-  }))
-  numGames = numGamesPattern:format(uninstalledGames)
-  table.insert(properties, Property({
-    title = LOCALIZATION:get('filter_is_uninstalled', 'Is not installed'),
-    value = numGames,
-    enum = ENUMS.FILTER_TYPES.UNINSTALLED
-  }))
-  table.sort(properties, sortPropertiesByTitle)
-  table.insert(properties, 1, Property({
-    title = LOCALIZATION:get('filter_clear_filters', 'Clear filters'),
-    value = ' ',
-    enum = ENUMS.FILTER_TYPES.NONE
-  }))
   table.insert(properties, 1, Property({
     title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
     value = ' ',
@@ -387,14 +405,77 @@ updateSlots = function()
     end
   end
 end
-Handshake = function(stack)
+Handshake = function(stack, appliedFilters)
   local success, err = pcall(function()
-    if stack then
-      SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_current_title', 'Filter (current games)')))
-    end
     log('Accepting Filter handshake', stack)
     STATE.STACK = stack
-    STATE.PROPERTIES = createProperties()
+    local platforms
+    do
+      local _accum_0 = { }
+      local _len_0 = 1
+      local _list_0 = require('main.platforms')
+      for _index_0 = 1, #_list_0 do
+        local Platform = _list_0[_index_0]
+        _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
+        _len_0 = _len_0 + 1
+      end
+      platforms = _accum_0
+    end
+    local games = nil
+    appliedFilters = appliedFilters:gsub('|', '"')
+    print(appliedFilters)
+    local filterStack = json.decode(appliedFilters)
+    if stack then
+      SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_current_title', 'Filter (current games)')))
+      local library = require('main.library')(COMPONENTS.SETTINGS, false)
+      local platformsEnabledStatus = { }
+      local temp = { }
+      for _index_0 = 1, #platforms do
+        local platform = platforms[_index_0]
+        local enabled = platform:isEnabled()
+        platformsEnabledStatus[platform:getPlatformID()] = enabled
+        if enabled then
+          table.insert(temp, platform)
+        end
+      end
+      platforms = temp
+      temp = nil
+      library:finalize(platformsEnabledStatus)
+      games = library:get()
+      print(games, #games, library.games, #library.games)
+      for _index_0 = 1, #filterStack do
+        local f = filterStack[_index_0]
+        f.args.games = games
+        library:filter(f.filter, f.args)
+        games = library:get()
+      end
+    else
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        for _index_0 = 1, #platforms do
+          local platform = platforms[_index_0]
+          if platform:isEnabled() then
+            _accum_0[_len_0] = platform
+            _len_0 = _len_0 + 1
+          end
+        end
+        platforms = _accum_0
+      end
+      games = io.readJSON('games.json')
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        local _list_0 = games.games
+        for _index_0 = 1, #_list_0 do
+          local args = _list_0[_index_0]
+          _accum_0[_len_0] = Game(args)
+          _len_0 = _len_0 + 1
+        end
+        games = _accum_0
+      end
+    end
+    STATE.PROPERTIES = createProperties(games, platforms, stack, filterStack)
     updateScrollbar()
     updateSlots()
     if COMPONENTS.SETTINGS:getCenterOnMonitor() then
@@ -449,9 +530,6 @@ MouseLeave = function(index)
     return 
   end
   if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   if index == 0 then

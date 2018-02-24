@@ -1,4 +1,5 @@
 utility = nil
+json = nil
 
 Game = nil
 
@@ -193,6 +194,7 @@ export Initialize = () ->
 			Game = require('main.game')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
+			json = require('lib.json')
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
@@ -481,7 +483,11 @@ export HandshakeFilter = () ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(
 		() ->
-			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Filter"]')\format(tostring(STATE.STACK_NEXT_FILTER)))
+			stack = tostring(STATE.STACK_NEXT_FILTER)
+			appliedFilters = '[]'
+			if STATE.STACK_NEXT_FILTER
+				appliedFilters = json.encode(COMPONENTS.LIBRARY\getFilterStack())\gsub('"', '|')
+			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%s, \'%s\')" "#ROOTCONFIG#\\Filter"]')\format(stack, appliedFilters))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -490,22 +496,11 @@ export Filter = (filterType, stack, arguments) ->
 	success, err = pcall(
 		() ->
 			log('Filter', filterType, type(filterType), stack, type(stack), arguments)
-			temp = {}
-			for key, value in arguments\gmatch('|([^:]+):([^|]+)')
-				temp[key] = value
-			games = if stack then STATE.GAMES else nil
-			args = {:games, :stack}
-			switch filterType
-				when ENUMS.FILTER_TYPES.PLATFORM
-					args.platformID = tonumber(temp.platformID)
-					args.platformOverride = temp.platformOverride
-				when ENUMS.FILTER_TYPES.TAG
-					args.tag = temp.tag
-				when ENUMS.FILTER_TYPES.HIDDEN
-					args.state = true
-				when ENUMS.FILTER_TYPES.UNINSTALLED
-					args.state = true
-			COMPONENTS.LIBRARY\filter(filterType, args)
+			arguments = arguments\gsub('|', '"')
+			arguments = json.decode(arguments)
+			arguments.games = if stack then STATE.GAMES else nil
+			arguments.stack = stack
+			COMPONENTS.LIBRARY\filter(filterType, arguments)
 			STATE.GAMES = COMPONENTS.LIBRARY\get()
 			STATE.SCROLL_INDEX = 1
 			updateSlots()
