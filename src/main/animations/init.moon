@@ -63,6 +63,7 @@ class AnimationQueue
 		SKIN\Bang('[!UpdateMeter "SlotAnimation"]')
 
 	resetSlots: () =>
+		log('Animations.resetSlots')
 		animationType = COMPONENTS.SETTINGS\getSlotsHoverAnimation()
 		return if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX
 		SKIN\Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')

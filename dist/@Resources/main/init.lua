@@ -190,6 +190,7 @@ updateSlots = function()
       end
     end
     if COMPONENTS.SLOTS:populate(STATE.GAMES, STATE.SCROLL_INDEX) then
+      COMPONENTS.ANIMATIONS:resetSlots()
       return COMPONENTS.SLOTS:update()
     else
       SKIN:Bang(('[!SetOption "Slot1Text" "Text" "%s"]'):format(LOCALIZATION:get('main_no_games', 'No games to show')))

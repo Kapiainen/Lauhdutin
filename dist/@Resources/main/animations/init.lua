@@ -95,6 +95,7 @@ do
       return SKIN:Bang('[!UpdateMeter "SlotAnimation"]')
     end,
     resetSlots = function(self)
+      log('Animations.resetSlots')
       local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
       if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
         return 
