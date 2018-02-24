@@ -169,7 +169,6 @@ sortPropertiesByTitle = function(a, b)
 end
 local createProperties
 createProperties = function(games, platforms, stack, filterStack)
-  print('filterStack', filterStack, #filterStack)
   local properties = { }
   local backButtonTitle = LOCALIZATION:get('filter_back_button_title', 'Back')
   local numGamesPattern = LOCALIZATION:get('game_number_of_games', '%d games')
@@ -346,7 +345,6 @@ createProperties = function(games, platforms, stack, filterStack)
   local skipUninstalled = false
   for _index_0 = 1, #filterStack do
     local f = filterStack[_index_0]
-    print(f.filter, f.args.state)
     if f.filter == ENUMS.FILTER_TYPES.UNINSTALLED then
       skipUninstalled = true
       break
@@ -423,7 +421,6 @@ Handshake = function(stack, appliedFilters)
     end
     local games = nil
     appliedFilters = appliedFilters:gsub('|', '"')
-    print(appliedFilters)
     local filterStack = json.decode(appliedFilters)
     if stack then
       SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_current_title', 'Filter (current games)')))
@@ -442,7 +439,6 @@ Handshake = function(stack, appliedFilters)
       temp = nil
       library:finalize(platformsEnabledStatus)
       games = library:get()
-      print(games, #games, library.games, #library.games)
       for _index_0 = 1, #filterStack do
         local f = filterStack[_index_0]
         f.args.games = games
