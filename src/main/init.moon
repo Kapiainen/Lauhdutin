@@ -155,8 +155,8 @@ updateSlots = () ->
 				COMPONENTS.SLOTS\update()
 			else
 				SKIN\Bang(('[!SetOption "Slot1Text" "Text" "%s"]')\format(LOCALIZATION\get('main_no_games', 'No games to show')))
-				COMPONENTS.SLOTS\update()
 				COMPONENTS.ANIMATIONS\resetSlots()
+				COMPONENTS.SLOTS\update()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
