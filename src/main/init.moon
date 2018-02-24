@@ -395,7 +395,6 @@ export HandshakeSearch = () ->
 	success, err = pcall(
 		() ->
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]')\format(tostring(STATE.STACK_NEXT_FILTER)))
-			STATE.STACK_NEXT_FILTER = false
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -478,7 +477,7 @@ export OnToolbarFilter = (stack) ->
 			configName = ('%s\\Filter')\format(STATE.ROOT_CONFIG)
 			config = utility.getConfig(configName)
 			if config ~= nil and config\isActive()
-				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
+				return HandshakeFilter()
 			SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

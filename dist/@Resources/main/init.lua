@@ -520,8 +520,7 @@ HandshakeSearch = function()
     return 
   end
   local success, err = pcall(function()
-    SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]'):format(tostring(STATE.STACK_NEXT_FILTER)))
-    STATE.STACK_NEXT_FILTER = false
+    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]'):format(tostring(STATE.STACK_NEXT_FILTER)))
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -636,7 +635,7 @@ OnToolbarFilter = function(stack)
     local configName = ('%s\\Filter'):format(STATE.ROOT_CONFIG)
     local config = utility.getConfig(configName)
     if config ~= nil and config:isActive() then
-      return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))
+      return HandshakeFilter()
     end
     return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
   end)
