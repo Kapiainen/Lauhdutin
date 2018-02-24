@@ -267,7 +267,7 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 		unless skipPlatforms
 			platformsProperty = createPlatformProperties(games, platforms)
 			if platformsProperty
-				table.insert(platformsProperty.properties, 1, Property({
+				table.insert(platformsProperty.properties, Property({
 					title: STATE.BACK_BUTTON_TITLE
 					value: ' '
 					properties: properties
@@ -277,7 +277,7 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 		unless skipTags
 			tagsProperty, gamesWithTags = createTagProperties(games, filterStack)
 			if tagsProperty
-				table.insert(tagsProperty.properties, 1, Property({
+				table.insert(tagsProperty.properties, Property({
 					title: STATE.BACK_BUTTON_TITLE
 					value: ' '
 					properties: properties
