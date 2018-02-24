@@ -845,6 +845,7 @@ HandshakeGame = function()
   local success, err = pcall(function()
     log('HandshakeGame')
     local gameID = STATE.GAME_BEING_MODIFIED:getGameID()
+    STATE.GAME_BEING_MODIFIED = nil
     assert(gameID ~= nil, 'No gameID to send to the Game config.')
     return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]'):format(gameID))
   end)
@@ -870,9 +871,8 @@ UpdateGame = function(gameID)
         end
       end
       assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
-      COMPONENTS.LIBRARY:update(game)
+      return COMPONENTS.LIBRARY:update(game)
     end
-    STATE.GAME_BEING_MODIFIED = nil
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

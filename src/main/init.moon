@@ -623,6 +623,7 @@ export HandshakeGame = () ->
 		() ->
 			log('HandshakeGame')
 			gameID = STATE.GAME_BEING_MODIFIED\getGameID()
+			STATE.GAME_BEING_MODIFIED = nil
 			assert(gameID ~= nil, 'No gameID to send to the Game config.')
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]')\format(gameID))
 	)
@@ -643,7 +644,6 @@ export UpdateGame = (gameID) ->
 						break
 				assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
 				COMPONENTS.LIBRARY\update(game)
-			STATE.GAME_BEING_MODIFIED = nil
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
