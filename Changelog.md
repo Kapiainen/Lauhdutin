@@ -1,4 +1,4 @@
-**Version 3.0.0 - 2018/MM/DD:**
+**Version 3.0.0 beta 1 - 2018/02/25:**
 - Rewritten in MoonScript/Lua, VBScript, and batch files.
 
 **Version 2.7.1 - 2017/05/29:**
