@@ -27,6 +27,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, index)
+      assert(type(index) == 'number' and index % 1 == 0, 'main.slots.slot.Slot')
       self.index = index
       self.game = nil
     end,

@@ -8,6 +8,8 @@ slideFrame = (option, pos, mag, scale) ->
 
 class SkinSlideAnimation extends Animation
 	new: (typ, reveal) =>
+		assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.skin_slide_animation.SkinSlideAnimation')
+		assert(type(reveal) == 'boolean', 'main.animations.skin_slide_animation.SkinSlideAnimation')
 		skin = SKIN\GetMeter('SlotsBackground')
 		beginAction = nil
 		finishAction = nil
@@ -73,6 +75,8 @@ class SkinSlideAnimation extends Animation
 				frames[4] = slideFrame('X', skinX, skinW, 1 / 2.5)
 				frames[5] = slideFrame('X', skinX, skinW, 1 / 1.8)
 				frames[6] = slideFrame('X', skinX, skinW, 1)
+			else
+				assert(nil, 'main.animations.skin_slide_animation.SkinSlideAnimation')
 		args = {
 			:beginAction
 			:finishAction

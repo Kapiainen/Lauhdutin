@@ -11,6 +11,7 @@ images = {
 
 class OverlaySlot
 	new: (settings) =>
+		assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
 		@contextSensitive = settings\getSlotsOverlayEnabled()
 		@platformNotRunning = LOCALIZATION\get('overlay_platform_not_running', '%s is not running')
 		@hoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
@@ -53,7 +54,7 @@ class OverlaySlot
 				info = @removeGame
 				image = images.error
 			else
-				assert(nil, 'Unsupported LEFT_CLICK_ACTION encountered in "OverlaySlot.show".')
+				assert(nil, 'main.slots.overlay_slot.show')
 		if @contextSensitive
 			if image
 				SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))

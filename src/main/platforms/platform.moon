@@ -3,6 +3,7 @@ Game = require('main.game')
 
 class Platform
 	new: (settings) =>
+		assert(type(settings) == 'table', 'main.platforms.platform.Platform')
 		@bannerExtensions = {
 			'.jpg'
 			'.png'

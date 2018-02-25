@@ -25,6 +25,11 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, index, typ, action, game, banner)
+      assert(type(index) == 'number' and index % 1 == 0, 'main.animations.slot_click_animation.SlotClickAnimation')
+      assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.slot_click_animation.SlotClickAnimation')
+      assert(type(action) == 'function', 'main.animations.slot_click_animation.SlotClickAnimation')
+      assert(type(game) == 'table', 'main.animations.slot_click_animation.SlotClickAnimation')
+      assert(type(banner) == 'string', 'main.animations.slot_click_animation.SlotClickAnimation')
       local resetAction
       resetAction = function(self)
         SKIN:Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
@@ -82,6 +87,8 @@ do
         frames[4] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 4.0)
         frames[5] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 12.0)
         frames[6] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 20.0)
+      else
+        assert(nil, 'main.animations.slot_click_animation.SlotClickAnimation')
       end
       local args = {
         resetAction = resetAction,

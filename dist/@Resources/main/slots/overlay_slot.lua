@@ -47,7 +47,7 @@ do
         info = self.removeGame
         image = images.error
       else
-        assert(nil, 'Unsupported LEFT_CLICK_ACTION encountered in "OverlaySlot.show".')
+        assert(nil, 'main.slots.overlay_slot.show')
       end
       if self.contextSensitive then
         if image then
@@ -75,6 +75,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
       self.contextSensitive = settings:getSlotsOverlayEnabled()
       self.platformNotRunning = LOCALIZATION:get('overlay_platform_not_running', '%s is not running')
       self.hoursPlayed = LOCALIZATION:get('overlay_hours_played', '%.0f hours played')

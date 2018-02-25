@@ -24,8 +24,11 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
+      assert(type(args.title) == 'string', 'sort.init.Property')
       self.title = args.title
+      assert(type(args.value) == 'string', 'sort.init.Property')
       self.value = args.value
+      assert((type(args.enum) == 'number' and args.enum % 1 == 0) or type(args.action) == 'function', 'sort.init.Property')
       self.enum = args.enum
       self.action = args.action
     end,
@@ -77,6 +80,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, index)
+      assert(type(index) == 'number' and index % 1 == 0, 'sort.init.Slot')
       self.index = index
     end,
     __base = _base_0,

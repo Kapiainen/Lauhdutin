@@ -3,8 +3,10 @@ Slot = require('settings.slots.slot')
 class Slots
 	new: () =>
 		@slots = [Slot(i) for i = 1, STATE.NUM_SLOTS]
+		assert(#@slots == STATE.NUM_SLOTS, 'settings.slots.init.Slots')
 		@settings = {}
 		scrollBar = SKIN\GetMeter('ScrollBar')
+		assert(scrollBar ~= nil 'settings.slots.init.Slots')
 		@scrollBarStart = if scrollBar then scrollBar\GetY() else 0
 		@scrollBarMaxHeight = if scrollBar then scrollBar\GetH() else 0
 		@scrollBarHeight = @scrollBarMaxHeight
