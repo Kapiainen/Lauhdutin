@@ -8,11 +8,13 @@ class Game
 		@path = args.path
 		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
 		@platformID = args.platformID
+		assert(@platformID > 0 and @platformID < ENUMS.PLATFORM_IDS.MAX, 'Unsupported platformID in "Game.new".')
 		@platformOverride = args.platformOverride
 		if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil)
 			@banner = args.banner
-		@expectedBanner = args.expectedBanner
 		@bannerURL = args.bannerURL
+		assert(@bannerURL == nil or (@bannerURL ~= nil and @banner ~= nil), '"Game" expected "args.banner" and "args.bannerURL" to not be nil or "args.bannerURL" to be nil.')
+		@expectedBanner = args.expectedBanner
 		@process = args.process or @_parseProcess(@path)
 		@uninstalled = args.uninstalled
 		@gameID = args.gameID

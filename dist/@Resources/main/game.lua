@@ -255,12 +255,14 @@ do
       self.path = args.path
       assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
       self.platformID = args.platformID
+      assert(self.platformID > 0 and self.platformID < ENUMS.PLATFORM_IDS.MAX, 'Unsupported platformID in "Game.new".')
       self.platformOverride = args.platformOverride
       if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil) then
         self.banner = args.banner
       end
-      self.expectedBanner = args.expectedBanner
       self.bannerURL = args.bannerURL
+      assert(self.bannerURL == nil or (self.bannerURL ~= nil and self.banner ~= nil), '"Game" expected "args.banner" and "args.bannerURL" to not be nil or "args.bannerURL" to be nil.')
+      self.expectedBanner = args.expectedBanner
       self.process = args.process or self:_parseProcess(self.path)
       self.uninstalled = args.uninstalled
       self.gameID = args.gameID

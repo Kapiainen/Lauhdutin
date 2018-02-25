@@ -4,6 +4,7 @@ export ENUMS = {
 		STEAM: 2
 		BATTLENET: 3
 		GOG_GALAXY: 4
+		MAX: 5
 	}
 	FILTER_TYPES: {
 		NONE: 1
