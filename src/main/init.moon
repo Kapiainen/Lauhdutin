@@ -699,6 +699,7 @@ export OnFinishedDetectingPlatformGames = () ->
 			if #STATE.PLATFORM_QUEUE > 0
 				return startDetectingPlatformGames()
 			STATE.PLATFORM_QUEUE = nil
+			log(('%d banners to download')\format(#STATE.BANNER_QUEUE))
 			if #STATE.BANNER_QUEUE > 0
 				return startDownloadingBanner()
 			onInitialized()

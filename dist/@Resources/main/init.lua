@@ -949,6 +949,7 @@ OnFinishedDetectingPlatformGames = function()
       return startDetectingPlatformGames()
     end
     STATE.PLATFORM_QUEUE = nil
+    log(('%d banners to download'):format(#STATE.BANNER_QUEUE))
     if #STATE.BANNER_QUEUE > 0 then
       return startDownloadingBanner()
     end
