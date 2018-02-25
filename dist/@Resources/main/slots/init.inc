@@ -1,19 +1,9 @@
 [Variables]
-SkinWidth=1920
+SkinWidth=1280
 SkinHeight=150
 SlotWidth=320
 SlotHeight=150
 SlotOverlayTextSize=12
-
-[SkinEnabler]
-Meter=Image
-SolidColor=0,0,0,1
-X=0
-Y=0
-W=1
-H=150
-MouseOverAction=[!CommandMeasure "Script" "OnMouseOver()"]
-MouseLeaveAction=[!CommandMeasure "Script" "OnMouseLeaveEnabler()"]
 
 [SlotsBackground]
 Meter=Image
@@ -176,72 +166,6 @@ H=150
 PreserveAspectRatio=2
 DynamicVariables=1
 Group=Slots|Slot4
-
-[Slot5Text]
-Meter=String
-Text=
-SolidColor=0,0,0,1
-X=([SlotsBackground:X] + 1440)
-Y=([SlotsBackground:Y] + 75)
-W=320
-H=150
-FontSize=#SlotOverlayTextSize#
-FontColor=#SlotOverlayTextColor#
-StringAlign=CenterCenter
-StringEffect=Shadow
-AntiAlias=1
-ClipString=1
-DynamicVariables=1
-LeftMouseDoubleClickAction=[!CommandMeasure "Script" "OnLeftClickSlot(5)"]
-MiddleMouseUpAction=[!CommandMeasure "Script" "OnMiddleClickSlot(5)"]
-MouseOverAction=[!CommandMeasure "Script" "OnHoverSlot(5)"]
-MouseLeaveAction=[!CommandMeasure "Script" "OnLeaveSlot(5)"]
-Group=Slots|Slot5
-
-[Slot5Image]
-Meter=Image
-ImageName=
-SolidColor=0,0,0,1
-X=([SlotsBackground:X] + 1280)
-Y=([SlotsBackground:Y] + 0)
-W=320
-H=150
-PreserveAspectRatio=2
-DynamicVariables=1
-Group=Slots|Slot5
-
-[Slot6Text]
-Meter=String
-Text=
-SolidColor=0,0,0,1
-X=([SlotsBackground:X] + 1760)
-Y=([SlotsBackground:Y] + 75)
-W=320
-H=150
-FontSize=#SlotOverlayTextSize#
-FontColor=#SlotOverlayTextColor#
-StringAlign=CenterCenter
-StringEffect=Shadow
-AntiAlias=1
-ClipString=1
-DynamicVariables=1
-LeftMouseDoubleClickAction=[!CommandMeasure "Script" "OnLeftClickSlot(6)"]
-MiddleMouseUpAction=[!CommandMeasure "Script" "OnMiddleClickSlot(6)"]
-MouseOverAction=[!CommandMeasure "Script" "OnHoverSlot(6)"]
-MouseLeaveAction=[!CommandMeasure "Script" "OnLeaveSlot(6)"]
-Group=Slots|Slot6
-
-[Slot6Image]
-Meter=Image
-ImageName=
-SolidColor=0,0,0,1
-X=([SlotsBackground:X] + 1600)
-Y=([SlotsBackground:Y] + 0)
-W=320
-H=150
-PreserveAspectRatio=2
-DynamicVariables=1
-Group=Slots|Slot6
 
 [SlotOverlayImage]
 Meter=Image
