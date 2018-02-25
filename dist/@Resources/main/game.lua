@@ -3,6 +3,31 @@ local Game
 do
   local _class_0
   local _base_0 = {
+    merge = function(self, old)
+      assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".')
+      log('Merging: ' .. old.title)
+      self.processOverride = old.processOverride
+      self.hidden = old.hidden
+      if self.lastPlayed ~= nil then
+        if old.lastPlayed ~= nil and old.lastPlayed > self.lastPlayed then
+          self.lastPlayed = old.lastPlayed
+        end
+      else
+        self.lastPlayed = old.lastPlayed
+      end
+      if self.hoursPlayed ~= nil then
+        if old.hoursPlayed ~= nil and old.hoursPlayed > self.hoursPlayed then
+          self.hoursPlayed = old.hoursPlayed
+        end
+      else
+        self.hoursPlayed = old.hoursPlayed
+      end
+      self.tags = old.tags
+      self.startingBangs = old.startingBangs
+      self.stoppingBangs = old.stoppingBangs
+      self.ignoresOtherBangs = old.ignoresOtherBangs
+      self.notes = old.notes
+    end,
     _moveThe = function(self, title)
       if title:lower():startsWith('the ') then
         title = ('%s, %s'):format(title:sub(5), title:sub(1, 3))
@@ -214,35 +239,11 @@ do
       return self.notes
     end,
     setNotes = function(self, str)
-      str = str:trim()
-      if str == '' then
+      if str:trim() == '' then
         self.notes = nil
       else
         self.notes = str
       end
-    end,
-    merge = function(self, old)
-      assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".')
-      log('Merging: ' .. old.title)
-      self.processOverride = old.processOverride
-      self.hidden = old.hidden
-      self.tags = old.tags
-      if self.lastPlayed ~= nil and old.lastPlayed ~= nil then
-        if old.lastPlayed > self.lastPlayed then
-          self.lastPlayed = old.lastPlayed
-        end
-      elseif old.lastPlayed ~= nil then
-        self.lastPlayed = old.lastPlayed
-      end
-      if self.hoursPlayed ~= nil and old.hoursPlayed ~= nil then
-        if old.hoursPlayed > self.hoursPlayed then
-          self.hoursPlayed = old.hoursPlayed
-        end
-      elseif old.hoursPlayed ~= nil then
-        self.hoursPlayed = old.hoursPlayed
-      end
-      self.startingBangs = old.startingBangs
-      self.stoppingBangs = old.stoppingBangs
     end
   }
   _base_0.__index = _base_0
@@ -261,18 +262,18 @@ do
       self.expectedBanner = args.expectedBanner
       self.bannerURL = args.bannerURL
       self.process = args.process or self:_parseProcess(self.path)
+      self.uninstalled = args.uninstalled
+      self.gameID = args.gameID
+      self.platformTags = args.platformTags
       self.processOverride = args.processOverride
       self.hidden = args.hidden
-      self.uninstalled = args.uninstalled
       self.lastPlayed = args.lastPlayed
       self.hoursPlayed = args.hoursPlayed
       self.tags = args.tags
-      self.platformTags = args.platformTags
       self.startingBangs = args.startingBangs
       self.stoppingBangs = args.stoppingBangs
       self.ignoresOtherBangs = args.ignoresOtherBangs
       self.notes = args.notes
-      self.gameID = args.gameID
     end,
     __base = _base_0,
     __name = "Game"

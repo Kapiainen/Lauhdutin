@@ -14,18 +14,40 @@ class Game
 		@expectedBanner = args.expectedBanner
 		@bannerURL = args.bannerURL
 		@process = args.process or @_parseProcess(@path)
+		@uninstalled = args.uninstalled
+		@gameID = args.gameID
+		@platformTags = args.platformTags
+		-- User-generated information, which needs to be used in the 'merge' method.
 		@processOverride = args.processOverride
 		@hidden = args.hidden
-		@uninstalled = args.uninstalled
 		@lastPlayed = args.lastPlayed
 		@hoursPlayed = args.hoursPlayed
 		@tags = args.tags
-		@platformTags = args.platformTags
 		@startingBangs = args.startingBangs
 		@stoppingBangs = args.stoppingBangs
 		@ignoresOtherBangs = args.ignoresOtherBangs
 		@notes = args.notes
-		@gameID = args.gameID
+
+	merge: (old) =>
+		assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".') -- TODO: Should 'Game' actually just be a table directly parsed from 'games.json'? Unnecessary allocations could be avoided.
+		log('Merging: ' .. old.title)
+		@processOverride = old.processOverride
+		@hidden = old.hidden
+		if @lastPlayed ~= nil
+			if old.lastPlayed ~= nil and old.lastPlayed > @lastPlayed
+				@lastPlayed = old.lastPlayed
+		else
+			@lastPlayed = old.lastPlayed
+		if @hoursPlayed ~= nil
+			if old.hoursPlayed ~= nil and old.hoursPlayed > @hoursPlayed
+				@hoursPlayed = old.hoursPlayed
+		else
+			@hoursPlayed = old.hoursPlayed
+		@tags = old.tags
+		@startingBangs = old.startingBangs
+		@stoppingBangs = old.stoppingBangs
+		@ignoresOtherBangs = old.ignoresOtherBangs
+		@notes = old.notes
 
 	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
 	-- the substring 'the' does not lead to a bunch of unrelated games beginning with 'the ' to show up.
@@ -153,24 +175,6 @@ class Game
 	getNotes: () => return @notes
 
 	setNotes: (str) =>
-		str = str\trim()
-		@notes = if str == '' then nil else str
-
-	merge: (old) =>
-		assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".') -- TODO: Should 'Game' actually just be a table directly parsed from 'games.json'? Unnecessary allocations could be avoided.
-		log('Merging: ' .. old.title)
-		@processOverride = old.processOverride
-		@hidden = old.hidden
-		@tags = old.tags
-		if @lastPlayed ~= nil and old.lastPlayed ~= nil
-			@lastPlayed = old.lastPlayed if old.lastPlayed > @lastPlayed
-		elseif old.lastPlayed ~= nil
-			@lastPlayed = old.lastPlayed
-		if @hoursPlayed ~= nil and old.hoursPlayed ~= nil
-			@hoursPlayed = old.hoursPlayed if old.hoursPlayed > @hoursPlayed
-		elseif old.hoursPlayed ~= nil
-			@hoursPlayed = old.hoursPlayed
-		@startingBangs = old.startingBangs
-		@stoppingBangs = old.stoppingBangs
+		@notes = if str\trim() == '' then nil else str
 
 return Game
