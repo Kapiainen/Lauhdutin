@@ -71,7 +71,7 @@ Support includes:
 - Launch games directly via the game's executable or via the GOG Galaxy client.
 - Automatically download banners for games that were found.
 
-**NOTE:** GOG Galaxy support requires placing the command-line tool `sqlite3.exe`, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive, in Lauhdutin's `@Resources` folder.
+**NOTE:** GOG Galaxy support requires the command-line tool `sqlite3.exe`, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable must be placed in Lauhdutin's `@Resources` folder.
 
 ### Blizzard Battle.net
 
