@@ -160,8 +160,8 @@ do
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
     end,
     getACFs = function(self)
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]'):format(self.libraries[1]))
       io.writeFile(io.joinPaths(self.cachePath, 'output.txt'), '')
+      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]'):format(self.libraries[1]))
       return self:getWaitCommand(), '', 'OnGotACFs'
     end,
     parseLocalConfig = function(self)
