@@ -1,3 +1,6 @@
+**Version 3.0.0 beta 2 - 2018/MM/DD:**
+- Fixed a bug that caused an error when the number of slots in the .inc file is greater than the number of slots based on the settings.
+
 **Version 3.0.0 beta 1 - 2018/02/25:**
 - Rewritten in MoonScript/Lua, VBScript, and batch files.
 
