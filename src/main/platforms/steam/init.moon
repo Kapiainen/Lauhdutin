@@ -263,6 +263,7 @@ class Steam extends Platform
 		manifests = file\splitIntoLines()
 		for manifest in *manifests
 			appID = manifest\match('appmanifest_(%d+)%.acf')
+			continue if appID == nil
 			assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
 			-- Disregard duplicates, if they appear for some reason.
 			continue if games[appID] ~= nil

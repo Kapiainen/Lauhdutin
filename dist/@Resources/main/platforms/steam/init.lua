@@ -344,6 +344,10 @@ do
         repeat
           local manifest = manifests[_index_0]
           local appID = manifest:match('appmanifest_(%d+)%.acf')
+          if appID == nil then
+            _continue_0 = true
+            break
+          end
           assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
           if games[appID] ~= nil then
             _continue_0 = true
