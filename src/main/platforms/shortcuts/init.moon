@@ -28,7 +28,7 @@ class Shortcuts extends Platform
 		games = {}
 		output = io.readFile(@outputPath)
 		lines = output\splitIntoLines()
-		while #lines > 0
+		while #lines > 0 and #lines % 3 == 0
 			absoluteFilePath = table.remove(lines, 1)
 			_, diverges = absoluteFilePath\find(@shortcutsPath)
 			relativeFilePath = absoluteFilePath\sub(diverges + 1)

@@ -23,7 +23,7 @@ do
       local games = { }
       local output = io.readFile(self.outputPath)
       local lines = output:splitIntoLines()
-      while #lines > 0 do
+      while #lines > 0 and #lines % 3 == 0 do
         local absoluteFilePath = table.remove(lines, 1)
         local _, diverges = absoluteFilePath:find(self.shortcutsPath)
         local relativeFilePath = absoluteFilePath:sub(diverges + 1)
