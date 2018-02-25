@@ -233,10 +233,7 @@ do
         local cacheBannerPath = io.joinPaths(self.cachePath, appID .. extension)
         if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath) then
           io.copyFile(gridBannerPath, cacheBannerPath, false)
-          banner = self:getBannerPath(appID)
-          if banner then
-            return banner, nil
-          end
+          return cacheBannerPath, nil
         end
       end
       banner = io.joinPaths(self.cachePath, appID .. '.jpg')
