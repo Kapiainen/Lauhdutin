@@ -1,4 +1,5 @@
-**Version 3.0.0 beta 3 - 2018/MM/DD:**
+**Version 3.0.0 beta 3 - 2018/02/25:**
+- Fixed a bug, which was introduced in the previous version, in the setting types.
 
 **Version 3.0.0 beta 2 - 2018/02/25:**
 - Fixed a bug that caused an error when the number of slots in the .inc file is greater than the number of slots based on the settings.
