@@ -781,6 +781,9 @@ OnLeftClickSlot = function(index)
   if STATE.SKIN_ANIMATION_PLAYING then
     return 
   end
+  if index < 1 or index > STATE.NUM_SLOTS then
+    return 
+  end
   local success, err = pcall(function()
     local game = COMPONENTS.SLOTS:leftClick(index)
     if not (game) then
@@ -813,6 +816,9 @@ OnMiddleClickSlot = function(index)
     return 
   end
   if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  if index < 1 or index > STATE.NUM_SLOTS then
     return 
   end
   local success, err = pcall(function()
@@ -885,6 +891,9 @@ OnHoverSlot = function(index)
   if STATE.SKIN_ANIMATION_PLAYING then
     return 
   end
+  if index < 1 or index > STATE.NUM_SLOTS then
+    return 
+  end
   local success, err = pcall(function()
     return COMPONENTS.SLOTS:hover(index)
   end)
@@ -897,6 +906,9 @@ OnLeaveSlot = function(index)
     return 
   end
   if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  if index < 1 or index > STATE.NUM_SLOTS then
     return 
   end
   local success, err = pcall(function()

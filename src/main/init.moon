@@ -579,6 +579,7 @@ removeGame = (game) ->
 export OnLeftClickSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			game = COMPONENTS.SLOTS\leftClick(index)
@@ -599,6 +600,7 @@ export OnLeftClickSlot = (index) ->
 export OnMiddleClickSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			log('OnMiddleClickSlot', index)
@@ -650,6 +652,7 @@ export UpdateGame = (gameID) ->
 export OnHoverSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			COMPONENTS.SLOTS\hover(index)
@@ -659,6 +662,7 @@ export OnHoverSlot = (index) ->
 export OnLeaveSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			COMPONENTS.SLOTS\leave(index)
