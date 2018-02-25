@@ -18,7 +18,10 @@ build = function()
   end
   contents = contents .. '\n'
   local Settings = require('settings.types')
-  local args = { }
+  local args = {
+    title = '',
+    tooltip = ''
+  }
   local settings
   do
     local _accum_0 = { }

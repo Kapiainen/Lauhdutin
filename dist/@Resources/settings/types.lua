@@ -9,6 +9,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
+      assert(type(args) == 'table', 'settings.types.Base')
       assert(type(args.title) == 'string', 'settings.types.Base')
       assert(type(args.tooltip) == 'string', 'settings.types.Base')
       assert(type(args.type) == 'number' and args.type % 1 == 0, 'settings.types.Base')
@@ -63,7 +64,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.ACTION
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.ACTION
+      end
       _class_0.__parent.__init(self, args)
       self.label = args.label
       self.perform = args.perform
@@ -127,7 +130,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.BOOLEAN
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.BOOLEAN
+      end
       _class_0.__parent.__init(self, args)
       self.getState = args.getState
       self.toggle = args.toggle
@@ -247,7 +252,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.INTEGER
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.INTEGER
+      end
       _class_0.__parent.__init(self, args)
       self.value = args.defaultValue or 0
       self.minValue = args.minValue or nil
@@ -342,7 +349,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.FOLDER_PATH
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.FOLDER_PATH
+      end
       _class_0.__parent.__init(self, args)
       self.getValue = args.getValue
       self.setValue = args.setValue
@@ -452,7 +461,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.SPINNER
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.SPINNER
+      end
       _class_0.__parent.__init(self, args)
       self.index = args.index
       self.values = {
@@ -601,7 +612,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
-      args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
+      end
       _class_0.__parent.__init(self, args)
       if args.setPath ~= nil then
         self.setPath = args.setPath

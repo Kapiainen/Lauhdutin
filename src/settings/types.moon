@@ -1,5 +1,6 @@
 class Base
 	new: (args) =>
+		assert(type(args) == 'table', 'settings.types.Base')
 		assert(type(args.title) == 'string', 'settings.types.Base')
 		assert(type(args.tooltip) == 'string', 'settings.types.Base')
 		assert(type(args.type) == 'number' and args.type % 1 == 0, 'settings.types.Base')
@@ -12,7 +13,7 @@ class Base
 
 class Action extends Base
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.ACTION
+		args.type = ENUMS.SETTING_TYPES.ACTION if args.type == nil
 		super(args)
 		@label = args.label
 		@perform = args.perform
@@ -42,7 +43,7 @@ class Action extends Base
 
 class Boolean extends Base
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.BOOLEAN
+		args.type = ENUMS.SETTING_TYPES.BOOLEAN if args.type == nil
 		super(args)
 		@getState = args.getState
 		@toggle = args.toggle
@@ -70,7 +71,7 @@ class Boolean extends Base
 
 class Integer extends Base
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.INTEGER
+		args.type = ENUMS.SETTING_TYPES.INTEGER if args.type == nil
 		super(args)
 		@value = args.defaultValue or 0
 		@minValue = args.minValue or nil
@@ -152,7 +153,7 @@ class Integer extends Base
 
 class FolderPath extends Base
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH
+		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH if args.type == nil
 		super(args)
 		@getValue = args.getValue
 		@setValue = args.setValue
@@ -202,7 +203,7 @@ class FolderPath extends Base
 
 class Spinner extends Base
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.SPINNER
+		args.type = ENUMS.SETTING_TYPES.SPINNER if args.type == nil
 		super(args)
 		@index = args.index
 		@values = {'UNDEFINED'}
@@ -277,7 +278,7 @@ class Spinner extends Base
 
 class FolderPathSpinner extends Spinner
 	new: (args) =>
-		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
+		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER if args.type == nil
 		super(args)
 		@setPath = args.setPath if args.setPath ~= nil
 		@dialogTitle = args.dialogTitle or 'Select a folder'
