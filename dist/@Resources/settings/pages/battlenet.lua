@@ -17,7 +17,7 @@ do
       self.title = 'Blizzard Battle.net'
       self.settings = {
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_battlenet_enabled_title', 'Enabled'),
+          title = LOCALIZATION:get('button_label_enabled', 'Enabled'),
           tooltip = LOCALIZATION:get('setting_battlenet_enabled_description', 'If enabled, then games installed via the Blizzard Battle.net client will be included.'),
           toggle = function()
             COMPONENTS.SETTINGS:toggleBattlenetEnabled()
@@ -57,7 +57,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_battlenet_starting_bangs_title', 'Starting bangs'),
+          title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
           tooltip = LOCALIZATION:get('setting_battlenet_starting_bangs_description', 'These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)
@@ -68,7 +68,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_battlenet_stopping_bangs_title', 'Stopping bangs'),
+          title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
           tooltip = LOCALIZATION:get('setting_battlenet_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.Paths	TRANSLATION_MISSING'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)

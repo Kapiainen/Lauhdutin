@@ -102,7 +102,7 @@ createProperties = (game, platform) ->
 	)
 	table.insert(properties,
 		Property({
-			title: LOCALIZATION\get('sort_hours_played', 'Hours played')
+			title: LOCALIZATION\get('button_label_hours_played', 'Hours played')
 			value: ' '
 			enum: ENUMS.SORTING_TYPES.HOURS_PLAYED
 		})

@@ -14,7 +14,7 @@ do
       self.title = 'GOG Galaxy'
       self.settings = {
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_gog_galaxy_enabled_title', 'Enabled'),
+          title = LOCALIZATION:get('button_label_enabled', 'Enabled'),
           tooltip = LOCALIZATION:get('setting_gog_galaxy_enabled_description', 'If enabled, then games installed via the GOG Galaxy client will be included.'),
           toggle = function(self)
             COMPONENTS.SETTINGS:toggleGOGGalaxyEnabled()
@@ -25,7 +25,7 @@ do
           end
         }),
         Settings.FolderPath({
-          title = LOCALIZATION:get('setting_gog_galaxy_client_path_title', 'Client path'),
+          title = LOCALIZATION:get('button_label_client_path', 'Client path'),
           tooltip = LOCALIZATION:get('setting_gog_galaxy_client_path_description', 'The folder that contains the GOG Galaxy client executable.'),
           getValue = function(self)
             return COMPONENTS.SETTINGS:getGOGGalaxyClientPath()
@@ -57,7 +57,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_gog_galaxy_starting_bangs_title', 'Starting bangs'),
+          title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
           tooltip = LOCALIZATION:get('setting_gog_galaxy_starting_bangs_description', 'These Rainmeter bangs are executed just before any GOG Galaxy game launches.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)
@@ -68,7 +68,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_gog_galaxy_stopping_bangs_title', 'Stopping bangs'),
+          title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
           tooltip = LOCALIZATION:get('setting_gog_galaxy_stopping_bangs_description', 'These Rainmeter bangs are executed just after any GOG Galaxy game terminates.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)

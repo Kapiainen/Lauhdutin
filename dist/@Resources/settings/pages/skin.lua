@@ -67,56 +67,56 @@ getLanguageIndex = function()
 end
 state.slotHoverAnimations = {
   {
-    displayValue = LOCALIZATION:get('setting_slots_hover_animation_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none', 'None')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_hover_animation_zoom_in', 'Zoom in')
+    displayValue = LOCALIZATION:get('setting_animation_label_zoom_in', 'Zoom in')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_hover_animation_jiggle', 'Jiggle')
+    displayValue = LOCALIZATION:get('setting_animation_label_jiggle', 'Jiggle')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_hover_animation_shake_left_right', 'Shake left and right')
+    displayValue = LOCALIZATION:get('setting_animation_label_shake_left_right', 'Shake left and right')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_hover_animation_shake_up_down', 'Shake up and down')
+    displayValue = LOCALIZATION:get('setting_animation_label_shake_up_down', 'Shake up and down')
   }
 }
 state.slotClickAnimations = {
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none', 'None')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_slide_up', 'Slide upwards')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_up', 'Slide upwards')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_slide_right', 'Slide to the right')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_right', 'Slide to the right')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_slide_down', 'Slide downwards')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_down', 'Slide downwards')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_slide_left', 'Slide to the left')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_left', 'Slide to the left')
   },
   {
-    displayValue = LOCALIZATION:get('setting_slots_click_animation_shrink', 'Shrink')
+    displayValue = LOCALIZATION:get('setting_animation_label_shrink', 'Shrink')
   }
 }
 state.skinAnimations = {
   {
-    displayValue = LOCALIZATION:get('setting_skin_animation_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none', 'None')
   },
   {
-    displayValue = LOCALIZATION:get('setting_skin_animation_slide_up', 'Slide upwards')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_up', 'Slide upwards')
   },
   {
-    displayValue = LOCALIZATION:get('setting_skin_animation_slide_right', 'Slide to the right')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_right', 'Slide to the right')
   },
   {
-    displayValue = LOCALIZATION:get('setting_skin_animation_slide_down', 'Slide downwards')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_down', 'Slide downwards')
   },
   {
-    displayValue = LOCALIZATION:get('setting_skin_animation_slide_left', 'Slide to the left')
+    displayValue = LOCALIZATION:get('setting_animation_label_slide_left', 'Slide to the left')
   }
 }
 local Skin
@@ -325,7 +325,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_bangs_starting_title', 'Starting bangs'),
+          title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
           tooltip = LOCALIZATION:get('setting_bangs_starting_description', 'These Rainmeter bangs are executed just before any game launches.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)
@@ -336,7 +336,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_bangs_stopping_title', 'Stopping bangs'),
+          title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
           tooltip = LOCALIZATION:get('setting_bangs_stopping_description', 'These Rainmeter bangs are executed just after any game terminates.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)

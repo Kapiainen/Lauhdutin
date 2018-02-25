@@ -181,11 +181,11 @@ createTagProperty = (tag, state) ->
 	f = () ->
 		switch STATE.GAME_TAGS[tag]
 			when ENUMS.TAG_STATES.DISABLED
-				return LOCALIZATION\get('game_tag_disabled', 'Disabled')
+				return LOCALIZATION\get('button_label_disabled', 'Disabled')
 			when ENUMS.TAG_STATES.ENABLED
-				return LOCALIZATION\get('game_tag_enabled', 'Enabled')
+				return LOCALIZATION\get('button_label_enabled', 'Enabled')
 			when ENUMS.TAG_STATES.ENABLED_PLATFORM
-				return LOCALIZATION\get('game_tag_enabled', 'Enabled') .. '*'
+				return LOCALIZATION\get('button_label_enabled', 'Enabled') .. '*'
 	if state == ENUMS.TAG_STATES.ENABLED_PLATFORM
 		return Property({
 					title: tag
@@ -233,7 +233,7 @@ createProperties = (game, platform) ->
 	-- Hours played
 	table.insert(properties,
 		Property({
-			title: LOCALIZATION\get('game_hours_played', 'Hours played')
+			title: LOCALIZATION\get('button_label_hours_played', 'Hours played')
 			value: ('%.0f')\format(game\getHoursPlayed())
 		})
 	)
@@ -256,8 +256,8 @@ createProperties = (game, platform) ->
 	-- Installed
 	f = () =>
 		if game\isInstalled()
-			return LOCALIZATION\get('game_installed_yes', 'Yes')
-		return LOCALIZATION\get('game_installed_no', 'No')
+			return LOCALIZATION\get('button_label_yes', 'Yes')
+		return LOCALIZATION\get('button_label_no', 'No')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_installed', 'Installed')
@@ -267,8 +267,8 @@ createProperties = (game, platform) ->
 	-- Visible
 	f = () =>
 		if game\isVisible()
-			return LOCALIZATION\get('game_visible_yes', 'Yes')
-		return LOCALIZATION\get('game_visible_no', 'No')
+			return LOCALIZATION\get('button_label_yes', 'Yes')
+		return LOCALIZATION\get('button_label_no', 'No')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_visible', 'Visible')
@@ -305,7 +305,7 @@ createProperties = (game, platform) ->
 		process = game\getProcess(true)
 		if process ~= nil and process ~= ''
 			return process 
-		return LOCALIZATION\get('game_process_none', 'None')
+		return LOCALIZATION\get('button_label_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_process', 'Process')
@@ -323,7 +323,7 @@ createProperties = (game, platform) ->
 			line = lines[1]
 			line ..= '...' if #lines > 1
 			return line
-		return LOCALIZATION\get('game_notes_none', 'None')
+		return LOCALIZATION\get('button_label_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_notes', 'Notes')
@@ -350,7 +350,7 @@ createProperties = (game, platform) ->
 			str = str\sub(4)
 			if str ~= ''
 				return str
-		return LOCALIZATION\get('game_tags_none', 'None')
+		return LOCALIZATION\get('button_label_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_tags', 'Tags')
@@ -373,8 +373,8 @@ createProperties = (game, platform) ->
 	-- Ignores other bangs
 	f = () =>
 		if game\getIgnoresOtherBangs()
-			return LOCALIZATION\get('game_ignores_other_bangs_yes', 'Yes')
-		return LOCALIZATION\get('game_ignores_other_bangs_no', 'No')
+			return LOCALIZATION\get('button_label_yes', 'Yes')
+		return LOCALIZATION\get('button_label_no', 'No')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_ignores_other_bangs', 'Ignores other bangs')
@@ -391,10 +391,10 @@ createProperties = (game, platform) ->
 			bangs = table.concat(bangs, ' | ')
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
-		return LOCALIZATION\get('game_starting_bangs_none', 'None')
+		return LOCALIZATION\get('button_label_none', 'None')
 	table.insert(properties,
 		Property({
-			title: LOCALIZATION\get('game_starting_bangs', 'Starting bangs')
+			title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
 			value: f()
 			action: (index) =>
 				StartEditingStartingBangs()
@@ -408,10 +408,10 @@ createProperties = (game, platform) ->
 			bangs = table.concat(bangs, ' | ')
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
-		return LOCALIZATION\get('game_stopping_bangs_none', 'None')
+		return LOCALIZATION\get('button_label_none', 'None')
 	table.insert(properties,
 		Property({
-			title: LOCALIZATION\get('game_stopping_bangs', 'Stopping bangs')
+			title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
 			value: f()
 			action: (index) =>
 				StartEditingStoppingBangs()

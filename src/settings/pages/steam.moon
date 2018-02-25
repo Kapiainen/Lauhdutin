@@ -64,7 +64,7 @@ class Steam extends Page
 		steamClientPathDescription = LOCALIZATION\get('setting_steam_client_path_description', 'This should be the folder that contains the Steam client executable.')
 		@settings = {
 			Settings.Boolean({
-				title: LOCALIZATION\get('setting_steam_enabled_title', 'Enabled')
+				title: LOCALIZATION\get('button_label_enabled', 'Enabled')
 				tooltip: LOCALIZATION\get('setting_steam_enabled_description', 'If enabled, then games installed via the Steam client will be included. Non-Steam game shortcuts that have been added to Steam will also be included.')
 				toggle: () ->
 					COMPONENTS.SETTINGS\toggleSteamEnabled()
@@ -73,7 +73,7 @@ class Steam extends Page
 					return COMPONENTS.SETTINGS\getSteamEnabled()
 			})
 			Settings.FolderPath({
-				title: LOCALIZATION\get('setting_steam_client_path_title', 'Client path')
+				title: LOCALIZATION\get('button_label_client_path', 'Client path')
 				tooltip: steamClientPathDescription
 				getValue: () =>
 					return COMPONENTS.SETTINGS\getSteamPath()
@@ -110,7 +110,7 @@ class Steam extends Page
 					return COMPONENTS.SETTINGS\getSteamParseCommunityProfile()
 			})
 			Settings.Action({
-				title: LOCALIZATION\get('setting_steam_starting_bangs_title', 'Starting bangs')
+				title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
 				tooltip: LOCALIZATION\get('setting_steam_starting_bangs_description', 'These Rainmeter bangs are executed just before any Steam game launches.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>
@@ -120,7 +120,7 @@ class Steam extends Page
 					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedSteamStartingBangs')
 			})
 			Settings.Action({
-				title: LOCALIZATION\get('setting_steam_stopping_bangs_title', 'Stopping bangs')
+				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
 				tooltip: LOCALIZATION\get('setting_steam_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Steam game terminates.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>

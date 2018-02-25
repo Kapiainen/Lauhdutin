@@ -14,7 +14,7 @@ do
       self.title = LOCALIZATION:get('setting_shortcuts_title', 'Windows shortcuts')
       self.settings = {
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_shortcuts_enabled_title', 'Enabled'),
+          title = LOCALIZATION:get('button_label_enabled', 'Enabled'),
           tooltip = LOCALIZATION:get('setting_shortcuts_enabled_description', 'If enabled, then Windows shortcuts placed in the designated folder will be included.'),
           toggle = function(self)
             COMPONENTS.SETTINGS:toggleShortcutsEnabled()
@@ -33,7 +33,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_shortcuts_starting_bangs_title', 'Starting bangs'),
+          title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
           tooltip = LOCALIZATION:get('setting_shortcuts_starting_bangs_description', 'These Rainmeter bangs are executed just before any Windows shortcut game launches.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)
@@ -44,7 +44,7 @@ do
           end
         }),
         Settings.Action({
-          title = LOCALIZATION:get('setting_shortcuts_stopping_bangs_title', 'Stopping bangs'),
+          title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
           tooltip = LOCALIZATION:get('setting_shortcuts_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Windows shortcut game terminates.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)

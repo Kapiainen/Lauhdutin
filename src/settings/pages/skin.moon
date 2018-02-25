@@ -44,28 +44,28 @@ getLanguageIndex = () ->
 
 -- Slot hover animations
 state.slotHoverAnimations = {
-	{displayValue: LOCALIZATION\get('setting_slots_hover_animation_none', 'None')}
-	{displayValue: LOCALIZATION\get('setting_slots_hover_animation_zoom_in', 'Zoom in')}
-	{displayValue: LOCALIZATION\get('setting_slots_hover_animation_jiggle', 'Jiggle')}
-	{displayValue: LOCALIZATION\get('setting_slots_hover_animation_shake_left_right', 'Shake left and right')}
-	{displayValue: LOCALIZATION\get('setting_slots_hover_animation_shake_up_down', 'Shake up and down')}
+	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_zoom_in', 'Zoom in')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_jiggle', 'Jiggle')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_shake_left_right', 'Shake left and right')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_shake_up_down', 'Shake up and down')}
 }
 -- Slot click animations
 state.slotClickAnimations = {
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_none', 'None')}
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_slide_up', 'Slide upwards')}
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_slide_right', 'Slide to the right')}
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_slide_down', 'Slide downwards')}
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_slide_left', 'Slide to the left')}
-	{displayValue: LOCALIZATION\get('setting_slots_click_animation_shrink', 'Shrink')}
+	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_up', 'Slide upwards')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_right', 'Slide to the right')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_down', 'Slide downwards')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_left', 'Slide to the left')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_shrink', 'Shrink')}
 }
 -- Skin animations
 state.skinAnimations = {
-	{displayValue: LOCALIZATION\get('setting_skin_animation_none', 'None')}
-	{displayValue: LOCALIZATION\get('setting_skin_animation_slide_up', 'Slide upwards')}
-	{displayValue: LOCALIZATION\get('setting_skin_animation_slide_right', 'Slide to the right')}
-	{displayValue: LOCALIZATION\get('setting_skin_animation_slide_down', 'Slide downwards')}
-	{displayValue: LOCALIZATION\get('setting_skin_animation_slide_left', 'Slide to the left')}
+	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_up', 'Slide upwards')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_right', 'Slide to the right')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_down', 'Slide downwards')}
+	{displayValue: LOCALIZATION\get('setting_animation_label_slide_left', 'Slide to the left')}
 }
 
 class Skin extends Page
@@ -241,7 +241,7 @@ class Skin extends Page
 					return COMPONENTS.SETTINGS\getBangsEnabled()
 			})
 			Settings.Action({
-				title: LOCALIZATION\get('setting_bangs_starting_title', 'Starting bangs')
+				title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
 				tooltip: LOCALIZATION\get('setting_bangs_starting_description', 'These Rainmeter bangs are executed just before any game launches.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>
@@ -251,7 +251,7 @@ class Skin extends Page
 					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStartingBangs')
 			})
 			Settings.Action({
-				title: LOCALIZATION\get('setting_bangs_stopping_title', 'Stopping bangs')
+				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
 				tooltip: LOCALIZATION\get('setting_bangs_stopping_description', 'These Rainmeter bangs are executed just after any game terminates.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>
