@@ -83,7 +83,7 @@ Blizzard Battle.net support does not currently include support for classic games
 
 ### Windows shortcuts and other platforms
 
-Windows shortcuts (.lnk and .url files) can be added to the `\@Resources\Shortcuts` folder. This folder can also be opened via a context option in the main config or via the settings page for Windows shortcuts.
+Windows shortcuts (.lnk and .url files) can be added to the `\@Resources\Shortcuts` folder. This folder can also be opened via the context menu in the main config or via the settings page for Windows shortcuts.
 
 Additional platforms might be supported in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing shortcuts for them in `\@Resources\Shortcuts`. If the shortcuts are placed in a subfolder, then the name of the subfolder will then be used as an override for the name of the games' platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
 
