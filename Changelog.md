@@ -2,6 +2,10 @@
 - Fixed a bug that caused an error when the number of slots in the .inc file is greater than the number of slots based on the settings.
 - Game class constructor now checks if the platform ID is valid.
 - Game class constructor now checks if a banner path was provided along with a banner URL.
+- Added more assertions and updated old ones to help with debugging.
+- Fixed a bug due to unexpected output when detecting Windows shortcuts.
+- Fixed a bug due to unexpected output when detecting Steam games.
+- Fixed a bug related to whitespace in paths to Steam libraries.
 
 **Version 3.0.0 beta 1 - 2018/02/25:**
 - Rewritten in MoonScript/Lua, VBScript, and batch files.
