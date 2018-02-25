@@ -8,7 +8,6 @@ class AnimationQueue
 		@queue = {}
 
 	push: (animation) =>
-		--assert(animation.__parent == Animation, '"AnimationQueue.push" expected an instance of a class that extends the "Animation" class.')
 		if #@queue > 0
 			unless @queue[1]\isMandatory()
 				@queue[1]\cancel()

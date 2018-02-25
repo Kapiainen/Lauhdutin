@@ -30,7 +30,7 @@ build = function(settings)
     elseif ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT == _exp_0 then
       enablerX = 0
     else
-      enablerX = assert(nil, 'Unsupported skin animation type in the main skin builder.')
+      enablerX = assert(nil, 'settings.build_main_skin.build')
     end
     local enablerY
     local _exp_1 = skinSlideAnimation
@@ -43,7 +43,7 @@ build = function(settings)
     elseif ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT == _exp_1 then
       enablerY = 0
     else
-      enablerY = assert(nil, 'Unsupported skin animation type in the main skin builder.')
+      enablerY = assert(nil, 'settings.build_main_skin.build')
     end
     local enablerWidth
     local _exp_2 = skinSlideAnimation
@@ -56,7 +56,7 @@ build = function(settings)
     elseif ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT == _exp_2 then
       enablerWidth = 1
     else
-      enablerWidth = assert(nil, 'Unsupported skin animation type in the main skin builder.')
+      enablerWidth = assert(nil, 'settings.build_main_skin.build')
     end
     local enablerHeight
     local _exp_3 = skinSlideAnimation
@@ -69,7 +69,7 @@ build = function(settings)
     elseif ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT == _exp_3 then
       enablerHeight = skinHeight
     else
-      enablerHeight = assert(nil, 'Unsupported skin animation type in the main skin builder.')
+      enablerHeight = assert(nil, 'settings.build_main_skin.build')
     end
     contents = contents .. table.concat({
       '[SkinEnabler]',

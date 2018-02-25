@@ -112,7 +112,7 @@ export Initialize = () ->
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')()\getBannerExtensions(), '|')\gsub('%.', '')
+			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')(COMPONENTS.SETTINGS)\getBannerExtensions(), '|')\gsub('%.', '')
 			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
 			SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
 			SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')

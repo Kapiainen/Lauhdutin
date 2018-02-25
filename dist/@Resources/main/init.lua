@@ -39,10 +39,10 @@ end
 local downloadFile
 downloadFile = function(url, path, finishCallback, errorCallback)
   log('Attempting to download file:', url, path, finishCallback, errorCallback)
-  assert(type(url) == 'string', '"downloadFile" expected "url" to be a string.')
-  assert(type(path) == 'string', '"downloadFile" expected "path" to be a string.')
-  assert(type(finishCallback) == 'string', '"downloadFile" expected "finishCallback" to be a string.')
-  assert(type(errorCallback) == 'string', '"downloadFile" expected "errorCallback" to be a string.')
+  assert(type(url) == 'string', 'main.init.downloadFile')
+  assert(type(path) == 'string', 'main.init.downloadFile')
+  assert(type(finishCallback) == 'string', 'main.init.downloadFile')
+  assert(type(errorCallback) == 'string', 'main.init.downloadFile')
   SKIN:Bang(('[!SetOption "Downloader" "URL" "%s"]'):format(url))
   SKIN:Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]'):format(path))
   SKIN:Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]'):format(finishCallback))
@@ -63,13 +63,13 @@ end
 local downloadBanner
 downloadBanner = function(game)
   log('Downloading a banner for', game:getTitle())
-  assert(game ~= nil, '"downloadBanner" expected "game" to not be nil.')
-  assert(game.__class == Game, '"downloadBanner" expected "game" to be an instance of "Game".')
+  assert(game ~= nil, 'main.init.downloadBanner')
+  assert(game.__class == Game, 'main.init.downloadBanner')
   local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
   return downloadFile(game:getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 end
 setUpdateDivider = function(value)
-  assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, '"setUpdateDivider" expected an integer value.')
+  assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
   SKIN:Bang(('[!SetOption "Script" "UpdateDivider" "%d"]'):format(value))
   return SKIN:Bang('[!UpdateMeasure "Script"]')
 end
@@ -109,7 +109,7 @@ startDetectingPlatformGames = function()
     log('Starting to detect GOG Galaxy games')
     return utility.runCommand(STATE.PLATFORM_QUEUE[1]:dumpDatabases())
   else
-    return assert(nil, 'Unsupported platform.')
+    return assert(nil, 'main.init.startDetectingPlatformGames')
   end
 end
 local detectGames
@@ -352,7 +352,7 @@ GameProcessTerminated = function(game)
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
         platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
       else
-        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
       end
       for _index_0 = 1, #platformBangs do
         local bang = platformBangs[_index_0]
@@ -800,7 +800,7 @@ OnLeftClickSlot = function(index)
     elseif ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME == _exp_0 then
       action = removeGame
     else
-      action = assert(nil, 'Unsupported LEFT_CLICK_ACTION.')
+      action = assert(nil, 'main.init.OnLeftClickSlot')
     end
     local animationType = COMPONENTS.SETTINGS:getSlotsClickAnimation()
     if not (COMPONENTS.ANIMATIONS:pushSlotClick(index, animationType, action, game)) then
@@ -852,7 +852,7 @@ HandshakeGame = function()
     log('HandshakeGame')
     local gameID = STATE.GAME_BEING_MODIFIED:getGameID()
     STATE.GAME_BEING_MODIFIED = nil
-    assert(gameID ~= nil, 'No gameID to send to the Game config.')
+    assert(gameID ~= nil, 'main.init.HandshakeGame')
     return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]'):format(gameID))
   end)
   if not (success) then
@@ -876,7 +876,7 @@ UpdateGame = function(gameID)
           break
         end
       end
-      assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
+      assert(game ~= nil, 'main.init.UpdateGame')
       return COMPONENTS.LIBRARY:update(game)
     end
   end)

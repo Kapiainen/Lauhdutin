@@ -59,6 +59,7 @@ do
       return self.platformStatuses
     end,
     monitor = function(self, game)
+      assert(type(game) == 'table', 'main.process.Process.monitor')
       self.currentGame = game
       local process = game:getProcess()
       log('Monitoring process', process)
@@ -67,7 +68,7 @@ do
       end
       self.gameStatus = false
       self.monitoring = true
-      assert(type(process) == 'string', '"Process.monitor" expected "process" to be a string.')
+      assert(type(process) == 'string', 'main.process.Process.monitor')
       self.duration = 0
       self.startingTime = os.time()
       SKIN:Bang(('[!SetOption "Process" "ProcessName" "%s"]'):format(process))

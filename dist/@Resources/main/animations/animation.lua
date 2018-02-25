@@ -42,9 +42,13 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
-      assert(type(args) == 'table', '"Animation.new" expected a table.')
-      assert(type(args.frames) == 'table', '"Animation.new" expected a table of frames.')
-      assert(#args.frames > 0, '"Animation.new" expected a table of 1 or more frames.')
+      assert(type(args) == 'table', 'animations.animation.Animation')
+      assert(type(args.frames) == 'table', 'animations.animation.Animation')
+      assert(#args.frames > 0, 'animations.animation.Animation')
+      assert(args.beginAction == nil or type(args.beginAction) == 'function', 'animations.animation.Animation')
+      assert(args.resetAction == nil or type(args.resetAction) == 'function', 'animations.animation.Animation')
+      assert(args.finishAction == nil or type(args.finishAction) == 'function', 'animations.animation.Animation')
+      assert(args.mandatory == nil or type(args.mandatory) == 'boolean', 'animations.animation.Animation')
       self.frames = args.frames
       self.numFrames = #self.frames
       self.currentFrame = 0

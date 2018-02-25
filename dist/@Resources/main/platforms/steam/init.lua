@@ -100,7 +100,7 @@ do
       if not (self.useCommunityProfile) then
         return nil
       end
-      assert(type(self.communityID) == 'string', '"downloadCommunityProfile" expected "@communityID" to be a string.')
+      assert(type(self.communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
       local url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1'):format(self.communityID)
       return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
     end,
@@ -344,7 +344,7 @@ do
         repeat
           local manifest = manifests[_index_0]
           local appID = manifest:match('appmanifest_(%d+)%.acf')
-          assert(type(appID) == 'string', '"Steam.generateGames" expected "appID" to be a string.')
+          assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
           if games[appID] ~= nil then
             _continue_0 = true
             break
@@ -444,12 +444,12 @@ do
       self.useCommunityProfile = settings:getSteamParseCommunityProfile()
       if self.enabled then
         local clientPath = io.joinPaths(self.steamPath, 'steam.exe')
-        assert(io.fileExists(clientPath, false), ('Steam client path is not valid.'):format(clientPath))
-        assert(self.accountID ~= nil, 'Expected a UserDataID.')
-        assert(tonumber(self.accountID) ~= nil, 'Expected the UserDataID to be an integer.')
+        assert(io.fileExists(clientPath, false), 'main.platforms.steam.init.Steam')
+        assert(self.accountID ~= nil, 'main.platforms.steam.init.Steam')
+        assert(tonumber(self.accountID) ~= nil, 'main.platforms.steam.init.Steam')
         if self.useCommunityProfile then
-          assert(self.accountID ~= nil, 'Expected a CommunityID.')
-          assert(tonumber(self.accountID) ~= nil, 'Expected the CommunityID to be an integer.')
+          assert(self.accountID ~= nil, 'main.platforms.steam.init.Steam')
+          assert(tonumber(self.accountID) ~= nil, 'main.platforms.steam.init.Steam')
         end
       end
       self.games = { }

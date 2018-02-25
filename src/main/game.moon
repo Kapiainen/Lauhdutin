@@ -2,18 +2,18 @@ utility = require('shared.utility')
 
 class Game
 	new: (args) =>
-		assert(type(args.title) == 'string', '"Game" expected "args.title" to be a string.')
+		assert(type(args.title) == 'string', 'main.game.Game')
 		@title = @_moveThe(args.title)
-		assert(type(args.path) == 'string', '"Game" expected "args.path" to be a string.')
+		assert(type(args.path) == 'string', 'main.game.Game')
 		@path = args.path
-		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
+		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
 		@platformID = args.platformID
-		assert(@platformID > 0 and @platformID < ENUMS.PLATFORM_IDS.MAX, 'Unsupported platformID in "Game.new".')
+		assert(@platformID > 0 and @platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
 		@platformOverride = args.platformOverride
 		if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil)
 			@banner = args.banner
 		@bannerURL = args.bannerURL
-		assert(@bannerURL == nil or (@bannerURL ~= nil and @banner ~= nil), '"Game" expected "args.banner" and "args.bannerURL" to not be nil or "args.bannerURL" to be nil.')
+		assert(@bannerURL == nil or (@bannerURL ~= nil and @banner ~= nil), 'main.game.Game')
 		@expectedBanner = args.expectedBanner
 		@process = args.process or @_parseProcess(@path)
 		@uninstalled = args.uninstalled
@@ -31,7 +31,7 @@ class Game
 		@notes = args.notes
 
 	merge: (old) =>
-		assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".') -- TODO: Should 'Game' actually just be a table directly parsed from 'games.json'? Unnecessary allocations could be avoided.
+		assert(old.__class == Game, 'main.game.Game')
 		log('Merging: ' .. old.title)
 		@processOverride = old.processOverride
 		@hidden = old.hidden
@@ -73,7 +73,7 @@ class Game
 	getGameID: () => return @gameID
 
 	setGameID: (value) =>
-		assert(type(value) == 'number' and value % 1 == 0, '"Game.setGameID" expected "value" to be an integer.')
+		assert(type(value) == 'number' and value % 1 == 0, 'main.game.Game')
 		@gameID = value
 
 	getTitle: () => return @title

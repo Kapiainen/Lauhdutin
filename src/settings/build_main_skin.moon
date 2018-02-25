@@ -28,28 +28,28 @@ build = (settings) ->
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_DOWN then 0
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT then 0
 			else
-				assert(nil, 'Unsupported skin animation type in the main skin builder.')
+				assert(nil, 'settings.build_main_skin.build')
 		enablerY = switch skinSlideAnimation
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_UP then 0
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_RIGHT then 0 
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_DOWN then skinHeight - 1
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT then 0
 			else
-				assert(nil, 'Unsupported skin animation type in the main skin builder.')
+				assert(nil, 'settings.build_main_skin.build')
 		enablerWidth = switch skinSlideAnimation
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_UP then skinWidth
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_RIGHT then 1
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_DOWN then skinWidth
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT then 1
 			else
-				assert(nil, 'Unsupported skin animation type in the main skin builder.')
+				assert(nil, 'settings.build_main_skin.build')
 		enablerHeight = switch skinSlideAnimation
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_UP then 1
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_RIGHT then skinHeight
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_DOWN then 1
 			when ENUMS.SKIN_ANIMATIONS.SLIDE_LEFT then skinHeight
 			else
-				assert(nil, 'Unsupported skin animation type in the main skin builder.')
+				assert(nil, 'settings.build_main_skin.build')
 		contents ..= table.concat({
 			'[SkinEnabler]'
 			'Meter=Image'

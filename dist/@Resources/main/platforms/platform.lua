@@ -44,6 +44,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      print(type(settings))
       assert(type(settings) == 'table', 'main.platforms.platform.Platform')
       self.bannerExtensions = {
         '.jpg',

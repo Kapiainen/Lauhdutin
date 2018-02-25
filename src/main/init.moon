@@ -42,10 +42,10 @@ export log = (...) -> print(...) if STATE.LOGGING == true
 
 downloadFile = (url, path, finishCallback, errorCallback) ->
 	log('Attempting to download file:', url, path, finishCallback, errorCallback)
-	assert(type(url) == 'string', '"downloadFile" expected "url" to be a string.')
-	assert(type(path) == 'string', '"downloadFile" expected "path" to be a string.')
-	assert(type(finishCallback) == 'string', '"downloadFile" expected "finishCallback" to be a string.')
-	assert(type(errorCallback) == 'string', '"downloadFile" expected "errorCallback" to be a string.')
+	assert(type(url) == 'string', 'main.init.downloadFile')
+	assert(type(path) == 'string', 'main.init.downloadFile')
+	assert(type(finishCallback) == 'string', 'main.init.downloadFile')
+	assert(type(errorCallback) == 'string', 'main.init.downloadFile')
 	SKIN\Bang(('[!SetOption "Downloader" "URL" "%s"]')\format(url))
 	SKIN\Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]')\format(path))
 	SKIN\Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]')\format(finishCallback))
@@ -64,13 +64,13 @@ stopDownloader = () ->
 
 downloadBanner = (game) ->
 	log('Downloading a banner for', game\getTitle())
-	assert(game ~= nil, '"downloadBanner" expected "game" to not be nil.')
-	assert(game.__class == Game, '"downloadBanner" expected "game" to be an instance of "Game".')
+	assert(game ~= nil, 'main.init.downloadBanner')
+	assert(game.__class == Game, 'main.init.downloadBanner')
 	bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
 	downloadFile(game\getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 
 export setUpdateDivider = (value) ->
-	assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, '"setUpdateDivider" expected an integer value.')
+	assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
 	SKIN\Bang(('[!SetOption "Script" "UpdateDivider" "%d"]')\format(value))
 	SKIN\Bang('[!UpdateMeasure "Script"]')
 
@@ -106,7 +106,7 @@ startDetectingPlatformGames = () ->
 			log('Starting to detect GOG Galaxy games')
 			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
 		else
-			assert(nil, 'Unsupported platform.')
+			assert(nil, 'main.init.startDetectingPlatformGames')
 
 detectGames = () ->
 	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
@@ -289,7 +289,7 @@ export GameProcessTerminated = (game) ->
 					when ENUMS.PLATFORM_IDS.GOG_GALAXY
 						COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
 					else
-						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
 				SKIN\Bang(bang) for bang in *platformBangs
 				SKIN\Bang(bang) for bang in *game\getStoppingBangs()
 			switch platformID
@@ -590,7 +590,7 @@ export OnLeftClickSlot = (index) ->
 				when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
 				when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
 				else
-					assert(nil, 'Unsupported LEFT_CLICK_ACTION.')
+					assert(nil, 'main.init.OnLeftClickSlot')
 			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
 			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
 				action(game)
@@ -626,7 +626,7 @@ export HandshakeGame = () ->
 			log('HandshakeGame')
 			gameID = STATE.GAME_BEING_MODIFIED\getGameID()
 			STATE.GAME_BEING_MODIFIED = nil
-			assert(gameID ~= nil, 'No gameID to send to the Game config.')
+			assert(gameID ~= nil, 'main.init.HandshakeGame')
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]')\format(gameID))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -644,7 +644,7 @@ export UpdateGame = (gameID) ->
 					if args.gameID == gameID
 						game = Game(args)
 						break
-				assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
+				assert(game ~= nil, 'main.init.UpdateGame')
 				COMPONENTS.LIBRARY\update(game)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

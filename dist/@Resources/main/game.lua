@@ -4,7 +4,7 @@ do
   local _class_0
   local _base_0 = {
     merge = function(self, old)
-      assert(old.__class == Game, '"merge" expected "old" to be an instance of "Game".')
+      assert(old.__class == Game, 'main.game.Game')
       log('Merging: ' .. old.title)
       self.processOverride = old.processOverride
       self.hidden = old.hidden
@@ -46,7 +46,7 @@ do
       return self.gameID
     end,
     setGameID = function(self, value)
-      assert(type(value) == 'number' and value % 1 == 0, '"Game.setGameID" expected "value" to be an integer.')
+      assert(type(value) == 'number' and value % 1 == 0, 'main.game.Game')
       self.gameID = value
     end,
     getTitle = function(self)
@@ -249,19 +249,19 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
-      assert(type(args.title) == 'string', '"Game" expected "args.title" to be a string.')
+      assert(type(args.title) == 'string', 'main.game.Game')
       self.title = self:_moveThe(args.title)
-      assert(type(args.path) == 'string', '"Game" expected "args.path" to be a string.')
+      assert(type(args.path) == 'string', 'main.game.Game')
       self.path = args.path
-      assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Game" expected "args.platformID" to be an integer.')
+      assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
       self.platformID = args.platformID
-      assert(self.platformID > 0 and self.platformID < ENUMS.PLATFORM_IDS.MAX, 'Unsupported platformID in "Game.new".')
+      assert(self.platformID > 0 and self.platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
       self.platformOverride = args.platformOverride
       if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil) then
         self.banner = args.banner
       end
       self.bannerURL = args.bannerURL
-      assert(self.bannerURL == nil or (self.bannerURL ~= nil and self.banner ~= nil), '"Game" expected "args.banner" and "args.bannerURL" to not be nil or "args.bannerURL" to be nil.')
+      assert(self.bannerURL == nil or (self.bannerURL ~= nil and self.banner ~= nil), 'main.game.Game')
       self.expectedBanner = args.expectedBanner
       self.process = args.process or self:_parseProcess(self.path)
       self.uninstalled = args.uninstalled

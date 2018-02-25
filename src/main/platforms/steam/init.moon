@@ -39,12 +39,12 @@ class Steam extends Platform
 		@useCommunityProfile = settings\getSteamParseCommunityProfile()
 		if @enabled
 			clientPath = io.joinPaths(@steamPath, 'steam.exe')
-			assert(io.fileExists(clientPath, false), ('Steam client path is not valid.')\format(clientPath))
-			assert(@accountID ~= nil, 'Expected a UserDataID.')
-			assert(tonumber(@accountID) ~= nil, 'Expected the UserDataID to be an integer.')
+			assert(io.fileExists(clientPath, false), 'main.platforms.steam.init.Steam')
+			assert(@accountID ~= nil, 'main.platforms.steam.init.Steam')
+			assert(tonumber(@accountID) ~= nil, 'main.platforms.steam.init.Steam')
 			if @useCommunityProfile
-				assert(@accountID ~= nil, 'Expected a CommunityID.')
-				assert(tonumber(@accountID) ~= nil, 'Expected the CommunityID to be an integer.')
+				assert(@accountID ~= nil, 'main.platforms.steam.init.Steam')
+				assert(tonumber(@accountID) ~= nil, 'main.platforms.steam.init.Steam')
 		@games = {}
 		@communityProfilePath = io.joinPaths(@cachePath, 'communityProfile.txt')
 		@communityProfileGames = nil
@@ -115,7 +115,7 @@ class Steam extends Platform
 
 	downloadCommunityProfile: () =>
 		return nil unless @useCommunityProfile
-		assert(type(@communityID) == 'string', '"downloadCommunityProfile" expected "@communityID" to be a string.')
+		assert(type(@communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
 		url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1')\format(@communityID)
 		return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
 
@@ -263,7 +263,7 @@ class Steam extends Platform
 		manifests = file\splitIntoLines()
 		for manifest in *manifests
 			appID = manifest\match('appmanifest_(%d+)%.acf')
-			assert(type(appID) == 'string', '"Steam.generateGames" expected "appID" to be a string.')
+			assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
 			-- Disregard duplicates, if they appear for some reason.
 			continue if games[appID] ~= nil
 			-- If the community profile has been parsed, then disregard games not found on the profile.

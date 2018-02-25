@@ -21,7 +21,7 @@ do
         version = table.remove(lines, 1)
         version = tonumber(version:match('^version%s(%d+)$')) or 0
       end
-      assert(type(version) == 'number' and version % 1 == 0, '"Localization.load" expected the version number to be an integer.')
+      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.load')
       for _index_0 = 1, #lines do
         local _continue_0 = false
         repeat
@@ -44,8 +44,8 @@ do
       return translations
     end,
     migrate = function(self, settings, version)
-      assert(type(version) == 'number' and version % 1 == 0, '"Localization.migrate" expected "version" to be an integer.')
-      assert(version <= self.version, ('"Localization.migrate" expected "version" to be less than or equal to %d.'):format(self.version))
+      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
+      assert(version <= self.version, 'shared.localization.Localization.migrate')
       if version == self.version then
         return false
       end
@@ -86,6 +86,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'shared.localization.Localization')
       self.version = 1
       self.language = settings:getLocalization()
       self.path = ('Languages\\%s.txt'):format(self.language)

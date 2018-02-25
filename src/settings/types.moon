@@ -1,14 +1,19 @@
 class Base
 	new: (args) =>
+		assert(type(args.title) == 'string', 'settings.types.Base')
+		assert(type(args.tooltip) == 'string', 'settings.types.Base')
+		assert(type(args.type) == 'number' and args.type % 1 == 0, 'settings.types.Base')
+		assert(args.type > 0 and args.type < ENUMS.SETTING_TYPES.MAX, 'settings.types.Base')
 		@title = args.title
 		@tooltip = args.tooltip
+		@type = args.type
 
-	getInc: (index) => assert(nil, ('Setting type "%s" has not yet implemented the "getInc" method.')\format(@__class.__name))
+	getInc: (index) => assert(nil, 'settings.types.Base.getInc')
 
 class Action extends Base
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.ACTION
 		super(args)
-		@type = ENUMS.SETTING_TYPES.ACTION
 		@label = args.label
 		@perform = args.perform
 
@@ -37,8 +42,8 @@ class Action extends Base
 
 class Boolean extends Base
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.BOOLEAN
 		super(args)
-		@type = ENUMS.SETTING_TYPES.BOOLEAN
 		@getState = args.getState
 		@toggle = args.toggle
 
@@ -65,8 +70,8 @@ class Boolean extends Base
 
 class Integer extends Base
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.INTEGER
 		super(args)
-		@type = ENUMS.SETTING_TYPES.INTEGER
 		@value = args.defaultValue or 0
 		@minValue = args.minValue or nil
 		@maxValue = args.maxValue or nil
@@ -147,8 +152,8 @@ class Integer extends Base
 
 class FolderPath extends Base
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH
 		super(args)
-		@type = ENUMS.SETTING_TYPES.FOLDER_PATH
 		@getValue = args.getValue
 		@setValue = args.setValue
 		@dialogTitle = args.dialogTitle or 'Select a folder'
@@ -197,8 +202,8 @@ class FolderPath extends Base
 
 class Spinner extends Base
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.SPINNER
 		super(args)
-		@type = ENUMS.SETTING_TYPES.SPINNER
 		@index = args.index
 		@values = {'UNDEFINED'}
 		@getIndex = args.getIndex if args.getIndex ~= nil
@@ -272,8 +277,8 @@ class Spinner extends Base
 
 class FolderPathSpinner extends Spinner
 	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
 		super(args)
-		@type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
 		@setPath = args.setPath if args.setPath ~= nil
 		@dialogTitle = args.dialogTitle or 'Select a folder'
 

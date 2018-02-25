@@ -33,15 +33,16 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, str)
-      self.active = tonumber(str:match('Active=(%d+)'))
-      self.windowX = tonumber(str:match('WindowX=(%d+)'))
-      self.windowY = tonumber(str:match('WindowY=(%d+)'))
-      self.clickThrough = tonumber(str:match('ClickThrough=(%d+)'))
-      self.draggable = tonumber(str:match('Draggable=(%d+)'))
-      self.snapEdges = tonumber(str:match('SnapEdges=(%d+)'))
-      self.keepOnScreen = tonumber(str:match('KeepOnScreen=(%d+)'))
-      self.alwaysOnTop = tonumber(str:match('AlwaysOnTop=(%d+)'))
-      self.loadOrder = tonumber(str:match('LoadOrder=(%d+)'))
+      assert(type(str) == 'string' and str ~= '', 'shared.utility.Config')
+      self.active = tonumber(str:match('Active=(%d+)')) or 0
+      self.windowX = tonumber(str:match('WindowX=(%d+)')) or 0
+      self.windowY = tonumber(str:match('WindowY=(%d+)')) or 0
+      self.clickThrough = tonumber(str:match('ClickThrough=(%d+)')) or 0
+      self.draggable = tonumber(str:match('Draggable=(%d+)')) or 0
+      self.snapEdges = tonumber(str:match('SnapEdges=(%d+)')) or 0
+      self.keepOnScreen = tonumber(str:match('KeepOnScreen=(%d+)')) or 0
+      self.alwaysOnTop = tonumber(str:match('AlwaysOnTop=(%d+)')) or 0
+      self.loadOrder = tonumber(str:match('LoadOrder=(%d+)')) or 0
     end,
     __base = _base_0,
     __name = "Config"
@@ -487,7 +488,7 @@ end
 return {
   createJSONHelpers = function()
     local json = require('lib.json')
-    assert(type(json) == 'table', 'Expected "json" to be a table.')
+    assert(type(json) == 'table', 'shared.utility.createJSONHelpers')
     io.readJSON = function(path, pathIsRelative)
       if pathIsRelative == nil then
         pathIsRelative = true
@@ -495,7 +496,7 @@ return {
       return json.decode(io.readFile(path, pathIsRelative))
     end
     io.writeJSON = function(relativePath, tbl)
-      assert(type(tbl) == 'table', 'Expected a table as the second argument.')
+      assert(type(tbl) == 'table', 'io.writeJSON')
       return io.writeFile(relativePath, json.encode(tbl))
     end
   end,
@@ -509,9 +510,9 @@ return {
     if outputType == nil then
       outputType = 'UTF16'
     end
-    assert(type(parameter) == 'string', '"runCommand" expected "parameter" to be a string.')
-    assert(type(output) == 'string', '"runCommand" expected "output" to be a string.')
-    assert(type(callback) == 'string', '"runCommand" expected "callback" to be a string.')
+    assert(type(parameter) == 'string', 'shared.utility.runCommand')
+    assert(type(output) == 'string', 'shared.utility.runCommand')
+    assert(type(callback) == 'string', 'shared.utility.runCommand')
     SKIN:Bang(('[!SetOption "Command" "Parameter" "%s"]'):format(parameter))
     SKIN:Bang(('[!SetOption "Command" "OutputFile" "%s"]'):format(output))
     SKIN:Bang(('[!SetOption "Command" "OutputType" "%s"]'):format(outputType))
@@ -535,7 +536,7 @@ return {
     end
   end,
   replaceUnsupportedChars = function(str)
-    assert(type(str) == 'string', '"utility.replaceUnsupportedChars" expected "str" to be a string.')
+    assert(type(str) == 'string', 'shared.utility.replaceUnsupportedChars')
     local result = ''
     local charsToReplace = { }
     for char in str:gmatch('[%z\1-\127\194-\244][\128-\191]*') do
@@ -581,7 +582,7 @@ return {
     return result
   end,
   getConfig = function(name)
-    assert(type(name) == 'string', '"utility.getConfig" expected "name" to be a string.')
+    assert(type(name) == 'string', 'shared.utility.getConfig')
     local path = io.joinPaths(SKIN:GetVariable('SETTINGSPATH'), 'Rainmeter.ini')
     local rainmeterINI = io.readFile(path, false)
     local pattern = '%[' .. name .. '%][^%[]+'
@@ -615,7 +616,7 @@ return {
     return configs
   end,
   getConfigMonitor = function(config)
-    assert(config.__class == Config, '"utility.getConfigMonitor" expected the first argument to be an instance of "Config".')
+    assert(config.__class == Config, 'shared.utility.getConfigMonitor')
     local x = config:getX()
     local y = config:getY()
     for i = 1, 8 do
@@ -648,9 +649,9 @@ return {
     if screen == nil then
       screen = 1
     end
-    assert(type(width) == 'number', '"utility.centerOnMonitor" expected the first argument to be a number.')
-    assert(type(height) == 'number', '"utility.centerOnMonitor" expected the second argument to be a number.')
-    assert(type(screen) == 'number', '"utility.centerOnMonitor" expected the third argument to be a number.')
+    assert(type(width) == 'number', 'shared.utility.centerOnMonitor')
+    assert(type(height) == 'number', 'shared.utility.centerOnMonitor')
+    assert(type(screen) == 'number', 'shared.utility.centerOnMonitor')
     local monitorX = tonumber(SKIN:GetVariable(('SCREENAREAX@%d'):format(screen)))
     local monitorY = tonumber(SKIN:GetVariable(('SCREENAREAY@%d'):format(screen)))
     local monitorWidth = tonumber(SKIN:GetVariable(('SCREENAREAWIDTH@%d'):format(screen)))

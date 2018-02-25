@@ -13,6 +13,7 @@ migrators = {
 
 class Localization
 	new: (settings) =>
+		assert(type(settings) == 'table', 'shared.localization.Localization')
 		@version = 1
 		@language = settings\getLocalization()
 		@path = ('Languages\\%s.txt')\format(@language)
@@ -28,7 +29,7 @@ class Localization
 		if #lines > 0
 			version = table.remove(lines, 1)
 			version = tonumber(version\match('^version%s(%d+)$')) or 0
-		assert(type(version) == 'number' and version % 1 == 0, '"Localization.load" expected the version number to be an integer.')
+		assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.load')
 		for line in *lines
 			key, translation = line\match('^([^\t]+)\t(.+)$')
 			continue if key == nil or translation == nil
@@ -38,8 +39,8 @@ class Localization
 		return translations
 
 	migrate: (settings, version) =>
-		assert(type(version) == 'number' and version % 1 == 0, '"Localization.migrate" expected "version" to be an integer.')
-		assert(version <= @version, ('"Localization.migrate" expected "version" to be less than or equal to %d.')\format(@version))
+		assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
+		assert(version <= @version, 'shared.localization.Localization.migrate')
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version

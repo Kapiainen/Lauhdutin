@@ -149,8 +149,8 @@ do
       })
     end,
     migrate = function(self, games, version)
-      assert(type(version) == 'number' and version % 1 == 0, '"Library.migrate" expected "version" to be an integer.')
-      assert(version <= self.version, ('"Library.migrate" expected "version" to be less than or equal to %d.'):format(self.version))
+      assert(type(version) == 'number' and version % 1 == 0, 'shared.library.Library.migrate')
+      assert(version <= self.version, 'shared.library.Library.migrate')
       if version == self.version then
         return false
       end
@@ -167,13 +167,13 @@ do
       if games == nil then
         return false
       end
-      assert(type(games) == 'table', '"Library.add" expected "games" to be a table.')
+      assert(type(games) == 'table', 'shared.library.Library.add')
       if #games == 0 then
         return false
       end
       for _index_0 = 1, #games do
         local game = games[_index_0]
-        assert(game.__class == Game, '"Library.add" expected each entry in "games" to be an instance of "Game".')
+        assert(game.__class == Game, 'shared.library.Library.add')
         for i, oldGame in ipairs(self.oldGames) do
           if game:getPlatformID() == oldGame:getPlatformID() and game:getTitle() == oldGame:getTitle() then
             game:merge(oldGame)
@@ -188,7 +188,7 @@ do
       return true
     end,
     finalize = function(self, platformEnabledStatus)
-      assert(type(platformEnabledStatus) == 'table', '"Library.finalize" expected "platformEnabledStatus" to be a table.')
+      assert(type(platformEnabledStatus) == 'table', 'shared.library.Library.finalize')
       self.platformEnabledStatus = platformEnabledStatus
       local _list_0 = self.oldGames
       for _index_0 = 1, #_list_0 do
@@ -216,7 +216,7 @@ do
       if games == nil then
         games = self.games
       end
-      assert(type(sorting) == 'number' and sorting % 1 == 0, '"Library.sort" expected "sorting" to be an integer.')
+      assert(type(sorting) == 'number' and sorting % 1 == 0, 'shared.library.Library.sort')
       local comp = nil
       local _exp_0 = sorting
       if ENUMS.SORTING_TYPES.ALPHABETICALLY == _exp_0 then
@@ -234,15 +234,15 @@ do
       else
         assert(nil, 'Unknown sorting type.')
       end
-      assert(type(comp) == 'function', '"Library.sort" expected "comp" to be a function.')
+      assert(type(comp) == 'function', 'shared.library.Library.sort')
       table.sort(games, comp)
       if games ~= self.games then
         return table.sort(self.games, comp)
       end
     end,
     fuzzySearch = function(self, str, pattern)
-      assert(type(str) == 'string', '"Library.fuzzySearch" expected "str" to be a string.')
-      assert(type(pattern) == 'string', '"Library.fuzzySearch" expected "pattern" to be a string.')
+      assert(type(str) == 'string', 'shared.library.Library.fuzzySearch')
+      assert(type(pattern) == 'string', 'shared.library.Library.fuzzySearch')
       local score = 0
       if str == '' or pattern == '' then
         return score
@@ -323,10 +323,10 @@ do
       end
     end,
     filter = function(self, filter, args)
-      assert(type(filter) == 'number' and filter % 1 == 0, '"Library.filter" expected "filter" to be an integer.')
+      assert(type(filter) == 'number' and filter % 1 == 0, 'shared.library.Library.filter')
       local gamesToProcess = nil
       if args ~= nil and args.stack == true then
-        assert(type(args.games) == 'table', '"Library.filter" expected "args.games" to be a table.')
+        assert(type(args.games) == 'table', 'shared.library.Library.filter')
         gamesToProcess = args.games
         args.games = nil
         table.insert(self.filterStack, {
@@ -379,8 +379,8 @@ do
         games = gamesToProcess
         self.filterStack = { }
       elseif ENUMS.FILTER_TYPES.TITLE == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.input) == 'string', '"Library.filter" expected "args.input" to be a string.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.input) == 'string', 'shared.library.Library.filter')
         if args.input == '' then
           games = gamesToProcess
         else
@@ -407,8 +407,8 @@ do
           end
         end
       elseif ENUMS.FILTER_TYPES.PLATFORM == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, '"Library.filter" expected "args.platformID" to be an integer.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
         local platformID = args.platformID
         local platformOverride = args.platformOverride
         if platformOverride ~= nil then
@@ -439,8 +439,8 @@ do
           end
         end
       elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.tag) == 'string', '"Library.filter" expected "args.tag" to be a string.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.tag) == 'string', 'shared.library.Library.filter')
         local tag = args.tag
         do
           local _accum_0 = { }
@@ -455,8 +455,8 @@ do
           games = _accum_0
         end
       elseif ENUMS.FILTER_TYPES.HIDDEN == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         local state = args.state
         do
           local _accum_0 = { }
@@ -471,8 +471,8 @@ do
           games = _accum_0
         end
       elseif ENUMS.FILTER_TYPES.UNINSTALLED == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         local state = args.state
         do
           local _accum_0 = { }
@@ -487,8 +487,8 @@ do
           games = _accum_0
         end
       elseif ENUMS.FILTER_TYPES.NO_TAGS == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         if args.state then
           do
             local _accum_0 = { }
@@ -517,14 +517,14 @@ do
           end
         end
       elseif ENUMS.FILTER_TYPES.RANDOM_GAME == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         games = {
           gamesToProcess[math.random(1, #gamesToProcess)]
         }
       elseif ENUMS.FILTER_TYPES.NEVER_PLAYED == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         do
           local _accum_0 = { }
           local _len_0 = 1
@@ -538,8 +538,8 @@ do
           games = _accum_0
         end
       elseif ENUMS.FILTER_TYPES.HAS_NOTES == _exp_0 then
-        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
-        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         do
           local _accum_0 = { }
           local _len_0 = 1
@@ -553,9 +553,9 @@ do
           games = _accum_0
         end
       else
-        assert(nil, 'Unknown filter type.')
+        assert(nil, 'shared.library.Library.filter')
       end
-      assert(type(games) == 'table', '"Library.filter" expected "games" to be a table.')
+      assert(type(games) == 'table', 'shared.library.Library.filter')
       self.processedGames = games
     end,
     getFilterStack = function(self)
@@ -570,8 +570,8 @@ do
       return games
     end,
     replace = function(self, old, new)
-      assert(old ~= nil and old.__class == Game, '"Library.replace" expected the first argument to be an instance of "Game".')
-      assert(new ~= nil and new.__class == Game, '"Library.replace" expected the second argument to be an instance of "Game".')
+      assert(old ~= nil and old.__class == Game, 'shared.library.Library.replace')
+      assert(new ~= nil and new.__class == Game, 'shared.library.Library.replace')
       return table.replace(self.games, old, new)
     end,
     remove = function(self, game)
@@ -586,6 +586,8 @@ do
       if regularMode == nil then
         regularMode = true
       end
+      assert(type(settings) == 'table', 'shared.library.Library')
+      assert(type(regularMode) == 'boolean', 'shared.library.Library')
       self.version = 1
       self.path = 'games.json'
       if regularMode then

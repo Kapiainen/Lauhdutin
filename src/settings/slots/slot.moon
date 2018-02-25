@@ -1,5 +1,6 @@
 class Slot
 	new: (index) =>
+		assert(type(index) == 'number' and index % 1 == 0, 'settings.slots.slot.Slot')
 		@index = index
 
 	update: (setting) =>
@@ -31,6 +32,6 @@ class Slot
 				SKIN\Bang(('[!SetOption "Slot%dFolderPathSpinnerValue" "Text" "%s"]')\format(@index, setting\getValues()[setting\getIndex()]))
 				SKIN\Bang(('[!ShowMeterGroup "Slot%dSettingFolderPathSpinner"]')\format(@index))
 			else
-				assert(nil, ('"Slot.update" does not yet support setting type "%s".')\format(setting.__class.__name))
+				assert(nil, 'settings.slots.slot.Slot.update')
 
 return Slot

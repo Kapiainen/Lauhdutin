@@ -6,8 +6,8 @@ do
       return #self.pages
     end,
     loadPage = function(self, index)
-      assert(type(index) == 'number' and index % 1 == 0, '"Pages.loadPage" expected "index" to be an integer.')
-      assert(index > 0 and index <= self:getCount(), ('"Pages.loadPage" expected "index" to be between 1 and %d, but instead got %d.'):format(self:getCount(), index))
+      assert(type(index) == 'number' and index % 1 == 0, 'settings.pages.init.Pages.loadPage')
+      assert(index > 0 and index <= self:getCount(), 'settings.pages.init.Pages.loadPage')
       self.currentPage = self.pages[index]
       return self.currentPage:getTitle(), self.currentPage:getSettings()
     end
