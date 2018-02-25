@@ -6,7 +6,7 @@ class Slots
 		assert(#@slots == STATE.NUM_SLOTS, 'settings.slots.init.Slots')
 		@settings = {}
 		scrollBar = SKIN\GetMeter('ScrollBar')
-		assert(scrollBar ~= nil 'settings.slots.init.Slots')
+		assert(scrollBar ~= nil, 'settings.slots.init.Slots')
 		@scrollBarStart = if scrollBar then scrollBar\GetY() else 0
 		@scrollBarMaxHeight = if scrollBar then scrollBar\GetH() else 0
 		@scrollBarHeight = @scrollBarMaxHeight

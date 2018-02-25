@@ -95,7 +95,7 @@ do
       assert(#self.slots == STATE.NUM_SLOTS, 'settings.slots.init.Slots')
       self.settings = { }
       local scrollBar = SKIN:GetMeter('ScrollBar')
-      assert(scrollBar ~= nil('settings.slots.init.Slots'))
+      assert(scrollBar ~= nil, 'settings.slots.init.Slots')
       if scrollBar then
         self.scrollBarStart = scrollBar:GetY()
       else
