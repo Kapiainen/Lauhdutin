@@ -489,8 +489,7 @@ do
       elseif ENUMS.FILTER_TYPES.NO_TAGS == _exp_0 then
         assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
         assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
-        local state = args.state
-        if state then
+        if args.state then
           do
             local _accum_0 = { }
             local _len_0 = 1
@@ -516,6 +515,42 @@ do
             end
             games = _accum_0
           end
+        end
+      elseif ENUMS.FILTER_TYPES.RANDOM_GAME == _exp_0 then
+        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        games = {
+          gamesToProcess[math.random(1, #gamesToProcess)]
+        }
+      elseif ENUMS.FILTER_TYPES.NEVER_PLAYED == _exp_0 then
+        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          for _index_0 = 1, #gamesToProcess do
+            local game = gamesToProcess[_index_0]
+            if game:getHoursPlayed() == 0 then
+              _accum_0[_len_0] = game
+              _len_0 = _len_0 + 1
+            end
+          end
+          games = _accum_0
+        end
+      elseif ENUMS.FILTER_TYPES.HAS_NOTES == _exp_0 then
+        assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+        assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          for _index_0 = 1, #gamesToProcess do
+            local game = gamesToProcess[_index_0]
+            if game:getNotes() ~= nil then
+              _accum_0[_len_0] = game
+              _len_0 = _len_0 + 1
+            end
+          end
+          games = _accum_0
         end
       else
         assert(nil, 'Unknown filter type.')

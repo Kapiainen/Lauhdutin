@@ -325,11 +325,22 @@ class Library
 			when ENUMS.FILTER_TYPES.NO_TAGS
 				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
 				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
-				state = args.state
-				if state
+				if args.state
 					games = [game for game in *gamesToProcess when #game\getTags() == 0 and #game\getPlatformTags() == 0]
 				else
 					games = [game for game in *gamesToProcess when #game\getTags() > 0 or #game\getPlatformTags() > 0]
+			when ENUMS.FILTER_TYPES.RANDOM_GAME
+				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+				games = {gamesToProcess[math.random(1, #gamesToProcess)]}
+			when ENUMS.FILTER_TYPES.NEVER_PLAYED
+				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+				games = [game for game in *gamesToProcess when game\getHoursPlayed() == 0]
+			when ENUMS.FILTER_TYPES.HAS_NOTES
+				assert(type(args) == 'table', '"Library.filter" expected "args" to be a table.')
+				assert(type(args.state) == 'boolean', '"Library.filter" expected "args.state" to be a boolean.')
+				games = [game for game in *gamesToProcess when game\getNotes() ~= nil]
 			else
 				assert(nil, 'Unknown filter type.')
 		assert(type(games) == 'table', '"Library.filter" expected "games" to be a table.')

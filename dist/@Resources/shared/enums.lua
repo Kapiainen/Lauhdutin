@@ -12,7 +12,10 @@ ENUMS = {
     TAG = 4,
     HIDDEN = 5,
     UNINSTALLED = 6,
-    NO_TAGS = 7
+    NO_TAGS = 7,
+    RANDOM_GAME = 8,
+    NEVER_PLAYED = 9,
+    HAS_NOTES = 10
   },
   SORTING_TYPES = {
     ALPHABETICALLY = 1,

@@ -323,6 +323,59 @@ createHiddenProperty = function(numGames)
     }
   })
 end
+local createRandomProperty
+createRandomProperty = function(numGames)
+  return Property({
+    title = LOCALIZATION:get('filter_random', 'Random game'),
+    value = STATE.NUM_GAMES_PATTERN:format(numGames),
+    enum = ENUMS.FILTER_TYPES.RANDOM_GAME,
+    arguments = {
+      state = true
+    }
+  })
+end
+local createNeverPlayedProperty
+createNeverPlayedProperty = function(games)
+  local numGames = 0
+  for _index_0 = 1, #games do
+    local game = games[_index_0]
+    if game:getHoursPlayed() == 0 then
+      numGames = numGames + 1
+    end
+  end
+  if numGames < 1 then
+    return nil
+  end
+  return Property({
+    title = LOCALIZATION:get('filter_never_played', 'Has never been played'),
+    value = STATE.NUM_GAMES_PATTERN:format(numGames),
+    enum = ENUMS.FILTER_TYPES.NEVER_PLAYED,
+    arguments = {
+      state = true
+    }
+  })
+end
+local createHasNotesProperty
+createHasNotesProperty = function(games)
+  local numGames = 0
+  for _index_0 = 1, #games do
+    local game = games[_index_0]
+    if game:getNotes() ~= nil then
+      numGames = numGames + 1
+    end
+  end
+  if numGames < 1 then
+    return nil
+  end
+  return Property({
+    title = LOCALIZATION:get('filter_has_notes', 'Has notes'),
+    value = STATE.NUM_GAMES_PATTERN:format(numGames),
+    enum = ENUMS.FILTER_TYPES.HAS_NOTES,
+    arguments = {
+      state = true
+    }
+  })
+end
 local createUninstalledProperty
 createUninstalledProperty = function(numGames)
   return Property({
@@ -365,6 +418,9 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
     local skipPlatforms = false
     local skipTags = false
     local skipNoTags = false
+    local skipRandom = false
+    local skipNeverPlayed = false
+    local skipHasNotes = false
     for _index_0 = 1, #filterStack do
       local f = filterStack[_index_0]
       local _exp_0 = f.filter
@@ -374,6 +430,12 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
         skipTags = true
       elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
         skipNoTags = true
+      elseif ENUMS.FILTER_TYPES.RANDOM_GAME == _exp_0 then
+        skipRandom = true
+      elseif ENUMS.FILTER_TYPES.NEVER_PLAYED == _exp_0 then
+        skipNeverPlayed = true
+      elseif ENUMS.FILTER_TYPES.HAS_NOTES == _exp_0 then
+        skipHasNotes = true
       end
     end
     if not (skipPlatforms) then
@@ -404,6 +466,21 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
       local numGamesWithoutTags = #games - gamesWithTags
       if numGamesWithoutTags > 0 then
         table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags))
+      end
+    end
+    if not skipRandom and #games > 1 then
+      table.insert(properties, createRandomProperty(#games))
+    end
+    if not (skipNeverPlayed) then
+      local neverPlayedProperty = createNeverPlayedProperty(games)
+      if neverPlayedProperty then
+        table.insert(properties, neverPlayedProperty)
+      end
+    end
+    if not (skipHasNotes) then
+      local hasNotesProperty = createHasNotesProperty(games)
+      if hasNotesProperty then
+        table.insert(properties, hasNotesProperty)
       end
     end
   end
@@ -552,76 +629,101 @@ Handshake = function(stack, appliedFilters)
   end
 end
 Scroll = function(direction)
-  if not (COMPONENTS.SLOTS) then
-    return 
+  local success, err = pcall(function()
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    local index = STATE.SCROLL_INDEX + direction
+    if index < 1 then
+      return 
+    elseif index > STATE.MAX_SCROLL_INDEX then
+      return 
+    end
+    STATE.SCROLL_INDEX = index
+    updateScrollbar()
+    return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  local index = STATE.SCROLL_INDEX + direction
-  if index < 1 then
-    return 
-  elseif index > STATE.MAX_SCROLL_INDEX then
-    return 
-  end
-  STATE.SCROLL_INDEX = index
-  updateScrollbar()
-  return updateSlots()
 end
 MouseOver = function(index)
-  if index < 1 then
-    return 
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    STATE.HIGHLIGHTED_SLOT_INDEX = index
+    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  STATE.HIGHLIGHTED_SLOT_INDEX = index
-  return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
 end
 MouseLeave = function(index)
-  if index < 1 then
-    return 
-  end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if index == 0 then
-    STATE.HIGHLIGHTED_SLOT_INDEX = 0
-    for i = index, STATE.NUM_SLOTS do
-      SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(i))
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
     end
-  else
-    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(index))
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if index == 0 then
+      STATE.HIGHLIGHTED_SLOT_INDEX = 0
+      for i = index, STATE.NUM_SLOTS do
+        SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(i))
+      end
+    else
+      return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(index))
+    end
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
 end
 MouseLeftPress = function(index)
-  if index < 1 then
-    return 
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
 end
 ButtonAction = function(index)
-  if index < 1 then
-    return 
-  end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
-  if COMPONENTS.SLOTS[index]:action() then
-    STATE.SCROLL_INDEX = 1
-    updateScrollbar()
-    return updateSlots()
-  else
-    return SKIN:Bang('[!DeactivateConfig]')
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
+    if COMPONENTS.SLOTS[index]:action() then
+      STATE.SCROLL_INDEX = 1
+      updateScrollbar()
+      return updateSlots()
+    else
+      return SKIN:Bang('[!DeactivateConfig]')
+    end
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
 end

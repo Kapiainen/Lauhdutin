@@ -221,6 +221,44 @@ createHiddenProperty = (numGames) ->
 		}
 	})
 
+createRandomProperty = (numGames) ->
+	return Property({
+		title: LOCALIZATION\get('filter_random', 'Random game')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.RANDOM_GAME
+		arguments: {
+			state: true
+		}
+	})
+
+createNeverPlayedProperty = (games) ->
+	numGames = 0
+	for game in *games
+		numGames += 1 if game\getHoursPlayed() == 0
+	return nil if numGames < 1
+	return Property({
+		title: LOCALIZATION\get('filter_never_played', 'Has never been played')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.NEVER_PLAYED
+		arguments: {
+			state: true
+		}
+	})
+
+createHasNotesProperty = (games) ->
+	numGames = 0
+	for game in *games
+		numGames += 1 if game\getNotes() ~= nil
+	return nil if numGames < 1
+	return Property({
+		title: LOCALIZATION\get('filter_has_notes', 'Has notes')
+		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		enum: ENUMS.FILTER_TYPES.HAS_NOTES
+		arguments: {
+			state: true
+		}
+	})
+
 createUninstalledProperty = (numGames) ->
 	return Property({
 		title: LOCALIZATION\get('filter_is_uninstalled', 'Is not installed')
@@ -256,6 +294,9 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 		skipPlatforms = false
 		skipTags = false
 		skipNoTags = false
+		skipRandom = false
+		skipNeverPlayed = false
+		skipHasNotes = false
 		for f in *filterStack
 			switch f.filter
 				when ENUMS.FILTER_TYPES.PLATFORM
@@ -264,6 +305,12 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 					skipTags = true
 				when ENUMS.FILTER_TYPES.TAG
 					skipNoTags = true
+				when ENUMS.FILTER_TYPES.RANDOM_GAME
+					skipRandom = true
+				when ENUMS.FILTER_TYPES.NEVER_PLAYED
+					skipNeverPlayed = true
+				when ENUMS.FILTER_TYPES.HAS_NOTES
+					skipHasNotes = true
 		unless skipPlatforms
 			platformsProperty = createPlatformProperties(games, platforms)
 			if platformsProperty
@@ -287,6 +334,16 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 			numGamesWithoutTags = #games - gamesWithTags
 			if numGamesWithoutTags > 0
 				table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags))
+		if not skipRandom and #games > 1
+			table.insert(properties, createRandomProperty(#games))
+		unless skipNeverPlayed
+			neverPlayedProperty = createNeverPlayedProperty(games)
+			if neverPlayedProperty
+				table.insert(properties, neverPlayedProperty)
+		unless skipHasNotes
+			hasNotesProperty = createHasNotesProperty(games)
+			if hasNotesProperty
+				table.insert(properties, hasNotesProperty)
 	table.sort(properties, sortPropertiesByTitle)
 	unless stack
 		table.insert(properties, createClearProperty())
@@ -379,47 +436,67 @@ export Handshake = (stack, appliedFilters) ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export Scroll = (direction) ->
-	return unless COMPONENTS.SLOTS
-	index = STATE.SCROLL_INDEX + direction
-	if index < 1
-		return
-	elseif index > STATE.MAX_SCROLL_INDEX
-		return
-	STATE.SCROLL_INDEX = index
-	updateScrollbar()
-	updateSlots()
+	success, err = pcall(
+		() ->
+			return unless COMPONENTS.SLOTS
+			index = STATE.SCROLL_INDEX + direction
+			if index < 1
+				return
+			elseif index > STATE.MAX_SCROLL_INDEX
+				return
+			STATE.SCROLL_INDEX = index
+			updateScrollbar()
+			updateSlots()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseOver = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	STATE.HIGHLIGHTED_SLOT_INDEX = index
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			STATE.HIGHLIGHTED_SLOT_INDEX = index
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseLeave = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	if index == 0
-		STATE.HIGHLIGHTED_SLOT_INDEX = 0
-		for i = index, STATE.NUM_SLOTS
-			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(i))
-	else
-		SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			if index == 0
+				STATE.HIGHLIGHTED_SLOT_INDEX = 0
+				for i = index, STATE.NUM_SLOTS
+					SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(i))
+			else
+				SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseLeftPress = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export ButtonAction = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
-	if COMPONENTS.SLOTS[index]\action()
-		STATE.SCROLL_INDEX = 1
-		updateScrollbar()
-		updateSlots()
-	else
-		SKIN\Bang('[!DeactivateConfig]')
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+			if COMPONENTS.SLOTS[index]\action()
+				STATE.SCROLL_INDEX = 1
+				updateScrollbar()
+				updateSlots()
+			else
+				SKIN\Bang('[!DeactivateConfig]')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
