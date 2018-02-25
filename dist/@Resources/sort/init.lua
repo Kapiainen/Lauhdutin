@@ -156,7 +156,7 @@ createProperties = function(game, platform)
     end
     return false
   end)
-  table.insert(properties, 1, Property({
+  table.insert(properties, Property({
     title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
     value = ' ',
     action = function(self)
@@ -215,79 +215,104 @@ Handshake = function(currentSortingType)
   end
 end
 Scroll = function(direction)
-  if not (COMPONENTS.SLOTS) then
-    return 
+  local success, err = pcall(function()
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    local index = STATE.SCROLL_INDEX + direction
+    if index < 1 then
+      return 
+    elseif index > STATE.MAX_SCROLL_INDEX then
+      return 
+    end
+    STATE.SCROLL_INDEX = index
+    updateScrollbar()
+    return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  local index = STATE.SCROLL_INDEX + direction
-  if index < 1 then
-    return 
-  elseif index > STATE.MAX_SCROLL_INDEX then
-    return 
-  end
-  STATE.SCROLL_INDEX = index
-  updateScrollbar()
-  return updateSlots()
 end
 MouseOver = function(index)
-  if index < 1 then
-    return 
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    STATE.HIGHLIGHTED_SLOT_INDEX = index
+    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  STATE.HIGHLIGHTED_SLOT_INDEX = index
-  return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
 end
 MouseLeave = function(index)
-  if index < 1 then
-    return 
-  end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  if index == 0 then
-    STATE.HIGHLIGHTED_SLOT_INDEX = 0
-    for i = index, STATE.NUM_SLOTS do
-      SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(i))
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
     end
-  else
-    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(index))
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    if index == 0 then
+      STATE.HIGHLIGHTED_SLOT_INDEX = 0
+      for i = index, STATE.NUM_SLOTS do
+        SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(i))
+      end
+    else
+      return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]'):format(index))
+    end
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
 end
 MouseLeftPress = function(index)
-  if index < 1 then
-    return 
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
 end
 ButtonAction = function(index)
-  if index < 1 then
-    return 
-  end
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
-    return 
-  end
-  SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
-  if COMPONENTS.SLOTS[index]:action() then
-    STATE.SCROLL_INDEX = 1
-    updateScrollbar()
-    return updateSlots()
-  else
-    return SKIN:Bang('[!DeactivateConfig]')
+  local success, err = pcall(function()
+    if index < 1 then
+      return 
+    end
+    if not (COMPONENTS.SLOTS) then
+      return 
+    end
+    if not (COMPONENTS.SLOTS[index]:hasAction()) then
+      return 
+    end
+    SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
+    if COMPONENTS.SLOTS[index]:action() then
+      STATE.SCROLL_INDEX = 1
+      updateScrollbar()
+      return updateSlots()
+    else
+      return SKIN:Bang('[!DeactivateConfig]')
+    end
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
   end
 end

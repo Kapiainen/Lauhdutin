@@ -112,7 +112,7 @@ createProperties = (game, platform) ->
 			return true
 		return false
 	)
-	table.insert(properties, 1,
+	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('button_label_cancel', 'Cancel')
 			value: ' '
@@ -164,48 +164,68 @@ export Handshake = (currentSortingType) ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export Scroll = (direction) ->
-	return unless COMPONENTS.SLOTS
-	index = STATE.SCROLL_INDEX + direction
-	if index < 1
-		return
-	elseif index > STATE.MAX_SCROLL_INDEX
-		return
-	STATE.SCROLL_INDEX = index
-	updateScrollbar()
-	updateSlots()
+	success, err = pcall(
+		() ->
+			return unless COMPONENTS.SLOTS
+			index = STATE.SCROLL_INDEX + direction
+			if index < 1
+				return
+			elseif index > STATE.MAX_SCROLL_INDEX
+				return
+			STATE.SCROLL_INDEX = index
+			updateScrollbar()
+			updateSlots()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseOver = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	STATE.HIGHLIGHTED_SLOT_INDEX = index
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			STATE.HIGHLIGHTED_SLOT_INDEX = index
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseLeave = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	if index == 0
-		STATE.HIGHLIGHTED_SLOT_INDEX = 0
-		for i = index, STATE.NUM_SLOTS
-			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(i))
-	else
-		SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			if index == 0
+				STATE.HIGHLIGHTED_SLOT_INDEX = 0
+				for i = index, STATE.NUM_SLOTS
+					SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(i))
+			else
+				SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export MouseLeftPress = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 export ButtonAction = (index) ->
-	return if index < 1
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
-	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
-	if COMPONENTS.SLOTS[index]\action()
-		STATE.SCROLL_INDEX = 1
-		updateScrollbar()
-		updateSlots()
-	else
-		SKIN\Bang('[!DeactivateConfig]')
+	success, err = pcall(
+		() ->
+			return if index < 1
+			return unless COMPONENTS.SLOTS
+			return unless COMPONENTS.SLOTS[index]\hasAction()
+			SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
+			if COMPONENTS.SLOTS[index]\action()
+				STATE.SCROLL_INDEX = 1
+				updateScrollbar()
+				updateSlots()
+			else
+				SKIN\Bang('[!DeactivateConfig]')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
