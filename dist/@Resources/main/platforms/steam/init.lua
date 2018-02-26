@@ -315,38 +315,42 @@ do
                 break
               end
             end
+            banner = self:getBannerPath(appID)
           end
-          banner = self:getBannerPath(appID)
-        end
-        if not (banner) then
-          expectedBanner = appID
-        end
-        local process
-        if game:match('AllowOverlay') then
-          process = 'GameOverlayUI.exe'
-        else
-          process = nil
-        end
-        local tags = { }
-        local tagsString = game:match('tags|(.+)')
-        if tagsString then
-          for tag in tagsString:gmatch('|%d|([^|]+)|') do
-            table.insert(tags, tag)
+          if not (banner) then
+            expectedBanner = appID
           end
+          local process
+          if game:match('AllowOverlay') then
+            process = 'GameOverlayUI.exe'
+          else
+            process = nil
+          end
+          local tags = { }
+          local tagsString = game:match('tags|(.+)')
+          if tagsString then
+            for tag in tagsString:gmatch('|%d|([^|]+)|') do
+              table.insert(tags, tag)
+            end
+          end
+          if #tags == 0 then
+            tags = nil
+          end
+          table.insert(games, {
+            title = title,
+            path = path,
+            process = process,
+            banner = banner,
+            expectedBanner = expectedBanner,
+            platformOverride = self.name,
+            platformTags = tags,
+            platformID = self.platformID
+          })
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
         end
-        if #tags == 0 then
-          tags = nil
-        end
-        table.insert(games, {
-          title = title,
-          path = path,
-          process = process,
-          banner = banner,
-          expectedBanner = expectedBanner,
-          platformOverride = self.name,
-          platformTags = tags,
-          platformID = self.platformID
-        })
       end
       for _index_0 = 1, #games do
         local args = games[_index_0]
@@ -370,6 +374,7 @@ do
           local manifest = manifests[_index_0]
           local appID = manifest:match('appmanifest_(%d+)%.acf')
           if appID == nil then
+            log('Skipping Steam game because the appID could not be parsed')
             _continue_0 = true
             break
           end
@@ -385,6 +390,21 @@ do
           file = io.readFile(io.joinPaths(libraryPath, manifest), false)
           local lines = file:splitIntoLines()
           local vdf = utility.parseVDF(lines)
+          local title = nil
+          if vdf.appstate ~= nil then
+            title = vdf.appstate.name
+          end
+          if title == nil and vdf.userconfig ~= nil then
+            title = vdf.userconfig.name
+          end
+          if title == nil and self.communityProfileGames ~= nil and self.communityProfileGames[appID] ~= nil then
+            title = self.communityProfileGames[appID].title
+          end
+          if title == nil then
+            log('Skipping Steam game', appID, 'because title could not be found')
+            _continue_0 = true
+            break
+          end
           local banner, bannerURL = self:getBanner(appID)
           local expectedBanner
           if banner ~= nil then
@@ -398,7 +418,7 @@ do
             self.communityProfileGames[appID] = nil
           end
           games[appID] = {
-            title = vdf.appstate.name or (vdf.userconfig and vdf.userconfig.name),
+            title = title,
             path = self:getPath(appID),
             platformID = self.platformID,
             banner = banner,

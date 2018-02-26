@@ -277,15 +277,25 @@ class Steam extends Platform
 		manifests = file\splitIntoLines()
 		for manifest in *manifests
 			appID = manifest\match('appmanifest_(%d+)%.acf')
-			continue if appID == nil
+			if appID == nil
+				log('Skipping Steam game because the appID could not be parsed')
+				continue 
 			assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
-			-- Disregard duplicates, if they appear for some reason.
-			continue if games[appID] ~= nil
-			-- If the community profile has been parsed, then disregard games not found on the profile.
-			continue if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil
+			continue if games[appID] ~= nil -- Disregard duplicates, if they appear for some reason.
+			continue if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil -- If the community profile has been parsed, then disregard games not found on the profile.
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
 			vdf = utility.parseVDF(lines)
+			title = nil
+			if vdf.appstate ~= nil
+				title = vdf.appstate.name
+			if title == nil and vdf.userconfig ~= nil
+				title = vdf.userconfig.name
+			if title == nil and @communityProfileGames ~= nil and @communityProfileGames[appID] ~= nil
+				title = @communityProfileGames[appID].title
+			if title == nil
+				log('Skipping Steam game', appID, 'because title could not be found')
+				continue
 			banner, bannerURL = @getBanner(appID)
 			expectedBanner = if banner ~= nil then nil else appID
 			hoursPlayed = nil
@@ -293,7 +303,7 @@ class Steam extends Platform
 				hoursPlayed = @communityProfileGames[appID].hoursPlayed
 				@communityProfileGames[appID] = nil
 			games[appID] = {
-				title: vdf.appstate.name or (vdf.userconfig and vdf.userconfig.name)
+				:title
 				path: @getPath(appID)
 				platformID: @platformID
 				:banner
