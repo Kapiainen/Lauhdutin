@@ -65,7 +65,18 @@ do
       for productID, _ in pairs(productIDs) do
         local _continue_0 = false
         repeat
-          local info = io.readFile(io.joinPaths(paths[productID], ('goggame-%s.info'):format(productID)), false)
+          local infoPath = io.joinPaths(paths[productID], ('goggame-%s.info'):format(productID))
+          if not (io.fileExists(infoPath, false)) then
+            log('Skipping GOG Galaxy game', productID, 'because the .info file could not be found')
+            _continue_0 = true
+            break
+          end
+          local info = io.readFile(infoPath, false)
+          if info == '' or info:trim() == '' then
+            log('Skipping GOG Galaxy game', productID, 'because the .info file is empty')
+            _continue_0 = true
+            break
+          end
           info = json.decode(info)
           local exePath = (info.playTasks[1].path:gsub('//', '\\'))
           local banner = self:getBannerPath(productID)

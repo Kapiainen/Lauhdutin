@@ -81,7 +81,14 @@ class GOGGalaxy extends Platform
 		productIDs, paths = @parseIndexDB()
 		titles, bannerURLs = @parseGalaxyDB(productIDs)
 		for productID, _ in pairs(productIDs)
-			info = io.readFile(io.joinPaths(paths[productID], ('goggame-%s.info')\format(productID)), false)
+			infoPath = io.joinPaths(paths[productID], ('goggame-%s.info')\format(productID))
+			unless io.fileExists(infoPath, false)
+				log('Skipping GOG Galaxy game', productID, 'because the .info file could not be found')
+				continue
+			info = io.readFile(infoPath, false)
+			if info == '' or info\trim() == ''
+				log('Skipping GOG Galaxy game', productID, 'because the .info file is empty')
+				continue
 			info = json.decode(info)
 			exePath = (info.playTasks[1].path\gsub('//', '\\'))
 			banner = @getBannerPath(productID)
