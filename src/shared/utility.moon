@@ -127,7 +127,7 @@ parseVDF = (lines, start = 1) ->
 	i = start - 1
 	while i < #lines
 		i += 1
-		key = lines[i]\match('^%s*"([^"]+)"\s*$') -- Start of a dictionary
+		key = lines[i]\match('^%s*"([^"]+)"%s*$') -- Start of a dictionary
 		if key ~= nil
 			assert(lines[i + 1]\match('^%s*{%s*$') ~= nil, '"parseVDF" expected "{".')
 			tbl, i = parseVDF(lines, i + 2)

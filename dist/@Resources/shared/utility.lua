@@ -452,7 +452,7 @@ parseVDF = function(lines, start)
     local _continue_0 = false
     repeat
       i = i + 1
-      local key = lines[i]:match('^%s*"([^"]+)"\s*$')
+      local key = lines[i]:match('^%s*"([^"]+)"%s*$')
       if key ~= nil then
         assert(lines[i + 1]:match('^%s*{%s*$') ~= nil, '"parseVDF" expected "{".')
         local tbl
