@@ -1,3 +1,7 @@
+export RUN_TESTS = true
+if RUN_TESTS
+	print('Running tests')
+
 utility = nil
 json = nil
 

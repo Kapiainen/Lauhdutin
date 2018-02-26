@@ -1,3 +1,7 @@
+RUN_TESTS = true
+if RUN_TESTS then
+  print('Running tests')
+end
 local utility = nil
 LOCALIZATION = nil
 STATE = {
