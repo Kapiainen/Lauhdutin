@@ -83,10 +83,16 @@ class Battlenet extends Platform
 					}
 				else
 					continue
-			args.platformID = @platformID
+			if args.title == nil
+				log('Skipping Blizzard Battle.net game because the title is missing')
+				continue
+			elseif args.path == nil
+				log('Skipping Blizzard Battle.net game because the path is missing')
+				continue
 			args.banner = @getBannerPath(args.title)
 			unless args.banner
 				args.expectedBanner = args.title
+			args.platformID = @platformID
 			table.insert(games, args)
 		for args in *games
 			table.insert(@games, Game(args))

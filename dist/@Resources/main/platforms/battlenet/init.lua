@@ -108,11 +108,20 @@ do
             _continue_0 = true
             break
           end
-          args.platformID = self.platformID
+          if args.title == nil then
+            log('Skipping Blizzard Battle.net game because the title is missing')
+            _continue_0 = true
+            break
+          elseif args.path == nil then
+            log('Skipping Blizzard Battle.net game because the path is missing')
+            _continue_0 = true
+            break
+          end
           args.banner = self:getBannerPath(args.title)
           if not (args.banner) then
             args.expectedBanner = args.title
           end
+          args.platformID = self.platformID
           table.insert(games, args)
           _continue_0 = true
         until true
