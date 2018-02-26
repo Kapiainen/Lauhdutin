@@ -224,7 +224,17 @@ class Steam extends Platform
 		for game in contents\reverse()\gmatch('(.-)emaNppA')
 			game = game\reverse()
 			title = game\match('|(.-)|')
-			appID = @generateAppID(title, ('"%s"')\format(game\match('"(.-)"')))
+			if title == nil
+				log('Skipping Steam shortcut because the title could not be parsed')
+				continue
+			path = ('"%s"')\format(game\match('"(.-)"'))
+			if path == nil
+				log('Skipping Steam shortcut because the path could not be parsed')
+				continue
+			appID = @generateAppID(title, path)
+			if appID == nil
+				log('Skipping Steam shortcut because the appID could not be generated')
+				continue
 			path = ('steam://rungameid/%s')\format(appID)
 			banner = @getBannerPath(appID, shortcutsBannerPath)
 			expectedBanner = nil

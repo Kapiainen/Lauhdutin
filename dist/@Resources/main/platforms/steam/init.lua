@@ -280,21 +280,40 @@ do
       contents = contents:gsub('%c', '|')
       local shortcutsBannerPath = 'cache\\steam_shortcuts'
       for game in contents:reverse():gmatch('(.-)emaNppA') do
-        game = game:reverse()
-        local title = game:match('|(.-)|')
-        local appID = self:generateAppID(title, ('"%s"'):format(game:match('"(.-)"')))
-        local path = ('steam://rungameid/%s'):format(appID)
-        local banner = self:getBannerPath(appID, shortcutsBannerPath)
-        local expectedBanner = nil
-        if not (banner) then
-          local _list_0 = self.bannerExtensions
-          for _index_0 = 1, #_list_0 do
-            local extension = _list_0[_index_0]
-            local gridBannerPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\grid\\', appID .. extension)
-            local cacheBannerPath = io.joinPaths(shortcutsBannerPath, appID .. extension)
-            if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath) then
-              io.copyFile(gridBannerPath, cacheBannerPath, false)
-              break
+        local _continue_0 = false
+        repeat
+          game = game:reverse()
+          local title = game:match('|(.-)|')
+          if title == nil then
+            log('Skipping Steam shortcut because the title could not be parsed')
+            _continue_0 = true
+            break
+          end
+          local path = ('"%s"'):format(game:match('"(.-)"'))
+          if path == nil then
+            log('Skipping Steam shortcut because the path could not be parsed')
+            _continue_0 = true
+            break
+          end
+          local appID = self:generateAppID(title, path)
+          if appID == nil then
+            log('Skipping Steam shortcut because the appID could not be generated')
+            _continue_0 = true
+            break
+          end
+          path = ('steam://rungameid/%s'):format(appID)
+          local banner = self:getBannerPath(appID, shortcutsBannerPath)
+          local expectedBanner = nil
+          if not (banner) then
+            local _list_0 = self.bannerExtensions
+            for _index_0 = 1, #_list_0 do
+              local extension = _list_0[_index_0]
+              local gridBannerPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\grid\\', appID .. extension)
+              local cacheBannerPath = io.joinPaths(shortcutsBannerPath, appID .. extension)
+              if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath) then
+                io.copyFile(gridBannerPath, cacheBannerPath, false)
+                break
+              end
             end
           end
           banner = self:getBannerPath(appID)
