@@ -63,32 +63,49 @@ do
       local productIDs, paths = self:parseIndexDB()
       local titles, bannerURLs = self:parseGalaxyDB(productIDs)
       for productID, _ in pairs(productIDs) do
-        local info = io.readFile(io.joinPaths(paths[productID], ('goggame-%s.info'):format(productID)), false)
-        info = json.decode(info)
-        local exePath = (info.playTasks[1].path:gsub('//', '\\'))
-        local banner = self:getBannerPath(productID)
-        local bannerURL = nil
-        local expectedBanner = nil
-        if not (banner) then
-          bannerURL = bannerURLs[productID]
-          banner = io.joinPaths(self.cachePath, productID .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
-          expectedBanner = productID
+        local _continue_0 = false
+        repeat
+          local info = io.readFile(io.joinPaths(paths[productID], ('goggame-%s.info'):format(productID)), false)
+          info = json.decode(info)
+          local exePath = (info.playTasks[1].path:gsub('//', '\\'))
+          local banner = self:getBannerPath(productID)
+          local bannerURL = nil
+          local expectedBanner = nil
+          if not (banner) then
+            bannerURL = bannerURLs[productID]
+            banner = io.joinPaths(self.cachePath, productID .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
+            expectedBanner = productID
+          end
+          local path = nil
+          if self.indirectLaunch then
+            path = ('"%s" "/command=runGame" "/gameId=%s"'):format(self.clientPath, productID)
+          else
+            path = ('"%s"'):format(io.joinPaths(paths[productID], exePath))
+          end
+          local title = titles[productID]
+          if title == nil then
+            log('Skipping GOG Galaxy game', productID, 'because title could not be found')
+            _continue_0 = true
+            break
+          elseif path == nil then
+            log('Skipping GOG Galaxy game', productID, 'because path could not be found')
+            _continue_0 = true
+            break
+          end
+          table.insert(games, {
+            banner = banner,
+            bannerURL = bannerURL,
+            expectedBanner = expectedBanner,
+            title = title,
+            path = path,
+            platformID = self.platformID,
+            process = exePath:reverse():match('^([^\\]+)'):reverse()
+          })
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
         end
-        local path = nil
-        if self.indirectLaunch then
-          path = ('"%s" "/command=runGame" "/gameId=%s"'):format(self.clientPath, productID)
-        else
-          path = ('"%s"'):format(io.joinPaths(paths[productID], exePath))
-        end
-        table.insert(games, {
-          banner = banner,
-          bannerURL = bannerURL,
-          expectedBanner = expectedBanner,
-          title = titles[productID],
-          path = path,
-          platformID = self.platformID,
-          process = exePath:reverse():match('^([^\\]+)'):reverse()
-        })
       end
       do
         local _accum_0 = { }

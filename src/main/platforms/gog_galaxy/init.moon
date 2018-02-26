@@ -96,11 +96,18 @@ class GOGGalaxy extends Platform
 				path = ('"%s" "/command=runGame" "/gameId=%s"')\format(@clientPath, productID)
 			else
 				path = ('"%s"')\format(io.joinPaths(paths[productID], exePath))
+			title = titles[productID]
+			if title == nil
+				log('Skipping GOG Galaxy game', productID, 'because title could not be found')
+				continue
+			elseif path == nil
+				log('Skipping GOG Galaxy game', productID, 'because path could not be found')
+				continue
 			table.insert(games, {
 				:banner
 				:bannerURL
 				:expectedBanner
-				title: titles[productID]
+				:title
 				:path
 				platformID: @platformID
 				process: exePath\reverse()\match('^([^\\]+)')\reverse()
