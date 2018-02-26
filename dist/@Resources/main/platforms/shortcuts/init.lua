@@ -24,56 +24,72 @@ do
       local output = io.readFile(self.outputPath)
       local lines = output:splitIntoLines()
       while #lines > 0 and #lines % 3 == 0 do
-        local absoluteFilePath = table.remove(lines, 1)
-        local _, diverges = absoluteFilePath:find(self.shortcutsPath)
-        local relativeFilePath = absoluteFilePath:sub(diverges + 1)
-        local parts = relativeFilePath:split('\\')
-        local title
-        local _exp_0 = #parts
-        if 1 == _exp_0 then
-          title = parts[1]
-        elseif 2 == _exp_0 then
-          title = parts[2]
-        else
-          title = assert(nil, 'Unexpected path structure when processing Windows shortcuts.')
-        end
-        title = title:match('^([^%.]+)')
-        local platformOverride
-        local _exp_1 = #parts
-        if 2 == _exp_1 then
-          platformOverride = parts[1]
-        else
-          platformOverride = nil
-        end
-        local banner = nil
-        local expectedBanner = nil
-        if platformOverride ~= nil then
-          banner = self:getBannerPath(title, ('Shortcuts\\%s'):format(platformOverride))
-        else
-          banner = self:getBannerPath(title, 'Shortcuts')
-        end
-        if not (banner) then
-          expectedBanner = title
-        end
-        local path = ('"%s"'):format(table.remove(lines, 1):match('^	Target=(.-)$'))
-        local arguments = table.remove(lines, 1)
-        if arguments then
-          arguments = arguments:match('^	Arguments=(.-)$')
-        end
-        if arguments ~= nil and arguments ~= '' then
-          arguments = arguments:split('"%s"')
-          if #arguments > 0 then
-            path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
+        local _continue_0 = false
+        repeat
+          local absoluteFilePath = table.remove(lines, 1)
+          local _, diverges = absoluteFilePath:find(self.shortcutsPath)
+          local relativeFilePath = absoluteFilePath:sub(diverges + 1)
+          local parts = relativeFilePath:split('\\')
+          local title
+          local _exp_0 = #parts
+          if 1 == _exp_0 then
+            title = parts[1]
+          elseif 2 == _exp_0 then
+            title = parts[2]
+          else
+            title = assert(nil, 'Unexpected path structure when processing Windows shortcuts.')
           end
+          title = title:match('^([^%.]+)')
+          local platformOverride
+          local _exp_1 = #parts
+          if 2 == _exp_1 then
+            platformOverride = parts[1]
+          else
+            platformOverride = nil
+          end
+          local banner = nil
+          local expectedBanner = nil
+          if platformOverride ~= nil then
+            banner = self:getBannerPath(title, ('Shortcuts\\%s'):format(platformOverride))
+          else
+            banner = self:getBannerPath(title, 'Shortcuts')
+          end
+          if not (banner) then
+            expectedBanner = title
+          end
+          local path = ('"%s"'):format(table.remove(lines, 1):match('^	Target=(.-)$'))
+          local arguments = table.remove(lines, 1)
+          if arguments then
+            arguments = arguments:match('^	Arguments=(.-)$')
+          end
+          if arguments ~= nil and arguments ~= '' then
+            arguments = arguments:split('"%s"')
+            if #arguments > 0 then
+              path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
+            end
+          end
+          if title == nil then
+            log('Skipping Windows shortcut', absoluteFilePath, 'because title could not be found')
+            _continue_0 = true
+            break
+          elseif path == nil then
+            log('Skipping Windows shortcut', absoluteFilePath, 'because path could not be found')
+            _continue_0 = true
+            break
+          end
+          table.insert(games, {
+            title = title,
+            banner = banner,
+            expectedBanner = expectedBanner,
+            path = path,
+            platformOverride = platformOverride,
+            platformID = self.platformID
+          })
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
         end
-        table.insert(games, {
-          title = title,
-          banner = banner,
-          expectedBanner = expectedBanner,
-          path = path,
-          platformOverride = platformOverride,
-          platformID = self.platformID
-        })
       end
       do
         local _accum_0 = { }

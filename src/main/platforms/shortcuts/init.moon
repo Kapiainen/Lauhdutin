@@ -56,6 +56,12 @@ class Shortcuts extends Platform
 				arguments = arguments\split('"%s"')
 				if #arguments > 0
 					path = ('%s "%s"')\format(path, table.concat(arguments, '" "'))
+			if title == nil
+				log('Skipping Windows shortcut', absoluteFilePath, 'because title could not be found')
+				continue
+			elseif path == nil
+				log('Skipping Windows shortcut', absoluteFilePath, 'because path could not be found')
+				continue
 			table.insert(games, {
 				:title
 				:banner
