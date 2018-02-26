@@ -1,3 +1,7 @@
+**Version 3.0.0 beta 4 - 2018/02/26:**
+- Added more checks to the various platforms to make sure that resources, titles, and paths are valid.
+- Game class constructor now checks that titles are not empty strings.
+
 **Version 3.0.0 beta 3 - 2018/02/25:**
 - Fixed a bug, which was introduced in the previous version, in the setting types.
 
