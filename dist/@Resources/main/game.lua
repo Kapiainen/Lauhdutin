@@ -249,7 +249,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
-      assert(type(args.title) == 'string', 'main.game.Game')
+      assert(type(args.title) == 'string' and args.title:trim() ~= '', 'main.game.Game')
       self.title = self:_moveThe(args.title)
       assert(type(args.path) == 'string', 'main.game.Game')
       self.path = args.path
