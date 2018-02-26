@@ -130,8 +130,12 @@ class Steam extends Platform
 		for game in file\gmatch('<game>(.-)</game>')
 			appID = game\match('<appID>(%d+)</appID>')
 			continue if games[appID] ~= nil
+			title = game\match('<name><!%[CDATA%[(.-)%]%]></name>')
+			if title == nil
+				log('Skipping Steam game', appID, 'because a title could not be parsed from the community profile')
+				continue
 			games[appID] = {
-				title: game\match('<name><!%[CDATA%[(.-)%]%]></name>')
+				:title
 				hoursPlayed: tonumber(game\match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
 			}
 			num += 1

@@ -122,8 +122,14 @@ do
             _continue_0 = true
             break
           end
+          local title = game:match('<name><!%[CDATA%[(.-)%]%]></name>')
+          if title == nil then
+            log('Skipping Steam game', appID, 'because a title could not be parsed from the community profile')
+            _continue_0 = true
+            break
+          end
           games[appID] = {
-            title = game:match('<name><!%[CDATA%[(.-)%]%]></name>'),
+            title = title,
             hoursPlayed = tonumber(game:match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
           }
           num = num + 1
