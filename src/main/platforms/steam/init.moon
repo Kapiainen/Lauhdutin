@@ -39,12 +39,12 @@ class Steam extends Platform
 		@useCommunityProfile = settings\getSteamParseCommunityProfile()
 		if @enabled
 			clientPath = io.joinPaths(@steamPath, 'steam.exe')
-			assert(io.fileExists(clientPath, false), 'main.platforms.steam.init.Steam')
-			assert(@accountID ~= nil, 'main.platforms.steam.init.Steam')
-			assert(tonumber(@accountID) ~= nil, 'main.platforms.steam.init.Steam')
+			assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
+			assert(@accountID ~= nil, 'A Steam account has not been chosen.')
+			assert(tonumber(@accountID) ~= nil, 'The Steam account is invalid.')
 			if @useCommunityProfile
-				assert(@accountID ~= nil, 'main.platforms.steam.init.Steam')
-				assert(tonumber(@accountID) ~= nil, 'main.platforms.steam.init.Steam')
+				assert(@communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
+				assert(tonumber(@communityID) ~= nil, 'The Steam ID is invalid.')
 		@games = {}
 		@communityProfilePath = io.joinPaths(@cachePath, 'communityProfile.txt')
 		@communityProfileGames = nil
