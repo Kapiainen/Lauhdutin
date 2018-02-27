@@ -239,7 +239,7 @@ Skin animations can be disabled completely.
 
 Example of a Finnish translation implemented with the included localization system.
 
-This skin supports localization, though it is somewhat limited. The default language is English, but additional languages can be added by copying `English.txt`, which can be found in `@Resources\Languages`, and translating the strings. The name of the file is also the name of the language in the settings window. The first line of the file should be the version of the localization system:
+This skin supports localization, though it is somewhat limited. The default language is English, but additional languages can be added by copying `English.txt`, which can be found in `@Resources\Languages`, and translating the strings. Translation files should be saved using the UTF-8 encoding. The name of the file is also the name of the language in the settings window. The first line of the file should be the version of the localization system:
 
 ```
 version N
