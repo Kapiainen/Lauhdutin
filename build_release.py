@@ -78,6 +78,15 @@ def main(root_path, releases_path, version):
 					print("      Skipping file based on pattern: '%s'" % os.path.relpath(path, root_path))
 				else:
 					print("      Adding file: '%s'" % os.path.relpath(path, root_path))
+					if "init.lua" in path:
+						with open(path, "r") as f:
+							for line in f.readlines():
+								if "RUN_TESTS" in line and "=" in line:
+									if "true" in line:
+										print("\n  Aborted build! Tests are enabled in '%s'!" % path)
+										return
+									else:
+										break
 					files_to_pack.append(path)
 	print("\n  Files to pack:")
 	for file in files_to_pack:
