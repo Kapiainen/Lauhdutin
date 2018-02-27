@@ -60,6 +60,7 @@ overlay_install	Install
 overlay_platform_not_running	%s is not running
 overlay_remove	Remove
 overlay_unhide	Unhide
+overlay_uninstalled	Uninstalled
 platform_name_windows_shortcut	Windows shortcut
 search_window_all_title	Search
 search_window_current_title	Search (current games)

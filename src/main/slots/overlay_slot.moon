@@ -21,6 +21,7 @@ class OverlaySlot
 		@unhideGame = LOCALIZATION\get('overlay_unhide', 'Unhide')
 		@alreadyVisible = LOCALIZATION\get('overlay_already_visible', 'Already visible')
 		@removeGame = LOCALIZATION\get('overlay_remove', 'Remove')
+		@uninstalledGame = LOCALIZATION\get('overlay_uninstalled', 'Uninstalled')
 
 	show: (index, game) =>
 		unless game
@@ -47,9 +48,13 @@ class OverlaySlot
 				if STATE.PLATFORM_RUNNING_STATUS[platformID] == false
 					info = @platformNotRunning\format(STATE.PLATFORM_NAMES[platformID])
 					image = images.error
-				elseif game\isInstalled() == false and (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
-					info = @installGame
-					image = images.install
+				elseif game\isInstalled() == false
+					if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
+						info = @installGame
+						image = images.install
+					else
+						info = @uninstalledGame
+						image = images.error
 			when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
 				info = @removeGame
 				image = images.error

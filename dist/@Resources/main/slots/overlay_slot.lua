@@ -39,9 +39,14 @@ do
         if STATE.PLATFORM_RUNNING_STATUS[platformID] == false then
           info = self.platformNotRunning:format(STATE.PLATFORM_NAMES[platformID])
           image = images.error
-        elseif game:isInstalled() == false and (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
-          info = self.installGame
-          image = images.install
+        elseif game:isInstalled() == false then
+          if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
+            info = self.installGame
+            image = images.install
+          else
+            info = self.uninstalledGame
+            image = images.error
+          end
         end
       elseif ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME == _exp_0 then
         info = self.removeGame
@@ -85,6 +90,7 @@ do
       self.unhideGame = LOCALIZATION:get('overlay_unhide', 'Unhide')
       self.alreadyVisible = LOCALIZATION:get('overlay_already_visible', 'Already visible')
       self.removeGame = LOCALIZATION:get('overlay_remove', 'Remove')
+      self.uninstalledGame = LOCALIZATION:get('overlay_uninstalled', 'Uninstalled')
     end,
     __base = _base_0,
     __name = "OverlaySlot"
