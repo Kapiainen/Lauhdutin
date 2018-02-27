@@ -146,13 +146,17 @@ do
       local libraries = {
         io.joinPaths(self.steamPath, 'steamapps\\')
       }
-      local file = io.readFile(io.joinPaths(self.steamPath, 'steamapps\\libraryfolders.vdf'), false)
-      local lines = file:splitIntoLines()
-      local vdf = utility.parseVDF(lines)
-      for key, value in pairs(vdf.libraryfolders) do
-        if tonumber(key) ~= nil then
-          if value:endsWith('\\') then
-            value = value .. '\\'
+      local libraryFoldersPath = io.joinPaths(self.steamPath, 'steamapps\\libraryfolders.vdf')
+      if io.fileExists(libraryFoldersPath, false) then
+        local file = io.readFile(libraryFoldersPath, false)
+        local lines = file:splitIntoLines()
+        local vdf = utility.parseVDF(lines)
+        for key, value in pairs(vdf.libraryfolders) do
+          if tonumber(key) ~= nil then
+            if value:endsWith('\\') then
+              value = value .. '\\'
+            end
+            table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
           end
           table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
         end

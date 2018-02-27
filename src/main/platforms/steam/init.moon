@@ -144,13 +144,17 @@ class Steam extends Platform
 
 	getLibraries: () =>
 		libraries = {io.joinPaths(@steamPath, 'steamapps\\')}
-		file = io.readFile(io.joinPaths(@steamPath, 'steamapps\\libraryfolders.vdf'), false)
-		lines = file\splitIntoLines()
-		vdf = utility.parseVDF(lines)
-		for key, value in pairs(vdf.libraryfolders)
-			if tonumber(key) ~= nil
-				value ..= '\\' if value\endsWith('\\')
-				table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+		libraryFoldersPath = io.joinPaths(@steamPath, 'steamapps\\libraryfolders.vdf')
+		if io.fileExists(libraryFoldersPath, false)
+			file = io.readFile(libraryFoldersPath, false)
+			lines = file\splitIntoLines()
+			vdf = utility.parseVDF(lines)
+			for key, value in pairs(vdf.libraryfolders)
+				if tonumber(key) ~= nil
+					value ..= '\\' if value\endsWith('\\')
+					table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+		else
+			log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
 		@libraries = libraries
 
 	hasLibrariesToParse: () => return #@libraries > 0
