@@ -123,7 +123,7 @@ class Steam extends Platform
 		downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
 		cachedPath = io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
 		os.rename(downloadedPath, cachedPath)
-		return unless io.readFile(@communityProfilePath)
+		return unless io.fileExists(@communityProfilePath)
 		file = io.readFile(@communityProfilePath)
 		games = {}
 		num = 0
@@ -139,7 +139,7 @@ class Steam extends Platform
 				hoursPlayed: tonumber(game\match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
 			}
 			num += 1
-		log(num)
+		log('Games found in the Steam community profile:', num)
 		@communityProfileGames = games
 
 	getLibraries: () =>

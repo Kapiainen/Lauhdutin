@@ -108,7 +108,7 @@ do
       local downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
       local cachedPath = io.joinPaths(STATE.PATHS.RESOURCES, self.cachePath, 'communityProfile.txt')
       os.rename(downloadedPath, cachedPath)
-      if not (io.readFile(self.communityProfilePath)) then
+      if not (io.fileExists(self.communityProfilePath)) then
         return 
       end
       local file = io.readFile(self.communityProfilePath)
@@ -139,7 +139,7 @@ do
           break
         end
       end
-      log(num)
+      log('Games found in the Steam community profile:', num)
       self.communityProfileGames = games
     end,
     getLibraries = function(self)
