@@ -176,27 +176,64 @@ class Steam extends Platform
 		lines = file\splitIntoLines()
 		return utility.parseVDF(lines)
 
-	getTags: (appID) =>
-		tags = {}
-		config = @sharedConfig.userroamingconfigstore
-		config = @sharedConfig.userlocalconfigstore if config == nil
-		return tags if config == nil
+	getTags: (appID, sharedConfig) =>
+		tags = nil
+		config = sharedConfig.userroamingconfigstore
+		config = sharedConfig.userlocalconfigstore if config == nil
+		if config == nil
+			log('Steam sharedConfig has an unsupported structure at the top-level')
+			return tags
+		if config.software == nil
+			log('Steam sharedConfig.software is nil')
+			return tags
+		if config.software.valve == nil
+			log('Steam sharedConfig.software.valve is nil')
+			return tags
+		if config.software.valve.steam == nil
+			log('Steam sharedConfig.software.valve.steam is nil')
+			return tags
+		if config.software.valve.steam.apps == nil
+			log('Steam sharedConfig.software.valve.steam.apps is nil')
+			return tags
 		app = config.software.valve.steam.apps[appID]
-		return tags if app == nil
-		return tags if app.tags == nil
+		if app == nil
+			log('Could not find the Steam game', appID, 'in sharedConfig')
+			return tags
+		if app.tags == nil
+			log('Failed to get tags for Steam game', appID)
+			return tags
 		return tags if type(app.tags) ~= 'table'
+		tags = {}
 		for index, tag in pairs(app.tags)
 			table.insert(tags, tag)
 		return if #tags > 0 then tags else nil
 
-	getLastPlayed: (appID) =>
+	getLastPlayed: (appID, localConfig) =>
 		lastPlayed = nil
-		config = @localConfig.userroamingconfigstore
-		config = @localConfig.userlocalconfigstore if config == nil
-		return lastPlayed if config == nil
+		config = localConfig.userroamingconfigstore
+		config = localConfig.userlocalconfigstore if config == nil
+		if config == nil
+			log('Steam localConfig has an unsupported structure at the top-level')
+			return lastPlayed
+		if config.software == nil
+			log('Steam localConfig.software is nil')
+			return lastPlayed
+		if config.software.valve == nil
+			log('Steam localConfig.software.valve is nil')
+			return lastPlayed
+		if config.software.valve.steam == nil
+			log('Steam localConfig.software.valve.steam is nil')
+			return lastPlayed
+		if config.software.valve.steam.apps == nil
+			log('Steam localConfig.software.valve.steam.apps is nil')
+			return lastPlayed
 		app = config.software.valve.steam.apps[appID]
-		return lastPlayed if app == nil
-		return lastPlayed if app.lastplayed == nil
+		if app == nil
+			log('Could not find the Steam game', appID, 'in localConfig')
+			return lastPlayed
+		if app.lastplayed == nil
+			log('Failed to get last played timestamp for Steam game', appID)
+			return lastPlayed
 		lastPlayed = tonumber(app.lastplayed)
 		return lastPlayed
 
@@ -314,13 +351,14 @@ class Steam extends Platform
 				:bannerURL
 				:expectedBanner
 				:hoursPlayed
-				lastPlayed: @getLastPlayed(appID)
-				platformTags: @getTags(appID)
+				lastPlayed: @getLastPlayed(appID, @localConfig)
+				platformTags: @getTags(appID, @sharedConfig)
 				process: @getProcess()
 			}
 		-- Wait until all detected Steam libraries have been processed before dealing with any remaining
 		-- (i.e. not installed) games found in the community profile.
 		if @communityProfileGames ~= nil and #@libraries == 0
+			log('Processing remaining Steam games found in the community profile')
 			for appID, game in pairs(@communityProfileGames)
 				continue if games[appID] ~= nil
 				banner, bannerURL = @getBanner(appID)
@@ -333,8 +371,8 @@ class Steam extends Platform
 					:bannerURL
 					:expectedBanner
 					hoursPlayed: game.hoursPlayed
-					lastPlayed: @getLastPlayed(appID)
-					platformTags: @getTags(appID)
+					lastPlayed: @getLastPlayed(appID, @localConfig)
+					platformTags: @getTags(appID, @sharedConfig)
 					process: @getProcess()
 					uninstalled: true
 				}

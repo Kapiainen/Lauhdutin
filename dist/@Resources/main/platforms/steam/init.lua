@@ -158,8 +158,9 @@ do
             end
             table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
           end
-          table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
         end
+      else
+        log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
       end
       self.libraries = libraries
     end,
@@ -184,25 +185,45 @@ do
       local lines = file:splitIntoLines()
       return utility.parseVDF(lines)
     end,
-    getTags = function(self, appID)
-      local tags = { }
-      local config = self.sharedConfig.userroamingconfigstore
+    getTags = function(self, appID, sharedConfig)
+      local tags = nil
+      local config = sharedConfig.userroamingconfigstore
       if config == nil then
-        config = self.sharedConfig.userlocalconfigstore
+        config = sharedConfig.userlocalconfigstore
       end
       if config == nil then
+        log('Steam sharedConfig has an unsupported structure at the top-level')
+        return tags
+      end
+      if config.software == nil then
+        log('Steam sharedConfig.software is nil')
+        return tags
+      end
+      if config.software.valve == nil then
+        log('Steam sharedConfig.software.valve is nil')
+        return tags
+      end
+      if config.software.valve.steam == nil then
+        log('Steam sharedConfig.software.valve.steam is nil')
+        return tags
+      end
+      if config.software.valve.steam.apps == nil then
+        log('Steam sharedConfig.software.valve.steam.apps is nil')
         return tags
       end
       local app = config.software.valve.steam.apps[appID]
       if app == nil then
+        log('Could not find the Steam game', appID, 'in sharedConfig')
         return tags
       end
       if app.tags == nil then
+        log('Failed to get tags for Steam game', appID)
         return tags
       end
       if type(app.tags) ~= 'table' then
         return tags
       end
+      tags = { }
       for index, tag in pairs(app.tags) do
         table.insert(tags, tag)
       end
@@ -212,20 +233,39 @@ do
         return nil
       end
     end,
-    getLastPlayed = function(self, appID)
+    getLastPlayed = function(self, appID, localConfig)
       local lastPlayed = nil
-      local config = self.localConfig.userroamingconfigstore
+      local config = localConfig.userroamingconfigstore
       if config == nil then
-        config = self.localConfig.userlocalconfigstore
+        config = localConfig.userlocalconfigstore
       end
       if config == nil then
+        log('Steam localConfig has an unsupported structure at the top-level')
+        return lastPlayed
+      end
+      if config.software == nil then
+        log('Steam localConfig.software is nil')
+        return lastPlayed
+      end
+      if config.software.valve == nil then
+        log('Steam localConfig.software.valve is nil')
+        return lastPlayed
+      end
+      if config.software.valve.steam == nil then
+        log('Steam localConfig.software.valve.steam is nil')
+        return lastPlayed
+      end
+      if config.software.valve.steam.apps == nil then
+        log('Steam localConfig.software.valve.steam.apps is nil')
         return lastPlayed
       end
       local app = config.software.valve.steam.apps[appID]
       if app == nil then
+        log('Could not find the Steam game', appID, 'in localConfig')
         return lastPlayed
       end
       if app.lastplayed == nil then
+        log('Failed to get last played timestamp for Steam game', appID)
         return lastPlayed
       end
       lastPlayed = tonumber(app.lastplayed)
@@ -429,8 +469,8 @@ do
             bannerURL = bannerURL,
             expectedBanner = expectedBanner,
             hoursPlayed = hoursPlayed,
-            lastPlayed = self:getLastPlayed(appID),
-            platformTags = self:getTags(appID),
+            lastPlayed = self:getLastPlayed(appID, self.localConfig),
+            platformTags = self:getTags(appID, self.sharedConfig),
             process = self:getProcess()
           }
           _continue_0 = true
@@ -440,6 +480,7 @@ do
         end
       end
       if self.communityProfileGames ~= nil and #self.libraries == 0 then
+        log('Processing remaining Steam games found in the community profile')
         for appID, game in pairs(self.communityProfileGames) do
           local _continue_0 = false
           repeat
@@ -462,8 +503,8 @@ do
               bannerURL = bannerURL,
               expectedBanner = expectedBanner,
               hoursPlayed = game.hoursPlayed,
-              lastPlayed = self:getLastPlayed(appID),
-              platformTags = self:getTags(appID),
+              lastPlayed = self:getLastPlayed(appID, self.localConfig),
+              platformTags = self:getTags(appID, self.sharedConfig),
               process = self:getProcess(),
               uninstalled = true
             }
