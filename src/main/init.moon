@@ -732,7 +732,13 @@ export OnCommunityProfileDownloaded = () ->
 		() ->
 			log('Successfully downloaded Steam community profile')
 			stopDownloader()
-			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile()
+			downloadedPath = STATE.PLATFORM_QUEUE[1]\getDownloadedCommunityProfilePath()
+			cachedPath = STATE.PLATFORM_QUEUE[1]\getCachedCommunityProfilePath()
+			os.rename(downloadedPath, cachedPath)
+			profile = ''
+			if io.fileExists(cachedPath, false)
+				profile = io.readFile(cachedPath, false)
+			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile(profile)
 			STATE.PLATFORM_QUEUE[1]\getLibraries()
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
 				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())

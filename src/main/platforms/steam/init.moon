@@ -119,15 +119,14 @@ class Steam extends Platform
 		url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1')\format(@communityID)
 		return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
 
-	parseCommunityProfile: () =>
-		downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
-		cachedPath = io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
-		os.rename(downloadedPath, cachedPath)
-		return unless io.fileExists(@communityProfilePath)
-		file = io.readFile(@communityProfilePath)
+	getDownloadedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
+
+	getCachedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
+
+	parseCommunityProfile: (profile) =>
 		games = {}
 		num = 0
-		for game in file\gmatch('<game>(.-)</game>')
+		for game in profile\gmatch('<game>(.-)</game>')
 			appID = game\match('<appID>(%d+)</appID>')
 			continue if games[appID] ~= nil
 			title = game\match('<name><!%[CDATA%[(.-)%]%]></name>')

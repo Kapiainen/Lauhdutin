@@ -104,17 +104,16 @@ do
       local url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1'):format(self.communityID)
       return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
     end,
-    parseCommunityProfile = function(self)
-      local downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
-      local cachedPath = io.joinPaths(STATE.PATHS.RESOURCES, self.cachePath, 'communityProfile.txt')
-      os.rename(downloadedPath, cachedPath)
-      if not (io.fileExists(self.communityProfilePath)) then
-        return 
-      end
-      local file = io.readFile(self.communityProfilePath)
+    getDownloadedCommunityProfilePath = function(self)
+      return io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
+    end,
+    getCachedCommunityProfilePath = function(self)
+      return io.joinPaths(STATE.PATHS.RESOURCES, self.cachePath, 'communityProfile.txt')
+    end,
+    parseCommunityProfile = function(self, profile)
       local games = { }
       local num = 0
-      for game in file:gmatch('<game>(.-)</game>') do
+      for game in profile:gmatch('<game>(.-)</game>') do
         local _continue_0 = false
         repeat
           local appID = game:match('<appID>(%d+)</appID>')
