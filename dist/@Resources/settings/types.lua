@@ -308,7 +308,7 @@ do
     getInc = function(self, index)
       return table.concat({
         ('[Slot%dFolderPathBrowse]'):format(index),
-        ('Text=%s'):format(LOCALIZATION:get('button_label_browse', 'Browse')),
+        'Text=Browse',
         'Meter=String',
         'SolidColor=#ButtonBaseColor#',
         ('X=([Slot%dBoundingBox:X] + [Slot%dBoundingBox:W] - #ButtonHeight# - 4)'):format(index, index),
@@ -541,7 +541,7 @@ do
     getInc = function(self, index)
       return table.concat({
         ('[Slot%dFolderPathSpinnerBrowse]'):format(index),
-        ('Text=%s'):format(LOCALIZATION:get('button_label_browse', 'Browse')),
+        'Text=Browse',
         'Meter=String',
         'SolidColor=#ButtonBaseColor#',
         ('X=([Slot%dBoundingBox:X] + [Slot%dBoundingBox:W] - #ButtonHeight# - 4)'):format(index, index),
