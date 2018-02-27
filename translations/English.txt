@@ -81,7 +81,7 @@ setting_battlenet_enabled_description	If enabled, then games installed via the B
 setting_battlenet_paths_description	""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
-setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.Paths	TRANSLATION_MISSING
+setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
 setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
