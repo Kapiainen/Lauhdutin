@@ -63,7 +63,7 @@ do
       end
       local contents = ('version %d\n'):format(self.version)
       for key, translation in pairs(translations) do
-        contents = contents .. ('%s\t%s\n'):format(key, translation)
+        contents = contents .. ('%s\t%s\n'):format(key, translation:gsub('\n', '\\n'))
       end
       return io.writeFile(self.path, contents)
     end,

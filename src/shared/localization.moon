@@ -50,7 +50,7 @@ class Localization
 	save: (translations = @translations) =>
 		contents = ('version %d\n')\format(@version)
 		for key, translation in pairs(translations)
-			contents ..= ('%s\t%s\n')\format(key, translation)
+			contents ..= ('%s\t%s\n')\format(key, translation\gsub('\n', '\\n'))
 		io.writeFile(@path, contents)
 
 	get: (key, default) =>
