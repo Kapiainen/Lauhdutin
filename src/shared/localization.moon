@@ -20,8 +20,10 @@ class Localization
 		@translations = @load()
 
 	load: () =>
+		log('Loading translation file')
 		translations = {}
 		unless io.fileExists(@path)
+			log('Translation file does not exist')
 			@save({})
 			return translations
 		lines = io.readFile(@path)\splitIntoLines()
@@ -45,9 +47,11 @@ class Localization
 		for migrator in *migrators
 			if version < migrator.version
 				migrator.func(translations)
+		log('Migrated translation file from version', version)
 		return true
 
 	save: (translations = @translations) =>
+		log('Saving translation file')
 		contents = ('version %d\n')\format(@version)
 		for key, translation in pairs(translations)
 			contents ..= ('%s\t%s\n')\format(key, translation\gsub('\n', '\\n'))
@@ -58,8 +62,10 @@ class Localization
 		if translation == nil
 			@translations[key] = default
 			if @language == 'English'
+				log('Writing default translation for the key', key)
 				io.writeFile(@path, ('%s	%s\n')\format(key, (default\gsub('\n', '\\n'))), 'a')
 			else
+				log('Writing "TRANSLATION_MISSING" for the key', key)
 				io.writeFile(@path, ('%s	TRANSLATION_MISSING\n')\format(key), 'a')
 			return default
 		elseif translation == 'TRANSLATION_MISSING'

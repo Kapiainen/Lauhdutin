@@ -10,8 +10,10 @@ do
   local _class_0
   local _base_0 = {
     load = function(self)
+      log('Loading translation file')
       local translations = { }
       if not (io.fileExists(self.path)) then
+        log('Translation file does not exist')
         self:save({ })
         return translations
       end
@@ -55,12 +57,14 @@ do
           migrator.func(translations)
         end
       end
+      log('Migrated translation file from version', version)
       return true
     end,
     save = function(self, translations)
       if translations == nil then
         translations = self.translations
       end
+      log('Saving translation file')
       local contents = ('version %d\n'):format(self.version)
       for key, translation in pairs(translations) do
         contents = contents .. ('%s\t%s\n'):format(key, translation:gsub('\n', '\\n'))
@@ -72,8 +76,10 @@ do
       if translation == nil then
         self.translations[key] = default
         if self.language == 'English' then
+          log('Writing default translation for the key', key)
           io.writeFile(self.path, ('%s	%s\n'):format(key, (default:gsub('\n', '\\n'))), 'a')
         else
+          log('Writing "TRANSLATION_MISSING" for the key', key)
           io.writeFile(self.path, ('%s	TRANSLATION_MISSING\n'):format(key), 'a')
         end
         return default
