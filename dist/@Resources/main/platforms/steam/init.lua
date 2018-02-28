@@ -20,6 +20,24 @@ lookupTable[61] = '1152921504606846976'
 lookupTable[62] = '2305843009213693952'
 lookupTable[63] = '4611686018427387904'
 lookupTable[64] = '9223372036854775808'
+do
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #lookupTable do
+    local value = lookupTable[_index_0]
+    do
+      local _accum_1 = { }
+      local _len_1 = 1
+      for char in value:reverse():gmatch('.') do
+        _accum_1[_len_1] = tonumber(char)
+        _len_1 = _len_1 + 1
+      end
+      _accum_0[_len_0] = _accum_1
+    end
+    _len_0 = _len_0 + 1
+  end
+  lookupTable = _accum_0
+end
 local Steam
 do
   local _class_0
@@ -36,6 +54,7 @@ do
       end
     end,
     toBinaryString = function(self, value)
+      assert(type(value) == 'number')
       local binary = { }
       for bit = 32, 1, -1 do
         binary[bit] = math.fmod(value, 2)
@@ -44,9 +63,11 @@ do
       return table.concat(binary)
     end,
     adjustBinaryStringHash = function(self, binary)
+      assert(type(binary) == 'string')
       return binary .. '00000010000000000000000000000000'
     end,
     toDecimalString = function(self, binary)
+      assert(type(binary) == 'string')
       local bitValues = { }
       local i = #binary
       for char in binary:gmatch('.') do
@@ -138,7 +159,7 @@ do
             break
           end
           games[appID] = {
-            title = title,
+            title = title:trim(),
             hoursPlayed = tonumber(game:match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
           }
           num = num + 1
@@ -307,24 +328,6 @@ do
     end,
     generateShortcuts = function(self)
       local games = { }
-      do
-        local _accum_0 = { }
-        local _len_0 = 1
-        for _index_0 = 1, #lookupTable do
-          local value = lookupTable[_index_0]
-          do
-            local _accum_1 = { }
-            local _len_1 = 1
-            for char in value:reverse():gmatch('.') do
-              _accum_1[_len_1] = tonumber(char)
-              _len_1 = _len_1 + 1
-            end
-            _accum_0[_len_0] = _accum_1
-          end
-          _len_0 = _len_0 + 1
-        end
-        lookupTable = _accum_0
-      end
       local shortcutsPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, '\\config\\shortcuts.vdf')
       if not (io.fileExists(shortcutsPath, false)) then
         return nil
@@ -578,5 +581,92 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Steam = _class_0
+end
+if RUN_TESTS then
+  local settings = {
+    getSteamEnabled = function(self)
+      return true
+    end,
+    getSteamPath = function(self)
+      return 'Y:\\Program Files (32)\\Steam'
+    end,
+    getSteamAccountID = function(self)
+      return '1234567890'
+    end,
+    getSteamCommunityID = function(self)
+      return '987654321'
+    end,
+    getSteamParseCommunityProfile = function(self)
+      return true
+    end
+  }
+  local steam = Steam(settings)
+  assert(steam:toBinaryString(136) == '00000000000000000000000010001000')
+  assert(steam:toBinaryString(5895412582) == '01011111011001001101101101100110')
+  assert(steam:adjustBinaryStringHash('') == '00000010000000000000000000000000')
+  assert(steam:adjustBinaryStringHash('0101') == '010100000010000000000000000000000000')
+  assert(steam:toDecimalString('1111') == '15')
+  assert(steam:toDecimalString('01001000100011100100111000010000') == '1217285648')
+  assert(steam:generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088')
+  assert(steam:generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008')
+  local profile = 'Some kind of header or other junk that we are not interested in...\n<game>\n	<appID>40400</appID>\n	<name><![CDATA[ AI War: Fleet Command ]]></name>\n	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/40400/91c4cd7c72ae83b354e9380f9e69849c34e163c3.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/40400 ]]></storeLink>\n	<hoursOnRecord>73.0</hoursOnRecord>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AIWar/achievements/]]></globalStatsLink>\n</game>\n<game>\n	<appID>108710</appID>\n	<name><![CDATA[ Alan Wake ]]></name>\n	<logo>\n	<![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/108710/0f9b6613ac50bf42639ed6a2e16e9b78e846ef0a.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/108710 ]]></storeLink>\n	<hoursOnRecord>26.7</hoursOnRecord>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlanWake/achievements/]]></globalStatsLink>\n</game>\n<game>\n	<appID>630</appID>\n	<name><![CDATA[ Alien Swarm ]]></name>\n	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/630/de3320a2c29b55b6f21d142dee26d9b044a29e97.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/630 ]]></storeLink>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlienSwarm/achievements/]]></globalStatsLink>\n</game>\nMore games, etc.'
+  steam:parseCommunityProfile(profile)
+  local numGames = 0
+  local games = steam.communityProfileGames
+  for appID, info in pairs(steam.communityProfileGames) do
+    local _exp_0 = appID
+    if '40400' == _exp_0 then
+      assert(info.title == 'AI War: Fleet Command')
+      assert(info.hoursPlayed == 73.0)
+    elseif '108710' == _exp_0 then
+      assert(info.title == 'Alan Wake')
+      assert(info.hoursPlayed == 26.7)
+    elseif '630' == _exp_0 then
+      assert(info.title == 'Alien Swarm')
+      assert(info.hoursPlayed == nil)
+    else
+      assert(nil)
+    end
+    numGames = numGames + 1
+  end
+  assert(numGames == 3)
+  local sharedConfig = {
+    userroamingconfigstore = {
+      software = {
+        valve = {
+          steam = {
+            apps = {
+              ['654035'] = {
+                tags = {
+                  'FPS',
+                  'Multiplayer'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  assert(steam:getTags('654020', sharedConfig) == nil)
+  assert(#steam:getTags('654035', sharedConfig) == 2)
+  local localConfig = {
+    userlocalconfigstore = {
+      software = {
+        valve = {
+          steam = {
+            apps = {
+              ['654020'] = {
+                lastplayed = '123456789'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  assert(steam:getLastPlayed('654020', localConfig) == 123456789)
+  assert(steam:getLastPlayed('654035', localConfig) == nil)
+  assert(steam:getPath('84065421351') == 'steam://rungameid/84065421351')
 end
 return Steam

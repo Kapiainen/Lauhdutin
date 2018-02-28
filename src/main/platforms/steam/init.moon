@@ -23,6 +23,7 @@ lookupTable[61] = '1152921504606846976'
 lookupTable[62] = '2305843009213693952'
 lookupTable[63] = '4611686018427387904'
 lookupTable[64] = '9223372036854775808'
+lookupTable = [ [tonumber(char) for char in value\reverse()\gmatch('.')] for value in *lookupTable ]
 
 class Steam extends Platform
 	new: (settings) =>
@@ -37,14 +38,6 @@ class Steam extends Platform
 		@accountID = settings\getSteamAccountID()
 		@communityID = settings\getSteamCommunityID()
 		@useCommunityProfile = settings\getSteamParseCommunityProfile()
-		if @enabled
-			clientPath = io.joinPaths(@steamPath, 'steam.exe')
-			assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
-			assert(@accountID ~= nil, 'A Steam account has not been chosen.')
-			assert(tonumber(@accountID) ~= nil, 'The Steam account is invalid.')
-			if @useCommunityProfile
-				assert(@communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
-				assert(tonumber(@communityID) ~= nil, 'The Steam ID is invalid.')
 		@games = {}
 		@communityProfilePath = io.joinPaths(@cachePath, 'communityProfile.txt')
 		@communityProfileGames = nil
@@ -61,6 +54,7 @@ class Steam extends Platform
 			assert(tonumber(@communityID) ~= nil, 'The Steam ID is invalid.')
 
 	toBinaryString: (value) =>
+		assert(type(value) == 'number')
 		binary = {}
 		for bit = 32, 1, -1
 			binary[bit] = math.fmod(value, 2)
@@ -68,9 +62,11 @@ class Steam extends Platform
 		return table.concat(binary)
 
 	adjustBinaryStringHash: (binary) =>
+		assert(type(binary) == 'string')
 		return binary .. '00000010000000000000000000000000' -- Equivalent to '<< 32 | 0x02000000'
 
 	toDecimalString: (binary) =>
+		assert(type(binary) == 'string')
 		bitValues = {}
 		i = #binary
 		for char in binary\gmatch('.')
@@ -143,7 +139,7 @@ class Steam extends Platform
 				log('Skipping Steam game', appID, 'because a title could not be parsed from the community profile')
 				continue
 			games[appID] = {
-				:title
+				title: title\trim()
 				hoursPlayed: tonumber(game\match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
 			}
 			num += 1
@@ -264,7 +260,6 @@ class Steam extends Platform
 
 	generateShortcuts: () =>
 		games = {}
-		lookupTable = [ [tonumber(char) for char in value\reverse()\gmatch('.')] for value in *lookupTable ]
 		shortcutsPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, '\\config\\shortcuts.vdf')
 		return nil unless io.fileExists(shortcutsPath, false)
 		contents = io.readFile(shortcutsPath, false, 'rb')
@@ -387,5 +382,105 @@ class Steam extends Platform
 				@communityProfileGames[appID] = nil
 		for appID, args in pairs(games)
 			table.insert(@games, Game(args))
+
+if RUN_TESTS
+	settings = {
+		getSteamEnabled: () => return true
+		getSteamPath: () => return 'Y:\\Program Files (32)\\Steam'
+		getSteamAccountID: () => return '1234567890'
+		getSteamCommunityID: () => return '987654321'
+		getSteamParseCommunityProfile: () => return true
+	}
+	steam = Steam(settings)
+
+	assert(steam\toBinaryString(136) == '00000000000000000000000010001000')
+	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110')
+
+	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000')
+	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000')
+
+	assert(steam\toDecimalString('1111') == '15')
+	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648')
+
+	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088')
+	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008')
+	
+	profile = 'Some kind of header or other junk that we are not interested in...
+<game>
+	<appID>40400</appID>
+	<name><![CDATA[ AI War: Fleet Command ]]></name>
+	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/40400/91c4cd7c72ae83b354e9380f9e69849c34e163c3.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/40400 ]]></storeLink>
+	<hoursOnRecord>73.0</hoursOnRecord>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AIWar/achievements/]]></globalStatsLink>
+</game>
+<game>
+	<appID>108710</appID>
+	<name><![CDATA[ Alan Wake ]]></name>
+	<logo>
+	<![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/108710/0f9b6613ac50bf42639ed6a2e16e9b78e846ef0a.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/108710 ]]></storeLink>
+	<hoursOnRecord>26.7</hoursOnRecord>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlanWake/achievements/]]></globalStatsLink>
+</game>
+<game>
+	<appID>630</appID>
+	<name><![CDATA[ Alien Swarm ]]></name>
+	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/630/de3320a2c29b55b6f21d142dee26d9b044a29e97.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/630 ]]></storeLink>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlienSwarm/achievements/]]></globalStatsLink>
+</game>
+More games, etc.'
+	steam\parseCommunityProfile(profile)
+	numGames = 0
+	games = steam.communityProfileGames
+	for appID, info in pairs(steam.communityProfileGames)
+		switch appID
+			when '40400'
+				assert(info.title == 'AI War: Fleet Command')
+				assert(info.hoursPlayed == 73.0)
+			when '108710'
+				assert(info.title == 'Alan Wake')
+				assert(info.hoursPlayed == 26.7)
+			when '630'
+				assert(info.title == 'Alien Swarm')
+				assert(info.hoursPlayed == nil)
+			else
+				assert(nil)
+		numGames += 1
+	assert(numGames == 3)
+
+	sharedConfig = {
+		userroamingconfigstore: {software: {valve: {steam: {apps: {
+			'654035': {
+				tags: {
+					'FPS'
+					'Multiplayer'
+				}
+			}
+		}}}}}}
+	assert(steam\getTags('654020', sharedConfig) == nil)
+	assert(#steam\getTags('654035', sharedConfig) == 2)
+
+	localConfig = {
+		userlocalconfigstore: {software: {valve: {steam: {apps: {
+			'654020': {
+				lastplayed: '123456789'
+			}
+		}}}}}}
+	assert(steam\getLastPlayed('654020', localConfig) == 123456789)
+	assert(steam\getLastPlayed('654035', localConfig) == nil)
+	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351')
+
+	--steam\downloadCommunityProfile()
+	--steam\getLibraries()
+	--steam\hasLibrariesToParse()
+	--steam\hasGottenACFs()
+	--steam\getACFs()
+	--steam\parseLocalConfig()
+	--steam\parseSharedConfig()
+	--steam\getBanner()
+	--steam\generateShortcuts()
+	--steam\generateGames()
 
 return Steam
