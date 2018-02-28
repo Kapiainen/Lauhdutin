@@ -38,13 +38,13 @@ class Localization
 			@save(translations)
 		return translations
 
-	migrate: (settings, version) =>
+	migrate: (translations, version) =>
 		assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
 		assert(version <= @version, 'shared.localization.Localization.migrate')
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version
-				migrator.func(settings)
+				migrator.func(translations)
 		return true
 
 	save: (translations = @translations) =>

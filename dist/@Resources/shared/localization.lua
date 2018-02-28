@@ -43,7 +43,7 @@ do
       end
       return translations
     end,
-    migrate = function(self, settings, version)
+    migrate = function(self, translations, version)
       assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
       assert(version <= self.version, 'shared.localization.Localization.migrate')
       if version == self.version then
@@ -52,7 +52,7 @@ do
       for _index_0 = 1, #migrators do
         local migrator = migrators[_index_0]
         if version < migrator.version then
-          migrator.func(settings)
+          migrator.func(translations)
         end
       end
       return true
