@@ -5,6 +5,7 @@ do
   local _class_0
   local _parent_0 = Platform
   local _base_0 = {
+    validate = function(self) end,
     parseShortcuts = function(self)
       if io.fileExists(self.outputPath) then
         io.writeFile(self.outputPath, '')

@@ -51,6 +51,15 @@ class Steam extends Platform
 		if @enabled
 			SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
 
+	validate: () =>
+		clientPath = io.joinPaths(@steamPath, 'steam.exe')
+		assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
+		assert(@accountID ~= nil, 'A Steam account has not been chosen.')
+		assert(tonumber(@accountID) ~= nil, 'The Steam account is invalid.')
+		if @useCommunityProfile
+			assert(@communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
+			assert(tonumber(@communityID) ~= nil, 'The Steam ID is invalid.')
+
 	toBinaryString: (value) =>
 		binary = {}
 		for bit = 32, 1, -1

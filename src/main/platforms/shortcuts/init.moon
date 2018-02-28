@@ -13,6 +13,8 @@ class Shortcuts extends Platform
 		@outputPath = io.joinPaths(@cachePath, 'output.txt')
 		@enabled = settings\getShortcutsEnabled()
 
+	validate: () => return
+
 	parseShortcuts: () =>
 		if io.fileExists(@outputPath)
 			io.writeFile(@outputPath, '')

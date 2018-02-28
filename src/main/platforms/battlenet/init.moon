@@ -15,6 +15,8 @@ class Battlenet extends Platform
 		@enabled = settings\getBattlenetEnabled()
 		@games = {}
 
+	validate: () => return
+
 	hasUnprocessedPaths: () => return #@battlenetPaths > 0
 	
 	hasProcessedPath: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))

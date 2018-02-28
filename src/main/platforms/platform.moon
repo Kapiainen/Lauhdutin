@@ -8,7 +8,8 @@ class Platform
 			'.jpg'
 			'.png'
 		}
-		return
+
+	validate: () => assert(nil, 'Platform has not implemented the validate method.')
 
 	isEnabled: () => return @enabled == true
 

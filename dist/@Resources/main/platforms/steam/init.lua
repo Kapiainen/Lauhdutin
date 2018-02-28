@@ -25,6 +25,16 @@ do
   local _class_0
   local _parent_0 = Platform
   local _base_0 = {
+    validate = function(self)
+      local clientPath = io.joinPaths(self.steamPath, 'steam.exe')
+      assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
+      assert(self.accountID ~= nil, 'A Steam account has not been chosen.')
+      assert(tonumber(self.accountID) ~= nil, 'The Steam account is invalid.')
+      if self.useCommunityProfile then
+        assert(self.communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
+        return assert(tonumber(self.communityID) ~= nil, 'The Steam ID is invalid.')
+      end
+    end,
     toBinaryString = function(self, value)
       local binary = { }
       for bit = 32, 1, -1 do
@@ -535,16 +545,6 @@ do
       self.accountID = settings:getSteamAccountID()
       self.communityID = settings:getSteamCommunityID()
       self.useCommunityProfile = settings:getSteamParseCommunityProfile()
-      if self.enabled then
-        local clientPath = io.joinPaths(self.steamPath, 'steam.exe')
-        assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
-        assert(self.accountID ~= nil, 'A Steam account has not been chosen.')
-        assert(tonumber(self.accountID) ~= nil, 'The Steam account is invalid.')
-        if self.useCommunityProfile then
-          assert(self.communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
-          assert(tonumber(self.communityID) ~= nil, 'The Steam ID is invalid.')
-        end
-      end
       self.games = { }
       self.communityProfilePath = io.joinPaths(self.cachePath, 'communityProfile.txt')
       self.communityProfileGames = nil

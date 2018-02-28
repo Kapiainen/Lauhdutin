@@ -115,12 +115,13 @@ startDetectingPlatformGames = () ->
 detectGames = () ->
 	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
 	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
-	log(#platforms .. ' platforms:')
+	log('Num platforms:', #platforms)
 	COMPONENTS.PROCESS\registerPlatforms(platforms)
 	STATE.PLATFORM_ENABLED_STATUS = {}
 	STATE.PLATFORM_QUEUE = {}
 	for platform in *platforms
 		enabled = platform\isEnabled()
+		platform\validate() if enabled
 		platformID = platform\getPlatformID()
 		STATE.PLATFORM_NAMES[platformID] = platform\getName()
 		STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled

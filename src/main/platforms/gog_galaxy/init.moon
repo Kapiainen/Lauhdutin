@@ -25,19 +25,20 @@ class GOGGalaxy extends Platform
 		@cachePath = 'cache\\gog_galaxy\\'
 		@enabled = settings\getGOGGalaxyEnabled()
 		@programDataPath = settings\getGOGGalaxyProgramDataPath()
-		if @enabled
-			assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-			assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
 		@indirectLaunch = settings\getGOGGalaxyIndirectLaunch()
 		@platformProcess = 'GalaxyClient.exe' if @indirectLaunch
 		@clientPath = settings\getGOGGalaxyClientPath()
+		@games = {}
+
+	validate: () =>
+		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
 		if @clientPath ~= nil
 			@clientPath = io.joinPaths(@clientPath, 'GalaxyClient.exe')
 			if @indirectLaunch
 				assert(io.fileExists(@clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
 		elseif @indirectLaunch
 			assert(@clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
-		@games = {}
 
 	hasDumpedDatabases: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 

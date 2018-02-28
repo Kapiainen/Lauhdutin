@@ -4,6 +4,9 @@ local Platform
 do
   local _class_0
   local _base_0 = {
+    validate = function(self)
+      return assert(nil, 'Platform has not implemented the validate method.')
+    end,
     isEnabled = function(self)
       return self.enabled == true
     end,

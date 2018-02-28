@@ -6,6 +6,18 @@ do
   local _class_0
   local _parent_0 = Platform
   local _base_0 = {
+    validate = function(self)
+      assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+      assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+      if self.clientPath ~= nil then
+        self.clientPath = io.joinPaths(self.clientPath, 'GalaxyClient.exe')
+        if self.indirectLaunch then
+          return assert(io.fileExists(self.clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
+        end
+      elseif self.indirectLaunch then
+        return assert(self.clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
+      end
+    end,
     hasDumpedDatabases = function(self)
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
     end,
@@ -140,23 +152,11 @@ do
       self.cachePath = 'cache\\gog_galaxy\\'
       self.enabled = settings:getGOGGalaxyEnabled()
       self.programDataPath = settings:getGOGGalaxyProgramDataPath()
-      if self.enabled then
-        assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-        assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-      end
       self.indirectLaunch = settings:getGOGGalaxyIndirectLaunch()
       if self.indirectLaunch then
         self.platformProcess = 'GalaxyClient.exe'
       end
       self.clientPath = settings:getGOGGalaxyClientPath()
-      if self.clientPath ~= nil then
-        self.clientPath = io.joinPaths(self.clientPath, 'GalaxyClient.exe')
-        if self.indirectLaunch then
-          assert(io.fileExists(self.clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
-        end
-      elseif self.indirectLaunch then
-        assert(self.clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
-      end
       self.games = { }
     end,
     __base = _base_0,

@@ -131,13 +131,16 @@ detectGames = function()
     end
     platforms = _accum_0
   end
-  log(#platforms .. ' platforms:')
+  log('Num platforms:', #platforms)
   COMPONENTS.PROCESS:registerPlatforms(platforms)
   STATE.PLATFORM_ENABLED_STATUS = { }
   STATE.PLATFORM_QUEUE = { }
   for _index_0 = 1, #platforms do
     local platform = platforms[_index_0]
     local enabled = platform:isEnabled()
+    if enabled then
+      platform:validate()
+    end
     local platformID = platform:getPlatformID()
     STATE.PLATFORM_NAMES[platformID] = platform:getName()
     STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled
