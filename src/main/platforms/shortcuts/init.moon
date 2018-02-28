@@ -49,7 +49,11 @@ class Shortcuts extends Platform
 				banner = @getBannerPath(title, 'Shortcuts')
 			unless banner
 				expectedBanner = title
-			path = ('"%s"')\format(table.remove(lines, 1)\match('^	Target=(.-)$'))
+			path = table.remove(lines, 1)\match('^	Target=(.-)$')
+			uninstalled = nil
+			unless io.fileExists(path, false)
+				uninstalled = true
+			path = ('"%s"')\format(path)
 			arguments = table.remove(lines, 1)
 			arguments = arguments\match('^	Arguments=(.-)$') if arguments
 			if arguments ~= nil and arguments ~= ''
@@ -68,6 +72,7 @@ class Shortcuts extends Platform
 				:expectedBanner
 				:path
 				:platformOverride
+				:uninstalled
 				platformID: @platformID
 			})
 		@games = [Game(args) for args in *games]

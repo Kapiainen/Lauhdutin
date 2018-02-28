@@ -57,7 +57,12 @@ do
           if not (banner) then
             expectedBanner = title
           end
-          local path = ('"%s"'):format(table.remove(lines, 1):match('^	Target=(.-)$'))
+          local path = table.remove(lines, 1):match('^	Target=(.-)$')
+          local uninstalled = nil
+          if not (io.fileExists(path, false)) then
+            uninstalled = true
+          end
+          path = ('"%s"'):format(path)
           local arguments = table.remove(lines, 1)
           if arguments then
             arguments = arguments:match('^	Arguments=(.-)$')
@@ -83,6 +88,7 @@ do
             expectedBanner = expectedBanner,
             path = path,
             platformOverride = platformOverride,
+            uninstalled = uninstalled,
             platformID = self.platformID
           })
           _continue_0 = true
