@@ -2,6 +2,7 @@
 - Added a slot overlay message for uninstalled games from platforms other than Steam and Blizzard Battle.net.
 - Added tests for the Game class.
 - Added tests for the Steam platform class.
+- Added tests for the Blizzard Battle.net platform class.
 - Added log messages to the methods in the Localization class.
 - Updated the Valve Data Format parser.
 - Updated setters in the Game class.
@@ -11,6 +12,7 @@
 - Updated shortcuts with invalid paths to be set as uninstalled in the Windows shortcuts platform class.
 - Refactored code related to downloading and parsing community profiles in the Steam platform class.
 - Refactored code related to validating e.g. values of settings in platform class constructors into their own validation methods to allow for tests.
+- Refactored Blizzard Battle.net platform class to allow for tests.
 - Fixed a bug related to saving translation files in the Localization class.
 - Fixed a bug in the Steam platform class related to parsing the community profile.
 - Fixed a bug that prevented use of localized strings in the 'Browse' button of settings related to folder paths.
