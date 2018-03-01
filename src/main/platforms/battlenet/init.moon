@@ -121,7 +121,7 @@ Hearthstone
 '
 	battlenet\generateGames(output)
 	games = battlenet.games
-	assert(#games == 4)
+	assert(#games == 4, 'Blizzard Battle.net test failed!')
 
 	output = 'BITS:x86
 Heroes of the Storm
@@ -133,7 +133,7 @@ Destiny 2
 '
 	battlenet\generateGames(output)
 	games = battlenet.games
-	assert(#games == 9)
+	assert(#games == 9, 'Blizzard Battle.net test failed!')
 	expectedGames = {
 		-- First library (64-bits)
 		{
@@ -184,8 +184,8 @@ Destiny 2
 		}
 	}
 	for i, game in ipairs(games)
-		assert(game\getTitle() == expectedGames[i].title)
-		assert(game\getPath() == expectedGames[i].path)
-		assert(game\getProcess() == expectedGames[i].process)
+		assert(game\getTitle() == expectedGames[i].title, 'Blizzard Battle.net test failed!')
+		assert(game\getPath() == expectedGames[i].path, 'Blizzard Battle.net test failed!')
+		assert(game\getProcess() == expectedGames[i].process, 'Blizzard Battle.net test failed!')
 
 return Battlenet

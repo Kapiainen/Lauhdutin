@@ -393,17 +393,17 @@ if RUN_TESTS
 	}
 	steam = Steam(settings)
 
-	assert(steam\toBinaryString(136) == '00000000000000000000000010001000')
-	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110')
+	assert(steam\toBinaryString(136) == '00000000000000000000000010001000', 'Steam test failed!')
+	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110', 'Steam test failed!')
 
-	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000')
-	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000')
+	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000', 'Steam test failed!')
+	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', 'Steam test failed!')
 
-	assert(steam\toDecimalString('1111') == '15')
-	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648')
+	assert(steam\toDecimalString('1111') == '15', 'Steam test failed!')
+	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648', 'Steam test failed!')
 
-	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088')
-	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008')
+	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', 'Steam test failed!')
+	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', 'Steam test failed!')
 	
 	profile = 'Some kind of header or other junk that we are not interested in...
 <game>
@@ -437,18 +437,18 @@ More games, etc.'
 	for appID, info in pairs(steam.communityProfileGames)
 		switch appID
 			when '40400'
-				assert(info.title == 'AI War: Fleet Command')
-				assert(info.hoursPlayed == 73.0)
+				assert(info.title == 'AI War: Fleet Command', 'Steam test failed!')
+				assert(info.hoursPlayed == 73.0, 'Steam test failed!')
 			when '108710'
-				assert(info.title == 'Alan Wake')
-				assert(info.hoursPlayed == 26.7)
+				assert(info.title == 'Alan Wake', 'Steam test failed!')
+				assert(info.hoursPlayed == 26.7, 'Steam test failed!')
 			when '630'
-				assert(info.title == 'Alien Swarm')
-				assert(info.hoursPlayed == nil)
+				assert(info.title == 'Alien Swarm', 'Steam test failed!')
+				assert(info.hoursPlayed == nil, 'Steam test failed!')
 			else
-				assert(nil)
+				assert(nil, 'Steam test failed!')
 		numGames += 1
-	assert(numGames == 3)
+	assert(numGames == 3, 'Steam test failed!')
 
 	sharedConfig = {
 		userroamingconfigstore: {software: {valve: {steam: {apps: {
@@ -459,8 +459,8 @@ More games, etc.'
 				}
 			}
 		}}}}}}
-	assert(steam\getTags('654020', sharedConfig) == nil)
-	assert(#steam\getTags('654035', sharedConfig) == 2)
+	assert(steam\getTags('654020', sharedConfig) == nil, 'Steam test failed!')
+	assert(#steam\getTags('654035', sharedConfig) == 2, 'Steam test failed!')
 
 	localConfig = {
 		userlocalconfigstore: {software: {valve: {steam: {apps: {
@@ -468,9 +468,9 @@ More games, etc.'
 				lastplayed: '123456789'
 			}
 		}}}}}}
-	assert(steam\getLastPlayed('654020', localConfig) == 123456789)
-	assert(steam\getLastPlayed('654035', localConfig) == nil)
-	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351')
+	assert(steam\getLastPlayed('654020', localConfig) == 123456789, 'Steam test failed!')
+	assert(steam\getLastPlayed('654035', localConfig) == nil, 'Steam test failed!')
+	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351', 'Steam test failed!')
 
 	--steam\downloadCommunityProfile()
 	--steam\getLibraries()
