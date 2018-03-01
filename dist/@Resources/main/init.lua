@@ -1050,7 +1050,7 @@ OnIdentifiedBattlenetFolders = function()
       return utility.runLastCommand()
     end
     log('Dumped list of folders in a Blizzard Battle.net folder')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    STATE.PLATFORM_QUEUE[1]:generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]:getCachePath(), 'output.txt')))
     if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
       return utility.runCommand(STATE.PLATFORM_QUEUE[1]:identifyFolders())
     end

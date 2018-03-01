@@ -12,15 +12,19 @@ do
     hasProcessedPath = function(self)
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
     end,
+    getCachePath = function(self)
+      return self.cachePath
+    end,
     identifyFolders = function(self)
       SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s"]'):format(self.battlenetPaths[1]))
       return self:getWaitCommand(), '', 'OnIdentifiedBattlenetFolders'
     end,
-    generateGames = function(self)
+    generateGames = function(self, output)
+      assert(type(output) == 'string')
+      table.remove(self.battlenetPaths, 1)
       local games = { }
-      local output = io.readFile(io.joinPaths(self.cachePath, 'output.txt'))
-      local basePath = table.remove(self.battlenetPaths, 1)
       local folders = output:lower():splitIntoLines()
+      assert(folders[1]:startsWith('bits:'))
       local bits = table.remove(folders, 1)
       if (bits:find('64')) ~= nil then
         bits = 64
@@ -185,5 +189,79 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Battlenet = _class_0
+end
+if RUN_TESTS then
+  local settings = {
+    getBattlenetPaths = function(self)
+      return {
+        'Y:\\Blizzard games',
+        'Z:\\Games\\Battle.net'
+      }
+    end,
+    getBattlenetEnabled = function(self)
+      return true
+    end
+  }
+  local battlenet = Battlenet(settings)
+  local output = 'BITS:AMD64\nDiablo III\nStarCraft\nOverwatch\nSome random game\nHearthstone\n'
+  battlenet:generateGames(output)
+  local games = battlenet.games
+  assert(#games == 4)
+  output = 'BITS:x86\nHeroes of the Storm\nStarCraft II\nStarCraft\nAnother random game\nWorld of Warcraft\nDestiny 2\n'
+  battlenet:generateGames(output)
+  games = battlenet.games
+  assert(#games == 9)
+  local expectedGames = {
+    {
+      title = 'Diablo III',
+      path = 'battlenet://D3',
+      process = 'Diablo III64.exe'
+    },
+    {
+      title = 'StarCraft',
+      path = 'battlenet://S1',
+      process = 'StarCraft.exe'
+    },
+    {
+      title = 'Overwatch',
+      path = 'battlenet://Pro',
+      process = 'Overwatch.exe'
+    },
+    {
+      title = 'Hearthstone',
+      path = 'battlenet://WTCG',
+      process = 'Hearthstone.exe'
+    },
+    {
+      title = 'Heroes of the Storm',
+      path = 'battlenet://Hero',
+      process = 'HeroesOfTheStorm.exe'
+    },
+    {
+      title = 'StarCraft II',
+      path = 'battlenet://S2',
+      process = 'SC2.exe'
+    },
+    {
+      title = 'StarCraft',
+      path = 'battlenet://S1',
+      process = 'StarCraft.exe'
+    },
+    {
+      title = 'World of Warcraft',
+      path = 'battlenet://WoW',
+      process = 'Wow.exe'
+    },
+    {
+      title = 'Destiny 2',
+      path = 'battlenet://DST2',
+      process = 'destiny2.exe'
+    }
+  }
+  for i, game in ipairs(games) do
+    assert(game:getTitle() == expectedGames[i].title)
+    assert(game:getPath() == expectedGames[i].path)
+    assert(game:getProcess() == expectedGames[i].process)
+  end
 end
 return Battlenet
