@@ -384,6 +384,7 @@ class Steam extends Platform
 			table.insert(@games, Game(args))
 
 if RUN_TESTS
+	assertionMessage = 'Steam test failed!'
 	settings = {
 		getSteamEnabled: () => return true
 		getSteamPath: () => return 'Y:\\Program Files (32)\\Steam'
@@ -393,17 +394,17 @@ if RUN_TESTS
 	}
 	steam = Steam(settings)
 
-	assert(steam\toBinaryString(136) == '00000000000000000000000010001000', 'Steam test failed!')
-	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110', 'Steam test failed!')
+	assert(steam\toBinaryString(136) == '00000000000000000000000010001000', assertionMessage)
+	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110', assertionMessage)
 
-	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000', 'Steam test failed!')
-	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', 'Steam test failed!')
+	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000', assertionMessage)
+	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', assertionMessage)
 
-	assert(steam\toDecimalString('1111') == '15', 'Steam test failed!')
-	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648', 'Steam test failed!')
+	assert(steam\toDecimalString('1111') == '15', assertionMessage)
+	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648', assertionMessage)
 
-	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', 'Steam test failed!')
-	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', 'Steam test failed!')
+	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', assertionMessage)
+	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', assertionMessage)
 	
 	profile = 'Some kind of header or other junk that we are not interested in...
 <game>
@@ -437,18 +438,18 @@ More games, etc.'
 	for appID, info in pairs(steam.communityProfileGames)
 		switch appID
 			when '40400'
-				assert(info.title == 'AI War: Fleet Command', 'Steam test failed!')
-				assert(info.hoursPlayed == 73.0, 'Steam test failed!')
+				assert(info.title == 'AI War: Fleet Command', assertionMessage)
+				assert(info.hoursPlayed == 73.0, assertionMessage)
 			when '108710'
-				assert(info.title == 'Alan Wake', 'Steam test failed!')
-				assert(info.hoursPlayed == 26.7, 'Steam test failed!')
+				assert(info.title == 'Alan Wake', assertionMessage)
+				assert(info.hoursPlayed == 26.7, assertionMessage)
 			when '630'
-				assert(info.title == 'Alien Swarm', 'Steam test failed!')
-				assert(info.hoursPlayed == nil, 'Steam test failed!')
+				assert(info.title == 'Alien Swarm', assertionMessage)
+				assert(info.hoursPlayed == nil, assertionMessage)
 			else
-				assert(nil, 'Steam test failed!')
+				assert(nil, assertionMessage)
 		numGames += 1
-	assert(numGames == 3, 'Steam test failed!')
+	assert(numGames == 3, assertionMessage)
 
 	sharedConfig = {
 		userroamingconfigstore: {software: {valve: {steam: {apps: {
@@ -459,8 +460,8 @@ More games, etc.'
 				}
 			}
 		}}}}}}
-	assert(steam\getTags('654020', sharedConfig) == nil, 'Steam test failed!')
-	assert(#steam\getTags('654035', sharedConfig) == 2, 'Steam test failed!')
+	assert(steam\getTags('654020', sharedConfig) == nil, assertionMessage)
+	assert(#steam\getTags('654035', sharedConfig) == 2, assertionMessage)
 
 	localConfig = {
 		userlocalconfigstore: {software: {valve: {steam: {apps: {
@@ -468,9 +469,9 @@ More games, etc.'
 				lastplayed: '123456789'
 			}
 		}}}}}}
-	assert(steam\getLastPlayed('654020', localConfig) == 123456789, 'Steam test failed!')
-	assert(steam\getLastPlayed('654035', localConfig) == nil, 'Steam test failed!')
-	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351', 'Steam test failed!')
+	assert(steam\getLastPlayed('654020', localConfig) == 123456789, assertionMessage)
+	assert(steam\getLastPlayed('654035', localConfig) == nil, assertionMessage)
+	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351', assertionMessage)
 
 	--steam\downloadCommunityProfile()
 	--steam\getLibraries()

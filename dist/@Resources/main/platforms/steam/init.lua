@@ -583,6 +583,7 @@ do
   Steam = _class_0
 end
 if RUN_TESTS then
+  local assertionMessage = 'Steam test failed!'
   local settings = {
     getSteamEnabled = function(self)
       return true
@@ -601,14 +602,14 @@ if RUN_TESTS then
     end
   }
   local steam = Steam(settings)
-  assert(steam:toBinaryString(136) == '00000000000000000000000010001000', 'Steam test failed!')
-  assert(steam:toBinaryString(5895412582) == '01011111011001001101101101100110', 'Steam test failed!')
-  assert(steam:adjustBinaryStringHash('') == '00000010000000000000000000000000', 'Steam test failed!')
-  assert(steam:adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', 'Steam test failed!')
-  assert(steam:toDecimalString('1111') == '15', 'Steam test failed!')
-  assert(steam:toDecimalString('01001000100011100100111000010000') == '1217285648', 'Steam test failed!')
-  assert(steam:generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', 'Steam test failed!')
-  assert(steam:generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', 'Steam test failed!')
+  assert(steam:toBinaryString(136) == '00000000000000000000000010001000', assertionMessage)
+  assert(steam:toBinaryString(5895412582) == '01011111011001001101101101100110', assertionMessage)
+  assert(steam:adjustBinaryStringHash('') == '00000010000000000000000000000000', assertionMessage)
+  assert(steam:adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', assertionMessage)
+  assert(steam:toDecimalString('1111') == '15', assertionMessage)
+  assert(steam:toDecimalString('01001000100011100100111000010000') == '1217285648', assertionMessage)
+  assert(steam:generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', assertionMessage)
+  assert(steam:generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', assertionMessage)
   local profile = 'Some kind of header or other junk that we are not interested in...\n<game>\n	<appID>40400</appID>\n	<name><![CDATA[ AI War: Fleet Command ]]></name>\n	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/40400/91c4cd7c72ae83b354e9380f9e69849c34e163c3.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/40400 ]]></storeLink>\n	<hoursOnRecord>73.0</hoursOnRecord>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AIWar/achievements/]]></globalStatsLink>\n</game>\n<game>\n	<appID>108710</appID>\n	<name><![CDATA[ Alan Wake ]]></name>\n	<logo>\n	<![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/108710/0f9b6613ac50bf42639ed6a2e16e9b78e846ef0a.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/108710 ]]></storeLink>\n	<hoursOnRecord>26.7</hoursOnRecord>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlanWake/achievements/]]></globalStatsLink>\n</game>\n<game>\n	<appID>630</appID>\n	<name><![CDATA[ Alien Swarm ]]></name>\n	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/630/de3320a2c29b55b6f21d142dee26d9b044a29e97.jpg]]></logo>\n	<storeLink><![CDATA[ http://steamcommunity.com/app/630 ]]></storeLink>\n	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlienSwarm/achievements/]]></globalStatsLink>\n</game>\nMore games, etc.'
   steam:parseCommunityProfile(profile)
   local numGames = 0
@@ -616,20 +617,20 @@ if RUN_TESTS then
   for appID, info in pairs(steam.communityProfileGames) do
     local _exp_0 = appID
     if '40400' == _exp_0 then
-      assert(info.title == 'AI War: Fleet Command', 'Steam test failed!')
-      assert(info.hoursPlayed == 73.0, 'Steam test failed!')
+      assert(info.title == 'AI War: Fleet Command', assertionMessage)
+      assert(info.hoursPlayed == 73.0, assertionMessage)
     elseif '108710' == _exp_0 then
-      assert(info.title == 'Alan Wake', 'Steam test failed!')
-      assert(info.hoursPlayed == 26.7, 'Steam test failed!')
+      assert(info.title == 'Alan Wake', assertionMessage)
+      assert(info.hoursPlayed == 26.7, assertionMessage)
     elseif '630' == _exp_0 then
-      assert(info.title == 'Alien Swarm', 'Steam test failed!')
-      assert(info.hoursPlayed == nil, 'Steam test failed!')
+      assert(info.title == 'Alien Swarm', assertionMessage)
+      assert(info.hoursPlayed == nil, assertionMessage)
     else
-      assert(nil, 'Steam test failed!')
+      assert(nil, assertionMessage)
     end
     numGames = numGames + 1
   end
-  assert(numGames == 3, 'Steam test failed!')
+  assert(numGames == 3, assertionMessage)
   local sharedConfig = {
     userroamingconfigstore = {
       software = {
@@ -648,8 +649,8 @@ if RUN_TESTS then
       }
     }
   }
-  assert(steam:getTags('654020', sharedConfig) == nil, 'Steam test failed!')
-  assert(#steam:getTags('654035', sharedConfig) == 2, 'Steam test failed!')
+  assert(steam:getTags('654020', sharedConfig) == nil, assertionMessage)
+  assert(#steam:getTags('654035', sharedConfig) == 2, assertionMessage)
   local localConfig = {
     userlocalconfigstore = {
       software = {
@@ -665,8 +666,8 @@ if RUN_TESTS then
       }
     }
   }
-  assert(steam:getLastPlayed('654020', localConfig) == 123456789, 'Steam test failed!')
-  assert(steam:getLastPlayed('654035', localConfig) == nil, 'Steam test failed!')
-  assert(steam:getPath('84065421351') == 'steam://rungameid/84065421351', 'Steam test failed!')
+  assert(steam:getLastPlayed('654020', localConfig) == 123456789, assertionMessage)
+  assert(steam:getLastPlayed('654035', localConfig) == nil, assertionMessage)
+  assert(steam:getPath('84065421351') == 'steam://rungameid/84065421351', assertionMessage)
 end
 return Steam
