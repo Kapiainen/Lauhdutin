@@ -3,6 +3,7 @@
 - Added tests for the Game class.
 - Added tests for the Steam platform class.
 - Added tests for the Blizzard Battle.net platform class.
+- Added tests for the GOG Galaxy platform class.
 - Added log messages to the methods in the Localization class.
 - Updated the Valve Data Format parser.
 - Updated setters in the Game class.
