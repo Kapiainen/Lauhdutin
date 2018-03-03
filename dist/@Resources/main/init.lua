@@ -1066,7 +1066,10 @@ OnDumpedDBs = function()
       return utility.runLastCommand()
     end
     log('Dumped GOG Galaxy databases')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    local cachePath = STATE.PLATFORM_QUEUE[1]:getCachePath()
+    local index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
+    local galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+    STATE.PLATFORM_QUEUE[1]:generateGames(index, galaxy)
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then

@@ -794,7 +794,10 @@ export OnDumpedDBs = () ->
 			unless STATE.PLATFORM_QUEUE[1]\hasDumpedDatabases()
 				return utility.runLastCommand()
 			log('Dumped GOG Galaxy databases')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
+			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
+			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
+			galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
