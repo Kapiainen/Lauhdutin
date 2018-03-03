@@ -103,6 +103,7 @@ class Battlenet extends Platform
 			table.insert(@games, Game(args))
 
 if RUN_TESTS
+	assertionMessage = 'Blizzard Battle.net test failed!'
 	settings = {
 		getBattlenetPaths: () => return {
 			'Y:\\Blizzard games'
@@ -121,7 +122,7 @@ Hearthstone
 '
 	battlenet\generateGames(output)
 	games = battlenet.games
-	assert(#games == 4, 'Blizzard Battle.net test failed!')
+	assert(#games == 4, assertionMessage)
 
 	output = 'BITS:x86
 Heroes of the Storm
@@ -133,7 +134,7 @@ Destiny 2
 '
 	battlenet\generateGames(output)
 	games = battlenet.games
-	assert(#games == 9, 'Blizzard Battle.net test failed!')
+	assert(#games == 9, assertionMessage)
 	expectedGames = {
 		-- First library (64-bits)
 		{
@@ -184,8 +185,8 @@ Destiny 2
 		}
 	}
 	for i, game in ipairs(games)
-		assert(game\getTitle() == expectedGames[i].title, 'Blizzard Battle.net test failed!')
-		assert(game\getPath() == expectedGames[i].path, 'Blizzard Battle.net test failed!')
-		assert(game\getProcess() == expectedGames[i].process, 'Blizzard Battle.net test failed!')
+		assert(game\getTitle() == expectedGames[i].title, assertionMessage)
+		assert(game\getPath() == expectedGames[i].path, assertionMessage)
+		assert(game\getProcess() == expectedGames[i].process, assertionMessage)
 
 return Battlenet

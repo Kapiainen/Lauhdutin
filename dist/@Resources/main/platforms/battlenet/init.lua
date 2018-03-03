@@ -191,6 +191,7 @@ do
   Battlenet = _class_0
 end
 if RUN_TESTS then
+  local assertionMessage = 'Blizzard Battle.net test failed!'
   local settings = {
     getBattlenetPaths = function(self)
       return {
@@ -206,11 +207,11 @@ if RUN_TESTS then
   local output = 'BITS:AMD64\nDiablo III\nStarCraft\nOverwatch\nSome random game\nHearthstone\n'
   battlenet:generateGames(output)
   local games = battlenet.games
-  assert(#games == 4, 'Blizzard Battle.net test failed!')
+  assert(#games == 4, assertionMessage)
   output = 'BITS:x86\nHeroes of the Storm\nStarCraft II\nStarCraft\nAnother random game\nWorld of Warcraft\nDestiny 2\n'
   battlenet:generateGames(output)
   games = battlenet.games
-  assert(#games == 9, 'Blizzard Battle.net test failed!')
+  assert(#games == 9, assertionMessage)
   local expectedGames = {
     {
       title = 'Diablo III',
@@ -259,9 +260,9 @@ if RUN_TESTS then
     }
   }
   for i, game in ipairs(games) do
-    assert(game:getTitle() == expectedGames[i].title, 'Blizzard Battle.net test failed!')
-    assert(game:getPath() == expectedGames[i].path, 'Blizzard Battle.net test failed!')
-    assert(game:getProcess() == expectedGames[i].process, 'Blizzard Battle.net test failed!')
+    assert(game:getTitle() == expectedGames[i].title, assertionMessage)
+    assert(game:getPath() == expectedGames[i].path, assertionMessage)
+    assert(game:getProcess() == expectedGames[i].process, assertionMessage)
   end
 end
 return Battlenet
