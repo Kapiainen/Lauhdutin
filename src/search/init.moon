@@ -17,6 +17,8 @@ COMPONENTS = {
 	STATUS: nil
 }
 
+export log = (...) -> print(...) if STATE.LOGGING == true
+
 -- TODO: Have a look at the possibility of being able to use Lua patterns (square brackets seem to cause issues, but dot works just fine)
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')

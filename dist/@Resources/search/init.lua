@@ -13,6 +13,11 @@ local STATE = {
 local COMPONENTS = {
   STATUS = nil
 }
+log = function(...)
+  if STATE.LOGGING == true then
+    return print(...)
+  end
+end
 Initialize = function()
   SKIN:Bang('[!Hide]')
   STATE.PATHS.RESOURCES = SKIN:GetVariable('@')
