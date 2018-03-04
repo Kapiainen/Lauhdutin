@@ -722,7 +722,11 @@ export OnParsedShortcuts = () ->
 			unless STATE.PLATFORM_QUEUE[1]\hasParsedShortcuts()
 				return utility.runLastCommand()
 			log('Parsed Windows shortcuts')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
+			output = ''
+			path = STATE.PLATFORM_QUEUE[1]\getOutputPath()
+			if io.fileExists(path)
+				output = io.readFile(path)
+			STATE.PLATFORM_QUEUE[1]\generateGames(output)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

@@ -984,7 +984,12 @@ OnParsedShortcuts = function()
       return utility.runLastCommand()
     end
     log('Parsed Windows shortcuts')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    local output = ''
+    local path = STATE.PLATFORM_QUEUE[1]:getOutputPath()
+    if io.fileExists(path) then
+      output = io.readFile(path)
+    end
+    STATE.PLATFORM_QUEUE[1]:generateGames(output)
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then

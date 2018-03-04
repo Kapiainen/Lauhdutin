@@ -23,12 +23,14 @@ class Shortcuts extends Platform
 
 	hasParsedShortcuts: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
-	generateGames: () =>
-		unless io.fileExists(@outputPath)
+	getOutputPath: () => return @outputPath
+
+	generateGames: (output) =>
+		assert(type(output) == 'string')
+		if output == ''
 			@games = {}
 			return
 		games = {}
-		output = io.readFile(@outputPath)
 		lines = output\splitIntoLines()
 		while #lines > 0 and #lines % 3 == 0
 			absoluteFilePath = table.remove(lines, 1)
@@ -78,5 +80,34 @@ class Shortcuts extends Platform
 				platformID: @platformID
 			})
 		@games = [Game(args) for args in *games]
+
+if RUN_TESTS
+	assertionMessage = 'Windows shortcuts test failed!'
+	settings = {
+		getShortcutsEnabled: () => return true
+	}
+	shortcuts = Shortcuts(settings)
+	output = 'D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some game.lnk
+	Target=Y:\\Games\\Some game\\game.exe
+	Arguments=
+D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some platform\\Some other game.lnk
+	Target=Y:\\Games\\Some other game\\othergame.exe
+	Arguments=--console'
+	shortcuts\generateGames(output)
+	games = shortcuts.games
+	assert(#games == 2)
+	assert(games[1].title == 'Some game', assertionMessage)
+	assert(games[1].path == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
+	assert(games[1].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[1].process == 'game.exe', assertionMessage)
+	assert(games[1].uninstalled == true, assertionMessage)
+	assert(games[1].expectedBanner == 'Some game', assertionMessage)
+	assert(games[2].title == 'Some other game', assertionMessage)
+	assert(games[2].path == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
+	assert(games[2].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[2].platformOverride == 'Some platform', assertionMessage)
+	assert(games[2].process == 'othergame.exe', assertionMessage)
+	assert(games[2].uninstalled == true, assertionMessage)
+	assert(games[2].expectedBanner == 'Some other game', assertionMessage)
 
 return Shortcuts
