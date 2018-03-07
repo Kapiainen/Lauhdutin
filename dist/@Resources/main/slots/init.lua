@@ -39,8 +39,11 @@ do
           local banner = game:getBanner()
           if banner ~= nil then
             COMPONENTS.ANIMATIONS:pushSlotHover(index, animationType, banner)
+            return true
           end
         end
+        COMPONENTS.ANIMATIONS:resetSlots()
+        COMPONENTS.ANIMATIONS:cancelAnimations()
       end
       return true
     end,

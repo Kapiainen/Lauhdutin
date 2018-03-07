@@ -34,6 +34,9 @@ class Slots
 				banner = game\getBanner()
 				if banner ~= nil
 					COMPONENTS.ANIMATIONS\pushSlotHover(index, animationType, banner)
+					return true
+			COMPONENTS.ANIMATIONS\resetSlots()
+			COMPONENTS.ANIMATIONS\cancelAnimations()
 		return true
 
 	getHoverIndex: () => return @hoveringSlot
