@@ -21,6 +21,7 @@
 - Fixed a bug in the Steam platform class related to parsing the community profile.
 - Fixed a bug that prevented use of localized strings in the 'Browse' button of settings related to folder paths.
 - Fixed a default value for a localized string.
+- Fixed a bug related to slot hover animations and games without banners.
 
 **Version 3.0.0 beta 4 - 2018/02/26:**
 - Added more checks to the various platforms to make sure that resources, titles, and paths are valid.
