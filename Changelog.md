@@ -1,4 +1,4 @@
-**Version 3.0.0 beta 5 - 2018/MM/DD:**
+**Version 3.0.0 beta 5 - 2018/03/08:**
 - Added a slot overlay message for uninstalled games from platforms other than Steam and Blizzard Battle.net.
 - Added tests for the Game class.
 - Added tests for the Steam platform class.
