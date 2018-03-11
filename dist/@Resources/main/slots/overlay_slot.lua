@@ -39,15 +39,20 @@ do
         if STATE.PLATFORM_RUNNING_STATUS[platformID] == false then
           info = self.platformNotRunning:format(STATE.PLATFORM_NAMES[platformID])
           image = images.error
-        elseif game:isInstalled() == false and (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
-          info = self.installGame
-          image = images.install
+        elseif game:isInstalled() == false then
+          if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
+            info = self.installGame
+            image = images.install
+          else
+            info = self.uninstalledGame
+            image = images.error
+          end
         end
       elseif ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME == _exp_0 then
         info = self.removeGame
         image = images.error
       else
-        assert(nil, 'Unsupported LEFT_CLICK_ACTION encountered in "OverlaySlot.show".')
+        assert(nil, 'main.slots.overlay_slot.show')
       end
       if self.contextSensitive then
         if image then
@@ -75,6 +80,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
       self.contextSensitive = settings:getSlotsOverlayEnabled()
       self.platformNotRunning = LOCALIZATION:get('overlay_platform_not_running', '%s is not running')
       self.hoursPlayed = LOCALIZATION:get('overlay_hours_played', '%.0f hours played')
@@ -84,6 +90,7 @@ do
       self.unhideGame = LOCALIZATION:get('overlay_unhide', 'Unhide')
       self.alreadyVisible = LOCALIZATION:get('overlay_already_visible', 'Already visible')
       self.removeGame = LOCALIZATION:get('overlay_remove', 'Remove')
+      self.uninstalledGame = LOCALIZATION:get('overlay_uninstalled', 'Uninstalled')
     end,
     __base = _base_0,
     __name = "OverlaySlot"

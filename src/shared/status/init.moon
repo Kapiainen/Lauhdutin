@@ -6,7 +6,7 @@ class Status
 	update: () => SKIN\Bang('[!UpdateMeter "StatusMessage"]')
 
 	show: (message, exception = false) =>
-		assert(type(message) == 'string', 'Expected "message" to be a string.')
+		assert(type(message) == 'string', 'shared.status.init.Status')
 		SKIN\Bang('[!ShowMeter "StatusMessage"]') unless @visible
 		@visible = true
 		if exception

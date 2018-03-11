@@ -3,14 +3,20 @@ do
   local _class_0
   local _base_0 = {
     getInc = function(self, index)
-      return assert(nil, ('Setting type "%s" has not yet implemented the "getInc" method.'):format(self.__class.__name))
+      return assert(nil, 'settings.types.Base.getInc')
     end
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
+      assert(type(args) == 'table', 'settings.types.Base')
+      assert(type(args.title) == 'string', 'settings.types.Base')
+      assert(type(args.tooltip) == 'string', 'settings.types.Base')
+      assert(type(args.type) == 'number' and args.type % 1 == 0, 'settings.types.Base')
+      assert(args.type > 0 and args.type < ENUMS.SETTING_TYPES.MAX, 'settings.types.Base')
       self.title = args.title
       self.tooltip = args.tooltip
+      self.type = args.type
     end,
     __base = _base_0,
     __name = "Base"
@@ -58,8 +64,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.ACTION
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.ACTION
       self.label = args.label
       self.perform = args.perform
     end,
@@ -122,8 +130,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.BOOLEAN
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.BOOLEAN
       self.getState = args.getState
       self.toggle = args.toggle
     end,
@@ -242,8 +252,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.INTEGER
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.INTEGER
       self.value = args.defaultValue or 0
       self.minValue = args.minValue or nil
       self.maxValue = args.maxValue or nil
@@ -296,7 +308,7 @@ do
     getInc = function(self, index)
       return table.concat({
         ('[Slot%dFolderPathBrowse]'):format(index),
-        ('Text=%s'):format(LOCALIZATION:get('button_label_browse', 'Browse')),
+        'Text=Browse',
         'Meter=String',
         'SolidColor=#ButtonBaseColor#',
         ('X=([Slot%dBoundingBox:X] + [Slot%dBoundingBox:W] - #ButtonHeight# - 4)'):format(index, index),
@@ -337,8 +349,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.FOLDER_PATH
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.FOLDER_PATH
       self.getValue = args.getValue
       self.setValue = args.setValue
       self.dialogTitle = args.dialogTitle or 'Select a folder'
@@ -447,8 +461,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.SPINNER
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.SPINNER
       self.index = args.index
       self.values = {
         'UNDEFINED'
@@ -525,7 +541,7 @@ do
     getInc = function(self, index)
       return table.concat({
         ('[Slot%dFolderPathSpinnerBrowse]'):format(index),
-        ('Text=%s'):format(LOCALIZATION:get('button_label_browse', 'Browse')),
+        'Text=Browse',
         'Meter=String',
         'SolidColor=#ButtonBaseColor#',
         ('X=([Slot%dBoundingBox:X] + [Slot%dBoundingBox:W] - #ButtonHeight# - 4)'):format(index, index),
@@ -596,8 +612,10 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
+      end
       _class_0.__parent.__init(self, args)
-      self.type = ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER
       if args.setPath ~= nil then
         self.setPath = args.setPath
       end

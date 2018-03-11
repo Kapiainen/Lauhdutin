@@ -239,8 +239,8 @@ class Settings
 	})
 
 	migrate: (settings, version) =>
-		assert(type(version) == 'number' and version % 1 == 0, '"Settings.migrate" expected "version" to be an integer.')
-		assert(version <= @version, ('"Settings.migrate" expected "version" to be less than or equal to %d.')\format(@version))
+		assert(type(version) == 'number' and version % 1 == 0, 'shared.settings.Settings.migrate')
+		assert(version <= @version, 'shared.settings.Settings.migrate')
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version

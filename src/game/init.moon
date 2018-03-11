@@ -1,3 +1,7 @@
+export RUN_TESTS = true
+if RUN_TESTS
+	print('Running tests')
+
 utility = nil
 
 export LOCALIZATION = nil
@@ -112,7 +116,7 @@ export Initialize = () ->
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')()\getBannerExtensions(), '|')\gsub('%.', '')
+			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')(COMPONENTS.SETTINGS)\getBannerExtensions(), '|')\gsub('%.', '')
 			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
 			SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
 			SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -123,8 +127,14 @@ export Initialize = () ->
 export Update = () ->
 	return
 
-updateTitle = (game) ->
-	SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(utility.replaceUnsupportedChars(game\getTitle())))
+updateTitle = (game, maxStringLength) ->
+	title = utility.replaceUnsupportedChars(game\getTitle())
+	SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(title))
+	if title\len() > maxStringLength
+		SKIN\Bang(('[!SetOption "PageTitle" "ToolTipText" "%s"]')\format(title))
+		SKIN\Bang('[!SetOption "PageTitle" "ToolTipHidden" "0"]')
+	else
+		SKIN\Bang('[!SetOption "PageTitle" "ToolTipHidden" "1"]')
 
 updateBanner = (game) ->
 	path = game\getBanner()
@@ -431,7 +441,9 @@ export Handshake = (gameID) ->
 					break
 			assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
 			STATE.GAME = game
-			updateTitle(game)
+			valueMeter = SKIN\GetMeter('PageTitle')
+			maxStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
+			updateTitle(game, maxStringLength)
 			updateBanner(game)
 			platform = nil
 			for p in *STATE.ALL_PLATFORMS

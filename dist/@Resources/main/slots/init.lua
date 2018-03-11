@@ -39,8 +39,11 @@ do
           local banner = game:getBanner()
           if banner ~= nil then
             COMPONENTS.ANIMATIONS:pushSlotHover(index, animationType, banner)
+            return true
           end
         end
+        COMPONENTS.ANIMATIONS:resetSlots()
+        COMPONENTS.ANIMATIONS:cancelAnimations()
       end
       return true
     end,
@@ -74,6 +77,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'main.slots.init.Slots')
       do
         local _accum_0 = { }
         local _len_0 = 1

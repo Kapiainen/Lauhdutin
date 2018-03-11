@@ -12,8 +12,8 @@ class Pages
 	getCount: () => return #@pages
 
 	loadPage: (index) =>
-		assert(type(index) == 'number' and index % 1 == 0, '"Pages.loadPage" expected "index" to be an integer.')
-		assert(index > 0 and index <= @getCount(), ('"Pages.loadPage" expected "index" to be between 1 and %d, but instead got %d.')\format(@getCount(), index))
+		assert(type(index) == 'number' and index % 1 == 0, 'settings.pages.init.Pages.loadPage')
+		assert(index > 0 and index <= @getCount(), 'settings.pages.init.Pages.loadPage')
 		@currentPage = @pages[index]
 		return @currentPage\getTitle(), @currentPage\getSettings()
 

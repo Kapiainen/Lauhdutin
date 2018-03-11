@@ -8,7 +8,7 @@ cd steam
 set "completed=%cd%\completed.txt"
 if exist %completed% del %completed%
 set "output=%cd%\output.txt"
-set "acfs=%~1appmanifest_*.acf"
+set "acfs="%~1appmanifest_*.acf""
 for %%F in (%acfs%) do (
 	echo %%~nF%%~xF >> %output%
 )

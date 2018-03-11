@@ -1,3 +1,7 @@
+RUN_TESTS = true
+if RUN_TESTS then
+  print('Running tests')
+end
 local utility = nil
 LOCALIZATION = nil
 local STATE = {
@@ -9,6 +13,11 @@ local STATE = {
 local COMPONENTS = {
   STATUS = nil
 }
+log = function(...)
+  if STATE.LOGGING == true then
+    return print(...)
+  end
+end
 Initialize = function()
   SKIN:Bang('[!Hide]')
   STATE.PATHS.RESOURCES = SKIN:GetVariable('@')

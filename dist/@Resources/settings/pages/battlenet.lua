@@ -69,7 +69,7 @@ do
         }),
         Settings.Action({
           title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
-          tooltip = LOCALIZATION:get('setting_battlenet_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.Paths	TRANSLATION_MISSING'),
+          tooltip = LOCALIZATION:get('setting_battlenet_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.'),
           label = LOCALIZATION:get('button_label_edit', 'Edit'),
           perform = function(self)
             local path = 'cache\\bangs.txt'

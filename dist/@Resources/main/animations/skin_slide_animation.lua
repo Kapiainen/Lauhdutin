@@ -15,6 +15,8 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, typ, reveal)
+      assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.skin_slide_animation.SkinSlideAnimation')
+      assert(type(reveal) == 'boolean', 'main.animations.skin_slide_animation.SkinSlideAnimation')
       local skin = SKIN:GetMeter('SlotsBackground')
       local beginAction = nil
       local finishAction = nil
@@ -93,6 +95,8 @@ do
         frames[4] = slideFrame('X', skinX, skinW, 1 / 2.5)
         frames[5] = slideFrame('X', skinX, skinW, 1 / 1.8)
         frames[6] = slideFrame('X', skinX, skinW, 1)
+      else
+        assert(nil, 'main.animations.skin_slide_animation.SkinSlideAnimation')
       end
       local args = {
         beginAction = beginAction,

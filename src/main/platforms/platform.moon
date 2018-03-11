@@ -3,11 +3,13 @@ Game = require('main.game')
 
 class Platform
 	new: (settings) =>
+		assert(type(settings) == 'table', 'main.platforms.platform.Platform')
 		@bannerExtensions = {
 			'.jpg'
 			'.png'
 		}
-		return
+
+	validate: () => assert(nil, 'Platform has not implemented the validate method.')
 
 	isEnabled: () => return @enabled == true
 

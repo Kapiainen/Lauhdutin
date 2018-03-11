@@ -23,6 +23,7 @@ lookupTable[61] = '1152921504606846976'
 lookupTable[62] = '2305843009213693952'
 lookupTable[63] = '4611686018427387904'
 lookupTable[64] = '9223372036854775808'
+lookupTable = [ [tonumber(char) for char in value\reverse()\gmatch('.')] for value in *lookupTable ]
 
 class Steam extends Platform
 	new: (settings) =>
@@ -37,21 +38,23 @@ class Steam extends Platform
 		@accountID = settings\getSteamAccountID()
 		@communityID = settings\getSteamCommunityID()
 		@useCommunityProfile = settings\getSteamParseCommunityProfile()
-		if @enabled
-			clientPath = io.joinPaths(@steamPath, 'steam.exe')
-			assert(io.fileExists(clientPath, false), ('Steam client path is not valid.')\format(clientPath))
-			assert(@accountID ~= nil, 'Expected a UserDataID.')
-			assert(tonumber(@accountID) ~= nil, 'Expected the UserDataID to be an integer.')
-			if @useCommunityProfile
-				assert(@accountID ~= nil, 'Expected a CommunityID.')
-				assert(tonumber(@accountID) ~= nil, 'Expected the CommunityID to be an integer.')
 		@games = {}
 		@communityProfilePath = io.joinPaths(@cachePath, 'communityProfile.txt')
 		@communityProfileGames = nil
 		if @enabled
 			SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
 
+	validate: () =>
+		clientPath = io.joinPaths(@steamPath, 'steam.exe')
+		assert(io.fileExists(clientPath, false), 'The Steam path is not valid.')
+		assert(@accountID ~= nil, 'A Steam account has not been chosen.')
+		assert(tonumber(@accountID) ~= nil, 'The Steam account is invalid.')
+		if @useCommunityProfile
+			assert(@communityID ~= nil, 'A Steam ID has not been provided for downloading the community profile.')
+			assert(tonumber(@communityID) ~= nil, 'The Steam ID is invalid.')
+
 	toBinaryString: (value) =>
+		assert(type(value) == 'number')
 		binary = {}
 		for bit = 32, 1, -1
 			binary[bit] = math.fmod(value, 2)
@@ -59,9 +62,11 @@ class Steam extends Platform
 		return table.concat(binary)
 
 	adjustBinaryStringHash: (binary) =>
+		assert(type(binary) == 'string')
 		return binary .. '00000010000000000000000000000000' -- Equivalent to '<< 32 | 0x02000000'
 
 	toDecimalString: (binary) =>
+		assert(type(binary) == 'string')
 		bitValues = {}
 		i = #binary
 		for char in binary\gmatch('.')
@@ -115,38 +120,45 @@ class Steam extends Platform
 
 	downloadCommunityProfile: () =>
 		return nil unless @useCommunityProfile
-		assert(type(@communityID) == 'string', '"downloadCommunityProfile" expected "@communityID" to be a string.')
+		assert(type(@communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
 		url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1')\format(@communityID)
 		return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
 
-	parseCommunityProfile: () =>
-		downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
-		cachedPath = io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
-		os.rename(downloadedPath, cachedPath)
-		return unless io.readFile(@communityProfilePath)
-		file = io.readFile(@communityProfilePath)
+	getDownloadedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
+
+	getCachedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
+
+	parseCommunityProfile: (profile) =>
 		games = {}
 		num = 0
-		for game in file\gmatch('<game>(.-)</game>')
+		for game in profile\gmatch('<game>(.-)</game>')
 			appID = game\match('<appID>(%d+)</appID>')
 			continue if games[appID] ~= nil
+			title = game\match('<name><!%[CDATA%[(.-)%]%]></name>')
+			if title == nil
+				log('Skipping Steam game', appID, 'because a title could not be parsed from the community profile')
+				continue
 			games[appID] = {
-				title: game\match('<name><!%[CDATA%[(.-)%]%]></name>')
+				title: title\trim()
 				hoursPlayed: tonumber(game\match('<hoursOnRecord>(%d+%.%d*)</hoursOnRecord>'))
 			}
 			num += 1
-		log(num)
+		log('Games found in the Steam community profile:', num)
 		@communityProfileGames = games
 
 	getLibraries: () =>
 		libraries = {io.joinPaths(@steamPath, 'steamapps\\')}
-		file = io.readFile(io.joinPaths(@steamPath, 'steamapps\\libraryfolders.vdf'), false)
-		lines = file\splitIntoLines()
-		vdf = utility.parseVDF(lines)
-		for key, value in pairs(vdf.libraryfolders)
-			if tonumber(key) ~= nil
-				value ..= '\\' if value\endsWith('\\')
-				table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+		libraryFoldersPath = io.joinPaths(@steamPath, 'steamapps\\libraryfolders.vdf')
+		if io.fileExists(libraryFoldersPath, false)
+			file = io.readFile(libraryFoldersPath, false)
+			lines = file\splitIntoLines()
+			vdf = utility.parseVDF(lines)
+			for key, value in pairs(vdf.libraryfolders)
+				if tonumber(key) ~= nil
+					value ..= '\\' if value\endsWith('\\')
+					table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+		else
+			log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
 		@libraries = libraries
 
 	hasLibrariesToParse: () => return #@libraries > 0
@@ -154,8 +166,8 @@ class Steam extends Platform
 	hasGottenACFs: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
 	getACFs: () =>
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]')\format(@libraries[1]))
 		io.writeFile(io.joinPaths(@cachePath, 'output.txt'), '')
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]')\format(@libraries[1]))
 		return @getWaitCommand(), '', 'OnGotACFs'
 
 	parseLocalConfig: () =>
@@ -168,27 +180,64 @@ class Steam extends Platform
 		lines = file\splitIntoLines()
 		return utility.parseVDF(lines)
 
-	getTags: (appID) =>
-		tags = {}
-		config = @sharedConfig.userroamingconfigstore
-		config = @sharedConfig.userlocalconfigstore if config == nil
-		return tags if config == nil
+	getTags: (appID, sharedConfig) =>
+		tags = nil
+		config = sharedConfig.userroamingconfigstore
+		config = sharedConfig.userlocalconfigstore if config == nil
+		if config == nil
+			log('Steam sharedConfig has an unsupported structure at the top-level')
+			return tags
+		if config.software == nil
+			log('Steam sharedConfig.software is nil')
+			return tags
+		if config.software.valve == nil
+			log('Steam sharedConfig.software.valve is nil')
+			return tags
+		if config.software.valve.steam == nil
+			log('Steam sharedConfig.software.valve.steam is nil')
+			return tags
+		if config.software.valve.steam.apps == nil
+			log('Steam sharedConfig.software.valve.steam.apps is nil')
+			return tags
 		app = config.software.valve.steam.apps[appID]
-		return tags if app == nil
-		return tags if app.tags == nil
+		if app == nil
+			log('Could not find the Steam game', appID, 'in sharedConfig')
+			return tags
+		if app.tags == nil
+			log('Failed to get tags for Steam game', appID)
+			return tags
 		return tags if type(app.tags) ~= 'table'
+		tags = {}
 		for index, tag in pairs(app.tags)
 			table.insert(tags, tag)
 		return if #tags > 0 then tags else nil
 
-	getLastPlayed: (appID) =>
+	getLastPlayed: (appID, localConfig) =>
 		lastPlayed = nil
-		config = @localConfig.userroamingconfigstore
-		config = @localConfig.userlocalconfigstore if config == nil
-		return lastPlayed if config == nil
+		config = localConfig.userroamingconfigstore
+		config = localConfig.userlocalconfigstore if config == nil
+		if config == nil
+			log('Steam localConfig has an unsupported structure at the top-level')
+			return lastPlayed
+		if config.software == nil
+			log('Steam localConfig.software is nil')
+			return lastPlayed
+		if config.software.valve == nil
+			log('Steam localConfig.software.valve is nil')
+			return lastPlayed
+		if config.software.valve.steam == nil
+			log('Steam localConfig.software.valve.steam is nil')
+			return lastPlayed
+		if config.software.valve.steam.apps == nil
+			log('Steam localConfig.software.valve.steam.apps is nil')
+			return lastPlayed
 		app = config.software.valve.steam.apps[appID]
-		return lastPlayed if app == nil
-		return lastPlayed if app.lastplayed == nil
+		if app == nil
+			log('Could not find the Steam game', appID, 'in localConfig')
+			return lastPlayed
+		if app.lastplayed == nil
+			log('Failed to get last played timestamp for Steam game', appID)
+			return lastPlayed
 		lastPlayed = tonumber(app.lastplayed)
 		return lastPlayed
 
@@ -211,7 +260,6 @@ class Steam extends Platform
 
 	generateShortcuts: () =>
 		games = {}
-		lookupTable = [ [tonumber(char) for char in value\reverse()\gmatch('.')] for value in *lookupTable ]
 		shortcutsPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, '\\config\\shortcuts.vdf')
 		return nil unless io.fileExists(shortcutsPath, false)
 		contents = io.readFile(shortcutsPath, false, 'rb')
@@ -220,7 +268,17 @@ class Steam extends Platform
 		for game in contents\reverse()\gmatch('(.-)emaNppA')
 			game = game\reverse()
 			title = game\match('|(.-)|')
-			appID = @generateAppID(title, ('"%s"')\format(game\match('"(.-)"')))
+			if title == nil
+				log('Skipping Steam shortcut because the title could not be parsed')
+				continue
+			path = ('"%s"')\format(game\match('"(.-)"'))
+			if path == nil
+				log('Skipping Steam shortcut because the path could not be parsed')
+				continue
+			appID = @generateAppID(title, path)
+			if appID == nil
+				log('Skipping Steam shortcut because the appID could not be generated')
+				continue
 			path = ('steam://rungameid/%s')\format(appID)
 			banner = @getBannerPath(appID, shortcutsBannerPath)
 			expectedBanner = nil
@@ -263,14 +321,25 @@ class Steam extends Platform
 		manifests = file\splitIntoLines()
 		for manifest in *manifests
 			appID = manifest\match('appmanifest_(%d+)%.acf')
-			assert(type(appID) == 'string', '"Steam.generateGames" expected "appID" to be a string.')
-			-- Disregard duplicates, if they appear for some reason.
-			continue if games[appID] ~= nil
-			-- If the community profile has been parsed, then disregard games not found on the profile.
-			continue if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil
+			if appID == nil
+				log('Skipping Steam game because the appID could not be parsed')
+				continue 
+			assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
+			continue if games[appID] ~= nil -- Disregard duplicates, if they appear for some reason.
+			continue if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil -- If the community profile has been parsed, then disregard games not found on the profile.
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
 			vdf = utility.parseVDF(lines)
+			title = nil
+			if vdf.appstate ~= nil
+				title = vdf.appstate.name
+			if title == nil and vdf.userconfig ~= nil
+				title = vdf.userconfig.name
+			if title == nil and @communityProfileGames ~= nil and @communityProfileGames[appID] ~= nil
+				title = @communityProfileGames[appID].title
+			if title == nil
+				log('Skipping Steam game', appID, 'because title could not be found')
+				continue
 			banner, bannerURL = @getBanner(appID)
 			expectedBanner = if banner ~= nil then nil else appID
 			hoursPlayed = nil
@@ -278,20 +347,21 @@ class Steam extends Platform
 				hoursPlayed = @communityProfileGames[appID].hoursPlayed
 				@communityProfileGames[appID] = nil
 			games[appID] = {
-				title: vdf.appstate.name or (vdf.userconfig and vdf.userconfig.name)
+				:title
 				path: @getPath(appID)
 				platformID: @platformID
 				:banner
 				:bannerURL
 				:expectedBanner
 				:hoursPlayed
-				lastPlayed: @getLastPlayed(appID)
-				platformTags: @getTags(appID)
+				lastPlayed: @getLastPlayed(appID, @localConfig)
+				platformTags: @getTags(appID, @sharedConfig)
 				process: @getProcess()
 			}
 		-- Wait until all detected Steam libraries have been processed before dealing with any remaining
 		-- (i.e. not installed) games found in the community profile.
 		if @communityProfileGames ~= nil and #@libraries == 0
+			log('Processing remaining Steam games found in the community profile')
 			for appID, game in pairs(@communityProfileGames)
 				continue if games[appID] ~= nil
 				banner, bannerURL = @getBanner(appID)
@@ -304,13 +374,114 @@ class Steam extends Platform
 					:bannerURL
 					:expectedBanner
 					hoursPlayed: game.hoursPlayed
-					lastPlayed: @getLastPlayed(appID)
-					platformTags: @getTags(appID)
+					lastPlayed: @getLastPlayed(appID, @localConfig)
+					platformTags: @getTags(appID, @sharedConfig)
 					process: @getProcess()
 					uninstalled: true
 				}
 				@communityProfileGames[appID] = nil
 		for appID, args in pairs(games)
 			table.insert(@games, Game(args))
+
+if RUN_TESTS
+	assertionMessage = 'Steam test failed!'
+	settings = {
+		getSteamEnabled: () => return true
+		getSteamPath: () => return 'Y:\\Program Files (32)\\Steam'
+		getSteamAccountID: () => return '1234567890'
+		getSteamCommunityID: () => return '987654321'
+		getSteamParseCommunityProfile: () => return true
+	}
+	steam = Steam(settings)
+
+	assert(steam\toBinaryString(136) == '00000000000000000000000010001000', assertionMessage)
+	assert(steam\toBinaryString(5895412582) == '01011111011001001101101101100110', assertionMessage)
+
+	assert(steam\adjustBinaryStringHash('') == '00000010000000000000000000000000', assertionMessage)
+	assert(steam\adjustBinaryStringHash('0101') == '010100000010000000000000000000000000', assertionMessage)
+
+	assert(steam\toDecimalString('1111') == '15', assertionMessage)
+	assert(steam\toDecimalString('01001000100011100100111000010000') == '1217285648', assertionMessage)
+
+	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', assertionMessage)
+	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', assertionMessage)
+	
+	profile = 'Some kind of header or other junk that we are not interested in...
+<game>
+	<appID>40400</appID>
+	<name><![CDATA[ AI War: Fleet Command ]]></name>
+	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/40400/91c4cd7c72ae83b354e9380f9e69849c34e163c3.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/40400 ]]></storeLink>
+	<hoursOnRecord>73.0</hoursOnRecord>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AIWar/achievements/]]></globalStatsLink>
+</game>
+<game>
+	<appID>108710</appID>
+	<name><![CDATA[ Alan Wake ]]></name>
+	<logo>
+	<![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/108710/0f9b6613ac50bf42639ed6a2e16e9b78e846ef0a.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/108710 ]]></storeLink>
+	<hoursOnRecord>26.7</hoursOnRecord>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlanWake/achievements/]]></globalStatsLink>
+</game>
+<game>
+	<appID>630</appID>
+	<name><![CDATA[ Alien Swarm ]]></name>
+	<logo><![CDATA[http://cdn.edgecast.steamstatic.com/steamcommunity/public/images/apps/630/de3320a2c29b55b6f21d142dee26d9b044a29e97.jpg]]></logo>
+	<storeLink><![CDATA[ http://steamcommunity.com/app/630 ]]></storeLink>
+	<globalStatsLink><![CDATA[http://steamcommunity.com/stats/AlienSwarm/achievements/]]></globalStatsLink>
+</game>
+More games, etc.'
+	steam\parseCommunityProfile(profile)
+	numGames = 0
+	games = steam.communityProfileGames
+	for appID, info in pairs(steam.communityProfileGames)
+		switch appID
+			when '40400'
+				assert(info.title == 'AI War: Fleet Command', assertionMessage)
+				assert(info.hoursPlayed == 73.0, assertionMessage)
+			when '108710'
+				assert(info.title == 'Alan Wake', assertionMessage)
+				assert(info.hoursPlayed == 26.7, assertionMessage)
+			when '630'
+				assert(info.title == 'Alien Swarm', assertionMessage)
+				assert(info.hoursPlayed == nil, assertionMessage)
+			else
+				assert(nil, assertionMessage)
+		numGames += 1
+	assert(numGames == 3, assertionMessage)
+
+	sharedConfig = {
+		userroamingconfigstore: {software: {valve: {steam: {apps: {
+			'654035': {
+				tags: {
+					'FPS'
+					'Multiplayer'
+				}
+			}
+		}}}}}}
+	assert(steam\getTags('654020', sharedConfig) == nil, assertionMessage)
+	assert(#steam\getTags('654035', sharedConfig) == 2, assertionMessage)
+
+	localConfig = {
+		userlocalconfigstore: {software: {valve: {steam: {apps: {
+			'654020': {
+				lastplayed: '123456789'
+			}
+		}}}}}}
+	assert(steam\getLastPlayed('654020', localConfig) == 123456789, assertionMessage)
+	assert(steam\getLastPlayed('654035', localConfig) == nil, assertionMessage)
+	assert(steam\getPath('84065421351') == 'steam://rungameid/84065421351', assertionMessage)
+
+	--steam\downloadCommunityProfile()
+	--steam\getLibraries()
+	--steam\hasLibrariesToParse()
+	--steam\hasGottenACFs()
+	--steam\getACFs()
+	--steam\parseLocalConfig()
+	--steam\parseSharedConfig()
+	--steam\getBanner()
+	--steam\generateShortcuts()
+	--steam\generateGames()
 
 return Steam

@@ -1,3 +1,7 @@
+RUN_TESTS = true
+if RUN_TESTS then
+  print('Running tests')
+end
 local utility = nil
 LOCALIZATION = nil
 STATE = {
@@ -49,8 +53,8 @@ RebuildMainSlots = function()
 end
 local updateTitle
 updateTitle = function(title)
-  assert(type(title) == 'string', '"updateTitle" expected "title" to be a string.')
-  assert(title ~= '', '"updateTitle" expected "title" to not be an empty string.')
+  assert(type(title) == 'string', 'settings.init.updateTitle')
+  assert(title ~= '', 'settings.init.updateTitle')
   return SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s (%d/%d)"]'):format(title, STATE.PAGE_INDEX, COMPONENTS.PAGES:getCount()))
 end
 local additionalEnums
@@ -61,7 +65,8 @@ additionalEnums = function()
     FOLDER_PATH = 3,
     SPINNER = 4,
     INTEGER = 5,
-    FOLDER_PATH_SPINNER = 6
+    FOLDER_PATH_SPINNER = 6,
+    MAX = 7
   }
 end
 Initialize = function()

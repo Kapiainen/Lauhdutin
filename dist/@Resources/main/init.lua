@@ -1,3 +1,7 @@
+RUN_TESTS = true
+if RUN_TESTS then
+  print('Running tests')
+end
 local utility = nil
 local json = nil
 local Game = nil
@@ -39,10 +43,10 @@ end
 local downloadFile
 downloadFile = function(url, path, finishCallback, errorCallback)
   log('Attempting to download file:', url, path, finishCallback, errorCallback)
-  assert(type(url) == 'string', '"downloadFile" expected "url" to be a string.')
-  assert(type(path) == 'string', '"downloadFile" expected "path" to be a string.')
-  assert(type(finishCallback) == 'string', '"downloadFile" expected "finishCallback" to be a string.')
-  assert(type(errorCallback) == 'string', '"downloadFile" expected "errorCallback" to be a string.')
+  assert(type(url) == 'string', 'main.init.downloadFile')
+  assert(type(path) == 'string', 'main.init.downloadFile')
+  assert(type(finishCallback) == 'string', 'main.init.downloadFile')
+  assert(type(errorCallback) == 'string', 'main.init.downloadFile')
   SKIN:Bang(('[!SetOption "Downloader" "URL" "%s"]'):format(url))
   SKIN:Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]'):format(path))
   SKIN:Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]'):format(finishCallback))
@@ -63,13 +67,13 @@ end
 local downloadBanner
 downloadBanner = function(game)
   log('Downloading a banner for', game:getTitle())
-  assert(game ~= nil, '"downloadBanner" expected "game" to not be nil.')
-  assert(game.__class == Game, '"downloadBanner" expected "game" to be an instance of "Game".')
+  assert(game ~= nil, 'main.init.downloadBanner')
+  assert(game.__class == Game, 'main.init.downloadBanner')
   local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
   return downloadFile(game:getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 end
 setUpdateDivider = function(value)
-  assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, '"setUpdateDivider" expected an integer value.')
+  assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
   SKIN:Bang(('[!SetOption "Script" "UpdateDivider" "%d"]'):format(value))
   return SKIN:Bang('[!UpdateMeasure "Script"]')
 end
@@ -109,7 +113,7 @@ startDetectingPlatformGames = function()
     log('Starting to detect GOG Galaxy games')
     return utility.runCommand(STATE.PLATFORM_QUEUE[1]:dumpDatabases())
   else
-    return assert(nil, 'Unsupported platform.')
+    return assert(nil, 'main.init.startDetectingPlatformGames')
   end
 end
 local detectGames
@@ -127,13 +131,16 @@ detectGames = function()
     end
     platforms = _accum_0
   end
-  log(#platforms .. ' platforms:')
+  log('Num platforms:', #platforms)
   COMPONENTS.PROCESS:registerPlatforms(platforms)
   STATE.PLATFORM_ENABLED_STATUS = { }
   STATE.PLATFORM_QUEUE = { }
   for _index_0 = 1, #platforms do
     local platform = platforms[_index_0]
     local enabled = platform:isEnabled()
+    if enabled then
+      platform:validate()
+    end
     local platformID = platform:getPlatformID()
     STATE.PLATFORM_NAMES[platformID] = platform:getName()
     STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled
@@ -352,7 +359,7 @@ GameProcessTerminated = function(game)
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
         platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
       else
-        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
       end
       for _index_0 = 1, #platformBangs do
         local bang = platformBangs[_index_0]
@@ -781,6 +788,9 @@ OnLeftClickSlot = function(index)
   if STATE.SKIN_ANIMATION_PLAYING then
     return 
   end
+  if index < 1 or index > STATE.NUM_SLOTS then
+    return 
+  end
   local success, err = pcall(function()
     local game = COMPONENTS.SLOTS:leftClick(index)
     if not (game) then
@@ -797,7 +807,7 @@ OnLeftClickSlot = function(index)
     elseif ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME == _exp_0 then
       action = removeGame
     else
-      action = assert(nil, 'Unsupported LEFT_CLICK_ACTION.')
+      action = assert(nil, 'main.init.OnLeftClickSlot')
     end
     local animationType = COMPONENTS.SETTINGS:getSlotsClickAnimation()
     if not (COMPONENTS.ANIMATIONS:pushSlotClick(index, animationType, action, game)) then
@@ -813,6 +823,9 @@ OnMiddleClickSlot = function(index)
     return 
   end
   if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  if index < 1 or index > STATE.NUM_SLOTS then
     return 
   end
   local success, err = pcall(function()
@@ -846,7 +859,7 @@ HandshakeGame = function()
     log('HandshakeGame')
     local gameID = STATE.GAME_BEING_MODIFIED:getGameID()
     STATE.GAME_BEING_MODIFIED = nil
-    assert(gameID ~= nil, 'No gameID to send to the Game config.')
+    assert(gameID ~= nil, 'main.init.HandshakeGame')
     return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]'):format(gameID))
   end)
   if not (success) then
@@ -870,7 +883,7 @@ UpdateGame = function(gameID)
           break
         end
       end
-      assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
+      assert(game ~= nil, 'main.init.UpdateGame')
       return COMPONENTS.LIBRARY:update(game)
     end
   end)
@@ -885,6 +898,9 @@ OnHoverSlot = function(index)
   if STATE.SKIN_ANIMATION_PLAYING then
     return 
   end
+  if index < 1 or index > STATE.NUM_SLOTS then
+    return 
+  end
   local success, err = pcall(function()
     return COMPONENTS.SLOTS:hover(index)
   end)
@@ -897,6 +913,9 @@ OnLeaveSlot = function(index)
     return 
   end
   if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  if index < 1 or index > STATE.NUM_SLOTS then
     return 
   end
   local success, err = pcall(function()
@@ -965,7 +984,12 @@ OnParsedShortcuts = function()
       return utility.runLastCommand()
     end
     log('Parsed Windows shortcuts')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    local output = ''
+    local path = STATE.PLATFORM_QUEUE[1]:getOutputPath()
+    if io.fileExists(path) then
+      output = io.readFile(path)
+    end
+    STATE.PLATFORM_QUEUE[1]:generateGames(output)
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then
@@ -976,7 +1000,14 @@ OnCommunityProfileDownloaded = function()
   local success, err = pcall(function()
     log('Successfully downloaded Steam community profile')
     stopDownloader()
-    STATE.PLATFORM_QUEUE[1]:parseCommunityProfile()
+    local downloadedPath = STATE.PLATFORM_QUEUE[1]:getDownloadedCommunityProfilePath()
+    local cachedPath = STATE.PLATFORM_QUEUE[1]:getCachedCommunityProfilePath()
+    os.rename(downloadedPath, cachedPath)
+    local profile = ''
+    if io.fileExists(cachedPath, false) then
+      profile = io.readFile(cachedPath, false)
+    end
+    STATE.PLATFORM_QUEUE[1]:parseCommunityProfile(profile)
     STATE.PLATFORM_QUEUE[1]:getLibraries()
     if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
       return utility.runCommand(STATE.PLATFORM_QUEUE[1]:getACFs())
@@ -1024,7 +1055,7 @@ OnIdentifiedBattlenetFolders = function()
       return utility.runLastCommand()
     end
     log('Dumped list of folders in a Blizzard Battle.net folder')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    STATE.PLATFORM_QUEUE[1]:generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]:getCachePath(), 'output.txt')))
     if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
       return utility.runCommand(STATE.PLATFORM_QUEUE[1]:identifyFolders())
     end
@@ -1040,7 +1071,10 @@ OnDumpedDBs = function()
       return utility.runLastCommand()
     end
     log('Dumped GOG Galaxy databases')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
+    local cachePath = STATE.PLATFORM_QUEUE[1]:getCachePath()
+    local index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
+    local galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+    STATE.PLATFORM_QUEUE[1]:generateGames(index, galaxy)
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then

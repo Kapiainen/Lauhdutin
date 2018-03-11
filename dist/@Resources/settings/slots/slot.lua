@@ -23,6 +23,7 @@ do
         return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingBoolean"]'):format(self.index))
       elseif ENUMS.SETTING_TYPES.FOLDER_PATH == _exp_0 then
         SKIN:Bang(('[!SetOption "Slot%dFolderPathValue" "Text" "%s"]'):format(self.index, setting:getValue()))
+        SKIN:Bang(('[!SetOption "Slot%dFolderPathBrowse" "Text" "%s"]'):format(self.index, LOCALIZATION:get('button_label_browse', 'Browse')))
         return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingFolderPath"]'):format(self.index))
       elseif ENUMS.SETTING_TYPES.SPINNER == _exp_0 then
         SKIN:Bang(('[!SetOption "Slot%dSpinnerValue" "Text" "%s"]'):format(self.index, setting:getValues()[setting:getIndex()].displayValue))
@@ -32,15 +33,17 @@ do
         return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingInteger"]'):format(self.index))
       elseif ENUMS.SETTING_TYPES.FOLDER_PATH_SPINNER == _exp_0 then
         SKIN:Bang(('[!SetOption "Slot%dFolderPathSpinnerValue" "Text" "%s"]'):format(self.index, setting:getValues()[setting:getIndex()]))
+        SKIN:Bang(('[!SetOption "Slot%dFolderPathSpinnerBrowse" "Text" "%s"]'):format(self.index, LOCALIZATION:get('button_label_browse', 'Browse')))
         return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingFolderPathSpinner"]'):format(self.index))
       else
-        return assert(nil, ('"Slot.update" does not yet support setting type "%s".'):format(setting.__class.__name))
+        return assert(nil, 'settings.slots.slot.Slot.update')
       end
     end
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, index)
+      assert(type(index) == 'number' and index % 1 == 0, 'settings.slots.slot.Slot')
       self.index = index
     end,
     __base = _base_0,

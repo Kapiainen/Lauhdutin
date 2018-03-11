@@ -1,3 +1,7 @@
+export RUN_TESTS = true
+if RUN_TESTS
+	print('Running tests')
+
 utility = nil
 json = nil
 
@@ -42,10 +46,10 @@ export log = (...) -> print(...) if STATE.LOGGING == true
 
 downloadFile = (url, path, finishCallback, errorCallback) ->
 	log('Attempting to download file:', url, path, finishCallback, errorCallback)
-	assert(type(url) == 'string', '"downloadFile" expected "url" to be a string.')
-	assert(type(path) == 'string', '"downloadFile" expected "path" to be a string.')
-	assert(type(finishCallback) == 'string', '"downloadFile" expected "finishCallback" to be a string.')
-	assert(type(errorCallback) == 'string', '"downloadFile" expected "errorCallback" to be a string.')
+	assert(type(url) == 'string', 'main.init.downloadFile')
+	assert(type(path) == 'string', 'main.init.downloadFile')
+	assert(type(finishCallback) == 'string', 'main.init.downloadFile')
+	assert(type(errorCallback) == 'string', 'main.init.downloadFile')
 	SKIN\Bang(('[!SetOption "Downloader" "URL" "%s"]')\format(url))
 	SKIN\Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]')\format(path))
 	SKIN\Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]')\format(finishCallback))
@@ -64,13 +68,13 @@ stopDownloader = () ->
 
 downloadBanner = (game) ->
 	log('Downloading a banner for', game\getTitle())
-	assert(game ~= nil, '"downloadBanner" expected "game" to not be nil.')
-	assert(game.__class == Game, '"downloadBanner" expected "game" to be an instance of "Game".')
+	assert(game ~= nil, 'main.init.downloadBanner')
+	assert(game.__class == Game, 'main.init.downloadBanner')
 	bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
 	downloadFile(game\getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 
 export setUpdateDivider = (value) ->
-	assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, '"setUpdateDivider" expected an integer value.')
+	assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
 	SKIN\Bang(('[!SetOption "Script" "UpdateDivider" "%d"]')\format(value))
 	SKIN\Bang('[!UpdateMeasure "Script"]')
 
@@ -106,17 +110,18 @@ startDetectingPlatformGames = () ->
 			log('Starting to detect GOG Galaxy games')
 			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
 		else
-			assert(nil, 'Unsupported platform.')
+			assert(nil, 'main.init.startDetectingPlatformGames')
 
 detectGames = () ->
 	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
 	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
-	log(#platforms .. ' platforms:')
+	log('Num platforms:', #platforms)
 	COMPONENTS.PROCESS\registerPlatforms(platforms)
 	STATE.PLATFORM_ENABLED_STATUS = {}
 	STATE.PLATFORM_QUEUE = {}
 	for platform in *platforms
 		enabled = platform\isEnabled()
+		platform\validate() if enabled
 		platformID = platform\getPlatformID()
 		STATE.PLATFORM_NAMES[platformID] = platform\getName()
 		STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled
@@ -289,7 +294,7 @@ export GameProcessTerminated = (game) ->
 					when ENUMS.PLATFORM_IDS.GOG_GALAXY
 						COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
 					else
-						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
 				SKIN\Bang(bang) for bang in *platformBangs
 				SKIN\Bang(bang) for bang in *game\getStoppingBangs()
 			switch platformID
@@ -579,6 +584,7 @@ removeGame = (game) ->
 export OnLeftClickSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			game = COMPONENTS.SLOTS\leftClick(index)
@@ -589,7 +595,7 @@ export OnLeftClickSlot = (index) ->
 				when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
 				when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
 				else
-					assert(nil, 'Unsupported LEFT_CLICK_ACTION.')
+					assert(nil, 'main.init.OnLeftClickSlot')
 			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
 			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
 				action(game)
@@ -599,6 +605,7 @@ export OnLeftClickSlot = (index) ->
 export OnMiddleClickSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			log('OnMiddleClickSlot', index)
@@ -624,7 +631,7 @@ export HandshakeGame = () ->
 			log('HandshakeGame')
 			gameID = STATE.GAME_BEING_MODIFIED\getGameID()
 			STATE.GAME_BEING_MODIFIED = nil
-			assert(gameID ~= nil, 'No gameID to send to the Game config.')
+			assert(gameID ~= nil, 'main.init.HandshakeGame')
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]')\format(gameID))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -642,7 +649,7 @@ export UpdateGame = (gameID) ->
 					if args.gameID == gameID
 						game = Game(args)
 						break
-				assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
+				assert(game ~= nil, 'main.init.UpdateGame')
 				COMPONENTS.LIBRARY\update(game)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -650,6 +657,7 @@ export UpdateGame = (gameID) ->
 export OnHoverSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			COMPONENTS.SLOTS\hover(index)
@@ -659,6 +667,7 @@ export OnHoverSlot = (index) ->
 export OnLeaveSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
 			COMPONENTS.SLOTS\leave(index)
@@ -713,7 +722,11 @@ export OnParsedShortcuts = () ->
 			unless STATE.PLATFORM_QUEUE[1]\hasParsedShortcuts()
 				return utility.runLastCommand()
 			log('Parsed Windows shortcuts')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
+			output = ''
+			path = STATE.PLATFORM_QUEUE[1]\getOutputPath()
+			if io.fileExists(path)
+				output = io.readFile(path)
+			STATE.PLATFORM_QUEUE[1]\generateGames(output)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -724,7 +737,13 @@ export OnCommunityProfileDownloaded = () ->
 		() ->
 			log('Successfully downloaded Steam community profile')
 			stopDownloader()
-			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile()
+			downloadedPath = STATE.PLATFORM_QUEUE[1]\getDownloadedCommunityProfilePath()
+			cachedPath = STATE.PLATFORM_QUEUE[1]\getCachedCommunityProfilePath()
+			os.rename(downloadedPath, cachedPath)
+			profile = ''
+			if io.fileExists(cachedPath, false)
+				profile = io.readFile(cachedPath, false)
+			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile(profile)
 			STATE.PLATFORM_QUEUE[1]\getLibraries()
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
 				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())
@@ -765,7 +784,7 @@ export OnIdentifiedBattlenetFolders = () ->
 			unless STATE.PLATFORM_QUEUE[1]\hasProcessedPath()
 				return utility.runLastCommand()
 			log('Dumped list of folders in a Blizzard Battle.net folder')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
+			STATE.PLATFORM_QUEUE[1]\generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]\getCachePath(), 'output.txt')))
 			if STATE.PLATFORM_QUEUE[1]\hasUnprocessedPaths()
 				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\identifyFolders())
 			OnFinishedDetectingPlatformGames()
@@ -779,7 +798,10 @@ export OnDumpedDBs = () ->
 			unless STATE.PLATFORM_QUEUE[1]\hasDumpedDatabases()
 				return utility.runLastCommand()
 			log('Dumped GOG Galaxy databases')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
+			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
+			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
+			galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

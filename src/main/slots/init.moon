@@ -3,6 +3,7 @@ OverlaySlot = require('main.slots.overlay_slot')
 
 class Slots
 	new: (settings) =>
+		assert(type(settings) == 'table', 'main.slots.init.Slots')
 		@slots = [Slot(i) for i = 1, STATE.NUM_SLOTS]
 		@overlaySlot = OverlaySlot(settings)
 		@overlaySlot\hide()
@@ -33,6 +34,9 @@ class Slots
 				banner = game\getBanner()
 				if banner ~= nil
 					COMPONENTS.ANIMATIONS\pushSlotHover(index, animationType, banner)
+					return true
+			COMPONENTS.ANIMATIONS\resetSlots()
+			COMPONENTS.ANIMATIONS\cancelAnimations()
 		return true
 
 	getHoverIndex: () => return @hoveringSlot

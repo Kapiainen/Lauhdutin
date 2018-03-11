@@ -9,7 +9,7 @@ do
       if exception == nil then
         exception = false
       end
-      assert(type(message) == 'string', 'Expected "message" to be a string.')
+      assert(type(message) == 'string', 'shared.status.init.Status')
       if not (self.visible) then
         SKIN:Bang('[!ShowMeter "StatusMessage"]')
       end

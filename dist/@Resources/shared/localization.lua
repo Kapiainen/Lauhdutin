@@ -10,8 +10,10 @@ do
   local _class_0
   local _base_0 = {
     load = function(self)
+      log('Loading translation file')
       local translations = { }
       if not (io.fileExists(self.path)) then
+        log('Translation file does not exist')
         self:save({ })
         return translations
       end
@@ -21,7 +23,7 @@ do
         version = table.remove(lines, 1)
         version = tonumber(version:match('^version%s(%d+)$')) or 0
       end
-      assert(type(version) == 'number' and version % 1 == 0, '"Localization.load" expected the version number to be an integer.')
+      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.load')
       for _index_0 = 1, #lines do
         local _continue_0 = false
         repeat
@@ -43,27 +45,29 @@ do
       end
       return translations
     end,
-    migrate = function(self, settings, version)
-      assert(type(version) == 'number' and version % 1 == 0, '"Localization.migrate" expected "version" to be an integer.')
-      assert(version <= self.version, ('"Localization.migrate" expected "version" to be less than or equal to %d.'):format(self.version))
+    migrate = function(self, translations, version)
+      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
+      assert(version <= self.version, 'shared.localization.Localization.migrate')
       if version == self.version then
         return false
       end
       for _index_0 = 1, #migrators do
         local migrator = migrators[_index_0]
         if version < migrator.version then
-          migrator.func(settings)
+          migrator.func(translations)
         end
       end
+      log('Migrated translation file from version', version)
       return true
     end,
     save = function(self, translations)
       if translations == nil then
         translations = self.translations
       end
+      log('Saving translation file')
       local contents = ('version %d\n'):format(self.version)
       for key, translation in pairs(translations) do
-        contents = contents .. ('%s\t%s\n'):format(key, translation)
+        contents = contents .. ('%s\t%s\n'):format(key, translation:gsub('\n', '\\n'))
       end
       return io.writeFile(self.path, contents)
     end,
@@ -72,8 +76,10 @@ do
       if translation == nil then
         self.translations[key] = default
         if self.language == 'English' then
+          log('Writing default translation for the key', key)
           io.writeFile(self.path, ('%s	%s\n'):format(key, (default:gsub('\n', '\\n'))), 'a')
         else
+          log('Writing "TRANSLATION_MISSING" for the key', key)
           io.writeFile(self.path, ('%s	TRANSLATION_MISSING\n'):format(key), 'a')
         end
         return default
@@ -86,6 +92,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'shared.localization.Localization')
       self.version = 1
       self.language = settings:getLocalization()
       self.path = ('Languages\\%s.txt'):format(self.language)

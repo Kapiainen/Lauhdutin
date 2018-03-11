@@ -54,13 +54,14 @@ class Process
 		return @platformStatuses
 
 	monitor: (game) =>
+		assert(type(game) == 'table', 'main.process.Process.monitor')
 		@currentGame = game
 		process = game\getProcess()
 		log('Monitoring process', process)
 		return if process == nil
 		@gameStatus = false
 		@monitoring = true
-		assert(type(process) == 'string', '"Process.monitor" expected "process" to be a string.')
+		assert(type(process) == 'string', 'main.process.Process.monitor')
 		@duration = 0
 		@startingTime = os.time()
 		SKIN\Bang(('[!SetOption "Process" "ProcessName" "%s"]')\format(process))

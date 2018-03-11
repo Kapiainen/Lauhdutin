@@ -5,6 +5,7 @@ do
   local _class_0
   local _parent_0 = Platform
   local _base_0 = {
+    validate = function(self) end,
     parseShortcuts = function(self)
       if io.fileExists(self.outputPath) then
         io.writeFile(self.outputPath, '')
@@ -15,65 +16,90 @@ do
     hasParsedShortcuts = function(self)
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
     end,
-    generateGames = function(self)
-      if not (io.fileExists(self.outputPath)) then
+    getOutputPath = function(self)
+      return self.outputPath
+    end,
+    generateGames = function(self, output)
+      assert(type(output) == 'string')
+      if output == '' then
         self.games = { }
         return 
       end
       local games = { }
-      local output = io.readFile(self.outputPath)
       local lines = output:splitIntoLines()
-      while #lines > 0 do
-        local absoluteFilePath = table.remove(lines, 1)
-        local _, diverges = absoluteFilePath:find(self.shortcutsPath)
-        local relativeFilePath = absoluteFilePath:sub(diverges + 1)
-        local parts = relativeFilePath:split('\\')
-        local title
-        local _exp_0 = #parts
-        if 1 == _exp_0 then
-          title = parts[1]
-        elseif 2 == _exp_0 then
-          title = parts[2]
-        else
-          title = assert(nil, 'Unexpected path structure when processing Windows shortcuts.')
-        end
-        title = title:match('^([^%.]+)')
-        local platformOverride
-        local _exp_1 = #parts
-        if 2 == _exp_1 then
-          platformOverride = parts[1]
-        else
-          platformOverride = nil
-        end
-        local banner = nil
-        local expectedBanner = nil
-        if platformOverride ~= nil then
-          banner = self:getBannerPath(title, ('Shortcuts\\%s'):format(platformOverride))
-        else
-          banner = self:getBannerPath(title, 'Shortcuts')
-        end
-        if not (banner) then
-          expectedBanner = title
-        end
-        local path = ('"%s"'):format(table.remove(lines, 1):match('^	Target=(.-)$'))
-        local arguments = table.remove(lines, 1)
-        if arguments then
-          arguments = arguments:match('^	Arguments=(.-)$')
-        end
-        if arguments ~= nil and arguments ~= '' then
-          arguments = arguments:split('"%s"')
-          if #arguments > 0 then
-            path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
+      while #lines > 0 and #lines % 3 == 0 do
+        local _continue_0 = false
+        repeat
+          local absoluteFilePath = table.remove(lines, 1)
+          local _, diverges = absoluteFilePath:find(self.shortcutsPath)
+          local relativeFilePath = absoluteFilePath:sub(diverges + 1)
+          local parts = relativeFilePath:split('\\')
+          local title
+          local _exp_0 = #parts
+          if 1 == _exp_0 then
+            title = parts[1]
+          elseif 2 == _exp_0 then
+            title = parts[2]
+          else
+            title = assert(nil, 'Unexpected path structure when processing Windows shortcuts.')
           end
+          title = title:match('^([^%.]+)')
+          local platformOverride
+          local _exp_1 = #parts
+          if 2 == _exp_1 then
+            platformOverride = parts[1]
+          else
+            platformOverride = nil
+          end
+          local banner = nil
+          local expectedBanner = nil
+          if platformOverride ~= nil then
+            banner = self:getBannerPath(title, ('Shortcuts\\%s'):format(platformOverride))
+          else
+            banner = self:getBannerPath(title, 'Shortcuts')
+          end
+          if not (banner) then
+            expectedBanner = title
+          end
+          local path = table.remove(lines, 1):match('^	Target=(.-)$')
+          local uninstalled = nil
+          if not (io.fileExists(path, false)) then
+            uninstalled = true
+          end
+          path = ('"%s"'):format(path)
+          local arguments = table.remove(lines, 1)
+          if arguments then
+            arguments = arguments:match('^	Arguments=(.-)$')
+          end
+          if arguments ~= nil and arguments ~= '' then
+            arguments = arguments:split('"%s"')
+            if #arguments > 0 then
+              path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
+            end
+          end
+          if title == nil then
+            log('Skipping Windows shortcut', absoluteFilePath, 'because title could not be found')
+            _continue_0 = true
+            break
+          elseif path == nil then
+            log('Skipping Windows shortcut', absoluteFilePath, 'because path could not be found')
+            _continue_0 = true
+            break
+          end
+          table.insert(games, {
+            title = title,
+            banner = banner,
+            expectedBanner = expectedBanner,
+            path = path,
+            platformOverride = platformOverride,
+            uninstalled = uninstalled,
+            platformID = self.platformID
+          })
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
         end
-        table.insert(games, {
-          title = title,
-          banner = banner,
-          expectedBanner = expectedBanner,
-          path = path,
-          platformOverride = platformOverride,
-          platformID = self.platformID
-        })
       end
       do
         local _accum_0 = { }
@@ -125,5 +151,31 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Shortcuts = _class_0
+end
+if RUN_TESTS then
+  local assertionMessage = 'Windows shortcuts test failed!'
+  local settings = {
+    getShortcutsEnabled = function(self)
+      return true
+    end
+  }
+  local shortcuts = Shortcuts(settings)
+  local output = 'D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some game.lnk\n	Target=Y:\\Games\\Some game\\game.exe\n	Arguments=\nD:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some platform\\Some other game.lnk\n	Target=Y:\\Games\\Some other game\\othergame.exe\n	Arguments=--console'
+  shortcuts:generateGames(output)
+  local games = shortcuts.games
+  assert(#games == 2)
+  assert(games[1].title == 'Some game', assertionMessage)
+  assert(games[1].path == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
+  assert(games[1].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+  assert(games[1].process == 'game.exe', assertionMessage)
+  assert(games[1].uninstalled == true, assertionMessage)
+  assert(games[1].expectedBanner == 'Some game', assertionMessage)
+  assert(games[2].title == 'Some other game', assertionMessage)
+  assert(games[2].path == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
+  assert(games[2].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+  assert(games[2].platformOverride == 'Some platform', assertionMessage)
+  assert(games[2].process == 'othergame.exe', assertionMessage)
+  assert(games[2].uninstalled == true, assertionMessage)
+  assert(games[2].expectedBanner == 'Some other game', assertionMessage)
 end
 return Shortcuts

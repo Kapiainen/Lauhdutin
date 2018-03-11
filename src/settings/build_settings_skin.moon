@@ -91,7 +91,10 @@ DynamicVariables=1
 	contents ..= '\n'
 
 	Settings = require('settings.types')
-	args = {}
+	args = {
+		title: ''
+		tooltip: ''
+	}
 	settings = [Setting(args) for key, Setting in pairs(Settings)]
 	for i = 1, STATE.NUM_SLOTS
 		contents ..= table.concat({

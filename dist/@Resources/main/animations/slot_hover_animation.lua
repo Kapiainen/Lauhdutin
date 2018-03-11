@@ -32,6 +32,9 @@ do
   setmetatable(_base_0, _parent_0.__base)
   _class_0 = setmetatable({
     __init = function(self, index, typ, banner)
+      assert(type(index) == 'number' and index % 1 == 0, 'main.animations.slot_hover_animation.SlotHoverAnimation')
+      assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.slot_hover_animation.SlotHoverAnimation')
+      assert(type(banner) == 'string', 'main.animations.slot_hover_animation.SlotHoverAnimation')
       local resetAction
       resetAction = function(self)
         SKIN:Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
@@ -75,6 +78,8 @@ do
         frames[3] = shakeFrame('Y', slotY, 0)
         frames[4] = shakeFrame('Y', slotY, 5)
         frames[5] = shakeFrame('Y', slotY, 0)
+      else
+        assert(nil, 'main.animations.slot_hover_animation.SlotHoverAnimation')
       end
       local args = {
         resetAction = resetAction,

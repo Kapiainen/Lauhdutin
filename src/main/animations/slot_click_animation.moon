@@ -17,6 +17,11 @@ shrinkFrame = (x, y, w, h, scale) ->
 
 class SlotClickAnimation extends Animation
 	new: (index, typ, action, game, banner) =>
+		assert(type(index) == 'number' and index % 1 == 0, 'main.animations.slot_click_animation.SlotClickAnimation')
+		assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.slot_click_animation.SlotClickAnimation')
+		assert(type(action) == 'function', 'main.animations.slot_click_animation.SlotClickAnimation')
+		assert(type(game) == 'table', 'main.animations.slot_click_animation.SlotClickAnimation')
+		assert(type(banner) == 'string', 'main.animations.slot_click_animation.SlotClickAnimation')
 		resetAction = () =>
 			SKIN\Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
 			SKIN\Bang(('[!UpdateMeter "SlotsBackgroundCutout"][!ShowMeter "Slot%dImage"]')\format(index))
@@ -69,6 +74,8 @@ class SlotClickAnimation extends Animation
 				frames[4] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 4.0)
 				frames[5] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 12.0)
 				frames[6] = shrinkFrame(slotX, slotY, slotW, slotH, 1 / 20.0)
+			else
+				assert(nil, 'main.animations.slot_click_animation.SlotClickAnimation')
 		args = {
 			:resetAction
 			:finishAction

@@ -1,3 +1,7 @@
+export RUN_TESTS = true
+if RUN_TESTS
+	print('Running tests')
+
 utility = nil
 
 export LOCALIZATION = nil
@@ -43,8 +47,8 @@ export RebuildMainSlots = () ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 updateTitle = (title) ->
-	assert(type(title) == 'string', '"updateTitle" expected "title" to be a string.')
-	assert(title ~= '', '"updateTitle" expected "title" to not be an empty string.')
+	assert(type(title) == 'string', 'settings.init.updateTitle')
+	assert(title ~= '', 'settings.init.updateTitle')
 	SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s (%d/%d)"]')\format(title, STATE.PAGE_INDEX, COMPONENTS.PAGES\getCount()))
 
 additionalEnums = () ->
@@ -55,6 +59,7 @@ additionalEnums = () ->
 		SPINNER: 4
 		INTEGER: 5
 		FOLDER_PATH_SPINNER: 6
+		MAX: 7
 	}
 
 export Initialize = () ->

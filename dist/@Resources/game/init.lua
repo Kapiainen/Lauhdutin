@@ -1,3 +1,7 @@
+RUN_TESTS = true
+if RUN_TESTS then
+  print('Running tests')
+end
 local utility = nil
 LOCALIZATION = nil
 STATE = {
@@ -191,7 +195,7 @@ Initialize = function()
     local scrollbar = SKIN:GetMeter('Scrollbar')
     STATE.SCROLLBAR.START = scrollbar:GetY()
     STATE.SCROLLBAR.MAX_HEIGHT = scrollbar:GetH()
-    STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')():getBannerExtensions(), '|'):gsub('%.', '')
+    STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')(COMPONENTS.SETTINGS):getBannerExtensions(), '|'):gsub('%.', '')
     SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save')))
     SKIN:Bang(('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel')))
     SKIN:Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -203,8 +207,15 @@ Initialize = function()
 end
 Update = function() end
 local updateTitle
-updateTitle = function(game)
-  return SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(utility.replaceUnsupportedChars(game:getTitle())))
+updateTitle = function(game, maxStringLength)
+  local title = utility.replaceUnsupportedChars(game:getTitle())
+  SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(title))
+  if title:len() > maxStringLength then
+    SKIN:Bang(('[!SetOption "PageTitle" "ToolTipText" "%s"]'):format(title))
+    return SKIN:Bang('[!SetOption "PageTitle" "ToolTipHidden" "0"]')
+  else
+    return SKIN:Bang('[!SetOption "PageTitle" "ToolTipHidden" "1"]')
+  end
 end
 local updateBanner
 updateBanner = function(game)
@@ -563,7 +574,9 @@ Handshake = function(gameID)
     end
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
     STATE.GAME = game
-    updateTitle(game)
+    local valueMeter = SKIN:GetMeter('PageTitle')
+    local maxStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
+    updateTitle(game, maxStringLength)
     updateBanner(game)
     local platform = nil
     local _list_1 = STATE.ALL_PLATFORMS

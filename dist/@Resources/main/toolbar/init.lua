@@ -12,6 +12,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
+      assert(type(settings) == 'table', 'main.toolbar.init.Toolbar')
       if not (settings:getLayoutToolbarAtTop()) then
         SKIN:Bang('[!SetOption "ToolbarBackground" "Y" "(#SkinHeight# - #ToolbarHeight#)]')
         SKIN:Bang('[!SetOption "ToolbarEnabler" "Y" "(#SkinHeight# - 1)]')

@@ -23,6 +23,9 @@ shakeFrame = (option, pos, mag) ->
 
 class SlotHoverAnimation extends Animation
 	new: (index, typ, banner) =>
+		assert(type(index) == 'number' and index % 1 == 0, 'main.animations.slot_hover_animation.SlotHoverAnimation')
+		assert(type(typ) == 'number' and typ % 1 == 0, 'main.animations.slot_hover_animation.SlotHoverAnimation')
+		assert(type(banner) == 'string', 'main.animations.slot_hover_animation.SlotHoverAnimation')
 		resetAction = () =>
 			SKIN\Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
 			SKIN\Bang(('[!UpdateMeter "SlotsBackgroundCutout"][!ShowMeter "Slot%dImage"]')\format(index))
@@ -64,6 +67,8 @@ class SlotHoverAnimation extends Animation
 				frames[3] = shakeFrame('Y', slotY, 0)
 				frames[4] = shakeFrame('Y', slotY, 5)
 				frames[5] = shakeFrame('Y', slotY, 0)
+			else
+				assert(nil, 'main.animations.slot_hover_animation.SlotHoverAnimation')
 		args = {
 			:resetAction
 			:frames

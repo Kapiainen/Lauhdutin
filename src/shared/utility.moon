@@ -1,14 +1,15 @@
 class Config
 	new: (str) =>
-		@active = tonumber(str\match('Active=(%d+)'))
-		@windowX = tonumber(str\match('WindowX=(%d+)'))
-		@windowY = tonumber(str\match('WindowY=(%d+)'))
-		@clickThrough = tonumber(str\match('ClickThrough=(%d+)'))
-		@draggable = tonumber(str\match('Draggable=(%d+)'))
-		@snapEdges = tonumber(str\match('SnapEdges=(%d+)'))
-		@keepOnScreen = tonumber(str\match('KeepOnScreen=(%d+)'))
-		@alwaysOnTop = tonumber(str\match('AlwaysOnTop=(%d+)'))
-		@loadOrder = tonumber(str\match('LoadOrder=(%d+)'))
+		assert(type(str) == 'string' and str ~= '', 'shared.utility.Config')
+		@active = tonumber(str\match('Active=(%d+)')) or 0
+		@windowX = tonumber(str\match('WindowX=(%d+)')) or 0
+		@windowY = tonumber(str\match('WindowY=(%d+)')) or 0
+		@clickThrough = tonumber(str\match('ClickThrough=(%d+)')) or 0
+		@draggable = tonumber(str\match('Draggable=(%d+)')) or 0
+		@snapEdges = tonumber(str\match('SnapEdges=(%d+)')) or 0
+		@keepOnScreen = tonumber(str\match('KeepOnScreen=(%d+)')) or 0
+		@alwaysOnTop = tonumber(str\match('AlwaysOnTop=(%d+)')) or 0
+		@loadOrder = tonumber(str\match('LoadOrder=(%d+)')) or 0
 
 	isActive: () => return @active == 1
 	getX: () => return @windowX
@@ -126,7 +127,7 @@ parseVDF = (lines, start = 1) ->
 	i = start - 1
 	while i < #lines
 		i += 1
-		key = lines[i]\match('^%s*"([^"]+)"\s*$') -- Start of a dictionary
+		key = lines[i]\match('^%s*"([^"]+)"%s*$') -- Start of a dictionary
 		if key ~= nil
 			assert(lines[i + 1]\match('^%s*{%s*$') ~= nil, '"parseVDF" expected "{".')
 			tbl, i = parseVDF(lines, i + 2)
@@ -149,17 +150,17 @@ parseVDF = (lines, start = 1) ->
 return {
 	createJSONHelpers: () ->
 		json = require('lib.json')
-		assert(type(json) == 'table', 'Expected "json" to be a table.')
+		assert(type(json) == 'table', 'shared.utility.createJSONHelpers')
 		io.readJSON = (path, pathIsRelative = true) -> return json.decode(io.readFile(path, pathIsRelative))
 
 		io.writeJSON = (relativePath, tbl) ->
-			assert(type(tbl) == 'table', 'Expected a table as the second argument.')
+			assert(type(tbl) == 'table', 'io.writeJSON')
 			return io.writeFile(relativePath, json.encode(tbl))
 
 	runCommand: (parameter, output, callback, callbackArgs = {}, state = 'Hide', outputType = 'UTF16') ->
-		assert(type(parameter) == 'string', '"runCommand" expected "parameter" to be a string.')
-		assert(type(output) == 'string', '"runCommand" expected "output" to be a string.')
-		assert(type(callback) == 'string', '"runCommand" expected "callback" to be a string.')
+		assert(type(parameter) == 'string', 'shared.utility.runCommand')
+		assert(type(output) == 'string', 'shared.utility.runCommand')
+		assert(type(callback) == 'string', 'shared.utility.runCommand')
 		SKIN\Bang(('[!SetOption "Command" "Parameter" "%s"]')\format(parameter))
 		SKIN\Bang(('[!SetOption "Command" "OutputFile" "%s"]')\format(output))
 		SKIN\Bang(('[!SetOption "Command" "OutputType" "%s"]')\format(outputType))
@@ -182,7 +183,7 @@ return {
 				assert(nil, ('"parseVDF" does not support the "%s" type as its argument.')\format(type(file)))
 
 	replaceUnsupportedChars: (str) ->
-		assert(type(str) == 'string', '"utility.replaceUnsupportedChars" expected "str" to be a string.')
+		assert(type(str) == 'string', 'shared.utility.replaceUnsupportedChars')
 		result = ''
 		charsToReplace = {}
 		for char in str\gmatch('[%z\1-\127\194-\244][\128-\191]*')
@@ -206,7 +207,7 @@ return {
 		return result
 
 	getConfig: (name) ->
-		assert(type(name) == 'string', '"utility.getConfig" expected "name" to be a string.')
+		assert(type(name) == 'string', 'shared.utility.getConfig')
 		path = io.joinPaths(SKIN\GetVariable('SETTINGSPATH'), 'Rainmeter.ini')
 		rainmeterINI = io.readFile(path, false)
 		pattern = '%[' .. name .. '%][^%[]+'
@@ -226,7 +227,7 @@ return {
 		return configs
 
 	getConfigMonitor: (config) ->
-		assert(config.__class == Config, '"utility.getConfigMonitor" expected the first argument to be an instance of "Config".')
+		assert(config.__class == Config, 'shared.utility.getConfigMonitor')
 		x = config\getX()
 		y = config\getY()
 		for i = 1, 8
@@ -240,9 +241,9 @@ return {
 		return nil
 
 	centerOnMonitor: (width, height, screen = 1) ->
-		assert(type(width) == 'number', '"utility.centerOnMonitor" expected the first argument to be a number.')
-		assert(type(height) == 'number', '"utility.centerOnMonitor" expected the second argument to be a number.')
-		assert(type(screen) == 'number', '"utility.centerOnMonitor" expected the third argument to be a number.')
+		assert(type(width) == 'number', 'shared.utility.centerOnMonitor')
+		assert(type(height) == 'number', 'shared.utility.centerOnMonitor')
+		assert(type(screen) == 'number', 'shared.utility.centerOnMonitor')
 		monitorX = tonumber(SKIN\GetVariable(('SCREENAREAX@%d')\format(screen)))
 		monitorY = tonumber(SKIN\GetVariable(('SCREENAREAY@%d')\format(screen)))
 		monitorWidth = tonumber(SKIN\GetVariable(('SCREENAREAWIDTH@%d')\format(screen)))

@@ -1,8 +1,8 @@
 class Slot
 	new: (index) =>
+		assert(type(index) == 'number' and index % 1 == 0, 'main.slots.slot.Slot')
 		@index = index
 		@game = nil
-		return
 
 	getGame: () => return @game
 

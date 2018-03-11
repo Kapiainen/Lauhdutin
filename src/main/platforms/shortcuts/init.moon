@@ -13,6 +13,8 @@ class Shortcuts extends Platform
 		@outputPath = io.joinPaths(@cachePath, 'output.txt')
 		@enabled = settings\getShortcutsEnabled()
 
+	validate: () => return
+
 	parseShortcuts: () =>
 		if io.fileExists(@outputPath)
 			io.writeFile(@outputPath, '')
@@ -21,14 +23,16 @@ class Shortcuts extends Platform
 
 	hasParsedShortcuts: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
-	generateGames: () =>
-		unless io.fileExists(@outputPath)
+	getOutputPath: () => return @outputPath
+
+	generateGames: (output) =>
+		assert(type(output) == 'string')
+		if output == ''
 			@games = {}
 			return
 		games = {}
-		output = io.readFile(@outputPath)
 		lines = output\splitIntoLines()
-		while #lines > 0
+		while #lines > 0 and #lines % 3 == 0
 			absoluteFilePath = table.remove(lines, 1)
 			_, diverges = absoluteFilePath\find(@shortcutsPath)
 			relativeFilePath = absoluteFilePath\sub(diverges + 1)
@@ -49,21 +53,61 @@ class Shortcuts extends Platform
 				banner = @getBannerPath(title, 'Shortcuts')
 			unless banner
 				expectedBanner = title
-			path = ('"%s"')\format(table.remove(lines, 1)\match('^	Target=(.-)$'))
+			path = table.remove(lines, 1)\match('^	Target=(.-)$')
+			uninstalled = nil
+			unless io.fileExists(path, false)
+				uninstalled = true
+			path = ('"%s"')\format(path)
 			arguments = table.remove(lines, 1)
 			arguments = arguments\match('^	Arguments=(.-)$') if arguments
 			if arguments ~= nil and arguments ~= ''
 				arguments = arguments\split('"%s"')
 				if #arguments > 0
 					path = ('%s "%s"')\format(path, table.concat(arguments, '" "'))
+			if title == nil
+				log('Skipping Windows shortcut', absoluteFilePath, 'because title could not be found')
+				continue
+			elseif path == nil
+				log('Skipping Windows shortcut', absoluteFilePath, 'because path could not be found')
+				continue
 			table.insert(games, {
 				:title
 				:banner
 				:expectedBanner
 				:path
 				:platformOverride
+				:uninstalled
 				platformID: @platformID
 			})
 		@games = [Game(args) for args in *games]
+
+if RUN_TESTS
+	assertionMessage = 'Windows shortcuts test failed!'
+	settings = {
+		getShortcutsEnabled: () => return true
+	}
+	shortcuts = Shortcuts(settings)
+	output = 'D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some game.lnk
+	Target=Y:\\Games\\Some game\\game.exe
+	Arguments=
+D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some platform\\Some other game.lnk
+	Target=Y:\\Games\\Some other game\\othergame.exe
+	Arguments=--console'
+	shortcuts\generateGames(output)
+	games = shortcuts.games
+	assert(#games == 2)
+	assert(games[1].title == 'Some game', assertionMessage)
+	assert(games[1].path == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
+	assert(games[1].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[1].process == 'game.exe', assertionMessage)
+	assert(games[1].uninstalled == true, assertionMessage)
+	assert(games[1].expectedBanner == 'Some game', assertionMessage)
+	assert(games[2].title == 'Some other game', assertionMessage)
+	assert(games[2].path == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
+	assert(games[2].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[2].platformOverride == 'Some platform', assertionMessage)
+	assert(games[2].process == 'othergame.exe', assertionMessage)
+	assert(games[2].uninstalled == true, assertionMessage)
+	assert(games[2].expectedBanner == 'Some other game', assertionMessage)
 
 return Shortcuts

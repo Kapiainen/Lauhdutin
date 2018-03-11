@@ -1,3 +1,7 @@
+export RUN_TESTS = true
+if RUN_TESTS
+	print('Running tests')
+
 utility = nil
 
 export LOCALIZATION = nil
@@ -23,13 +27,17 @@ COMPONENTS = {
 
 class Property
 	new: (args) =>
+		assert(type(args.title) == 'string', 'sort.init.Property')
 		@title = args.title
+		assert(type(args.value) == 'string', 'sort.init.Property')
 		@value = args.value
+		assert((type(args.enum) == 'number' and args.enum % 1 == 0) or type(args.action) == 'function', 'sort.init.Property')
 		@enum = args.enum
 		@action = args.action
 
 class Slot
 	new: (index) =>
+		assert(type(index) == 'number' and index % 1 == 0, 'sort.init.Slot')
 		@index = index
 
 	populate: (property) =>

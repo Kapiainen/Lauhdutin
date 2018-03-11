@@ -1,3 +1,47 @@
+**Version 3.0.0 beta 6 - 2018/MM/DD:**
+- Updated the Game window to include a tooltip for game titles, which are long and might not fit in the title bar.
+
+**Version 3.0.0 beta 5 - 2018/03/08:**
+- Added a slot overlay message for uninstalled games from platforms other than Steam and Blizzard Battle.net.
+- Added tests for the Game class.
+- Added tests for the Steam platform class.
+- Added tests for the Blizzard Battle.net platform class.
+- Added tests for the GOG Galaxy platform class.
+- Added tests for the Windows shortcuts platform class.
+- Added log messages to the methods in the Localization class.
+- Updated the Valve Data Format parser.
+- Updated setters in the Game class.
+- Updated a log message in the Steam platform class.
+- Updated how Steam libraries are detected in the Steam platform class.
+- Updated how tags and last played timestamps are parsed in the Steam platform class.
+- Updated shortcuts with invalid paths to be set as uninstalled in the Windows shortcuts platform class.
+- Refactored code related to downloading and parsing community profiles in the Steam platform class.
+- Refactored code related to validating e.g. values of settings in platform class constructors into their own validation methods to allow for tests.
+- Refactored Blizzard Battle.net platform class to allow for tests.
+- Refactored GOG Galaxy platform class to allow for tests.
+- Refactored Windows shortcuts platform class to allow for tests.
+- Fixed a bug related to saving translation files in the Localization class.
+- Fixed a bug in the Steam platform class related to parsing the community profile.
+- Fixed a bug that prevented use of localized strings in the 'Browse' button of settings related to folder paths.
+- Fixed a default value for a localized string.
+- Fixed a bug related to slot hover animations and games without banners.
+
+**Version 3.0.0 beta 4 - 2018/02/26:**
+- Added more checks to the various platforms to make sure that resources, titles, and paths are valid.
+- Game class constructor now checks that titles are not empty strings.
+
+**Version 3.0.0 beta 3 - 2018/02/25:**
+- Fixed a bug, which was introduced in the previous version, in the setting types.
+
+**Version 3.0.0 beta 2 - 2018/02/25:**
+- Fixed a bug that caused an error when the number of slots in the .inc file is greater than the number of slots based on the settings.
+- Game class constructor now checks if the platform ID is valid.
+- Game class constructor now checks if a banner path was provided along with a banner URL.
+- Added more assertions and updated old ones to help with debugging.
+- Fixed a bug due to unexpected output when detecting Windows shortcuts.
+- Fixed a bug due to unexpected output when detecting Steam games.
+- Fixed a bug related to whitespace in paths to Steam libraries.
+
 **Version 3.0.0 beta 1 - 2018/02/25:**
 - Rewritten in MoonScript/Lua, VBScript, and batch files.
 

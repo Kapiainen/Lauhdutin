@@ -11,6 +11,7 @@ images = {
 
 class OverlaySlot
 	new: (settings) =>
+		assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
 		@contextSensitive = settings\getSlotsOverlayEnabled()
 		@platformNotRunning = LOCALIZATION\get('overlay_platform_not_running', '%s is not running')
 		@hoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
@@ -20,6 +21,7 @@ class OverlaySlot
 		@unhideGame = LOCALIZATION\get('overlay_unhide', 'Unhide')
 		@alreadyVisible = LOCALIZATION\get('overlay_already_visible', 'Already visible')
 		@removeGame = LOCALIZATION\get('overlay_remove', 'Remove')
+		@uninstalledGame = LOCALIZATION\get('overlay_uninstalled', 'Uninstalled')
 
 	show: (index, game) =>
 		unless game
@@ -46,14 +48,18 @@ class OverlaySlot
 				if STATE.PLATFORM_RUNNING_STATUS[platformID] == false
 					info = @platformNotRunning\format(STATE.PLATFORM_NAMES[platformID])
 					image = images.error
-				elseif game\isInstalled() == false and (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
-					info = @installGame
-					image = images.install
+				elseif game\isInstalled() == false
+					if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
+						info = @installGame
+						image = images.install
+					else
+						info = @uninstalledGame
+						image = images.error
 			when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
 				info = @removeGame
 				image = images.error
 			else
-				assert(nil, 'Unsupported LEFT_CLICK_ACTION encountered in "OverlaySlot.show".')
+				assert(nil, 'main.slots.overlay_slot.show')
 		if @contextSensitive
 			if image
 				SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))
