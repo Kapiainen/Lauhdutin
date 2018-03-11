@@ -207,8 +207,15 @@ Initialize = function()
 end
 Update = function() end
 local updateTitle
-updateTitle = function(game)
-  return SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(utility.replaceUnsupportedChars(game:getTitle())))
+updateTitle = function(game, maxStringLength)
+  local title = utility.replaceUnsupportedChars(game:getTitle())
+  SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(title))
+  if title:len() > maxStringLength then
+    SKIN:Bang(('[!SetOption "PageTitle" "ToolTipText" "%s"]'):format(title))
+    return SKIN:Bang('[!SetOption "PageTitle" "ToolTipHidden" "0"]')
+  else
+    return SKIN:Bang('[!SetOption "PageTitle" "ToolTipHidden" "1"]')
+  end
 end
 local updateBanner
 updateBanner = function(game)
@@ -567,7 +574,9 @@ Handshake = function(gameID)
     end
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
     STATE.GAME = game
-    updateTitle(game)
+    local valueMeter = SKIN:GetMeter('PageTitle')
+    local maxStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
+    updateTitle(game, maxStringLength)
     updateBanner(game)
     local platform = nil
     local _list_1 = STATE.ALL_PLATFORMS
