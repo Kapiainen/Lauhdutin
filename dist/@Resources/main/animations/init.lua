@@ -24,25 +24,26 @@ do
     end,
     pushSlotHover = function(self, index, animationType, banner)
       if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
-        return 
+        return false
       end
       if STATE.SKIN_ANIMATION_PLAYING then
-        return 
+        return false
       end
       if not (STATE.SKIN_VISIBLE) then
-        return 
+        return false
       end
-      return self:push(SlotHoverAnimation(index, animationType, banner))
+      self:push(SlotHoverAnimation(index, animationType, banner))
+      return true
     end,
     pushSlotClick = function(self, index, animationType, action, game)
       if animationType <= ENUMS.SLOT_CLICK_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_CLICK_ANIMATIONS.MAX then
         return false
       end
       if STATE.SKIN_ANIMATION_PLAYING then
-        return 
+        return false
       end
       if not (STATE.SKIN_VISIBLE) then
-        return 
+        return false
       end
       local banner = game:getBanner()
       if banner == nil then
@@ -56,57 +57,60 @@ do
         return false
       end
       if STATE.SKIN_ANIMATION_PLAYING then
-        return 
+        return false
       end
       if reveal and STATE.SKIN_VISIBLE then
-        return 
+        return false
       end
       if not reveal and not STATE.SKIN_VISIBLE then
-        return 
+        return false
       end
       self:push(SkinSlideAnimation(animationType, reveal))
       return true
     end,
     play = function(self)
       if #self.queue < 1 then
-        return 
+        return false
       end
       self.queue[1]:play()
       if self.queue[1] ~= nil and self.queue[1]:hasFinished() then
-        return table.remove(self.queue, 1)
+        table.remove(self.queue, 1)
       end
+      return true
     end,
     updateSlot = function(self, index)
       if index < 1 then
-        return 
+        return false
       end
       if COMPONENTS.SETTINGS:getSlotsHoverAnimation() == ENUMS.SLOT_HOVER_ANIMATIONS.NONE then
-        return 
+        return false
       end
       local game = COMPONENTS.SLOTS:getGame(index)
       if game == nil then
-        return 
+        return false
       end
       local banner = game:getBanner()
       if banner == nil then
-        return 
+        return false
       end
       SKIN:Bang(('[!SetOption "SlotAnimation" "ImageName" "#@#%s"]'):format(banner))
-      return SKIN:Bang('[!UpdateMeter "SlotAnimation"]')
+      SKIN:Bang('[!UpdateMeter "SlotAnimation"]')
+      return true
     end,
     resetSlots = function(self)
       log('Animations.resetSlots')
       local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
       if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
-        return 
+        return false
       end
       SKIN:Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
-      return SKIN:Bang('[!UpdateMeter "SlotsBackgroundCutout"][!ShowMeterGroup "Slots"]')
+      SKIN:Bang('[!UpdateMeter "SlotsBackgroundCutout"][!ShowMeterGroup "Slots"]')
+      return true
     end,
     cancelAnimations = function(self)
       local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
       if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
-        return 
+        return false
       end
       local i = 2
       while i <= #self.queue do
@@ -117,8 +121,9 @@ do
         end
       end
       if self.queue[1] ~= nil and not self.queue[1]:isMandatory() then
-        return self.queue[1]:cancel()
+        self.queue[1]:cancel()
       end
+      return true
     end
   }
   _base_0.__index = _base_0
