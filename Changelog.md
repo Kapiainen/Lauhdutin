@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 6 - 2018/MM/DD:**
 - Updated the Game window to include a tooltip for game titles, which are long and might not fit in the title bar.
+- Updated Game window layout.
 
 **Version 3.0.0 beta 5 - 2018/03/08:**
 - Added a slot overlay message for uninstalled games from platforms other than Steam and Blizzard Battle.net.
