@@ -154,10 +154,13 @@ class Steam extends Platform
 			file = io.readFile(libraryFoldersPath, false)
 			lines = file\splitIntoLines()
 			vdf = utility.parseVDF(lines)
-			for key, value in pairs(vdf.libraryfolders)
-				if tonumber(key) ~= nil
-					value ..= '\\' if value\endsWith('\\')
-					table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+			if type(vdf.libraryfolders) == 'table'
+				for key, value in pairs(vdf.libraryfolders)
+					if tonumber(key) ~= nil
+						value ..= '\\' if value\endsWith('\\')
+						table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+			else
+				log('\\Steam\\steamapps\\libraryfolders.vdf does not contain a table called "libraryfolders".')
 		else
 			log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
 		@libraries = libraries

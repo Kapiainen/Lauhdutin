@@ -182,13 +182,17 @@ do
         local file = io.readFile(libraryFoldersPath, false)
         local lines = file:splitIntoLines()
         local vdf = utility.parseVDF(lines)
-        for key, value in pairs(vdf.libraryfolders) do
-          if tonumber(key) ~= nil then
-            if value:endsWith('\\') then
-              value = value .. '\\'
+        if type(vdf.libraryfolders) == 'table' then
+          for key, value in pairs(vdf.libraryfolders) do
+            if tonumber(key) ~= nil then
+              if value:endsWith('\\') then
+                value = value .. '\\'
+              end
+              table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
             end
-            table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
           end
+        else
+          log('\\Steam\\steamapps\\libraryfolders.vdf does not contain a table called "libraryfolders".')
         end
       else
         log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
