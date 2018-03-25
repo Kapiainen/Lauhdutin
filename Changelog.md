@@ -1,4 +1,4 @@
-**Version 3.0.0 beta 6 - 2018/MM/DD:**
+**Version 3.0.0 beta 6 - 2018/03/25:**
 - Added more log messages to the Steam platform class.
 - Updated the Game window to include a tooltip for game titles, which are long and might not fit in the title bar.
 - Updated Game window layout.
