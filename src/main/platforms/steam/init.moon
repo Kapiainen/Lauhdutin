@@ -147,6 +147,7 @@ class Steam extends Platform
 		@communityProfileGames = games
 
 	getLibraries: () =>
+		log('Getting Steam libraries from libraryfolders.vdf')
 		libraries = {io.joinPaths(@steamPath, 'steamapps\\')}
 		libraryFoldersPath = io.joinPaths(@steamPath, 'steamapps\\libraryfolders.vdf')
 		if io.fileExists(libraryFoldersPath, false)
@@ -171,11 +172,13 @@ class Steam extends Platform
 		return @getWaitCommand(), '', 'OnGotACFs'
 
 	parseLocalConfig: () =>
+		log('Parsing localconfig.vdf')
 		file = io.readFile(io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\localconfig.vdf'), false)
 		lines = file\splitIntoLines()
 		return utility.parseVDF(lines)
 
 	parseSharedConfig: () =>
+		log('Parsing sharedconfig.vdf')
 		file = io.readFile(io.joinPaths(@steamPath, 'userdata\\', @accountID, '\\7\\remote\\sharedconfig.vdf'), false)
 		lines = file\splitIntoLines()
 		return utility.parseVDF(lines)
@@ -320,13 +323,18 @@ class Steam extends Platform
 		file = io.readFile(io.joinPaths(@cachePath, 'output.txt'))
 		manifests = file\splitIntoLines()
 		for manifest in *manifests
+			log('Processing Steam game:', manifest)
 			appID = manifest\match('appmanifest_(%d+)%.acf')
 			if appID == nil
 				log('Skipping Steam game because the appID could not be parsed')
-				continue 
+				continue
 			assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
-			continue if games[appID] ~= nil -- Disregard duplicates, if they appear for some reason.
-			continue if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil -- If the community profile has been parsed, then disregard games not found on the profile.
+			if games[appID] ~= nil -- Disregard duplicates, if they appear for some reason.
+				log('Skipping Steam game', appID, 'because it has already been processed')
+				continue
+			if @communityProfileGames ~= nil and @communityProfileGames[appID] == nil -- If the community profile has been parsed, then disregard games not found on the profile.
+				log('Skipping Steam game', appID, 'because it does not appear in the community profile')
+				continue
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
 			vdf = utility.parseVDF(lines)
@@ -363,7 +371,7 @@ class Steam extends Platform
 		if @communityProfileGames ~= nil and #@libraries == 0
 			log('Processing remaining Steam games found in the community profile')
 			for appID, game in pairs(@communityProfileGames)
-				continue if games[appID] ~= nil
+				continue if games[appID] ~= nil -- The game has already been processed
 				banner, bannerURL = @getBanner(appID)
 				expectedBanner = if banner ~= nil then nil else appID
 				games[appID] = {

@@ -173,6 +173,7 @@ do
       self.communityProfileGames = games
     end,
     getLibraries = function(self)
+      log('Getting Steam libraries from libraryfolders.vdf')
       local libraries = {
         io.joinPaths(self.steamPath, 'steamapps\\')
       }
@@ -206,11 +207,13 @@ do
       return self:getWaitCommand(), '', 'OnGotACFs'
     end,
     parseLocalConfig = function(self)
+      log('Parsing localconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\localconfig.vdf'), false)
       local lines = file:splitIntoLines()
       return utility.parseVDF(lines)
     end,
     parseSharedConfig = function(self)
+      log('Parsing sharedconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, '\\7\\remote\\sharedconfig.vdf'), false)
       local lines = file:splitIntoLines()
       return utility.parseVDF(lines)
@@ -428,6 +431,7 @@ do
         local _continue_0 = false
         repeat
           local manifest = manifests[_index_0]
+          log('Processing Steam game:', manifest)
           local appID = manifest:match('appmanifest_(%d+)%.acf')
           if appID == nil then
             log('Skipping Steam game because the appID could not be parsed')
@@ -436,10 +440,12 @@ do
           end
           assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
           if games[appID] ~= nil then
+            log('Skipping Steam game', appID, 'because it has already been processed')
             _continue_0 = true
             break
           end
           if self.communityProfileGames ~= nil and self.communityProfileGames[appID] == nil then
+            log('Skipping Steam game', appID, 'because it does not appear in the community profile')
             _continue_0 = true
             break
           end
