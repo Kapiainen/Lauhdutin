@@ -1,4 +1,5 @@
 **Version 3.0.0 beta 7 - 2018/MM/DD:**
+- Updated readme to more accurately reflect the functionality of the search button.
 - Fixed a bug that prevented the cached Steam community profile from being refreshed.
 
 **Version 3.0.0 beta 6 - 2018/03/25:**
