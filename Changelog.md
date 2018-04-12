@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 7 - 2018/MM/DD:**
 - Updated readme to more accurately reflect the functionality of the search button.
+- Updated the description of the `Parse community profile` setting in Steam's settings page.
 - Fixed a bug that prevented the cached Steam community profile from being refreshed.
 - Fixed a bug that crashed the skin when processing Windows shortcuts, if relevant paths included characters that are considered to be special characters in Lua patterns.
 
