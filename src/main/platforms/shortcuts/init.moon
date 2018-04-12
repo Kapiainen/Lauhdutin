@@ -34,8 +34,7 @@ class Shortcuts extends Platform
 		lines = output\splitIntoLines()
 		while #lines > 0 and #lines % 3 == 0
 			absoluteFilePath = table.remove(lines, 1)
-			_, diverges = absoluteFilePath\find(@shortcutsPath)
-			relativeFilePath = absoluteFilePath\sub(diverges + 1)
+			relativeFilePath = absoluteFilePath\sub(#@shortcutsPath + 1)
 			parts = relativeFilePath\split('\\')
 			title = switch #parts
 				when 1 then parts[1]
