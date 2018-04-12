@@ -1,3 +1,5 @@
+**Version 3.0.0 beta 8 - 2018/MM/DD:**
+
 **Version 3.0.0 beta 7 - 2018/04/12:**
 - Updated readme to more accurately reflect the functionality of the search button.
 - Updated the description of the `Parse community profile` setting in Steam's settings page.
