@@ -64,6 +64,8 @@ Support includes:
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played and last played timestamp, which are tracked for each game by Steam into Lauhdutin's corresponding system.
 
+Parsing the Steam community profile for information (e.g. hours played) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
+
 ### GOG Galaxy
 
 Support includes:
