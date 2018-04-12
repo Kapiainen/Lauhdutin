@@ -1,4 +1,4 @@
-RUN_TESTS = false
+RUN_TESTS = true
 if RUN_TESTS then
   print('Running tests')
 end
