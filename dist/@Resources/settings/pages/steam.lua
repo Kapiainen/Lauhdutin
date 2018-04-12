@@ -147,7 +147,7 @@ do
         }),
         Settings.Boolean({
           title = LOCALIZATION:get('setting_steam_community_profile_title', 'Parse community profile'),
-          tooltip = LOCALIZATION:get('setting_steam_community_profile_description', 'If enabled, then the Steam community profile will be downloaded and parsed to get:\n- All games associated with the chosen account even if not installed at the moment.\n- The total hours played of each game associated with the chosen account.\n\nRequires the Steam community profile to be public.'),
+          tooltip = LOCALIZATION:get('setting_steam_community_profile_description', "If enabled, then the Steam community profile will be downloaded and parsed to get:\n- All games associated with the chosen account even if not installed at the moment.\n- The total hours played of each game associated with the chosen account.\n\nRequires that the Game details setting in the Steam profile's privacy settings is set as public."),
           toggle = function()
             COMPONENTS.SETTINGS:toggleSteamParseCommunityProfile()
             return true
