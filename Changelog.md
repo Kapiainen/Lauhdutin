@@ -1,4 +1,4 @@
-**Version 3.0.0 beta 8 - 2018/MM/DD:**
+**Version 3.0.0 beta 8 - 2018/04/16:**
 - Fixed bugs caused by whitespace in paths processed by batch files.
 - Fixed a bug that lead to multiple attempts to delete the cached Steam community profile.
 
