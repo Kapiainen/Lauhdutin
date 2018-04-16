@@ -343,31 +343,33 @@ GameProcessTerminated = function(game)
     COMPONENTS.LIBRARY:save()
     local platformID = game:getPlatformID()
     if COMPONENTS.SETTINGS:getBangsEnabled() then
-      local _list_0 = COMPONENTS.SETTINGS:getGlobalStoppingBangs()
+      if not (game:getIgnoresOtherBangs()) then
+        local _list_0 = COMPONENTS.SETTINGS:getGlobalStoppingBangs()
+        for _index_0 = 1, #_list_0 do
+          local bang = _list_0[_index_0]
+          SKIN:Bang(bang)
+        end
+        local platformBangs
+        local _exp_0 = platformID
+        if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
+          platformBangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
+        elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
+          platformBangs = COMPONENTS.SETTINGS:getSteamStoppingBangs()
+        elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
+          platformBangs = COMPONENTS.SETTINGS:getBattlenetStoppingBangs()
+        elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+          platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
+        else
+          platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
+        end
+        for _index_0 = 1, #platformBangs do
+          local bang = platformBangs[_index_0]
+          SKIN:Bang(bang)
+        end
+      end
+      local _list_0 = game:getStoppingBangs()
       for _index_0 = 1, #_list_0 do
         local bang = _list_0[_index_0]
-        SKIN:Bang(bang)
-      end
-      local platformBangs
-      local _exp_0 = platformID
-      if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
-        platformBangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
-      elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
-        platformBangs = COMPONENTS.SETTINGS:getSteamStoppingBangs()
-      elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
-        platformBangs = COMPONENTS.SETTINGS:getBattlenetStoppingBangs()
-      elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-        platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
-      else
-        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
-      end
-      for _index_0 = 1, #platformBangs do
-        local bang = platformBangs[_index_0]
-        SKIN:Bang(bang)
-      end
-      local _list_1 = game:getStoppingBangs()
-      for _index_0 = 1, #_list_1 do
-        local bang = _list_1[_index_0]
         SKIN:Bang(bang)
       end
     end
@@ -699,31 +701,33 @@ launchGame = function(game)
   updateSlots()
   COMPONENTS.PROCESS:monitor(game)
   if COMPONENTS.SETTINGS:getBangsEnabled() then
-    local _list_0 = COMPONENTS.SETTINGS:getGlobalStartingBangs()
+    if not (game:getIgnoresOtherBangs()) then
+      local _list_0 = COMPONENTS.SETTINGS:getGlobalStartingBangs()
+      for _index_0 = 1, #_list_0 do
+        local bang = _list_0[_index_0]
+        SKIN:Bang(bang)
+      end
+      local platformBangs
+      local _exp_0 = game:getPlatformID()
+      if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getShortcutsStartingBangs()
+      elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getSteamStartingBangs()
+      elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getBattlenetStartingBangs()
+      elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStartingBangs()
+      else
+        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+      end
+      for _index_0 = 1, #platformBangs do
+        local bang = platformBangs[_index_0]
+        SKIN:Bang(bang)
+      end
+    end
+    local _list_0 = game:getStartingBangs()
     for _index_0 = 1, #_list_0 do
       local bang = _list_0[_index_0]
-      SKIN:Bang(bang)
-    end
-    local platformBangs
-    local _exp_0 = game:getPlatformID()
-    if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
-      platformBangs = COMPONENTS.SETTINGS:getShortcutsStartingBangs()
-    elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
-      platformBangs = COMPONENTS.SETTINGS:getSteamStartingBangs()
-    elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
-      platformBangs = COMPONENTS.SETTINGS:getBattlenetStartingBangs()
-    elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-      platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStartingBangs()
-    else
-      platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
-    end
-    for _index_0 = 1, #platformBangs do
-      local bang = platformBangs[_index_0]
-      SKIN:Bang(bang)
-    end
-    local _list_1 = game:getStartingBangs()
-    for _index_0 = 1, #_list_1 do
-      local bang = _list_1[_index_0]
       SKIN:Bang(bang)
     end
   end

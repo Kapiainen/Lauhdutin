@@ -283,19 +283,20 @@ export GameProcessTerminated = (game) ->
 			COMPONENTS.LIBRARY\save()
 			platformID = game\getPlatformID()
 			if COMPONENTS.SETTINGS\getBangsEnabled()
-				SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStoppingBangs()
-				platformBangs = switch platformID
-					when ENUMS.PLATFORM_IDS.SHORTCUTS
-						COMPONENTS.SETTINGS\getShortcutsStoppingBangs()
-					when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
-						COMPONENTS.SETTINGS\getSteamStoppingBangs()
-					when ENUMS.PLATFORM_IDS.BATTLENET
-						COMPONENTS.SETTINGS\getBattlenetStoppingBangs()
-					when ENUMS.PLATFORM_IDS.GOG_GALAXY
-						COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
-					else
-						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
-				SKIN\Bang(bang) for bang in *platformBangs
+				unless game\getIgnoresOtherBangs()
+					SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStoppingBangs()
+					platformBangs = switch platformID
+						when ENUMS.PLATFORM_IDS.SHORTCUTS
+							COMPONENTS.SETTINGS\getShortcutsStoppingBangs()
+						when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
+							COMPONENTS.SETTINGS\getSteamStoppingBangs()
+						when ENUMS.PLATFORM_IDS.BATTLENET
+							COMPONENTS.SETTINGS\getBattlenetStoppingBangs()
+						when ENUMS.PLATFORM_IDS.GOG_GALAXY
+							COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
+						else
+							assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
+					SKIN\Bang(bang) for bang in *platformBangs
 				SKIN\Bang(bang) for bang in *game\getStoppingBangs()
 			switch platformID
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
@@ -525,19 +526,20 @@ launchGame = (game) ->
 	updateSlots()
 	COMPONENTS.PROCESS\monitor(game)
 	if COMPONENTS.SETTINGS\getBangsEnabled()
-		SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
-		platformBangs = switch game\getPlatformID()
-			when ENUMS.PLATFORM_IDS.SHORTCUTS
-				COMPONENTS.SETTINGS\getShortcutsStartingBangs()
-			when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
-				COMPONENTS.SETTINGS\getSteamStartingBangs()
-			when ENUMS.PLATFORM_IDS.BATTLENET
-				COMPONENTS.SETTINGS\getBattlenetStartingBangs()
-			when ENUMS.PLATFORM_IDS.GOG_GALAXY
-				COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
-			else
-				assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
-		SKIN\Bang(bang) for bang in *platformBangs
+		unless game\getIgnoresOtherBangs()
+			SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
+			platformBangs = switch game\getPlatformID()
+				when ENUMS.PLATFORM_IDS.SHORTCUTS
+					COMPONENTS.SETTINGS\getShortcutsStartingBangs()
+				when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
+					COMPONENTS.SETTINGS\getSteamStartingBangs()
+				when ENUMS.PLATFORM_IDS.BATTLENET
+					COMPONENTS.SETTINGS\getBattlenetStartingBangs()
+				when ENUMS.PLATFORM_IDS.GOG_GALAXY
+					COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
+				else
+					assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+			SKIN\Bang(bang) for bang in *platformBangs
 		SKIN\Bang(bang) for bang in *game\getStartingBangs()
 	SKIN\Bang(('[%s]')\format(game\getPath()))
 	SKIN\Bang('[!HideFade]') if COMPONENTS.SETTINGS\getHideSkin()
