@@ -1,4 +1,4 @@
-export RUN_TESTS = false
+export RUN_TESTS = true
 if RUN_TESTS
 	print('Running tests')
 
