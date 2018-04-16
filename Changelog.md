@@ -1,4 +1,5 @@
 **Version 3.0.0 beta 8 - 2018/MM/DD:**
+- Fixed a bug that lead to multiple attempts to delete the cached Steam community profile.
 
 **Version 3.0.0 beta 7 - 2018/04/12:**
 - Updated readme to more accurately reflect the functionality of the search button.

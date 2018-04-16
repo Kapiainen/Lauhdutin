@@ -131,6 +131,7 @@ do
       if not (self.useCommunityProfile) then
         return nil
       end
+      SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
       assert(type(self.communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
       local url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1'):format(self.communityID)
       return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
@@ -561,9 +562,6 @@ do
       self.games = { }
       self.communityProfilePath = io.joinPaths(self.cachePath, 'communityProfile.txt')
       self.communityProfileGames = nil
-      if self.enabled then
-        return SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
-      end
     end,
     __base = _base_0,
     __name = "Steam",

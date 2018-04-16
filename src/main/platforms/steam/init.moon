@@ -41,8 +41,6 @@ class Steam extends Platform
 		@games = {}
 		@communityProfilePath = io.joinPaths(@cachePath, 'communityProfile.txt')
 		@communityProfileGames = nil
-		if @enabled
-			SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
 
 	validate: () =>
 		clientPath = io.joinPaths(@steamPath, 'steam.exe')
@@ -120,6 +118,7 @@ class Steam extends Platform
 
 	downloadCommunityProfile: () =>
 		return nil unless @useCommunityProfile
+		SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
 		assert(type(@communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
 		url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1')\format(@communityID)
 		return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
