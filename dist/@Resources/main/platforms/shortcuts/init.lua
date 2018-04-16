@@ -31,8 +31,7 @@ do
         local _continue_0 = false
         repeat
           local absoluteFilePath = table.remove(lines, 1)
-          local _, diverges = absoluteFilePath:find(self.shortcutsPath)
-          local relativeFilePath = absoluteFilePath:sub(diverges + 1)
+          local relativeFilePath = absoluteFilePath:sub(#self.shortcutsPath + 1)
           local parts = relativeFilePath:split('\\')
           local title
           local _exp_0 = #parts

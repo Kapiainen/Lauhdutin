@@ -1,5 +1,21 @@
-**Version 3.0.0 beta 6 - 2018/MM/DD:**
+**Version 3.0.0 beta 9 - 2018/MM/DD:**
+- Finished implementing games' ability to ignore executing bangs other than their own.
+- Fixed a bug in the localization system that caused certain characters to be removed from strings.
+
+**Version 3.0.0 beta 8 - 2018/04/16:**
+- Fixed bugs caused by whitespace in paths processed by batch files.
+- Fixed a bug that lead to multiple attempts to delete the cached Steam community profile.
+
+**Version 3.0.0 beta 7 - 2018/04/12:**
+- Updated readme to more accurately reflect the functionality of the search button.
+- Updated the description of the `Parse community profile` setting in Steam's settings page.
+- Fixed a bug that prevented the cached Steam community profile from being refreshed.
+- Fixed a bug that crashed the skin when processing Windows shortcuts, if relevant paths included characters that are considered to be special characters in Lua patterns.
+
+**Version 3.0.0 beta 6 - 2018/03/25:**
+- Added more log messages to the Steam platform class.
 - Updated the Game window to include a tooltip for game titles, which are long and might not fit in the title bar.
+- Updated Game window layout.
 
 **Version 3.0.0 beta 5 - 2018/03/08:**
 - Added a slot overlay message for uninstalled games from platforms other than Steam and Blizzard Battle.net.

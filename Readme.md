@@ -64,6 +64,8 @@ Support includes:
 - Automatically download banners for Steam games that were found.
 - Integrate the total amount of hours played and last played timestamp, which are tracked for each game by Steam into Lauhdutin's corresponding system.
 
+Parsing the Steam community profile for information (e.g. hours played) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
+
 ### GOG Galaxy
 
 Support includes:
@@ -150,9 +152,9 @@ The toolbar, which can be made visible by hovering the mouse over the top or bot
 
 The button on the left-hand side of the toolbar is for searching for games based on the title. Searching uses fuzzy matching, which means that you do not need to input the exact same title as the game you are looking for. Titles are instead compared to the input and given a score. Using just the initials of a game's title should be enough to place it at the top of the list of results in many cases (e.g. `wtno` for `Wolfenstein: The New Order`).
 
-- Left-clicking the button searches all games.
-- Middle-clicking the button searches the current list of games, which might be the result of applying various filters.
-- Right-clicking the button clears all filters and resets the list of games and can be used to instantly go to the beginning of the list of games.
+- Left-clicking the button searches through all installed games.
+- Middle-clicking the button searches through the current list of games, which might be the result of applying various filters.
+- Right-clicking the button clears all filters and resets the list of games. It can also be used to instantly go to the beginning of the list of games.
 
 ### Sort
 

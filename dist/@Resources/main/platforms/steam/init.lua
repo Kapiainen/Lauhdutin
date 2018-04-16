@@ -131,6 +131,7 @@ do
       if not (self.useCommunityProfile) then
         return nil
       end
+      SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
       assert(type(self.communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
       local url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1'):format(self.communityID)
       return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
@@ -173,6 +174,7 @@ do
       self.communityProfileGames = games
     end,
     getLibraries = function(self)
+      log('Getting Steam libraries from libraryfolders.vdf')
       local libraries = {
         io.joinPaths(self.steamPath, 'steamapps\\')
       }
@@ -181,13 +183,17 @@ do
         local file = io.readFile(libraryFoldersPath, false)
         local lines = file:splitIntoLines()
         local vdf = utility.parseVDF(lines)
-        for key, value in pairs(vdf.libraryfolders) do
-          if tonumber(key) ~= nil then
-            if value:endsWith('\\') then
-              value = value .. '\\'
+        if type(vdf.libraryfolders) == 'table' then
+          for key, value in pairs(vdf.libraryfolders) do
+            if tonumber(key) ~= nil then
+              if value:endsWith('\\') then
+                value = value .. '\\'
+              end
+              table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
             end
-            table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
           end
+        else
+          log('\\Steam\\steamapps\\libraryfolders.vdf does not contain a table called "libraryfolders".')
         end
       else
         log('Could not find "\\Steam\\steamapps\\libraryfolders.vdf"')
@@ -206,11 +212,13 @@ do
       return self:getWaitCommand(), '', 'OnGotACFs'
     end,
     parseLocalConfig = function(self)
+      log('Parsing localconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\localconfig.vdf'), false)
       local lines = file:splitIntoLines()
       return utility.parseVDF(lines)
     end,
     parseSharedConfig = function(self)
+      log('Parsing sharedconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, '\\7\\remote\\sharedconfig.vdf'), false)
       local lines = file:splitIntoLines()
       return utility.parseVDF(lines)
@@ -428,6 +436,7 @@ do
         local _continue_0 = false
         repeat
           local manifest = manifests[_index_0]
+          log('Processing Steam game:', manifest)
           local appID = manifest:match('appmanifest_(%d+)%.acf')
           if appID == nil then
             log('Skipping Steam game because the appID could not be parsed')
@@ -436,10 +445,12 @@ do
           end
           assert(type(appID) == 'string', 'main.platforms.steam.init.generateGames')
           if games[appID] ~= nil then
+            log('Skipping Steam game', appID, 'because it has already been processed')
             _continue_0 = true
             break
           end
           if self.communityProfileGames ~= nil and self.communityProfileGames[appID] == nil then
+            log('Skipping Steam game', appID, 'because it does not appear in the community profile')
             _continue_0 = true
             break
           end
@@ -551,9 +562,6 @@ do
       self.games = { }
       self.communityProfilePath = io.joinPaths(self.cachePath, 'communityProfile.txt')
       self.communityProfileGames = nil
-      if self.enabled then
-        return SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
-      end
     end,
     __base = _base_0,
     __name = "Steam",

@@ -539,7 +539,8 @@ return {
     assert(type(str) == 'string', 'shared.utility.replaceUnsupportedChars')
     local result = ''
     local charsToReplace = { }
-    for char in str:gmatch('[%z\1-\127\194-\244][\128-\191]*') do
+    local hasCharsToReplace = false
+    for char in str:gmatch('[%z\1-\127\194-\255][\128-\191]*') do
       local _continue_0 = false
       repeat
         local lookupValue = nil
@@ -568,6 +569,7 @@ return {
             break
           end
           charsToReplace[lookupValue[1]] = lookupValue[2]
+          hasCharsToReplace = true
         end
         result = result .. char
         _continue_0 = true
@@ -576,8 +578,12 @@ return {
         break
       end
     end
-    for find, replace in pairs(charsToReplace) do
-      result = result:gsub(find, replace)
+    if hasCharsToReplace then
+      for find, replace in pairs(charsToReplace) do
+        result = result:gsub(find, replace)
+      end
+    else
+      result = str
     end
     return result
   end,
