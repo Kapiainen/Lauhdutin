@@ -186,7 +186,8 @@ return {
 		assert(type(str) == 'string', 'shared.utility.replaceUnsupportedChars')
 		result = ''
 		charsToReplace = {}
-		for char in str\gmatch('[%z\1-\127\194-\244][\128-\191]*')
+		hasCharsToReplace = false
+		for char in str\gmatch('[%z\1-\127\194-\255][\128-\191]*')
 			lookupValue = nil
 			-- TODO: Have a look at this again. Seems like this would cause an excessive amount of allocations.
 			-- TODO: Any way to reduce the amount of allocations?
@@ -201,9 +202,13 @@ return {
 				--) -- Leave here for testing purposes, but comment out for releases
 				continue if lookupValue == nil
 				charsToReplace[lookupValue[1]] = lookupValue[2]
+				hasCharsToReplace = true
 			result ..= char
-		for find, replace in pairs(charsToReplace)
-			result = result\gsub(find, replace)
+		if hasCharsToReplace
+			for find, replace in pairs(charsToReplace)
+				result = result\gsub(find, replace)
+		else
+			result = str
 		return result
 
 	getConfig: (name) ->
