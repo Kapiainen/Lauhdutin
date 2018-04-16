@@ -186,6 +186,7 @@ return {
 		assert(type(str) == 'string', 'shared.utility.replaceUnsupportedChars')
 		result = ''
 		charsToReplace = {}
+		hasCharsToDrop = false
 		hasCharsToReplace = false
 		for char in str\gmatch('[%z\1-\127\194-\255][\128-\191]*')
 			lookupValue = nil
@@ -200,14 +201,16 @@ return {
 				--assert(lookupValue ~= nil,
 				--	('Encountered unsupported variable-width character: %s %s')\format(char, table.concat(bytes, '|'))
 				--) -- Leave here for testing purposes, but comment out for releases
-				continue if lookupValue == nil
+				if lookupValue == nil
+					hasCharsToDrop = true
+					continue
 				charsToReplace[lookupValue[1]] = lookupValue[2]
 				hasCharsToReplace = true
 			result ..= char
 		if hasCharsToReplace
 			for find, replace in pairs(charsToReplace)
 				result = result\gsub(find, replace)
-		else
+		elseif not hasCharsToDrop or #result == 0
 			result = str
 		return result
 
