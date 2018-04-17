@@ -1,4 +1,4 @@
-**Version 3.0.0 beta 9 - 2018/MM/DD:**
+**Version 3.0.0 beta 9 - 2018/04/17:**
 - Finished implementing games' ability to ignore executing bangs other than their own.
 - Fixed a bug in the localization system that caused certain supported characters to be removed from strings.
 
