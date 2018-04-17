@@ -67,7 +67,7 @@ getLanguageIndex = function()
 end
 state.slotHoverAnimations = {
   {
-    displayValue = LOCALIZATION:get('button_label_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none_animation', 'None')
   },
   {
     displayValue = LOCALIZATION:get('setting_animation_label_zoom_in', 'Zoom in')
@@ -84,7 +84,7 @@ state.slotHoverAnimations = {
 }
 state.slotClickAnimations = {
   {
-    displayValue = LOCALIZATION:get('button_label_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none_animation', 'None')
   },
   {
     displayValue = LOCALIZATION:get('setting_animation_label_slide_up', 'Slide upwards')
@@ -104,7 +104,7 @@ state.slotClickAnimations = {
 }
 state.skinAnimations = {
   {
-    displayValue = LOCALIZATION:get('button_label_none', 'None')
+    displayValue = LOCALIZATION:get('button_label_none_animation', 'None')
   },
   {
     displayValue = LOCALIZATION:get('setting_animation_label_slide_up', 'Slide upwards')

@@ -8,7 +8,11 @@ button_label_edit	Edit
 button_label_enabled	Enabled
 button_label_hours_played	Hours played
 button_label_no	No
-button_label_none	None
+button_label_none_animation	None
+button_label_none_process	None
+button_label_none_notes	None
+button_label_none_tags	None
+button_label_none_bangs	None
 button_label_open	Open
 button_label_save	Save
 button_label_starting_bangs	Starting bangs

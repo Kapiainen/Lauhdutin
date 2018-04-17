@@ -44,7 +44,7 @@ getLanguageIndex = () ->
 
 -- Slot hover animations
 state.slotHoverAnimations = {
-	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('button_label_none_animation', 'None')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_zoom_in', 'Zoom in')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_jiggle', 'Jiggle')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_shake_left_right', 'Shake left and right')}
@@ -52,7 +52,7 @@ state.slotHoverAnimations = {
 }
 -- Slot click animations
 state.slotClickAnimations = {
-	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('button_label_none_animation', 'None')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_up', 'Slide upwards')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_right', 'Slide to the right')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_down', 'Slide downwards')}
@@ -61,7 +61,7 @@ state.slotClickAnimations = {
 }
 -- Skin animations
 state.skinAnimations = {
-	{displayValue: LOCALIZATION\get('button_label_none', 'None')}
+	{displayValue: LOCALIZATION\get('button_label_none_animation', 'None')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_up', 'Slide upwards')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_right', 'Slide to the right')}
 	{displayValue: LOCALIZATION\get('setting_animation_label_slide_down', 'Slide downwards')}
