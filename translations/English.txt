@@ -8,15 +8,11 @@ button_label_edit	Edit
 button_label_enabled	Enabled
 button_label_hours_played	Hours played
 button_label_no	No
-button_label_none_animation	None
-button_label_none_process	None
-button_label_none_notes	None
-button_label_none_tags	None
-button_label_none_bangs	None
 button_label_open	Open
 button_label_save	Save
 button_label_starting_bangs	Starting bangs
 button_label_stopping_bangs	Stopping bangs
+button_label_bangs_none	None
 button_label_yes	Yes
 filter_back_button_title	Back
 filter_clear_filters	Clear filters
@@ -36,12 +32,15 @@ game_last_played	Last played
 game_last_played_never	Never
 game_no_banner	No banner
 game_notes	Notes
+game_notes_none	None
 game_number_of_games	%d games
 game_path	Path
 game_platform	Platform
 game_process	Process
+game_process_none	None
 game_tag_create	Create a new tag
 game_tags	Tags
+game_tags_none	None
 game_visible	Visible
 main_context_title_execute_stopping_bangs	Execute stopping bangs
 main_context_title_open_shortcuts_folder	Open shortcuts folder
@@ -77,6 +76,7 @@ setting_animation_label_slide_left	Slide to the left
 setting_animation_label_slide_right	Slide to the right
 setting_animation_label_slide_up	Slide upwards
 setting_animation_label_zoom_in	Zoom in
+setting_animation_label_none	None
 setting_bangs_enabled_description	If enabled, then the specified Rainmeter bangs are executed when a game starts or terminates.
 setting_bangs_enabled_title	Execute bangs
 setting_bangs_starting_description	These Rainmeter bangs are executed just before any game launches.
