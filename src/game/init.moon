@@ -315,7 +315,7 @@ createProperties = (game, platform) ->
 		process = game\getProcess(true)
 		if process ~= nil and process ~= ''
 			return process 
-		return LOCALIZATION\get('button_label_none', 'None')
+		return LOCALIZATION\get('game_process_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_process', 'Process')
@@ -333,7 +333,7 @@ createProperties = (game, platform) ->
 			line = lines[1]
 			line ..= '...' if #lines > 1
 			return line
-		return LOCALIZATION\get('button_label_none', 'None')
+		return LOCALIZATION\get('game_notes_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_notes', 'Notes')
@@ -360,7 +360,7 @@ createProperties = (game, platform) ->
 			str = str\sub(4)
 			if str ~= ''
 				return str
-		return LOCALIZATION\get('button_label_none', 'None')
+		return LOCALIZATION\get('game_tags_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('game_tags', 'Tags')
@@ -401,7 +401,7 @@ createProperties = (game, platform) ->
 			bangs = table.concat(bangs, ' | ')
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
-		return LOCALIZATION\get('button_label_none', 'None')
+		return LOCALIZATION\get('button_label_bangs_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
@@ -418,7 +418,7 @@ createProperties = (game, platform) ->
 			bangs = table.concat(bangs, ' | ')
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
-		return LOCALIZATION\get('button_label_none', 'None')
+		return LOCALIZATION\get('button_label_bangs_none', 'None')
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')

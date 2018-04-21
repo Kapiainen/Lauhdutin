@@ -420,7 +420,7 @@ createProperties = function(game, platform)
     if process ~= nil and process ~= '' then
       return process
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_process_none', 'None')
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('game_process', 'Process'),
@@ -440,7 +440,7 @@ createProperties = function(game, platform)
       end
       return line
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_notes_none', 'None')
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('game_notes', 'Notes'),
@@ -476,7 +476,7 @@ createProperties = function(game, platform)
         return str
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_tags_none', 'None')
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('game_tags', 'Tags'),
@@ -530,7 +530,7 @@ createProperties = function(game, platform)
         return (bangs:gsub('\"', '\'\''))
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
@@ -548,7 +548,7 @@ createProperties = function(game, platform)
         return (bangs:gsub('\"', '\'\''))
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
   table.insert(properties, Property({
     title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
