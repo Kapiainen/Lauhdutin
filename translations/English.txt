@@ -1,4 +1,5 @@
 version 1
+button_label_bangs_none	None
 button_label_browse	Browse
 button_label_cancel	Cancel
 button_label_client_path	Client path
@@ -12,7 +13,6 @@ button_label_open	Open
 button_label_save	Save
 button_label_starting_bangs	Starting bangs
 button_label_stopping_bangs	Stopping bangs
-button_label_bangs_none	None
 button_label_yes	Yes
 filter_back_button_title	Back
 filter_clear_filters	Clear filters
@@ -68,6 +68,7 @@ platform_name_windows_shortcut	Windows shortcut
 search_window_all_title	Search
 search_window_current_title	Search (current games)
 setting_animation_label_jiggle	Jiggle
+setting_animation_label_none	None
 setting_animation_label_shake_left_right	Shake left and right
 setting_animation_label_shake_up_down	Shake up and down
 setting_animation_label_shrink	Shrink
@@ -76,7 +77,6 @@ setting_animation_label_slide_left	Slide to the left
 setting_animation_label_slide_right	Slide to the right
 setting_animation_label_slide_up	Slide upwards
 setting_animation_label_zoom_in	Zoom in
-setting_animation_label_none	None
 setting_bangs_enabled_description	If enabled, then the specified Rainmeter bangs are executed when a game starts or terminates.
 setting_bangs_enabled_title	Execute bangs
 setting_bangs_starting_description	These Rainmeter bangs are executed just before any game launches.
