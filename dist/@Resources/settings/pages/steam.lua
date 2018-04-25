@@ -29,7 +29,7 @@ getPersonaName = function(accountID)
   if config.friends == nil then
     return nil
   end
-  return config.friends.personaname
+  return utility.replaceUnsupportedChars(config.friends.personaname)
 end
 local updateUsers
 updateUsers = function()
@@ -49,7 +49,7 @@ updateUsers = function()
           break
         end
         for communityID, user in pairs(users) do
-          if user.personaname == personaName then
+          if utility.replaceUnsupportedChars(user.personaname) == personaName then
             table.insert(state.accounts, {
               accountID = accountID,
               communityID = communityID,
