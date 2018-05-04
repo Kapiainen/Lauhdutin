@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 10 - 2018/MM/DD:**
 - Updated translations to improve compatibility with various languages.
+- Fixed a bug in the GOG Galaxy platform related to downloading missing banners.
 
 **Version 3.0.0 beta 9 - 2018/04/17:**
 - Finished implementing games' ability to ignore executing bangs other than their own.

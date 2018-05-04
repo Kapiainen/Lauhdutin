@@ -89,14 +89,16 @@ do
       end
       return json.decode(file)
     end,
-    getBanner = function(self, productID)
+    getBanner = function(self, productID, bannerURLs)
       assert(type(productID) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.getBanner')
       local banner = self:getBannerPath(productID)
       if not (banner) then
         local bannerURL = bannerURLs[productID]
-        banner = io.joinPaths(self.cachePath, productID .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
-        local expectedBanner = productID
-        return banner, bannerURL, expectedBanner
+        if bannerURL then
+          banner = io.joinPaths(self.cachePath, productID .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
+          local expectedBanner = productID
+          return banner, bannerURL, expectedBanner
+        end
       end
       return banner, nil, nil
     end,
@@ -122,7 +124,7 @@ do
       for productID, _ in pairs(productIDs) do
         local _continue_0 = false
         repeat
-          local banner, bannerURL, expectedBanner = self:getBanner(productID)
+          local banner, bannerURL, expectedBanner = self:getBanner(productID, bannerURLs)
           local info = self:parseInfo(paths[productID], productID)
           if type(info) ~= 'table' then
             log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
