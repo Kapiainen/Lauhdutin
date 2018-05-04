@@ -10,7 +10,14 @@ getUsers = function()
   if not (io.fileExists(path, false)) then
     return nil
   end
-  return utility.parseVDF(io.readFile(path, false)).users
+  local vdf = utility.parseVDF(io.readFile(path, false))
+  if vdf == nil or vdf.users == nil then
+    return nil
+  end
+  for communityID, user in pairs(vdf.users) do
+    user.personaname = utility.replaceUnsupportedChars(user.personaname)
+  end
+  return vdf.users
 end
 local getPersonaName
 getPersonaName = function(accountID)
@@ -49,13 +56,14 @@ updateUsers = function()
           break
         end
         for communityID, user in pairs(users) do
-          if utility.replaceUnsupportedChars(user.personaname) == personaName then
+          if user.personaname == personaName then
             table.insert(state.accounts, {
               accountID = accountID,
               communityID = communityID,
               personaName = personaName,
               displayValue = personaName
             })
+            users[communityID] = nil
             break
           end
         end
