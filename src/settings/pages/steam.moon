@@ -19,7 +19,7 @@ getPersonaName = (accountID) ->
 	config = vdf.userlocalconfigstore if config == nil
 	return nil if config == nil
 	return nil if config.friends == nil
-	return config.friends.personaname
+	return utility.replaceUnsupportedChars(config.friends.personaname)
 
 updateUsers = () -> 
 	state.accounts = {}
@@ -32,7 +32,7 @@ updateUsers = () ->
 			personaName = getPersonaName(accountID)
 			continue if personaName == nil
 			for communityID, user in pairs(users)
-				if user.personaname == personaName
+				if utility.replaceUnsupportedChars(user.personaname) == personaName
 					table.insert(state.accounts, {
 						:accountID
 						:communityID 
