@@ -1,4 +1,4 @@
-**Version 3.0.0 beta 10 - 2018/MM/DD:**
+**Version 3.0.0 beta 10 - 2018/05/04:**
 - Updated translations to improve compatibility with various languages.
 - Updated Steam settings page to remove unsupported characters from the profile names of detected accounts.
 - Fixed a bug in the GOG Galaxy platform related to downloading missing banners.
