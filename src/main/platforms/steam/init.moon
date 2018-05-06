@@ -95,8 +95,8 @@ class Steam extends Platform
 	--
 	--   hash = crc32(path .. title)
 	--   hash = hash | 0x80000000
-    --   hash = hash << 32
-    --   hash = hash | 0x02000000
+	--   hash = hash << 32
+	--   hash = hash | 0x02000000
 	--
 	-- # Issues
 	-- Left-shifting by 32 is not feasible since it results in 0.
