@@ -563,13 +563,16 @@ end
 Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting Game handshake', gameID)
-    local game = nil
-    local _list_0 = STATE.ALL_GAMES
-    for _index_0 = 1, #_list_0 do
-      local candidate = _list_0[_index_0]
-      if candidate:getGameID() == gameID then
-        game = candidate
-        break
+    local game = STATE.ALL_GAMES[gameID]
+    if game == nil or game.gameID ~= gameID then
+      game = nil
+      local _list_0 = STATE.ALL_GAMES
+      for _index_0 = 1, #_list_0 do
+        local candidate = _list_0[_index_0]
+        if candidate:getGameID() == gameID then
+          game = candidate
+          break
+        end
       end
     end
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
@@ -579,9 +582,9 @@ Handshake = function(gameID)
     updateTitle(game, maxStringLength)
     updateBanner(game)
     local platform = nil
-    local _list_1 = STATE.ALL_PLATFORMS
-    for _index_0 = 1, #_list_1 do
-      local p = _list_1[_index_0]
+    local _list_0 = STATE.ALL_PLATFORMS
+    for _index_0 = 1, #_list_0 do
+      local p = _list_0[_index_0]
       if p:getPlatformID() == game:getPlatformID() then
         platform = p
         break

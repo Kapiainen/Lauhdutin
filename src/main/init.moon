@@ -646,11 +646,13 @@ export UpdateGame = (gameID) ->
 			if gameID ~= nil
 				games = io.readJSON(STATE.PATHS.GAMES)
 				games = games.games
-				game = nil
-				for args in *games
-					if args.gameID == gameID
-						game = Game(args)
-						break
+				game = games[gameID] -- gameID should also be the index of the game since the games table in games.json should be sorted according to the gameIDs.
+				if game == nil or game.gameID ~= gameID
+					game = nil
+					for args in *games
+						if args.gameID == gameID
+							game = Game(args)
+							break
 				assert(game ~= nil, 'main.init.UpdateGame')
 				COMPONENTS.LIBRARY\update(game)
 	)

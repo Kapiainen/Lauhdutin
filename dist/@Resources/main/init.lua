@@ -879,12 +879,15 @@ UpdateGame = function(gameID)
     if gameID ~= nil then
       local games = io.readJSON(STATE.PATHS.GAMES)
       games = games.games
-      local game = nil
-      for _index_0 = 1, #games do
-        local args = games[_index_0]
-        if args.gameID == gameID then
-          game = Game(args)
-          break
+      local game = games[gameID]
+      if game == nil or game.gameID ~= gameID then
+        game = nil
+        for _index_0 = 1, #games do
+          local args = games[_index_0]
+          if args.gameID == gameID then
+            game = Game(args)
+            break
+          end
         end
       end
       assert(game ~= nil, 'main.init.UpdateGame')

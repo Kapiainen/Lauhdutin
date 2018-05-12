@@ -434,11 +434,13 @@ export Handshake = (gameID) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Game handshake', gameID)
-			game = nil
-			for candidate in *STATE.ALL_GAMES
-				if candidate\getGameID() == gameID
-					game = candidate
-					break
+			game = STATE.ALL_GAMES[gameID]
+			if game == nil or game.gameID ~= gameID
+				game = nil
+				for candidate in *STATE.ALL_GAMES
+					if candidate\getGameID() == gameID
+						game = candidate
+						break
 			assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
 			STATE.GAME = game
 			valueMeter = SKIN\GetMeter('PageTitle')

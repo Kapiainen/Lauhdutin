@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 11 - 2018/MM/DD:**
 - Updated the Library class to serialize the list of games in a sorted state.
+- Updated Main and Game configs to make use of serialized games being sorted.
 
 **Version 3.0.0 beta 10 - 2018/05/04:**
 - Updated translations to improve compatibility with various languages.
