@@ -141,7 +141,7 @@ do
     end,
     save = function(self, games)
       if games == nil then
-        games = self.games
+        games = self.gamesSortedByGameID
       end
       return io.writeJSON(self.path, {
         version = self.version,
@@ -199,6 +199,10 @@ do
         table.insert(self.games, game)
       end
       self.oldGames = nil
+      self.gamesSortedByGameID = table.shallowCopy(self.games)
+      return table.sort(self.gamesSortedByGameID, function(a, b)
+        return a.gameID < b.gameID
+      end)
     end,
     update = function(self, updatedGame)
       local gameID = updatedGame:getGameID()
@@ -595,7 +599,7 @@ do
         self.backupFilePattern = 'games_backup_%d.json'
         self.games = { }
         self.oldGames = self:load()
-        self.currentGameID = 0
+        self.currentGameID = 1
       else
         local games = io.readJSON(self.path)
         do
@@ -613,6 +617,7 @@ do
       end
       self.filterStack = { }
       self.processedGames = nil
+      self.gamesSortedByGameID = nil
     end,
     __base = _base_0,
     __name = "Library"

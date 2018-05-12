@@ -70,13 +70,14 @@ class Library
 			@backupFilePattern = 'games_backup_%d.json'
 			@games = {}
 			@oldGames = @load()
-			@currentGameID = 0
+			@currentGameID = 1
 		else
 			games = io.readJSON(@path)
 			@games = [Game(args) for args in *games.games]
 			@oldGames = {}
 		@filterStack = {}
 		@processedGames = nil
+		@gamesSortedByGameID = nil
 
 	createBackup: (path) =>
 		games = io.readJSON(path)
@@ -113,10 +114,11 @@ class Library
 				return games
 		return {}
 
-	save: (games = @games) => io.writeJSON(@path, {
-		version: @version
-		games: games
-	})
+	save: (games = @gamesSortedByGameID) =>
+		io.writeJSON(@path, {
+			version: @version
+			games: games
+		})
 
 	migrate: (games, version) =>
 		assert(type(version) == 'number' and version % 1 == 0, 'shared.library.Library.migrate')
@@ -153,6 +155,8 @@ class Library
 			@currentGameID += 1
 			table.insert(@games, game)
 		@oldGames = nil
+		@gamesSortedByGameID = table.shallowCopy(@games)
+		table.sort(@gamesSortedByGameID, (a, b) -> return a.gameID < b.gameID)
 
 	update: (updatedGame) =>
 		gameID = updatedGame\getGameID()

@@ -1,3 +1,6 @@
+**Version 3.0.0 beta 11 - 2018/MM/DD:**
+- Updated the Library class to serialize the list of games in a sorted state.
+
 **Version 3.0.0 beta 10 - 2018/05/04:**
 - Updated translations to improve compatibility with various languages.
 - Updated Steam settings page to remove unsupported characters from the profile names of detected accounts.
