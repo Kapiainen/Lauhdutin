@@ -651,10 +651,10 @@ export UpdateGame = (gameID) ->
 					game = nil
 					for args in *games
 						if args.gameID == gameID
-							game = Game(args)
+							game = args
 							break
 				assert(game ~= nil, 'main.init.UpdateGame')
-				COMPONENTS.LIBRARY\update(game)
+				COMPONENTS.LIBRARY\update(Game(game))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

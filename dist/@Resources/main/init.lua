@@ -885,13 +885,13 @@ UpdateGame = function(gameID)
         for _index_0 = 1, #games do
           local args = games[_index_0]
           if args.gameID == gameID then
-            game = Game(args)
+            game = args
             break
           end
         end
       end
       assert(game ~= nil, 'main.init.UpdateGame')
-      return COMPONENTS.LIBRARY:update(game)
+      return COMPONENTS.LIBRARY:update(Game(game))
     end
   end)
   if not (success) then
