@@ -62,7 +62,7 @@ do
       return self:update()
     end,
     update = function(self)
-      if self.property then
+      if self.property ~= nil then
         if self.property.update ~= nil then
           self.property.value = self.property:update()
         end
@@ -77,15 +77,15 @@ do
         end
         return 
       end
-      SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" ""]'):format(self.index))
-      SKIN:Bang(('[!SetOption "Slot%dValue" "Text" ""]'):format(self.index))
+      SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" " "]'):format(self.index))
+      SKIN:Bang(('[!SetOption "Slot%dValue" "Text" " "]'):format(self.index))
       return SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]'):format(self.index))
     end,
     hasAction = function(self)
-      return self.property.action ~= nil
+      return self.property ~= nil and self.property.action ~= nil
     end,
     action = function(self)
-      if self.property.action == nil then
+      if self.property == nil or self.property.action == nil then
         return 
       end
       return self.property:action(self.index)
@@ -619,7 +619,7 @@ Handshake = function(gameID)
   end
 end
 Scroll = function(direction)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   local index = STATE.SCROLL_INDEX + direction
@@ -633,17 +633,17 @@ Scroll = function(direction)
   return updateSlots()
 end
 MouseOver = function(index)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   STATE.HIGHLIGHTED_SLOT_INDEX = index
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
 end
 MouseLeave = function(index)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   if index == 0 then
@@ -656,19 +656,13 @@ MouseLeave = function(index)
   end
 end
 MouseLeftPress = function(index)
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
 end
 ButtonAction = function(index)
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
@@ -802,7 +796,7 @@ OnCreatedTag = function(tag)
     STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
     STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
     local createProperty = table.remove(STATE.TAG_PROPERTIES, 1)
-    table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, ENUMS.TAG_STATES.ENABLED))
+    table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, STATE.GAME_TAGS[tag]))
     table.sort(STATE.TAG_PROPERTIES, sortPropertiesByTitle)
     table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
     updateScrollbar()

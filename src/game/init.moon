@@ -49,7 +49,7 @@ class Slot
 		@update()
 
 	update: () =>
-		if @property
+		if @property ~= nil
 			@property.value = @property\update() if @property.update ~= nil
 			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
 			value = utility.replaceUnsupportedChars(@property.value)
@@ -60,14 +60,14 @@ class Slot
 			else
 				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]')\format(@index))
 			return
-		SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" ""]')\format(@index))
-		SKIN\Bang(('[!SetOption "Slot%dValue" "Text" ""]')\format(@index))
+		SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" " "]')\format(@index))
+		SKIN\Bang(('[!SetOption "Slot%dValue" "Text" " "]')\format(@index))
 		SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]')\format(@index))
 
-	hasAction: () => return @property.action ~= nil
+	hasAction: () => return @property ~= nil and @property.action ~= nil
 
 	action: () =>
-		return if @property.action == nil
+		return if @property == nil or @property.action == nil
 		@property\action(@index)
 
 Game = nil
@@ -476,7 +476,7 @@ export Handshake = (gameID) ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export Scroll = (direction) ->
-	return unless COMPONENTS.SLOTS
+	return unless COMPONENTS.SLOTS ~= nil
 	index = STATE.SCROLL_INDEX + direction
 	if index < 1
 		return
@@ -487,13 +487,13 @@ export Scroll = (direction) ->
 	updateSlots()
 
 export MouseOver = (index) ->
-	return unless COMPONENTS.SLOTS
+	return unless COMPONENTS.SLOTS ~= nil
 	STATE.HIGHLIGHTED_SLOT_INDEX = index
-	return unless COMPONENTS.SLOTS[index]\hasAction()
+	return unless COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]\hasAction()
 	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
 
 export MouseLeave = (index) ->
-	return unless COMPONENTS.SLOTS
+	return unless COMPONENTS.SLOTS ~= nil
 	if index == 0
 		STATE.HIGHLIGHTED_SLOT_INDEX = 0
 		for i = index, STATE.NUM_SLOTS
@@ -502,13 +502,11 @@ export MouseLeave = (index) ->
 		SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
 
 export MouseLeftPress = (index) ->
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
+	return unless COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]\hasAction()
 	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
 
 export ButtonAction = (index) ->
-	return unless COMPONENTS.SLOTS
-	return unless COMPONENTS.SLOTS[index]\hasAction()
+	return unless COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]\hasAction()
 	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
 	COMPONENTS.SLOTS[index]\action()
 	updateSlots()
@@ -616,7 +614,7 @@ export OnCreatedTag = (tag) ->
 			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
 			STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
 			createProperty = table.remove(STATE.TAG_PROPERTIES, 1)
-			table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, ENUMS.TAG_STATES.ENABLED))
+			table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, STATE.GAME_TAGS[tag]))
 			table.sort(STATE.TAG_PROPERTIES, sortPropertiesByTitle)
 			table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
 			updateScrollbar()
