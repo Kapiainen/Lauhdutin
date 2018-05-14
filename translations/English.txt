@@ -62,6 +62,7 @@ overlay_hours_played	%.0f hours played
 overlay_install	Install
 overlay_platform_not_running	%s is not running
 overlay_remove	Remove
+overlay_single_hour_played	%.0f hour played
 overlay_unhide	Unhide
 overlay_uninstalled	Uninstalled
 platform_name_windows_shortcut	Windows shortcut

@@ -61,7 +61,12 @@ do
           SKIN:Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
         end
         if info == '' then
-          info = self.hoursPlayed:format(game:getHoursPlayed())
+          local numHoursPlayed = math.round(game:getHoursPlayed())
+          if numHoursPlayed == 1 then
+            info = self.singleHourPlayed:format(numHoursPlayed)
+          else
+            info = self.hoursPlayed:format(numHoursPlayed)
+          end
         end
         local text = ('%s#CRLF##CRLF##CRLF##CRLF#%s'):format(utility.replaceUnsupportedChars(game:getTitle()), info)
         SKIN:Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]'):format(text))
@@ -84,6 +89,7 @@ do
       self.contextSensitive = settings:getSlotsOverlayEnabled()
       self.platformNotRunning = LOCALIZATION:get('overlay_platform_not_running', '%s is not running')
       self.hoursPlayed = LOCALIZATION:get('overlay_hours_played', '%.0f hours played')
+      self.singleHourPlayed = LOCALIZATION:get('overlay_single_hour_played', '%.0f hour played')
       self.installGame = LOCALIZATION:get('overlay_install', 'Install')
       self.hideGame = LOCALIZATION:get('overlay_hide', 'Hide')
       self.alreadyHidden = LOCALIZATION:get('overlay_already_hidden', 'Already hidden')

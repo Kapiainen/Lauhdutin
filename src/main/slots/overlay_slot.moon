@@ -15,6 +15,7 @@ class OverlaySlot
 		@contextSensitive = settings\getSlotsOverlayEnabled()
 		@platformNotRunning = LOCALIZATION\get('overlay_platform_not_running', '%s is not running')
 		@hoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
+		@singleHourPlayed = LOCALIZATION\get('overlay_single_hour_played', '%.0f hour played')
 		@installGame = LOCALIZATION\get('overlay_install', 'Install')
 		@hideGame = LOCALIZATION\get('overlay_hide', 'Hide')
 		@alreadyHidden = LOCALIZATION\get('overlay_already_hidden', 'Already hidden')
@@ -66,7 +67,11 @@ class OverlaySlot
 			else
 				SKIN\Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
 			if info == ''
-				info = @hoursPlayed\format(game\getHoursPlayed())
+				numHoursPlayed = math.round(game\getHoursPlayed())
+				if numHoursPlayed == 1
+					info = @singleHourPlayed\format(numHoursPlayed)
+				else
+					info = @hoursPlayed\format(numHoursPlayed)
 			text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(game\getTitle()), info)
 			SKIN\Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]')\format(text))
 		slot = SKIN\GetMeter(('Slot%dImage')\format(index))
