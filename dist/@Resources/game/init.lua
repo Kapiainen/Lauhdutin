@@ -463,12 +463,28 @@ createProperties = function(game, platform)
       tags[tag] = true
     end
     if tags then
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        for tag, fromPlatform in pairs(tags) do
+          _accum_0[_len_0] = {
+            tag = tag,
+            fromPlatform = fromPlatform
+          }
+          _len_0 = _len_0 + 1
+        end
+        tags = _accum_0
+      end
+      table.sort(tags, function(a, b)
+        return a.tag < b.tag
+      end)
       local str = ''
-      for tag, fromPlatform in pairs(tags) do
-        if fromPlatform then
-          str = str .. (' | %s*'):format(tag)
+      for _index_0 = 1, #tags do
+        local entry = tags[_index_0]
+        if entry.fromPlatform then
+          str = str .. (' | %s*'):format(entry.tag)
         else
-          str = str .. (' | %s'):format(tag)
+          str = str .. (' | %s'):format(entry.tag)
         end
       end
       str = str:sub(4)

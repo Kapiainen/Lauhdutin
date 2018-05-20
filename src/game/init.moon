@@ -351,12 +351,14 @@ createProperties = (game, platform) ->
 		for tag in *game\getPlatformTags()
 			tags[tag] = true
 		if tags
+			tags = [{tag: tag, fromPlatform: fromPlatform} for tag, fromPlatform in pairs(tags)]
+			table.sort(tags, (a, b) -> return a.tag < b.tag)
 			str = ''
-			for tag, fromPlatform in pairs(tags)
-				if fromPlatform
-					str ..= (' | %s*')\format(tag)
+			for entry in *tags
+				if entry.fromPlatform
+					str ..= (' | %s*')\format(entry.tag)
 				else
-					str ..= (' | %s')\format(tag)
+					str ..= (' | %s')\format(entry.tag)
 			str = str\sub(4)
 			if str ~= ''
 				return str
