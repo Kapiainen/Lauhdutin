@@ -18,6 +18,7 @@ STATE = {
   NUM_SLOTS = 0,
   SCROLL_INDEX = 1,
   SCROLL_STEP = 1,
+  SCROLL_INDEX_UPDATED = nil,
   LEFT_CLICK_ACTION = 1,
   PLATFORM_NAMES = { },
   PLATFORM_RUNNING_STATUS = { },
@@ -1121,6 +1122,106 @@ OnFinishedDownloadingBanners = function()
     log('Finished downloading banners')
     stopDownloader()
     return onInitialized()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+ReacquireBanner = function(gameID)
+  local success, err = pcall(function()
+    local games = io.readJSON(STATE.PATHS.GAMES)
+    games = games.games
+    local game = games[gameID]
+    if game == nil or game.gameID ~= gameID then
+      game = nil
+      for _index_0 = 1, #games do
+        local args = games[_index_0]
+        if args.gameID == gameID then
+          game = args
+          break
+        end
+      end
+    end
+    assert(game ~= nil, 'main.init.OnReacquireBanner')
+    game = Game(game)
+    log('Reacquiring a banner for', game:getTitle())
+    local platform = nil
+    local platforms
+    do
+      local _accum_0 = { }
+      local _len_0 = 1
+      local _list_0 = require('main.platforms')
+      for _index_0 = 1, #_list_0 do
+        local Platform = _list_0[_index_0]
+        _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
+        _len_0 = _len_0 + 1
+      end
+      platforms = _accum_0
+    end
+    local platformID = game:getPlatformID()
+    for _index_0 = 1, #platforms do
+      local p = platforms[_index_0]
+      if p:getPlatformID() == platformID then
+        platform = p
+        break
+      end
+    end
+    if platform == nil then
+      print("Failed to get platform", platformID)
+      return 
+    end
+    local url
+    local _exp_0 = platformID
+    if ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
+      local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+      url = platform:generateBannerURL(appID)
+    elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+      local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+      local galaxy = io.readFile(io.joinPaths(platform:getCachePath(), 'galaxy.txt'))
+      local productIDs = { }
+      productIDs[productID] = true
+      local titles, bannerURLs = platform:parseGalaxyDB(productIDs, galaxy)
+      url = bannerURLs[productID]
+    else
+      url = nil
+    end
+    if url == nil then
+      print("Failed to url", gameID)
+      return 
+    end
+    STATE.BANNER_QUEUE = {
+      game
+    }
+    local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
+    return downloadFile(url, bannerPath, 'OnBannerReacquisitionFinished', 'OnBannerReacquisitionError')
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnBannerReacquisitionFinished = function()
+  local success, err = pcall(function()
+    log('Successfully reacquired a banner')
+    local game = STATE.BANNER_QUEUE[1]
+    STATE.BANNER_QUEUE = nil
+    local downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN:GetMeasure('Downloader'):GetOption('DownloadFile'))
+    local bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game:getBanner())
+    os.remove(bannerPath)
+    os.rename(downloadedPath, bannerPath)
+    stopDownloader()
+    STATE.SCROLL_INDEX_UPDATED = false
+    SKIN:Bang('[!UpdateMeasure "Script"]')
+    return SKIN:Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnBannerReacquisitionError = function()
+  local success, err = pcall(function()
+    log('Failed to reacquire a banner')
+    STATE.BANNER_QUEUE = nil
+    return stopDownloader()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

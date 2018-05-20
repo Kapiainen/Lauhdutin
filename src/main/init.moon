@@ -22,6 +22,7 @@ export STATE = {
 	NUM_SLOTS: 0
 	SCROLL_INDEX: 1
 	SCROLL_STEP: 1
+	SCROLL_INDEX_UPDATED: nil
 	LEFT_CLICK_ACTION: 1
 	PLATFORM_NAMES: {}
 	PLATFORM_RUNNING_STATUS: {}
@@ -845,6 +846,79 @@ export OnFinishedDownloadingBanners = () ->
 			onInitialized()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
+
+export ReacquireBanner = (gameID) ->
+	success, err = pcall(
+		() ->
+			games = io.readJSON(STATE.PATHS.GAMES)
+			games = games.games
+			game = games[gameID]
+			if game == nil or game.gameID ~= gameID
+				game = nil
+				for args in *games
+					if args.gameID == gameID
+						game = args
+						break
+			assert(game ~= nil, 'main.init.OnReacquireBanner')
+			game = Game(game)
+			log('Reacquiring a banner for', game\getTitle())
+			platform = nil
+			platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+			platformID = game\getPlatformID()
+			for p in *platforms
+				if p\getPlatformID() == platformID
+					platform = p
+					break
+			if platform == nil
+				print("Failed to get platform", platformID)
+				return
+			url = switch platformID
+				when ENUMS.PLATFORM_IDS.STEAM
+					appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+					platform\generateBannerURL(appID)
+				when ENUMS.PLATFORM_IDS.GOG_GALAXY
+					productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+					galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
+					productIDs = {}
+					productIDs[productID] = true
+					titles, bannerURLs = platform\parseGalaxyDB(productIDs, galaxy)
+					bannerURLs[productID]
+				else nil
+			if url == nil
+				print("Failed to url", gameID)
+				return
+			STATE.BANNER_QUEUE = {game}
+			bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
+			downloadFile(url, bannerPath, 'OnBannerReacquisitionFinished', 'OnBannerReacquisitionError')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnBannerReacquisitionFinished = () ->
+	success, err = pcall(
+		() ->
+			log('Successfully reacquired a banner')
+			game = STATE.BANNER_QUEUE[1]
+			STATE.BANNER_QUEUE = nil
+			downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN\GetMeasure('Downloader')\GetOption('DownloadFile'))
+			bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game\getBanner())
+			os.remove(bannerPath)
+			os.rename(downloadedPath, bannerPath)
+			stopDownloader()
+			STATE.SCROLL_INDEX_UPDATED = false
+			SKIN\Bang('[!UpdateMeasure "Script"]')
+			SKIN\Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnBannerReacquisitionError = () ->
+	success, err = pcall(
+		() ->
+			log('Failed to reacquire a banner')
+			STATE.BANNER_QUEUE = nil
+			stopDownloader()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
 
 -- Context title action
 export ToggleHideGames = () ->
