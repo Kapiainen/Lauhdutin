@@ -793,7 +793,7 @@ OnCreatedTag = function(tag)
     if STATE.ALL_TAGS[tag] ~= nil then
       return 
     end
-    STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
+    STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
     STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
     local createProperty = table.remove(STATE.TAG_PROPERTIES, 1)
     table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, STATE.GAME_TAGS[tag]))

@@ -611,7 +611,7 @@ export OnCreatedTag = (tag) ->
 		() ->
 			tag = tag\sub(1, -2)
 			return if STATE.ALL_TAGS[tag] ~= nil
-			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
+			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
 			STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
 			createProperty = table.remove(STATE.TAG_PROPERTIES, 1)
 			table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, STATE.GAME_TAGS[tag]))
