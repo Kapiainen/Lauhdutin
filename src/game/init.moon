@@ -421,6 +421,20 @@ createStoppingBangsProperty = (game) ->
 		update: f
 	})
 
+createBannerReacquisitionProperty = (game) ->
+	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
+	switch game\getPlatformID()
+		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
+			if game\getPlatformOverride() == nil
+				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
+	return Property({
+		title: LOCALIZATION\get('button_label_reacquire_banner', 'Reacquire banner')
+		:value
+		action: () ->
+			SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+		update: nil
+	})
+
 createProperties = (game, platform) ->
 	return {
 		createPlatformProperty(game, platform)
@@ -435,6 +449,7 @@ createProperties = (game, platform) ->
 		createIgnoresOtherBangsProperty(game)
 		createStartingBangsProperty(game)
 		createStoppingBangsProperty(game)
+		createBannerReacquisitionProperty(game)
 	}
 
 export Handshake = (gameID) ->
@@ -693,5 +708,12 @@ export OnEditedNotes = () ->
 			notes = io.readFile(STATE.PATHS.NOTES)
 			STATE.GAME\setNotes(notes)
 			updateSlots()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnReacquiredBanner = () ->
+	success, err = pcall(
+		() ->
+			updateBanner(STATE.GAME)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

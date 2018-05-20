@@ -621,6 +621,24 @@ createStoppingBangsProperty = function(game)
     update = f
   })
 end
+local createBannerReacquisitionProperty
+createBannerReacquisitionProperty = function(game)
+  local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
+  local _exp_0 = game:getPlatformID()
+  if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+    if game:getPlatformOverride() == nil then
+      value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
+    end
+  end
+  return Property({
+    title = LOCALIZATION:get('button_label_reacquire_banner', 'Reacquire banner'),
+    value = value,
+    action = function()
+      return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+    end,
+    update = nil
+  })
+end
 local createProperties
 createProperties = function(game, platform)
   return {
@@ -635,7 +653,8 @@ createProperties = function(game, platform)
     createTagsProperty(game),
     createIgnoresOtherBangsProperty(game),
     createStartingBangsProperty(game),
-    createStoppingBangsProperty(game)
+    createStoppingBangsProperty(game),
+    createBannerReacquisitionProperty(game)
   }
 end
 Handshake = function(gameID)
@@ -954,6 +973,14 @@ OnEditedNotes = function()
     local notes = io.readFile(STATE.PATHS.NOTES)
     STATE.GAME:setNotes(notes)
     return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnReacquiredBanner = function()
+  local success, err = pcall(function()
+    return updateBanner(STATE.GAME)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
