@@ -373,6 +373,7 @@ createProperties = (game, platform) ->
 					STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
 				for tag in *game\getPlatformTags()
 					STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
+				SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_accept', 'Accept')))
 				STATE.TAG_PROPERTIES = createTagProperties()
 				STATE.PROPERTIES = STATE.TAG_PROPERTIES
 				STATE.PREVIOUS_SCROLL_INDEX = STATE.SCROLL_INDEX
@@ -514,6 +515,8 @@ export ButtonAction = (index) ->
 	updateSlots()
 
 showDefaultProperties = () ->
+	SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
+	SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
 	STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
 	STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
 	STATE.PREVIOUS_SCROLL_INDEX = 1
