@@ -685,6 +685,14 @@ ButtonAction = function(index)
   COMPONENTS.SLOTS[index]:action()
   return updateSlots()
 end
+local showDefaultProperties
+showDefaultProperties = function()
+  STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
+  STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
+  STATE.PREVIOUS_SCROLL_INDEX = 1
+  updateScrollbar()
+  return updateSlots()
+end
 Save = function()
   local success, err = pcall(function()
     local _exp_0 = STATE.PROPERTIES
@@ -707,11 +715,7 @@ Save = function()
         end
         return _accum_0
       end)())
-      STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-      STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-      STATE.PREVIOUS_SCROLL_INDEX = 1
-      updateScrollbar()
-      return updateSlots()
+      return showDefaultProperties()
     end
   end)
   if not (success) then
@@ -724,11 +728,7 @@ Cancel = function()
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       return SKIN:Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
     elseif STATE.TAG_PROPERTIES == _exp_0 then
-      STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-      STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-      STATE.PREVIOUS_SCROLL_INDEX = 1
-      updateScrollbar()
-      return updateSlots()
+      return showDefaultProperties()
     end
   end)
   if not (success) then

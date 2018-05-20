@@ -513,6 +513,13 @@ export ButtonAction = (index) ->
 	COMPONENTS.SLOTS[index]\action()
 	updateSlots()
 
+showDefaultProperties = () ->
+	STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
+	STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
+	STATE.PREVIOUS_SCROLL_INDEX = 1
+	updateScrollbar()
+	updateSlots()
+
 export Save = () ->
 	success, err = pcall(
 		() ->
@@ -523,11 +530,7 @@ export Save = () ->
 					SKIN\Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]')\format(gameID))
 				when STATE.TAG_PROPERTIES
 					STATE.GAME\setTags([tag for tag, state in pairs(STATE.GAME_TAGS) when state == ENUMS.TAG_STATES.ENABLED])
-					STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-					STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-					STATE.PREVIOUS_SCROLL_INDEX = 1
-					updateScrollbar()
-					updateSlots()
+					showDefaultProperties()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -538,11 +541,7 @@ export Cancel = () ->
 				when STATE.DEFAULT_PROPERTIES
 					SKIN\Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
 				when STATE.TAG_PROPERTIES
-					STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-					STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-					STATE.PREVIOUS_SCROLL_INDEX = 1
-					updateScrollbar()
-					updateSlots()
+					showDefaultProperties()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
