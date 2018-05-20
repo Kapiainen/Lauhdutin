@@ -389,7 +389,7 @@ GameProcessTerminated = function(game)
 end
 ManuallyTerminateGameProcess = function()
   local success, err = pcall(function()
-    return COMPONENTS.PROCESS:stopMonitoring(false)
+    return COMPONENTS.PROCESS:stopMonitoring()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

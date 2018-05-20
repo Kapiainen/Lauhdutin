@@ -58,16 +58,17 @@ class Process
 		@currentGame = game
 		process = game\getProcess()
 		log('Monitoring process', process)
+		@duration = 0
+		@startingTime = os.time()
 		return if process == nil
 		@gameStatus = false
 		@monitoring = true
 		assert(type(process) == 'string', 'main.process.Process.monitor')
-		@duration = 0
-		@startingTime = os.time()
 		SKIN\Bang(('[!SetOption "Process" "ProcessName" "%s"]')\format(process))
 		SKIN\Bang('[!SetOption "Process" "UpdateDivider" "63"]')
 
 	stopMonitoring: () =>
+		return if @currentGame == nil
 		@gameStatus = false
 		@monitoring = false
 		@duration = os.time() - @startingTime

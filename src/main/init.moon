@@ -309,7 +309,7 @@ export GameProcessTerminated = (game) ->
 export ManuallyTerminateGameProcess = () ->
 	success, err = pcall(
 		() ->
-			COMPONENTS.PROCESS\stopMonitoring(false)
+			COMPONENTS.PROCESS\stopMonitoring()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

@@ -63,18 +63,21 @@ do
       self.currentGame = game
       local process = game:getProcess()
       log('Monitoring process', process)
+      self.duration = 0
+      self.startingTime = os.time()
       if process == nil then
         return 
       end
       self.gameStatus = false
       self.monitoring = true
       assert(type(process) == 'string', 'main.process.Process.monitor')
-      self.duration = 0
-      self.startingTime = os.time()
       SKIN:Bang(('[!SetOption "Process" "ProcessName" "%s"]'):format(process))
       return SKIN:Bang('[!SetOption "Process" "UpdateDivider" "63"]')
     end,
     stopMonitoring = function(self)
+      if self.currentGame == nil then
+        return 
+      end
       self.gameStatus = false
       self.monitoring = false
       self.duration = os.time() - self.startingTime
