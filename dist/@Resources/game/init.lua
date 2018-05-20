@@ -19,6 +19,7 @@ STATE = {
   GAME = nil,
   ALL_GAMES = nil,
   GAMES_VERSION = nil,
+  ALL_TAGS = nil,
   ALL_PLATFORMS = nil,
   HIGHLIGHTED_SLOT_INDEX = 0,
   CENTERED = false
@@ -125,6 +126,39 @@ additionalEnums = function()
     MAX = 4
   }
 end
+local getGamesAndTags
+getGamesAndTags = function()
+  local games = io.readJSON(STATE.PATHS.GAMES)
+  STATE.GAMES_VERSION = games.version
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = games.games
+    for _index_0 = 1, #_list_0 do
+      local args = _list_0[_index_0]
+      _accum_0[_len_0] = Game(args)
+      _len_0 = _len_0 + 1
+    end
+    STATE.ALL_GAMES = _accum_0
+  end
+  if STATE.ALL_TAGS == nil then
+    STATE.ALL_TAGS = { }
+    local _list_0 = STATE.ALL_GAMES
+    for _index_0 = 1, #_list_0 do
+      local game = _list_0[_index_0]
+      local _list_1 = game:getTags()
+      for _index_1 = 1, #_list_1 do
+        local tag = _list_1[_index_1]
+        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+      end
+      local _list_2 = game:getPlatformTags()
+      for _index_1 = 1, #_list_2 do
+        local tag = _list_2[_index_1]
+        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+      end
+    end
+  end
+end
 Initialize = function()
   SKIN:Bang('[!Hide]')
   STATE.PATHS.RESOURCES = SKIN:GetVariable('@')
@@ -151,36 +185,9 @@ Initialize = function()
       end
       STATE.ALL_PLATFORMS = _accum_0
     end
-    local games = io.readJSON(STATE.PATHS.GAMES)
-    STATE.GAMES_VERSION = games.version
-    do
-      local _accum_0 = { }
-      local _len_0 = 1
-      local _list_0 = games.games
-      for _index_0 = 1, #_list_0 do
-        local args = _list_0[_index_0]
-        _accum_0[_len_0] = Game(args)
-        _len_0 = _len_0 + 1
-      end
-      STATE.ALL_GAMES = _accum_0
-    end
+    getGamesAndTags()
     STATE.NUM_SLOTS = 4
     STATE.SCROLL_INDEX = 1
-    STATE.ALL_TAGS = { }
-    local _list_0 = STATE.ALL_GAMES
-    for _index_0 = 1, #_list_0 do
-      local game = _list_0[_index_0]
-      local _list_1 = game:getTags()
-      for _index_1 = 1, #_list_1 do
-        local tag = _list_1[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
-      local _list_2 = game:getPlatformTags()
-      for _index_1 = 1, #_list_2 do
-        local tag = _list_2[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
-    end
     local valueMeter = SKIN:GetMeter('Slot1Value')
     local maxValueStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
     do
@@ -580,6 +587,7 @@ end
 Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting Game handshake', gameID)
+    getGamesAndTags()
     local game = STATE.ALL_GAMES[gameID]
     if game == nil or game.gameID ~= gameID then
       game = nil

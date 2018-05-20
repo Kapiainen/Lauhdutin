@@ -21,6 +21,7 @@ export STATE = {
 	GAME: nil
 	ALL_GAMES: nil
 	GAMES_VERSION: nil
+	ALL_TAGS: nil
 	ALL_PLATFORMS: nil
 	HIGHLIGHTED_SLOT_INDEX: 0
 	CENTERED: false
@@ -82,6 +83,18 @@ additionalEnums = () ->
 		MAX: 4
 	}
 
+getGamesAndTags = () ->
+	games = io.readJSON(STATE.PATHS.GAMES)
+	STATE.GAMES_VERSION = games.version
+	STATE.ALL_GAMES = [Game(args) for args in *games.games]
+	if STATE.ALL_TAGS == nil
+		STATE.ALL_TAGS = {}
+		for game in *STATE.ALL_GAMES
+			for tag in *game\getTags()
+				STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+			for tag in *game\getPlatformTags()
+				STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
 	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
@@ -99,17 +112,9 @@ export Initialize = () ->
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			Game = require('main.game')
 			STATE.ALL_PLATFORMS = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
-			games = io.readJSON(STATE.PATHS.GAMES)
-			STATE.GAMES_VERSION = games.version
-			STATE.ALL_GAMES = [Game(args) for args in *games.games]
+			getGamesAndTags()
 			STATE.NUM_SLOTS = 4
 			STATE.SCROLL_INDEX = 1
-			STATE.ALL_TAGS = {}
-			for game in *STATE.ALL_GAMES
-				for tag in *game\getTags()
-					STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-				for tag in *game\getPlatformTags()
-					STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
 			valueMeter = SKIN\GetMeter('Slot1Value')
 			maxValueStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
 			COMPONENTS.SLOTS = [Slot(i, maxValueStringLength) for i = 1, STATE.NUM_SLOTS]
@@ -437,6 +442,7 @@ export Handshake = (gameID) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Game handshake', gameID)
+			getGamesAndTags()
 			game = STATE.ALL_GAMES[gameID]
 			if game == nil or game.gameID ~= gameID
 				game = nil

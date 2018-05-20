@@ -7,6 +7,7 @@
 - Fixed a bug in the Game config's slots when all of them cannot be filled.
 - Fixed a bug that caused an error when manually executing stopping bangs while the skin is not monitoring a game process.
 - Fixed a bug that caused newly created tags, which had been disabled, to become enabled when viewing the list of tags.
+- Fixed a bug that caused unsaved changes, which had been made to one game, to be saved when another game was inspected via the Game config without closing the Game config first.
 
 **Version 3.0.0 beta 10 - 2018/05/04:**
 - Updated translations to improve compatibility with various languages.
