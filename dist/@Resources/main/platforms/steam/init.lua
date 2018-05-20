@@ -309,6 +309,9 @@ do
       lastPlayed = tonumber(app.lastplayed)
       return lastPlayed
     end,
+    generateBannerURL = function(self, appID)
+      return ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
+    end,
     getBanner = function(self, appID)
       local banner = self:getBannerPath(appID)
       if banner then
@@ -325,7 +328,7 @@ do
         end
       end
       banner = io.joinPaths(self.cachePath, appID .. '.jpg')
-      local bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
+      local bannerURL = self:generateBannerURL(appID)
       return banner, bannerURL
     end,
     getPath = function(self, appID)
