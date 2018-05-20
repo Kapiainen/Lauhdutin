@@ -1,8 +1,8 @@
 **Version 3.0.0 beta 11 - 2018/MM/DD:**
 - Updated the Library class to serialize the list of games in a sorted state.
-- Updated Main and Game configs to make use of serialized games being sorted.
+- Updated the Main and Game configs to make use of serialized games being sorted.
 - Updated the slot overlay and added a translation string to improve compatibility with some languages.
-- Updated Game config to have the tags sorted alphabetically in the preview.
+- Updated the Game config to have the tags sorted alphabetically in the preview.
 - Refactored parts of the Game config.
 - Fixed a bug in the Game config's slots when all of them cannot be filled.
 - Fixed a bug that caused an error when manually executing stopping bangs while the skin is not monitoring a game process.
