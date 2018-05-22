@@ -1014,7 +1014,7 @@ export TriggerGameDetection = () ->
 	success, err = pcall(
 		() ->
 			games = io.readJSON(STATE.PATHS.GAMES)
-			games.modified = nil
+			games.updated = nil
 			io.writeJSON(STATE.PATHS.GAMES, games)
 			SKIN\Bang("[!Refresh]")
 	)

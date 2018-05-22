@@ -1346,7 +1346,7 @@ end
 TriggerGameDetection = function()
   local success, err = pcall(function()
     local games = io.readJSON(STATE.PATHS.GAMES)
-    games.modified = nil
+    games.updated = nil
     io.writeJSON(STATE.PATHS.GAMES, games)
     return SKIN:Bang("[!Refresh]")
   end)
