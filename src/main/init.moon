@@ -113,8 +113,8 @@ startDetectingPlatformGames = () ->
 		else
 			assert(nil, 'main.init.startDetectingPlatformGames')
 
-detectGames = () ->
-	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
+detectPlatforms = () ->
+	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_platforms', 'Detecting platforms'))
 	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
 	log('Num platforms:', #platforms)
 	COMPONENTS.PROCESS\registerPlatforms(platforms)
@@ -130,6 +130,9 @@ detectGames = () ->
 		table.insert(STATE.PLATFORM_QUEUE, platform) if enabled
 		log(' ' .. STATE.PLATFORM_NAMES[platformID] .. ' = ' .. tostring(enabled))
 	assert(#STATE.PLATFORM_QUEUE > 0, 'There are no enabled platforms.')
+
+detectGames = () ->
+	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
 	STATE.BANNER_QUEUE = {}
 	startDetectingPlatformGames()
 
@@ -180,7 +183,6 @@ onInitialized = () ->
 	if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE
 		COMPONENTS.ANIMATIONS\pushSkinSlide(animationType, false)
 		setUpdateDivider(1)
-	COMPONENTS.PROCESS\update()
 	log('Skin initialized')
 
 additionalEnums = () ->
@@ -217,14 +219,19 @@ export Initialize = () ->
 			SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_hiding_games', 'Start hiding games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
+			SKIN\Bang(('[!SetVariable "ContextTitleDetectGames" "%s"]')\format(LOCALIZATION\get('main_context_title_detect_games', 'Detect games')))
 			COMPONENTS.TOOLBAR = require('main.toolbar')(COMPONENTS.SETTINGS)
 			COMPONENTS.TOOLBAR\hide()
 			COMPONENTS.ANIMATIONS = require('main.animations')()
 			STATE.NUM_SLOTS = COMPONENTS.SETTINGS\getLayoutRows() * COMPONENTS.SETTINGS\getLayoutColumns()
 			COMPONENTS.SLOTS = require('main.slots')(COMPONENTS.SETTINGS)
-			COMPONENTS.LIBRARY = require('shared.library')(COMPONENTS.SETTINGS)
 			COMPONENTS.PROCESS = require('main.process')()
-			detectGames()
+			COMPONENTS.LIBRARY = require('shared.library')(COMPONENTS.SETTINGS)
+			detectPlatforms()
+			if COMPONENTS.LIBRARY\getDetectGames() == true
+				detectGames()
+			else
+				onInitialized()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -1002,3 +1009,13 @@ export ToggleRemoveGames = () ->
 			STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
+
+export TriggerGameDetection = () ->
+	success, err = pcall(
+		() ->
+			games = io.readJSON(STATE.PATHS.GAMES)
+			games.modified = nil
+			io.writeJSON(STATE.PATHS.GAMES, games)
+			SKIN\Bang("[!Refresh]")
+	)
+	COMPONENTS.STATUS\show(err, true) unless success	

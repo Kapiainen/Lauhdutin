@@ -130,6 +130,7 @@ local getGamesAndTags
 getGamesAndTags = function()
   local games = io.readJSON(STATE.PATHS.GAMES)
   STATE.GAMES_VERSION = games.version
+  STATE.GAMES_MODIFICATION_TIME = games.modified or os.date('*t')
   do
     local _accum_0 = { }
     local _len_0 = 1
@@ -783,7 +784,8 @@ Save = function()
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       io.writeJSON(STATE.PATHS.GAMES, {
         version = STATE.GAMES_VERSION,
-        games = STATE.ALL_GAMES
+        games = STATE.ALL_GAMES,
+        modified = STATE.GAMES_MODIFICATION_TIME
       })
       local gameID = STATE.GAME:getGameID()
       return SKIN:Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]'):format(gameID))

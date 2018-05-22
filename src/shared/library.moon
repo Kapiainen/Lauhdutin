@@ -65,19 +65,30 @@ class Library
 		assert(type(regularMode) == 'boolean', 'shared.library.Library')
 		@version = 1
 		@path = 'games.json'
-		if regularMode
-			@numBackups = settings\getNumberOfBackups()
-			@backupFilePattern = 'games_backup_%d.json'
-			@games = {}
-			@oldGames = @load()
-			@currentGameID = 1
-		else
-			games = io.readJSON(@path)
-			@games = [Game(args) for args in *games.games]
-			@oldGames = {}
+		games = if io.fileExists(@path) then io.readJSON(@path) else {}
+		@currentGameID = 1
+		@numBackups = settings\getNumberOfBackups()
+		@backupFilePattern = 'games_backup_%d.json'
 		@filterStack = {}
 		@processedGames = nil
 		@gamesSortedByGameID = nil
+		@detectGames = false
+		if regularMode
+			date = os.date('*t')
+			modified = games.modified or {}
+			if modified.year == date.year and modified.month == date.month and modified.day == date.day
+				@games = [Game(args) for args in *games.games]
+				@oldGames = {}
+			else
+				@games = {}
+				@oldGames = @load()
+				@detectGames = true
+		else
+			@games = [Game(args) for args in *games.games]
+			@oldGames = {}
+
+	getDetectGames: () =>
+		return @detectGames
 
 	createBackup: (path) =>
 		games = io.readJSON(path)
@@ -119,6 +130,7 @@ class Library
 		io.writeJSON(@path, {
 			version: @version
 			games: games
+			modified: os.date('*t')
 		})
 
 	migrate: (games, version) =>
