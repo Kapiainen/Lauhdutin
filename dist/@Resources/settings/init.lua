@@ -245,7 +245,7 @@ OnLanguagesListed = function()
   if not (io.fileExists('cache\\languages.txt')) then
     return utility.runLastCommand()
   end
-  local setting = COMPONENTS.SLOTS:getSetting(COMPONENTS.SLOTS:getNumSettings() - 2)
+  local setting = COMPONENTS.SLOTS:getSetting(COMPONENTS.SLOTS:getNumSettings() - 3)
   setting:setValues()
   COMPONENTS.SLOTS:scroll()
   return COMPONENTS.STATUS:hide()

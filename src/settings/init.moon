@@ -208,7 +208,7 @@ export EditFolderPath = (index, path) ->
 export OnLanguagesListed = () ->
 	unless io.fileExists('cache\\languages.txt')
 		return utility.runLastCommand()
-	setting = COMPONENTS.SLOTS\getSetting(COMPONENTS.SLOTS\getNumSettings() - 2)
+	setting = COMPONENTS.SLOTS\getSetting(COMPONENTS.SLOTS\getNumSettings() - 3) -- Magic number offset
 	setting\setValues()
 	COMPONENTS.SLOTS\scroll()
 	COMPONENTS.STATUS\hide()
@@ -216,7 +216,7 @@ export OnLanguagesListed = () ->
 export OnSteamUsersListed = () ->
 	unless io.fileExists('cache\\steam\\completed.txt')
 		return utility.runLastCommand()
-	COMPONENTS.SLOTS\getSetting(3)\setValues()
+	COMPONENTS.SLOTS\getSetting(3)\setValues() -- Magic number offset
 	COMPONENTS.SLOTS\scroll()
 
 export CycleSpinner = (index, direction) -> COMPONENTS.SLOTS\cycleSpinner(index, direction)

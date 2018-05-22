@@ -119,6 +119,17 @@ state.skinAnimations = {
     displayValue = LOCALIZATION:get('setting_animation_label_slide_left', 'Slide to the left')
   }
 }
+state.gameDetectionFrequencies = {
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_never', 'Never')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_always', 'Always')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_once_per_day', 'Once per day')
+  }
+}
 local Skin
 do
   local _class_0
@@ -377,6 +388,24 @@ do
           onValueChanged = function(self, value)
             return COMPONENTS.SETTINGS:setNumberOfBackups(value)
           end
+        }),
+        Settings.Spinner({
+          title = LOCALIZATION:get('setting_game_detection_frequency_title', 'Game detection frequency'),
+          tooltip = LOCALIZATION:get('setting_game_detection_frequency_description', 'How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.'),
+          index = COMPONENTS.SETTINGS:getGameDetectionFrequency(),
+          setIndex = function(self, index)
+            if index < 1 then
+              index = #self:getValues()
+            elseif index > #self:getValues() then
+              index = 1
+            end
+            self.index = index
+            return COMPONENTS.SETTINGS:setGameDetectionFrequency(index)
+          end,
+          getValues = function(self)
+            return state.gameDetectionFrequencies
+          end,
+          setValues = function(self) end
         }),
         Settings.Boolean({
           title = LOCALIZATION:get('setting_logging_title', 'Log'),
