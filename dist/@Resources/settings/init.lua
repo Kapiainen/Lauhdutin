@@ -8,7 +8,8 @@ STATE = {
   INITIALIZED = false,
   PATHS = {
     RESOURCES = nil,
-    RAINMETER = nil
+    RAINMETER = nil,
+    GAMES = 'games.json'
   },
   CURRENT_CONFIG = nil,
   NUM_SLOTS = 4,
@@ -149,6 +150,37 @@ requiresRebuilding = function()
   end
   return false
 end
+local requiresGameDetection
+requiresGameDetection = function()
+  if COMPONENTS.SETTINGS:getShortcutsEnabled() ~= COMPONENTS.OLD_SETTINGS:getShortcutsEnabled() then
+    return true
+  elseif COMPONENTS.SETTINGS:getSteamEnabled() ~= COMPONENTS.OLD_SETTINGS:getSteamEnabled() then
+    return true
+  elseif COMPONENTS.SETTINGS:getBattlenetEnabled() ~= COMPONENTS.OLD_SETTINGS:getBattlenetEnabled() then
+    return true
+  elseif COMPONENTS.SETTINGS:getGOGGalaxyEnabled() ~= COMPONENTS.OLD_SETTINGS:getGOGGalaxyEnabled() then
+    return true
+  elseif COMPONENTS.SETTINGS:getSteamPath() ~= COMPONENTS.OLD_SETTINGS:getSteamPath() then
+    return true
+  elseif #COMPONENTS.SETTINGS:getBattlenetPaths() ~= #COMPONENTS.OLD_SETTINGS:getBattlenetPaths() then
+    return true
+  elseif #COMPONENTS.SETTINGS:getBattlenetPaths() == #COMPONENTS.OLD_SETTINGS:getBattlenetPaths() then
+    local newBattlenetPaths = COMPONENTS.SETTINGS:getBattlenetPaths()
+    local oldBattlenetPaths = COMPONENTS.OLD_SETTINGS:getBattlenetPaths()
+    for _index_0 = 1, #newBattlenetPaths do
+      local path = newBattlenetPaths[_index_0]
+      local index = table.find(oldBattlenetPaths, path)
+      if index ~= nil then
+        table.remove(oldBattlenetPaths, index)
+      else
+        return true
+      end
+    end
+  elseif COMPONENTS.SETTINGS:getGOGGalaxyClientPath() ~= COMPONENTS.OLD_SETTINGS:getGOGGalaxyClientPath() then
+    return true
+  end
+  return false
+end
 Close = function()
   if not (STATE.INITIALIZED) then
     return 
@@ -157,6 +189,11 @@ Close = function()
     if COMPONENTS.SETTINGS:hasChanged(COMPONENTS.OLD_SETTINGS:get()) then
       if requiresRebuilding() then
         RebuildMainSlots()
+      end
+      if requiresGameDetection() then
+        local games = io.readJSON(STATE.PATHS.GAMES)
+        games.updated = nil
+        io.writeJSON(STATE.PATHS.GAMES, games)
       end
       local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
       if mainConfig ~= nil and mainConfig:isActive() then
