@@ -153,6 +153,12 @@ local migrators = {
       settings.steam_personaname = nil
       settings.show_platform = nil
     end
+  },
+  {
+    version = 2,
+    func = function(settings)
+      settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+    end
   }
 }
 local Settings
@@ -242,7 +248,7 @@ do
       return self.settings.numberOfBackups or 5
     end,
     setNumberOfBackups = function(self, value)
-      if value < 0 then
+      if value < 1 then
         return 
       end
       self.settings.numberOfBackups = value
@@ -260,10 +266,19 @@ do
       return self.settings.sorting or ENUMS.SORTING_TYPES.ALPHABETICALLY
     end,
     setSorting = function(self, value)
-      if value < 1 then
+      if value < ENUMS.SORTING_TYPES.ALPHABETICALLY or value >= ENUMS.SORTING_TYPES.MAX then
         return 
       end
       self.settings.sorting = value
+    end,
+    getGameDetectionFrequency = function(self)
+      return self.settings.gameDetectionFrequency or ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+    end,
+    setGameDetectionFrequency = function(self, value)
+      if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX then
+        return 
+      end
+      self.settings.gameDetectionFrequency = value
     end,
     getLocalization = function(self)
       return self.settings.localization or 'English'
@@ -658,12 +673,13 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self)
-      self.version = 1
+      self.version = 2
       self.path = 'settings.json'
       self.defaultSettings = {
         numberOfBackups = 5,
         logging = false,
         sorting = ENUMS.SORTING_TYPES.ALPHABETICALLY,
+        gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY,
         bangs = {
           enabled = true,
           global = {

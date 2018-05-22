@@ -137,16 +137,22 @@ migrators = {
 			settings.steam_personaname = nil
 			settings.show_platform = nil
 	}
+	{
+		version: 2
+		func: (settings) ->
+			settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+	}
 }
 
 class Settings
 	new: () =>
-		@version = 1
+		@version = 2
 		@path = 'settings.json'
 		@defaultSettings = {
 			numberOfBackups: 5
 			logging: false -- If true, then extra information is printed to Rainmeter's log. Useful when troubleshooting issues.
 			sorting: ENUMS.SORTING_TYPES.ALPHABETICALLY -- How games are sorted.
+			gameDetectionFrequency: ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY -- How often the skin attempts to detect games when the skin is loaded.
 			bangs: {
 				enabled: true -- Whether or not bangs are executed (applies to global, platform-specific, and game-specific bangs).
 				global: {
@@ -271,7 +277,7 @@ class Settings
 	getNumberOfBackups: () => return @settings.numberOfBackups or 5
 
 	setNumberOfBackups: (value) =>
-		return if value < 0
+		return if value < 1
 		@settings.numberOfBackups = value
 
 	getLogging: () =>
@@ -284,8 +290,14 @@ class Settings
 	getSorting: () => return @settings.sorting or ENUMS.SORTING_TYPES.ALPHABETICALLY
 
 	setSorting: (value) =>
-		return if value < 1
+		return if value < ENUMS.SORTING_TYPES.ALPHABETICALLY or value >= ENUMS.SORTING_TYPES.MAX
 		@settings.sorting = value
+
+	getGameDetectionFrequency: () => return @settings.gameDetectionFrequency or ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+
+	setGameDetectionFrequency: (value) =>
+		return if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX
+		@settings.gameDetectionFrequency = value
 
 	getLocalization: () => return @settings.localization or 'English'
 

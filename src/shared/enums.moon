@@ -49,4 +49,10 @@ export ENUMS = {
 		SLIDE_LEFT: 5
 		MAX: 6
 	}
+	GAME_DETECTION_FREQUENCY: {
+		NEVER: 1
+		ALWAYS: 2
+		ONCE_PER_DAY: 3
+		MAX: 4
+	}
 }
