@@ -246,6 +246,9 @@ class Steam extends Platform
 		lastPlayed = tonumber(app.lastplayed)
 		return lastPlayed
 
+	generateBannerURL: (appID) =>
+		return ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
+
 	getBanner: (appID) =>
 		banner = @getBannerPath(appID)
 		return banner, nil if banner -- Found an existing copy in the skin's cache
@@ -256,7 +259,7 @@ class Steam extends Platform
 				io.copyFile(gridBannerPath, cacheBannerPath, false)
 				return cacheBannerPath, nil -- Found a custom banner that was assigned via Steam's grid view
 		banner = io.joinPaths(@cachePath, appID .. '.jpg')
-		bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
+		bannerURL = @generateBannerURL(appID)
 		return banner, bannerURL -- Download the game's banner
 
 	getPath: (appID) => return ('steam://rungameid/%s')\format(appID)

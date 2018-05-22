@@ -343,9 +343,8 @@ createTagProperties = function()
   }))
   return properties
 end
-local createProperties
-createProperties = function(game, platform)
-  local properties = { }
+local createPlatformProperty
+createPlatformProperty = function(game, platform)
   local platformOverride = game:getPlatformOverride()
   local platformName
   if platformOverride ~= nil then
@@ -353,14 +352,20 @@ createProperties = function(game, platform)
   else
     platformName = platform:getName()
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_platform', 'Platform'),
     value = platformName
-  }))
-  table.insert(properties, Property({
+  })
+end
+local createHoursPlayedProperty
+createHoursPlayedProperty = function(game)
+  return Property({
     title = LOCALIZATION:get('button_label_hours_played', 'Hours played'),
     value = ('%.0f'):format(game:getHoursPlayed())
-  }))
+  })
+end
+local createLastPlayedProperty
+createLastPlayedProperty = function(game)
   local f
   f = function(self)
     local lastPlayed = game:getLastPlayed()
@@ -370,34 +375,45 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('game_last_played_never', 'Never')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_last_played', 'Last played'),
     value = f()
-  }))
+  })
+end
+local createInstalledProperty
+createInstalledProperty = function(game)
+  local f
   f = function(self)
     if game:isInstalled() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_installed', 'Installed'),
     value = f()
-  }))
+  })
+end
+local createVisibleProperty
+createVisibleProperty = function(game)
+  local f
   f = function(self)
     if game:isVisible() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_visible', 'Visible'),
     value = f(),
     action = function(self, index)
       return STATE.GAME:toggleVisibility()
     end,
     update = f
-  }))
+  })
+end
+local createPathProperty
+createPathProperty = function(game)
   local path = game:getPath()
   local action = nil
   if path:startsWith('"') and path:endsWith('"') then
@@ -411,13 +427,15 @@ createProperties = function(game, platform)
       end
     end
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_path', 'Path'),
     value = ('""%s""'):format(game:getPath()),
     action = action
-  }))
-  action = nil
-  path = nil
+  })
+end
+local createProcessProperty
+createProcessProperty = function(game)
+  local f
   f = function(self)
     local processOverride = game:getProcessOverride()
     if processOverride ~= nil and processOverride ~= '' then
@@ -429,14 +447,18 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('game_process_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_process', 'Process'),
     value = f(),
     action = function(self, index)
       return StartEditingProcessOverride(index)
     end,
     update = f
-  }))
+  })
+end
+local createNotesProperty
+createNotesProperty = function(game)
+  local f
   f = function(self)
     local notes = game:getNotes()
     if notes ~= nil and notes:len() > 0 then
@@ -449,14 +471,18 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('game_notes_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_notes', 'Notes'),
     value = f(),
     action = function(self, index)
       return StartEditingNotes()
     end,
     update = f
-  }))
+  })
+end
+local createTagsProperty
+createTagsProperty = function(game)
+  local f
   f = function(self)
     local tags = { }
     local _list_0 = game:getTags()
@@ -501,7 +527,7 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('game_tags_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_tags', 'Tags'),
     value = f(),
     action = function(self, index)
@@ -531,21 +557,29 @@ createProperties = function(game, platform)
       return updateSlots()
     end,
     update = f
-  }))
+  })
+end
+local createIgnoresOtherBangsProperty
+createIgnoresOtherBangsProperty = function(game)
+  local f
   f = function(self)
     if game:getIgnoresOtherBangs() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_ignores_other_bangs', 'Ignores other bangs'),
     value = f(),
     action = function(self, index)
       return STATE.GAME:toggleIgnoresOtherBangs()
     end,
     update = f
-  }))
+  })
+end
+local createStartingBangsProperty
+createStartingBangsProperty = function(game)
+  local f
   f = function(self)
     local bangs = game:getStartingBangs()
     if bangs and #bangs > 0 then
@@ -556,14 +590,18 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
     value = f(),
     action = function(self, index)
       return StartEditingStartingBangs()
     end,
     update = f
-  }))
+  })
+end
+local createStoppingBangsProperty
+createStoppingBangsProperty = function(game)
+  local f
   f = function(self)
     local bangs = game:getStoppingBangs()
     if bangs and #bangs > 0 then
@@ -574,15 +612,50 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
     value = f(),
     action = function(self, index)
       return StartEditingStoppingBangs()
     end,
     update = f
-  }))
-  return properties
+  })
+end
+local createBannerReacquisitionProperty
+createBannerReacquisitionProperty = function(game)
+  local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
+  local _exp_0 = game:getPlatformID()
+  if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+    if game:getPlatformOverride() == nil then
+      value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
+    end
+  end
+  return Property({
+    title = LOCALIZATION:get('button_label_reacquire_banner', 'Reacquire banner'),
+    value = value,
+    action = function()
+      return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+    end,
+    update = nil
+  })
+end
+local createProperties
+createProperties = function(game, platform)
+  return {
+    createPlatformProperty(game, platform),
+    createHoursPlayedProperty(game),
+    createLastPlayedProperty(game),
+    createInstalledProperty(game),
+    createVisibleProperty(game),
+    createPathProperty(game),
+    createProcessProperty(game),
+    createNotesProperty(game),
+    createTagsProperty(game),
+    createIgnoresOtherBangsProperty(game),
+    createStartingBangsProperty(game),
+    createStoppingBangsProperty(game),
+    createBannerReacquisitionProperty(game)
+  }
 end
 Handshake = function(gameID)
   local success, err = pcall(function()
@@ -900,6 +973,14 @@ OnEditedNotes = function()
     local notes = io.readFile(STATE.PATHS.NOTES)
     STATE.GAME:setNotes(notes)
     return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnReacquiredBanner = function()
+  local success, err = pcall(function()
+    return updateBanner(STATE.GAME)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
