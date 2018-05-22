@@ -46,6 +46,7 @@ game_tag_create	Create a new tag
 game_tags	Tags
 game_tags_none	None
 game_visible	Visible
+main_context_title_detect_games	Detect games
 main_context_title_execute_stopping_bangs	Execute stopping bangs
 main_context_title_open_shortcuts_folder	Open shortcuts folder
 main_context_title_settings	Settings
@@ -58,6 +59,7 @@ main_context_title_stop_unhiding_games	Stop unhiding games
 main_no_games	No games to show
 main_status_detecting_games	Detecting games
 main_status_detecting_platform_games	Detecting %s games
+main_status_detecting_platforms	Detecting platforms
 main_status_n_banners_to_download	%d banners left to download
 overlay_already_hidden	Already hidden
 overlay_already_visible	Already visible
