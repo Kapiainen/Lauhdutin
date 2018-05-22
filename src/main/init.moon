@@ -518,8 +518,8 @@ export Filter = (filterType, stack, arguments) ->
 
 -- Slots
 launchGame = (game) ->
-	game\setLastPlayed(os.time())
 	if game\isInstalled() == true
+		game\setLastPlayed(os.time())
 		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
 		COMPONENTS.LIBRARY\save()
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
@@ -545,6 +545,7 @@ launchGame = (game) ->
 		SKIN\Bang(('[%s]')\format(game\getPath()))
 		SKIN\Bang('[!HideFade]') if COMPONENTS.SETTINGS\getHideSkin()
 	elseif game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
+		game\setLastPlayed(os.time())
 		game\setInstalled(true)
 		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
 		COMPONENTS.LIBRARY\save()
