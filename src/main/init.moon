@@ -519,30 +519,39 @@ export Filter = (filterType, stack, arguments) ->
 -- Slots
 launchGame = (game) ->
 	game\setLastPlayed(os.time())
-	COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
-	COMPONENTS.LIBRARY\save()
-	STATE.GAMES = COMPONENTS.LIBRARY\get()
-	STATE.SCROLL_INDEX = 1
-	updateSlots()
-	COMPONENTS.PROCESS\monitor(game)
-	if COMPONENTS.SETTINGS\getBangsEnabled()
-		unless game\getIgnoresOtherBangs()
-			SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
-			platformBangs = switch game\getPlatformID()
-				when ENUMS.PLATFORM_IDS.SHORTCUTS
-					COMPONENTS.SETTINGS\getShortcutsStartingBangs()
-				when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
-					COMPONENTS.SETTINGS\getSteamStartingBangs()
-				when ENUMS.PLATFORM_IDS.BATTLENET
-					COMPONENTS.SETTINGS\getBattlenetStartingBangs()
-				when ENUMS.PLATFORM_IDS.GOG_GALAXY
-					COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
-				else
-					assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
-			SKIN\Bang(bang) for bang in *platformBangs
-		SKIN\Bang(bang) for bang in *game\getStartingBangs()
-	SKIN\Bang(('[%s]')\format(game\getPath()))
-	SKIN\Bang('[!HideFade]') if COMPONENTS.SETTINGS\getHideSkin()
+	if game\isInstalled() == true
+		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
+		COMPONENTS.LIBRARY\save()
+		STATE.GAMES = COMPONENTS.LIBRARY\get()
+		STATE.SCROLL_INDEX = 1
+		updateSlots()
+		COMPONENTS.PROCESS\monitor(game)
+		if COMPONENTS.SETTINGS\getBangsEnabled()
+			unless game\getIgnoresOtherBangs()
+				SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
+				platformBangs = switch game\getPlatformID()
+					when ENUMS.PLATFORM_IDS.SHORTCUTS
+						COMPONENTS.SETTINGS\getShortcutsStartingBangs()
+					when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
+						COMPONENTS.SETTINGS\getSteamStartingBangs()
+					when ENUMS.PLATFORM_IDS.BATTLENET
+						COMPONENTS.SETTINGS\getBattlenetStartingBangs()
+					when ENUMS.PLATFORM_IDS.GOG_GALAXY
+						COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
+					else
+						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+				SKIN\Bang(bang) for bang in *platformBangs
+			SKIN\Bang(bang) for bang in *game\getStartingBangs()
+		SKIN\Bang(('[%s]')\format(game\getPath()))
+		SKIN\Bang('[!HideFade]') if COMPONENTS.SETTINGS\getHideSkin()
+	elseif game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
+		game\setInstalled(true)
+		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
+		COMPONENTS.LIBRARY\save()
+		STATE.GAMES = COMPONENTS.LIBRARY\get()
+		STATE.SCROLL_INDEX = 1
+		updateSlots()
+		SKIN\Bang(('[%s]')\format(game\getPath()))
 
 hideGame = (game) ->
 	return if game\isVisible() == false
