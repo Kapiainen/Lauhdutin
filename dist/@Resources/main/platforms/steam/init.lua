@@ -459,7 +459,12 @@ do
           end
           file = io.readFile(io.joinPaths(libraryPath, manifest), false)
           local lines = file:splitIntoLines()
-          local vdf = utility.parseVDF(lines)
+          local success, vdf = pcall(utility.parseVDF, lines)
+          if not (success) then
+            log(('Failed to parse "%s": %s'):format(manifest, vdf))
+            _continue_0 = true
+            break
+          end
           local title = nil
           if vdf.appstate ~= nil then
             title = vdf.appstate.name

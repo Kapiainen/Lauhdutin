@@ -342,7 +342,10 @@ class Steam extends Platform
 				continue
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
-			vdf = utility.parseVDF(lines)
+			success, vdf = pcall(utility.parseVDF, lines)
+			unless success
+				log(('Failed to parse "%s": %s')\format(manifest, vdf))
+				continue
 			title = nil
 			if vdf.appstate ~= nil
 				title = vdf.appstate.name

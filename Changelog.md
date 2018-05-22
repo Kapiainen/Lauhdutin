@@ -1,3 +1,7 @@
+**Version 3.0.0 beta 12 - 2018/05/22:**
+- Updated Steam platform to skip games with appmanifests that cause parsing errors and write the issue to the log.
+- Updated Library class to improve how it deals with `games.json` having an unexpected structure.
+
 **Version 3.0.0 beta 11 - 2018/05/20:**
 - Updated the Library class to serialize the list of games in a sorted state.
 - Updated the Main and Game configs to make use of serialized games being sorted.
