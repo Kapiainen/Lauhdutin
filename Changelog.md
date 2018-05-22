@@ -1,3 +1,7 @@
+**Version 3.0.0 beta 13 - 2018/05/22:**
+- Fixed a bug where starting to install a Steam game via the skin would trigger bangs as if starting the game.
+- Fixed a bug where installing a Steam game via the skin would not update its state from uninstalled to installed.
+
 **Version 3.0.0 beta 12 - 2018/05/22:**
 - Updated Steam platform to skip games with appmanifests that cause parsing errors and write the issue to the log.
 - Updated Library class to improve how it deals with `games.json` having an unexpected structure.
