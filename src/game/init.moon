@@ -86,7 +86,7 @@ additionalEnums = () ->
 getGamesAndTags = () ->
 	games = io.readJSON(STATE.PATHS.GAMES)
 	STATE.GAMES_VERSION = games.version
-	STATE.GAMES_MODIFICATION_TIME = games.modified or os.date('*t')
+	STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
 	STATE.ALL_GAMES = [Game(args) for args in *games.games]
 	if STATE.ALL_TAGS == nil
 		STATE.ALL_TAGS = {}
@@ -549,7 +549,7 @@ export Save = () ->
 		() ->
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
-					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, modified: STATE.GAMES_MODIFICATION_TIME})
+					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, updated: STATE.GAMES_UPDATED_TIMESTAMP})
 					gameID = STATE.GAME\getGameID()
 					SKIN\Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]')\format(gameID))
 				when STATE.TAG_PROPERTIES
