@@ -703,8 +703,8 @@ Filter = function(filterType, stack, arguments)
 end
 local launchGame
 launchGame = function(game)
-  game:setLastPlayed(os.time())
   if game:isInstalled() == true then
+    game:setLastPlayed(os.time())
     COMPONENTS.LIBRARY:sort(COMPONENTS.SETTINGS:getSorting())
     COMPONENTS.LIBRARY:save()
     STATE.GAMES = COMPONENTS.LIBRARY:get()
@@ -747,6 +747,7 @@ launchGame = function(game)
       return SKIN:Bang('[!HideFade]')
     end
   elseif game:getPlatformID() == ENUMS.PLATFORM_IDS.STEAM then
+    game:setLastPlayed(os.time())
     game:setInstalled(true)
     COMPONENTS.LIBRARY:sort(COMPONENTS.SETTINGS:getSorting())
     COMPONENTS.LIBRARY:save()
