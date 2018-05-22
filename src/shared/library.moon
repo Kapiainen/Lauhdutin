@@ -73,16 +73,25 @@ class Library
 		@processedGames = nil
 		@gamesSortedByGameID = nil
 		@detectGames = false
+		@updatedTimestamp = if regularMode == true then os.date('*t') else games.updated
 		if regularMode
-			date = os.date('*t')
-			modified = games.modified or {}
-			if modified.year == date.year and modified.month == date.month and modified.day == date.day
-				@games = [Game(args) for args in *games.games]
-				@oldGames = {}
-			else
+			@detectGames = switch settings\getGameDetectionFrequency()
+				when ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS
+					true
+				when ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+					@updatedTimestamp = os.date('*t')
+					updated = games.updated or {}
+					if updated.year == @updatedTimestamp.year and updated.month == @updatedTimestamp.month and updated.day == @updatedTimestamp.day
+						false
+					else
+						true
+				else false
+			if @detectGames == true
 				@games = {}
 				@oldGames = @load()
-				@detectGames = true
+			else
+				@games = [Game(args) for args in *games.games]
+				@oldGames = {}
 		else
 			@games = [Game(args) for args in *games.games]
 			@oldGames = {}
@@ -130,7 +139,7 @@ class Library
 		io.writeJSON(@path, {
 			version: @version
 			games: games
-			modified: os.date('*t')
+			updated: @updatedTimestamp
 		})
 
 	migrate: (games, version) =>

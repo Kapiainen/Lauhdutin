@@ -152,7 +152,7 @@ do
       return io.writeJSON(self.path, {
         version = self.version,
         games = games,
-        modified = os.date('*t')
+        updated = self.updatedTimestamp
       })
     end,
     migrate = function(self, games, version)
@@ -614,10 +614,30 @@ do
       self.processedGames = nil
       self.gamesSortedByGameID = nil
       self.detectGames = false
+      if regularMode == true then
+        self.updatedTimestamp = os.date('*t')
+      else
+        self.updatedTimestamp = games.updated
+      end
       if regularMode then
-        local date = os.date('*t')
-        local modified = games.modified or { }
-        if modified.year == date.year and modified.month == date.month and modified.day == date.day then
+        local _exp_0 = settings:getGameDetectionFrequency()
+        if ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS == _exp_0 then
+          self.detectGames = true
+        elseif ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY == _exp_0 then
+          self.updatedTimestamp = os.date('*t')
+          local updated = games.updated or { }
+          if updated.year == self.updatedTimestamp.year and updated.month == self.updatedTimestamp.month and updated.day == self.updatedTimestamp.day then
+            self.detectGames = false
+          else
+            self.detectGames = true
+          end
+        else
+          self.detectGames = false
+        end
+        if self.detectGames == true then
+          self.games = { }
+          self.oldGames = self:load()
+        else
           do
             local _accum_0 = { }
             local _len_0 = 1
@@ -630,10 +650,6 @@ do
             self.games = _accum_0
           end
           self.oldGames = { }
-        else
-          self.games = { }
-          self.oldGames = self:load()
-          self.detectGames = true
         end
       else
         do
