@@ -107,6 +107,7 @@ class Library
 				games = io.readJSON(path)
 				version = games.version or 0
 				games = games.games if version > 0
+				games = {} if type(games) ~= 'table'
 				migrated = @migrate(games, version)
 				games = [Game(args) for args in *games]
 				if migrated

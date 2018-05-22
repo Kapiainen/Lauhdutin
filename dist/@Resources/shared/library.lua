@@ -120,6 +120,9 @@ do
           if version > 0 then
             games = games.games
           end
+          if type(games) ~= 'table' then
+            games = { }
+          end
           local migrated = self:migrate(games, version)
           do
             local _accum_0 = { }
