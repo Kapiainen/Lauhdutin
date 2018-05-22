@@ -94,6 +94,11 @@ setting_battlenet_paths_description	""Define the absolute paths to folders, whic
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
 setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
+setting_game_detection_frequency_always	Always
+setting_game_detection_frequency_description	How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.
+setting_game_detection_frequency_never	Never
+setting_game_detection_frequency_once_per_day	Once per day
+setting_game_detection_frequency_title	Game detection frequency
 setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
