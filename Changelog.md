@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 14 - 2018/MM/DD:**
 - Fixed a bug where an uninstalled game's last played timestamp could be updated by attempting to start the game even though it should not be updated.
+- Fixed a bug that caused the overlay slot background to be visible despite overlay slots being disabled.
 
 **Version 3.0.0 beta 13 - 2018/05/22:**
 - Fixed a bug where starting to install a Steam game via the skin would trigger bangs as if starting the game.
