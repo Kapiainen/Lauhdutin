@@ -191,8 +191,8 @@ do
       })
     end,
     migrate = function(self, settings, version)
-      assert(type(version) == 'number' and version % 1 == 0, 'shared.settings.Settings.migrate')
-      assert(version <= self.version, 'shared.settings.Settings.migrate')
+      assert(type(version) == 'number' and version % 1 == 0, 'Expected the settings version number to be an integer.')
+      assert(version <= self.version, ('Unsupported settings version. Expected version %d or earlier.'):format(self.version))
       if version == self.version then
         return false
       end

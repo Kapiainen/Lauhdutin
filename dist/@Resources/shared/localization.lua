@@ -23,7 +23,7 @@ do
         version = table.remove(lines, 1)
         version = tonumber(version:match('^version%s(%d+)$')) or 0
       end
-      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.load')
+      assert(type(version) == 'number' and version % 1 == 0, 'Expected the translation strings version number to be an integer.')
       for _index_0 = 1, #lines do
         local _continue_0 = false
         repeat
@@ -46,8 +46,8 @@ do
       return translations
     end,
     migrate = function(self, translations, version)
-      assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
-      assert(version <= self.version, 'shared.localization.Localization.migrate')
+      assert(type(version) == 'number' and version % 1 == 0, 'Expected the translation strings version number to be an integer.')
+      assert(version <= self.version, ('Unsupported translation strings version. Expected version %d or earlier.'):format(self.version))
       if version == self.version then
         return false
       end
