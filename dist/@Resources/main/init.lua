@@ -1101,7 +1101,24 @@ OnDumpedDBs = function()
     log('Dumped GOG Galaxy databases')
     local cachePath = STATE.PLATFORM_QUEUE[1]:getCachePath()
     local index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
-    local galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+    local galaxyPath = io.joinPaths(cachePath, 'galaxy.txt')
+    local galaxy = io.readFile(galaxyPath)
+    local newGalaxy = { }
+    local wholeLine = { }
+    local lines = galaxy:splitIntoLines()
+    for _index_0 = 1, #lines do
+      local line = lines[_index_0]
+      if line:match('^%d+|[^|]+|[^|]+|.+$') then
+        table.insert(newGalaxy, table.concat(wholeLine, ''))
+        wholeLine = { }
+      end
+      table.insert(wholeLine, line)
+    end
+    if #wholeLine > 0 then
+      table.insert(newGalaxy, table.concat(wholeLine, ''))
+    end
+    galaxy = table.concat(newGalaxy, '\n')
+    io.writeFile(galaxyPath, galaxy)
     STATE.PLATFORM_QUEUE[1]:generateGames(index, galaxy)
     return OnFinishedDetectingPlatformGames()
   end)
@@ -1187,14 +1204,18 @@ ReacquireBanner = function(gameID)
       end
     end
     if platform == nil then
-      print("Failed to get platform", platformID)
+      log("Failed to get platform for banner reacquisition", platformID)
       return 
     end
     local url
     local _exp_0 = platformID
     if ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
-      local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
-      url = platform:generateBannerURL(appID)
+      if game:getPlatformOverride() == nil then
+        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        url = platform:generateBannerURL(appID)
+      else
+        url = nil
+      end
     elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
       local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
       local galaxy = io.readFile(io.joinPaths(platform:getCachePath(), 'galaxy.txt'))
@@ -1206,7 +1227,7 @@ ReacquireBanner = function(gameID)
       url = nil
     end
     if url == nil then
-      print("Failed to url", gameID)
+      log("Failed to get URL for banner reacquisition", gameID)
       return 
     end
     STATE.BANNER_QUEUE = {
@@ -1360,6 +1381,109 @@ TriggerGameDetection = function()
     games.updated = nil
     io.writeJSON(STATE.PATHS.GAMES, games)
     return SKIN:Bang("[!Refresh]")
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OpenStorePage = function(gameID)
+  local success, err = pcall(function()
+    if gameID ~= nil then
+      local games = io.readJSON(STATE.PATHS.GAMES)
+      games = games.games
+      local game = games[gameID]
+      if game == nil or game.gameID ~= gameID then
+        game = nil
+        for _index_0 = 1, #games do
+          local args = games[_index_0]
+          if args.gameID == gameID then
+            game = args
+            break
+          end
+        end
+      end
+      assert(game ~= nil, 'main.init.OpenStorePage')
+      game = Game(game)
+      local platform = nil
+      local platforms
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        local _list_0 = require('main.platforms')
+        for _index_0 = 1, #_list_0 do
+          local Platform = _list_0[_index_0]
+          _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
+          _len_0 = _len_0 + 1
+        end
+        platforms = _accum_0
+      end
+      local platformID = game:getPlatformID()
+      for _index_0 = 1, #platforms do
+        local p = platforms[_index_0]
+        if p:getPlatformID() == platformID then
+          platform = p
+          break
+        end
+      end
+      if platform == nil then
+        log("Failed to get platform for opening the store page", platformID)
+        return 
+      end
+      local url
+      local _exp_0 = platformID
+      if ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
+        if game:getPlatformOverride() == nil then
+          local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+          url = ('https://store.steampowered.com/app/%s'):format(appID)
+        else
+          url = nil
+        end
+      elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+        local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        local galaxy = io.readFile(io.joinPaths(platform:getCachePath(), 'galaxy.txt'))
+        local link = nil
+        local _list_0 = galaxy:splitIntoLines()
+        for _index_0 = 1, #_list_0 do
+          local line = _list_0[_index_0]
+          if line:startsWith(productID) then
+            local links = line:match('^%d+|[^|]+|[^|]+|(.+)$')
+            if links ~= nil then
+              links = json.decode(links:lower())
+              if link == nil and links.store ~= nil then
+                if type(links.store.href) == 'string' then
+                  link = links.store.href
+                elseif type(links.store) == 'string' then
+                  link = links.store
+                end
+              end
+              if link == nil and links.forum ~= nil then
+                if type(links.forum.href) == 'string' then
+                  link = links.forum.href:gsub('forum', 'game')
+                elseif type(links.forum) == 'string' then
+                  link = links.forum:gsub('forum', 'game')
+                end
+              end
+              if link == nil and links.product_card ~= nil then
+                if type(links.product_card.href) == 'string' then
+                  link = links.product_card.href
+                elseif type(links.product_card) == 'string' then
+                  link = links.product_card
+                end
+              end
+            end
+            break
+          end
+        end
+        url = link
+      else
+        url = nil
+      end
+      if url == nil then
+        log("Failed to get URL for opening the store page", gameID)
+        return 
+      end
+      return SKIN:Bang(('[%s]'):format(url))
+    end
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

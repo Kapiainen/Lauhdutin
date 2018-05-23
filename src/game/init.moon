@@ -436,6 +436,19 @@ createBannerReacquisitionProperty = (game) ->
 		:action
 		update: nil
 	})
+
+createOpenStorePageProperty = (game) ->
+	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
+	action = nil
+	switch game\getPlatformID()
+		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
+			if game\getPlatformOverride() == nil
+				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
+				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+	return Property({
+		title: LOCALIZATION\get('button_label_open_store_page', 'Open store page')
+		:value
+		:action
 		update: nil
 	})
 
@@ -454,6 +467,7 @@ createProperties = (game, platform) ->
 		createStartingBangsProperty(game)
 		createStoppingBangsProperty(game)
 		createBannerReacquisitionProperty(game)
+		createOpenStorePageProperty(game)
 	}
 
 export Handshake = (gameID) ->

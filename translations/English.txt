@@ -11,6 +11,7 @@ button_label_enabled	Enabled
 button_label_hours_played	Hours played
 button_label_no	No
 button_label_open	Open
+button_label_open_store_page	Open store page
 button_label_platform_not_supported	Platform not supported
 button_label_platform_supported	Platform supported
 button_label_reacquire_banner	Reacquire banner

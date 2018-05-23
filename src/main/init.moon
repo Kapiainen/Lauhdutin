@@ -822,7 +822,20 @@ export OnDumpedDBs = () ->
 			log('Dumped GOG Galaxy databases')
 			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
 			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
-			galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+			galaxyPath = io.joinPaths(cachePath, 'galaxy.txt')
+			galaxy = io.readFile(galaxyPath)
+			newGalaxy = {}
+			wholeLine = {}
+			lines = galaxy\splitIntoLines()
+			for line in *lines
+				if line\match('^%d+|[^|]+|[^|]+|.+$')
+					table.insert(newGalaxy, table.concat(wholeLine, ''))
+					wholeLine = {}
+				table.insert(wholeLine, line)
+			if #wholeLine > 0
+				table.insert(newGalaxy, table.concat(wholeLine, ''))
+			galaxy = table.concat(newGalaxy, '\n')
+			io.writeFile(galaxyPath, galaxy)
 			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy)
 			OnFinishedDetectingPlatformGames()
 	)
@@ -887,12 +900,15 @@ export ReacquireBanner = (gameID) ->
 					platform = p
 					break
 			if platform == nil
-				print("Failed to get platform", platformID)
+				log("Failed to get platform for banner reacquisition", platformID)
 				return
 			url = switch platformID
 				when ENUMS.PLATFORM_IDS.STEAM
-					appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
-					platform\generateBannerURL(appID)
+					if game\getPlatformOverride() == nil
+						appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+						platform\generateBannerURL(appID)
+					else
+						nil
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
 					productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
 					galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
@@ -902,7 +918,7 @@ export ReacquireBanner = (gameID) ->
 					bannerURLs[productID]
 				else nil
 			if url == nil
-				print("Failed to url", gameID)
+				log("Failed to get URL for banner reacquisition", gameID)
 				return
 			STATE.BANNER_QUEUE = {game}
 			bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
@@ -1028,4 +1044,70 @@ export TriggerGameDetection = () ->
 			io.writeJSON(STATE.PATHS.GAMES, games)
 			SKIN\Bang("[!Refresh]")
 	)
-	COMPONENTS.STATUS\show(err, true) unless success	
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OpenStorePage = (gameID) ->
+	success, err = pcall(
+		() ->
+			if gameID ~= nil
+				games = io.readJSON(STATE.PATHS.GAMES)
+				games = games.games
+				game = games[gameID]
+				if game == nil or game.gameID ~= gameID
+					game = nil
+					for args in *games
+						if args.gameID == gameID
+							game = args
+							break
+				assert(game ~= nil, 'main.init.OpenStorePage')
+				game = Game(game)
+				platform = nil
+				platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+				platformID = game\getPlatformID()
+				for p in *platforms
+					if p\getPlatformID() == platformID
+						platform = p
+						break
+				if platform == nil
+					log("Failed to get platform for opening the store page", platformID)
+					return
+				url = switch platformID
+					when ENUMS.PLATFORM_IDS.STEAM
+						if game\getPlatformOverride() == nil
+							appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+							('https://store.steampowered.com/app/%s')\format(appID)
+						else
+							nil
+					when ENUMS.PLATFORM_IDS.GOG_GALAXY
+						productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+						galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
+						link = nil
+						for line in *galaxy\splitIntoLines()
+							if line\startsWith(productID)
+								links = line\match('^%d+|[^|]+|[^|]+|(.+)$')
+								if links ~= nil
+									links = json.decode(links\lower())
+									if link == nil and links.store ~= nil
+										if type(links.store.href) == 'string'
+											link = links.store.href
+										elseif type(links.store) == 'string'
+											link = links.store
+									if link == nil and links.forum ~= nil
+										if type(links.forum.href) == 'string'
+											link = links.forum.href\gsub('forum', 'game')
+										elseif type(links.forum) == 'string'
+											link = links.forum\gsub('forum', 'game')
+									if link == nil and links.product_card ~= nil
+										if type(links.product_card.href) == 'string'
+											link = links.product_card.href
+										elseif type(links.product_card) == 'string'
+											link = links.product_card
+								break
+						link
+					else nil
+				if url == nil
+					log("Failed to get URL for opening the store page", gameID)
+					return
+				SKIN\Bang(('[%s]')\format(url))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success

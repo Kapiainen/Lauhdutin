@@ -73,7 +73,7 @@ class GOGGalaxy extends Platform
 		titles = {}
 		bannerURLs = {}
 		for line in *lines
-			productID, title, images = line\match('^(%d+)|([^|]+)|(.+)$')
+			productID, title, images = line\match('^(%d+)|([^|]+)|([^|]+)|.+$')
 			continue unless productIDs[productID] == true
 			titles[productID] = title
 			images = json.decode(images\lower())

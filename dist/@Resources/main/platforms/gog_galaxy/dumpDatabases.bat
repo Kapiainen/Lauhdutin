@@ -14,6 +14,6 @@ if exist %galaxy% del %galaxy%
 cd ..\..\
 set "sqlite="%cd%\sqlite3.exe""
 start /B "" %sqlite% %1 "select productId, localpath from Products;" > %index%
-start /B "" %sqlite% %2 "select productId, title, images from LimitedDetails;" > %galaxy%
+start /B "" %sqlite% %2 "select productId, title, images, links from LimitedDetails;" > %galaxy%
 echo "" > %completed%
 ::pause
