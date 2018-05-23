@@ -12,7 +12,7 @@ class Status
 		if exception
 			@exception = true
 			starts, ends = message\find('%[string ""%]:')
-			message = message\sub(ends + 1) if ends
+			message = 'Line ' .. message\sub(ends + 1) if ends
 		message = message\gsub('\"', '\'\'')
 		if exception
 			SKIN\Bang(('[!Log "Error: %s" "Error"]')\format(message))

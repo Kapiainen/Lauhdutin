@@ -31,7 +31,7 @@ class Localization
 		if #lines > 0
 			version = table.remove(lines, 1)
 			version = tonumber(version\match('^version%s(%d+)$')) or 0
-		assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.load')
+		assert(type(version) == 'number' and version % 1 == 0, 'Expected the translation strings version number to be an integer.')
 		for line in *lines
 			key, translation = line\match('^([^\t]+)\t(.+)$')
 			continue if key == nil or translation == nil
@@ -41,8 +41,8 @@ class Localization
 		return translations
 
 	migrate: (translations, version) =>
-		assert(type(version) == 'number' and version % 1 == 0, 'shared.localization.Localization.migrate')
-		assert(version <= @version, 'shared.localization.Localization.migrate')
+		assert(type(version) == 'number' and version % 1 == 0, 'Expected the translation strings version number to be an integer.')
+		assert(version <= @version, ('Unsupported translation strings version. Expected version %d or earlier.')\format(@version))
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version

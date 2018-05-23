@@ -12,6 +12,9 @@ do
   local _class_0
   local _base_0 = {
     show = function(self, index, game)
+      if not (self.contextSensitive) then
+        return 
+      end
       if not (game) then
         self:hide()
         return 
@@ -54,23 +57,21 @@ do
       else
         assert(nil, 'main.slots.overlay_slot.show')
       end
-      if self.contextSensitive then
-        if image then
-          SKIN:Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]'):format(image))
-        else
-          SKIN:Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
-        end
-        if info == '' then
-          local numHoursPlayed = math.round(game:getHoursPlayed())
-          if numHoursPlayed == 1 then
-            info = self.singleHourPlayed:format(numHoursPlayed)
-          else
-            info = self.hoursPlayed:format(numHoursPlayed)
-          end
-        end
-        local text = ('%s#CRLF##CRLF##CRLF##CRLF#%s'):format(utility.replaceUnsupportedChars(game:getTitle()), info)
-        SKIN:Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]'):format(text))
+      if image then
+        SKIN:Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]'):format(image))
+      else
+        SKIN:Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
       end
+      if info == '' then
+        local numHoursPlayed = math.round(game:getHoursPlayed())
+        if numHoursPlayed == 1 then
+          info = self.singleHourPlayed:format(numHoursPlayed)
+        else
+          info = self.hoursPlayed:format(numHoursPlayed)
+        end
+      end
+      local text = ('%s#CRLF##CRLF##CRLF##CRLF#%s'):format(utility.replaceUnsupportedChars(game:getTitle()), info)
+      SKIN:Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]'):format(text))
       local slot = SKIN:GetMeter(('Slot%dImage'):format(index))
       SKIN:Bang(('[!SetOption "SlotOverlayImage" "X" "%d"]'):format(slot:GetX()))
       SKIN:Bang(('[!SetOption "SlotOverlayImage" "Y" "%d"]'):format(slot:GetY()))

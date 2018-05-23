@@ -245,8 +245,8 @@ class Settings
 	})
 
 	migrate: (settings, version) =>
-		assert(type(version) == 'number' and version % 1 == 0, 'shared.settings.Settings.migrate')
-		assert(version <= @version, 'shared.settings.Settings.migrate')
+		assert(type(version) == 'number' and version % 1 == 0, 'Expected the settings version number to be an integer.')
+		assert(version <= @version, ('Unsupported settings version. Expected version %d or earlier.')\format(@version))
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version

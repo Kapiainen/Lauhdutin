@@ -25,6 +25,7 @@ class OverlaySlot
 		@uninstalledGame = LOCALIZATION\get('overlay_uninstalled', 'Uninstalled')
 
 	show: (index, game) =>
+		return unless @contextSensitive
 		unless game
 			@hide()
 			return
@@ -61,19 +62,18 @@ class OverlaySlot
 				image = images.error
 			else
 				assert(nil, 'main.slots.overlay_slot.show')
-		if @contextSensitive
-			if image
-				SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))
+		if image
+			SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))
+		else
+			SKIN\Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
+		if info == ''
+			numHoursPlayed = math.round(game\getHoursPlayed())
+			if numHoursPlayed == 1
+				info = @singleHourPlayed\format(numHoursPlayed)
 			else
-				SKIN\Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
-			if info == ''
-				numHoursPlayed = math.round(game\getHoursPlayed())
-				if numHoursPlayed == 1
-					info = @singleHourPlayed\format(numHoursPlayed)
-				else
-					info = @hoursPlayed\format(numHoursPlayed)
-			text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(game\getTitle()), info)
-			SKIN\Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]')\format(text))
+				info = @hoursPlayed\format(numHoursPlayed)
+		text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(game\getTitle()), info)
+		SKIN\Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]')\format(text))
 		slot = SKIN\GetMeter(('Slot%dImage')\format(index))
 		SKIN\Bang(('[!SetOption "SlotOverlayImage" "X" "%d"]')\format(slot\GetX()))
 		SKIN\Bang(('[!SetOption "SlotOverlayImage" "Y" "%d"]')\format(slot\GetY()))
