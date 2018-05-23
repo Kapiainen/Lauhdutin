@@ -1,5 +1,6 @@
 **Version 3.0.0 beta 14 - 2018/MM/DD:**
 - Updated error messages related to version numbers of games, settings, and translations.
+- Updated error messages to clarify that the preceding number is the line number in the Lua file where the error occurred rather than an error code.
 - Fixed a bug where an uninstalled game's last played timestamp could be updated by attempting to start the game even though it should not be updated.
 - Fixed a bug that caused the overlay slot background to be visible despite overlay slots being disabled.
 

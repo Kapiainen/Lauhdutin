@@ -18,7 +18,7 @@ do
         self.exception = true
         local starts, ends = message:find('%[string ""%]:')
         if ends then
-          message = message:sub(ends + 1)
+          message = 'Line ' .. message:sub(ends + 1)
         end
       end
       message = message:gsub('\"', '\'\'')
