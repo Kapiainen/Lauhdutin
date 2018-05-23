@@ -563,6 +563,22 @@ do
           end
           games = _accum_0
         end
+      elseif ENUMS.FILTER_TYPES.LACKS_TAG == _exp_0 then
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.tag) == 'string', 'shared.library.Library.filter')
+        local tag = args.tag
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          for _index_0 = 1, #gamesToProcess do
+            local game = gamesToProcess[_index_0]
+            if game:hasTag(tag) ~= true then
+              _accum_0[_len_0] = game
+              _len_0 = _len_0 + 1
+            end
+          end
+          games = _accum_0
+        end
       else
         assert(nil, 'shared.library.Library.filter')
       end

@@ -26,6 +26,7 @@ filter_has_notes	Has notes
 filter_has_tag	Has tag
 filter_is_hidden	Is hidden
 filter_is_uninstalled	Is not installed
+filter_lacks_tag	Lacks tag
 filter_never_played	Has never been played
 filter_random	Random game
 filter_window_all_title	Filter

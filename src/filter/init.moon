@@ -205,6 +205,45 @@ createTagProperties = (games, filterStack) ->
 		properties: tagProperties
 	}), gamesWithTags
 
+createLacksTagProperties = (games, filterStack) ->
+	tags = {}
+	for game in *games
+		skinTags = game\getTags()
+		platformTags = game\getPlatformTags()
+		combinedTags = {}
+		for tag in *skinTags
+			combinedTags[tag] = true
+		for tag in *platformTags
+			combinedTags[tag] = true
+		for tag, _ in pairs(combinedTags)
+			skip = false
+			for f in *filterStack
+				if f.filter == ENUMS.FILTER_TYPES.LACKS_TAG and f.args.tag == tag
+					skip = true
+					break
+			continue if skip
+			if tags[tag] == nil
+				tags[tag] = 0
+			tags[tag] += 1
+	tagProperties = {}
+	for tag, numGames in pairs(tags)
+		numGames = #games - numGames
+		if numGames > 0
+			table.insert(tagProperties, Property({
+				title: tag
+				value: STATE.NUM_GAMES_PATTERN\format(numGames)
+				arguments: {
+					tag: tag
+				}
+			}))
+	table.sort(tagProperties, sortPropertiesByTitle)
+	return Property({
+		title: LOCALIZATION\get('filter_lacks_tag', 'Lacks tag')
+		value: STATE.NUM_GAMES_PATTERN\format(#games)
+		enum: ENUMS.FILTER_TYPES.LACKS_TAG
+		properties: tagProperties
+	})
+
 createHasNoTagsProperty = (numGames) ->
 	return Property({
 		title: LOCALIZATION\get('filter_has_no_tags', 'Has no tags')
@@ -348,6 +387,13 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 			hasNotesProperty = createHasNotesProperty(games)
 			if hasNotesProperty
 				table.insert(properties, hasNotesProperty)
+		lacksTagProperty = createLacksTagProperties(games, filterStack)
+		table.insert(lacksTagProperty.properties, Property({
+			title: STATE.BACK_BUTTON_TITLE
+			value: ' '
+			properties: properties
+		}))
+		table.insert(properties, lacksTagProperty)
 	table.sort(properties, sortPropertiesByTitle)
 	unless stack
 		table.insert(properties, createClearProperty())

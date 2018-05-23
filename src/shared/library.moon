@@ -369,6 +369,11 @@ class Library
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				games = [game for game in *gamesToProcess when game\getNotes() ~= nil]
+			when ENUMS.FILTER_TYPES.LACKS_TAG
+				assert(type(args) == 'table', 'shared.library.Library.filter')
+				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
+				tag = args.tag
+				games = [game for game in *gamesToProcess when game\hasTag(tag) ~= true]
 			else
 				assert(nil, 'shared.library.Library.filter')
 		assert(type(games) == 'table', 'shared.library.Library.filter')
