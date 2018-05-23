@@ -424,15 +424,18 @@ createStoppingBangsProperty = (game) ->
 
 createBannerReacquisitionProperty = (game) ->
 	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
+	action = nil
 	switch game\getPlatformID()
 		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
 			if game\getPlatformOverride() == nil
 				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
+				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
 	return Property({
 		title: LOCALIZATION\get('button_label_reacquire_banner', 'Reacquire banner')
 		:value
-		action: () ->
-			SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+		:action
+		update: nil
+	})
 		update: nil
 	})
 

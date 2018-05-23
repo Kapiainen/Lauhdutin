@@ -625,18 +625,23 @@ end
 local createBannerReacquisitionProperty
 createBannerReacquisitionProperty = function(game)
   local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
+  local action = nil
   local _exp_0 = game:getPlatformID()
   if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
     if game:getPlatformOverride() == nil then
       value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
+      action = function()
+        return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+      end
     end
   end
   return Property({
     title = LOCALIZATION:get('button_label_reacquire_banner', 'Reacquire banner'),
     value = value,
-    action = function()
-      return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
-    end,
+    action = action,
+    update = nil
+  })
+end
     update = nil
   })
 end
