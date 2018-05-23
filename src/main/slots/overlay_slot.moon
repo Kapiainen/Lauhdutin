@@ -14,8 +14,14 @@ class OverlaySlot
 		assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
 		@contextSensitive = settings\getSlotsOverlayEnabled()
 		@platformNotRunning = LOCALIZATION\get('overlay_platform_not_running', '%s is not running')
-		@hoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
+		@multipleHoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
 		@singleHourPlayed = LOCALIZATION\get('overlay_single_hour_played', '%.0f hour played')
+		@singleHourSingleMinutePlayed = LOCALIZATION\get('overlay_single_hour_single_minute_played', '%.0f hour %.0f minute played')
+		@singleHourMultipleMinutesPlayed = LOCALIZATION\get('overlay_single_hour_multiple_minute_played', '%.0f hour %.0f minutes played')
+		@multipleHoursSingleMinutePlayed = LOCALIZATION\get('overlay_multiple_hour_single_minute_played', '%.0f hours %.0f minute played')
+		@multipleHoursMultipleMinutesPlayed = LOCALIZATION\get('overlay_multiple_hour_multiple_minute_played', '%.0f hours %.0f minutes played')
+		@singleMinutePlayed = LOCALIZATION\get('overlay_single_minute_played', '%.0f minute played')
+		@multipleMinutesPlayed = LOCALIZATION\get('overlay_multiple_minutes_played', '%.0f minutes played')
 		@installGame = LOCALIZATION\get('overlay_install', 'Install')
 		@hideGame = LOCALIZATION\get('overlay_hide', 'Hide')
 		@alreadyHidden = LOCALIZATION\get('overlay_already_hidden', 'Already hidden')
@@ -23,6 +29,57 @@ class OverlaySlot
 		@alreadyVisible = LOCALIZATION\get('overlay_already_visible', 'Already visible')
 		@removeGame = LOCALIZATION\get('overlay_remove', 'Remove')
 		@uninstalledGame = LOCALIZATION\get('overlay_uninstalled', 'Uninstalled')
+		textOptions = {}
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE] = (game) =>
+			return game\getTitle()
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.GAME_PLATFORM] = (game) =>
+			return STATE.PLATFORM_NAMES[game\getPlatformID()]
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS] = (game) =>
+			numHoursPlayed = math.round(game\getHoursPlayed())
+			if numHoursPlayed == 1
+				return @singleHourPlayed\format(numHoursPlayed)
+			return @multipleHoursPlayed\format(numHoursPlayed)
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_AND_MINUTES] = (game) =>
+			hoursPlayed = game\getHoursPlayed()
+			numHoursPlayed = math.floor(hoursPlayed)
+			numMinutesPlayed = math.round((hoursPlayed - numHoursPlayed) * 60.0)
+			if numHoursPlayed == 1
+				if numMinutesPlayed == 1
+					return @singleHourSingleMinutePlayed\format(numHoursPlayed, numMinutesPlayed)
+				return @singleHourMultipleMinutesPlayed\format(numHoursPlayed, numMinutesPlayed)
+			if numMinutesPlayed == 1
+				return @multipleHoursSingleMinutePlayed\format(numHoursPlayed, numMinutesPlayed)
+			return @multipleHoursMultipleMinutesPlayed\format(numHoursPlayed, numMinutesPlayed)
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES] = (game) =>
+			hoursPlayed = game\getHoursPlayed()
+			numHoursPlayed = math.floor(hoursPlayed)
+			if numHoursPlayed == 1
+				return @singleHourPlayed\format(numHoursPlayed)
+			elseif numHoursPlayed > 0
+				return @multipleHoursPlayed\format(numHoursPlayed)
+			numMinutesPlayed = math.round((hoursPlayed - numHoursPlayed) * 60.0)
+			if numMinutesPlayed == 1
+				return @singleMinutePlayed\format(numMinutesPlayed)
+			return @multipleMinutesPlayed\format(numMinutesPlayed)
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.LAST_PLAYED_YYYYMMDD] = (game) =>
+			lastPlayed = game\getLastPlayed()
+			if lastPlayed > 315532800
+				date = os.date('*t', lastPlayed)
+				return ('%04.f-%02.f-%02.f')\format(date.year, date.month, date.day)
+				--return ('%04.f-%02.f-%02.f %02.f:%02.f:%02.f')\format(
+				--	date.year, date.month, date.day,
+				--	date.hour, date.min, date.sec
+				--)
+			return ''
+		textOptions[ENUMS.OVERLAY_SLOT_TEXT.NOTES] = (game) =>
+			notes = game\getNotes()
+			if notes == nil
+				return ''
+			return notes
+		@getUpperText = textOptions[settings\getSlotsOverlayUpperText()]
+		@getLowerText = textOptions[settings\getSlotsOverlayLowerText()]
+		if settings\getSlotsOverlayImagesEnabled() ~= true
+			images = {}
 
 	show: (index, game) =>
 		return unless @contextSensitive
@@ -31,34 +88,43 @@ class OverlaySlot
 			return
 		log(('Showing overlay for %s')\format(game\getTitle()))
 		image = images.play
-		info = ''
+		upperText = ''
+		lowerText = ''
 		platformID = game\getPlatformID()
 		switch STATE.LEFT_CLICK_ACTION
 			when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME
+				upperText = game\getTitle()
 				if game\isVisible() == false
-					info = @alreadyHidden
+					lowerText = @alreadyHidden
 				else
-					info = @hideGame
+					lowerText = @hideGame
 				image = images.hide
 			when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME
+				upperText = game\getTitle()
 				if game\isVisible() == true
-					info = @alreadyVisible
+					lowerText = @alreadyVisible
 				else
-					info = @unhideGame
+					lowerText = @unhideGame
 				image = images.unhide
 			when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
 				if STATE.PLATFORM_RUNNING_STATUS[platformID] == false
-					info = @platformNotRunning\format(STATE.PLATFORM_NAMES[platformID])
+					upperText = game\getTitle()
+					lowerText = @platformNotRunning\format(STATE.PLATFORM_NAMES[platformID])
 					image = images.error
 				elseif game\isInstalled() == false
+					upperText = game\getTitle()
 					if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
-						info = @installGame
+						lowerText = @installGame
 						image = images.install
 					else
-						info = @uninstalledGame
+						lowerText = @uninstalledGame
 						image = images.error
+				else
+					upperText = @getUpperText(game) if @getUpperText ~= nil
+					lowerText = @getLowerText(game) if @getLowerText ~= nil
 			when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
-				info = @removeGame
+				upperText = game\getTitle()
+				lowerText = @removeGame
 				image = images.error
 			else
 				assert(nil, 'main.slots.overlay_slot.show')
@@ -66,13 +132,7 @@ class OverlaySlot
 			SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))
 		else
 			SKIN\Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
-		if info == ''
-			numHoursPlayed = math.round(game\getHoursPlayed())
-			if numHoursPlayed == 1
-				info = @singleHourPlayed\format(numHoursPlayed)
-			else
-				info = @hoursPlayed\format(numHoursPlayed)
-		text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(game\getTitle()), info)
+		text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(upperText), utility.replaceUnsupportedChars(lowerText))
 		SKIN\Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]')\format(text))
 		slot = SKIN\GetMeter(('Slot%dImage')\format(index))
 		SKIN\Bang(('[!SetOption "SlotOverlayImage" "X" "%d"]')\format(slot\GetX()))
