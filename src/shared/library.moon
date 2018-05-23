@@ -85,6 +85,11 @@ class Library
 						false
 					else
 						true
+				when ENUMS.GAME_DETECTION_FREQUENCY.NEVER
+					if games.updated == nil
+						true
+					else
+						false
 				else false
 			if @detectGames == true
 				@games = {}

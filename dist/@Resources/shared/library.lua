@@ -647,6 +647,12 @@ do
           else
             self.detectGames = true
           end
+        elseif ENUMS.GAME_DETECTION_FREQUENCY.NEVER == _exp_0 then
+          if games.updated == nil then
+            self.detectGames = true
+          else
+            self.detectGames = false
+          end
         else
           self.detectGames = false
         end
