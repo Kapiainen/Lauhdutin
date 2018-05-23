@@ -1,3 +1,7 @@
+**Version 3.1.0 beta 1 - YYYY/MM/DD:**
+- Added a setting for toggling context-sensitive images in slot overlays.
+- Added settings for the information to show in the upper and lower halves of the slot overlay.
+
 **Version 3.0.0 beta 14 - 2018/MM/DD:**
 - Updated error messages related to version numbers of games, settings, and translations.
 - Updated error messages to clarify that the preceding number is the line number in the Lua file where the error occurred rather than an error code.

@@ -158,6 +158,9 @@ local migrators = {
     version = 2,
     func = function(settings)
       settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+      settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+      settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+      settings.slots.overlayImagesEnabled = true
     end
   }
 }
@@ -440,6 +443,33 @@ do
     toggleSlotsOverlayEnabled = function(self)
       self.settings.slots.overlayEnabled = not self.settings.slots.overlayEnabled
     end,
+    getSlotsOverlayUpperText = function(self)
+      return self.settings.slots.overlayUpperText or ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+    end,
+    setSlotsOverlayUpperText = function(self, value)
+      if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX then
+        return 
+      end
+      self.settings.slots.overlayUpperText = value
+    end,
+    getSlotsOverlayLowerText = function(self)
+      return self.settings.slots.overlayLowerText or ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+    end,
+    setSlotsOverlayLowerText = function(self, value)
+      if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX then
+        return 
+      end
+      self.settings.slots.overlayLowerText = value
+    end,
+    getSlotsOverlayImagesEnabled = function(self)
+      if self.settings.slots.overlayImagesEnabled ~= nil then
+        return self.settings.slots.overlayImagesEnabled
+      end
+      return false
+    end,
+    toggleSlotsOverlayImagesEnabled = function(self)
+      self.settings.slots.overlayImagesEnabled = not self.settings.slots.overlayImagesEnabled
+    end,
     getSlotsHoverAnimation = function(self)
       return self.settings.slots.hoverAnimation or ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
     end,
@@ -705,6 +735,9 @@ do
         slots = {
           doubleClickToLaunch = false,
           overlayEnabled = true,
+          overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE,
+          overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES,
+          overlayImagesEnabled = true,
           hoverAnimation = ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN,
           clickAnimation = ENUMS.SLOT_CLICK_ANIMATIONS.SHRINK
         },

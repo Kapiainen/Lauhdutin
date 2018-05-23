@@ -75,6 +75,18 @@ state.gameDetectionFrequencies = {
 	{displayValue: LOCALIZATION\get('setting_game_detection_frequency_once_per_day', 'Once per day')}
 }
 
+-- Slot overlay text options
+state.slotsOverlayTextOptions = {
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_none', 'Nothing')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_game_title', 'Title')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_game_platform', 'Platform')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_time_played_hours', 'Hours played')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_time_played_hours_and_minutes', 'Hours and minutes played')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_time_played_hours_or_minutes', 'Hours or minutes played')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_last_played_yyyymmdd', 'Last played (YYYY-MM-DD)')}
+	{displayValue: LOCALIZATION\get('setting_slots_overlay_text_option_notes', 'Notes')}
+}
+
 class Skin extends Page
 	new: () =>
 		super()
@@ -127,13 +139,54 @@ class Skin extends Page
 					COMPONENTS.SETTINGS\setLayoutHeight(value)
 			})
 			Settings.Boolean({
-				title: LOCALIZATION\get('setting_slots_overlay_enabled_title', 'Show overlay on slots')
+				title: LOCALIZATION\get('setting_slots_overlay_enabled_title', 'Show overlays on slots')
 				tooltip: LOCALIZATION\get('setting_slots_overlay_enabled_description', 'If enabled, then an overlay with contextual information is displayed when the mouse is on a slot.')
 				toggle: () ->
 					COMPONENTS.SETTINGS\toggleSlotsOverlayEnabled()
 					return true
 				getState: () ->
 					return COMPONENTS.SETTINGS\getSlotsOverlayEnabled()
+			})
+			Settings.Boolean({
+				title: LOCALIZATION\get('setting_slots_overlay_images_enabled_title', 'Show images on slot overlays')
+				tooltip: LOCALIZATION\get('setting_slots_overlay_images_enabled_description', 'If enabled, then context-sensitive images are used in the slot overlays.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleSlotsOverlayImagesEnabled()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getSlotsOverlayImagesEnabled()
+			})
+			Settings.Spinner({
+				title: LOCALIZATION\get('setting_slots_overlay_upper_text_title', 'Slot overlay upper text')
+				tooltip: LOCALIZATION\get('setting_slots_overlay_upper_text_description', 'The text that is shown on the upper half of the slot overlay.')
+				index: COMPONENTS.SETTINGS\getSlotsOverlayUpperText()
+				setIndex: (index) =>
+					if index < 1
+						index = #@getValues()
+					elseif index > #@getValues()
+						index = 1
+					@index = index
+					COMPONENTS.SETTINGS\setSlotsOverlayUpperText(index)
+				getValues: () =>
+					return state.slotsOverlayTextOptions
+				setValues: () =>
+					return
+			})
+			Settings.Spinner({
+				title: LOCALIZATION\get('setting_slots_overlay_lower_text_title', 'Slot overlay lower text')
+				tooltip: LOCALIZATION\get('setting_slots_overlay_lower_text_description', 'The text that is shown on the lower half of the slot overlay.')
+				index: COMPONENTS.SETTINGS\getSlotsOverlayLowerText()
+				setIndex: (index) =>
+					if index < 1
+						index = #@getValues()
+					elseif index > #@getValues()
+						index = 1
+					@index = index
+					COMPONENTS.SETTINGS\setSlotsOverlayLowerText(index)
+				getValues: () =>
+					return state.slotsOverlayTextOptions
+				setValues: () =>
+					return
 			})
 			Settings.Spinner({
 				title: LOCALIZATION\get('setting_slots_hover_animation_title', 'Slot hover animation')

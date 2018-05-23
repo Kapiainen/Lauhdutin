@@ -141,6 +141,9 @@ migrators = {
 		version: 2
 		func: (settings) ->
 			settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+			settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+			settings.slots.overlayImagesEnabled = true
 	}
 }
 
@@ -178,6 +181,9 @@ class Settings
 			slots: {
 				doubleClickToLaunch: false
 				overlayEnabled: true
+				overlayUpperText: ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+				overlayLowerText: ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+				overlayImagesEnabled: true
 				hoverAnimation: ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
 				clickAnimation: ENUMS.SLOT_CLICK_ANIMATIONS.SHRINK
 			}
@@ -415,6 +421,25 @@ class Settings
 		return true
 
 	toggleSlotsOverlayEnabled: () => @settings.slots.overlayEnabled = not @settings.slots.overlayEnabled
+
+	getSlotsOverlayUpperText: () => return @settings.slots.overlayUpperText or ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+
+	setSlotsOverlayUpperText: (value) =>
+		return if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX
+		@settings.slots.overlayUpperText = value
+
+	getSlotsOverlayLowerText: () => return @settings.slots.overlayLowerText or ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+
+	setSlotsOverlayLowerText: (value) =>
+		return if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX
+		@settings.slots.overlayLowerText = value
+
+	getSlotsOverlayImagesEnabled: () =>
+		if @settings.slots.overlayImagesEnabled ~= nil
+			return @settings.slots.overlayImagesEnabled
+		return false
+
+	toggleSlotsOverlayImagesEnabled: () => @settings.slots.overlayImagesEnabled = not @settings.slots.overlayImagesEnabled
 
 	getSlotsHoverAnimation: () => return @settings.slots.hoverAnimation or ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
 	
