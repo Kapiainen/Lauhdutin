@@ -942,7 +942,7 @@ StartEditingHoursPlayed = function(index)
 end
 OnEditedHoursPlayed = function(hoursPlayed)
   local success, err = pcall(function()
-    STATE.GAME:setHoursPlayed(tonumber(hoursPlayed:sub(1, -2)))
+    STATE.GAME:setHoursPlayed(tonumber((hoursPlayed:sub(1, -2):gsub(',', '.'))))
     updateSlots()
     return OnDismissedInput()
   end)

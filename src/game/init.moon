@@ -666,7 +666,7 @@ export StartEditingHoursPlayed = (index) ->
 export OnEditedHoursPlayed = (hoursPlayed) ->
 	success, err = pcall(
 		() ->
-			STATE.GAME\setHoursPlayed(tonumber(hoursPlayed\sub(1, -2)))
+			STATE.GAME\setHoursPlayed(tonumber((hoursPlayed\sub(1, -2)\gsub(',', '.'))))
 			updateSlots()
 			OnDismissedInput()
 	)
