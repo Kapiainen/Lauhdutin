@@ -1,3 +1,15 @@
+**Version 3.1.0 beta 1 - YYYY/MM/DD:**
+- Added a setting for how often games should be detected when the skin is loaded.
+- Added a custom skin action to force the skin to refresh and detect games.
+- Added a setting for toggling context-sensitive images in slot overlays.
+- Added settings for the information to show in the upper and lower halves of the slot overlay.
+- Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
+- Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
+- Added a `Lacks tag` filter to find games that do **not** have a specific tag.
+- Updated the Game menu so that the hours played property can be modified.
+- Updated the Game menu so that editable properties use the current value as the default value in the text input box.
+- Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
+
 **Version 3.0.0 - 2018/05/25:**
 - Updated error messages related to version numbers of games, settings, and translations.
 - Updated error messages to clarify that the preceding number is the line number in the Lua file where the error occurred rather than an error code.

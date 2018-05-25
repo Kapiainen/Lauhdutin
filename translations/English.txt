@@ -11,6 +11,10 @@ button_label_enabled	Enabled
 button_label_hours_played	Hours played
 button_label_no	No
 button_label_open	Open
+button_label_open_store_page	Open store page
+button_label_platform_not_supported	Platform not supported
+button_label_platform_supported	Platform supported
+button_label_reacquire_banner	Reacquire banner
 button_label_save	Save
 button_label_starting_bangs	Starting bangs
 button_label_stopping_bangs	Stopping bangs
@@ -23,6 +27,7 @@ filter_has_notes	Has notes
 filter_has_tag	Has tag
 filter_is_hidden	Is hidden
 filter_is_uninstalled	Is not installed
+filter_lacks_tag	Lacks tag
 filter_never_played	Has never been played
 filter_random	Random game
 filter_window_all_title	Filter
@@ -43,6 +48,7 @@ game_tag_create	Create a new tag
 game_tags	Tags
 game_tags_none	None
 game_visible	Visible
+main_context_title_detect_games	Detect games
 main_context_title_execute_stopping_bangs	Execute stopping bangs
 main_context_title_open_shortcuts_folder	Open shortcuts folder
 main_context_title_settings	Settings
@@ -55,15 +61,22 @@ main_context_title_stop_unhiding_games	Stop unhiding games
 main_no_games	No games to show
 main_status_detecting_games	Detecting games
 main_status_detecting_platform_games	Detecting %s games
+main_status_detecting_platforms	Detecting platforms
 main_status_n_banners_to_download	%d banners left to download
 overlay_already_hidden	Already hidden
 overlay_already_visible	Already visible
 overlay_hide	Hide
 overlay_hours_played	%.0f hours played
 overlay_install	Install
+overlay_multiple_hour_multiple_minute_played	%.0f hours %.0f minutes played
+overlay_multiple_hour_single_minute_played	%.0f hours %.0f minute played
+overlay_multiple_minutes_played	%.0f minutes played
 overlay_platform_not_running	%s is not running
 overlay_remove	Remove
+overlay_single_hour_multiple_minute_played	%.0f hour %.0f minutes played
 overlay_single_hour_played	%.0f hour played
+overlay_single_hour_single_minute_played	%.0f hour %.0f minute played
+overlay_single_minute_played	%.0f minute played
 overlay_unhide	Unhide
 overlay_uninstalled	Uninstalled
 platform_name_windows_shortcut	Windows shortcut
@@ -89,6 +102,11 @@ setting_battlenet_paths_description	""Define the absolute paths to folders, whic
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
 setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
+setting_game_detection_frequency_always	Always
+setting_game_detection_frequency_description	How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.
+setting_game_detection_frequency_never	Never
+setting_game_detection_frequency_once_per_day	Once per day
+setting_game_detection_frequency_title	Game detection frequency
 setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
@@ -133,7 +151,21 @@ setting_slots_horizontal_orientation_title	Horizontal orientation
 setting_slots_hover_animation_description	The animation that plays when the mouse is on a slot.
 setting_slots_hover_animation_title	Slot hover animation
 setting_slots_overlay_enabled_description	If enabled, then an overlay with contextual information is displayed when the mouse is on a slot.
-setting_slots_overlay_enabled_title	Show overlay on slots
+setting_slots_overlay_enabled_title	Show overlays on slots
+setting_slots_overlay_images_enabled_description	If enabled, then context-sensitive images are used in the slot overlays.
+setting_slots_overlay_images_enabled_title	Show images on slot overlays
+setting_slots_overlay_lower_text_description	The text that is shown on the lower half of the slot overlay.
+setting_slots_overlay_lower_text_title	Slot overlay lower text
+setting_slots_overlay_text_option_game_platform	Platform
+setting_slots_overlay_text_option_game_title	Title
+setting_slots_overlay_text_option_last_played_yyyymmdd	Last played (YYYY-MM-DD)
+setting_slots_overlay_text_option_none	Nothing
+setting_slots_overlay_text_option_notes	Notes
+setting_slots_overlay_text_option_time_played_hours	Hours played
+setting_slots_overlay_text_option_time_played_hours_and_minutes	Hours and minutes played
+setting_slots_overlay_text_option_time_played_hours_or_minutes	Hours or minutes played
+setting_slots_overlay_upper_text_description	The text that is shown on the upper half of the slot overlay.
+setting_slots_overlay_upper_text_title	Slot overlay upper text
 setting_slots_rows_description	The number of rows of slots.
 setting_slots_rows_title	Number of rows
 setting_slots_toolbar_at_top_description	If enabled, then the toolbar is at the top of the skin.

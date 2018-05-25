@@ -119,6 +119,43 @@ state.skinAnimations = {
     displayValue = LOCALIZATION:get('setting_animation_label_slide_left', 'Slide to the left')
   }
 }
+state.gameDetectionFrequencies = {
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_never', 'Never')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_always', 'Always')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_game_detection_frequency_once_per_day', 'Once per day')
+  }
+}
+state.slotsOverlayTextOptions = {
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_none', 'Nothing')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_game_title', 'Title')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_game_platform', 'Platform')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_time_played_hours', 'Hours played')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_time_played_hours_and_minutes', 'Hours and minutes played')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_time_played_hours_or_minutes', 'Hours or minutes played')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_last_played_yyyymmdd', 'Last played (YYYY-MM-DD)')
+  },
+  {
+    displayValue = LOCALIZATION:get('setting_slots_overlay_text_option_notes', 'Notes')
+  }
+}
 local Skin
 do
   local _class_0
@@ -184,7 +221,7 @@ do
           end
         }),
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_slots_overlay_enabled_title', 'Show overlay on slots'),
+          title = LOCALIZATION:get('setting_slots_overlay_enabled_title', 'Show overlays on slots'),
           tooltip = LOCALIZATION:get('setting_slots_overlay_enabled_description', 'If enabled, then an overlay with contextual information is displayed when the mouse is on a slot.'),
           toggle = function()
             COMPONENTS.SETTINGS:toggleSlotsOverlayEnabled()
@@ -193,6 +230,53 @@ do
           getState = function()
             return COMPONENTS.SETTINGS:getSlotsOverlayEnabled()
           end
+        }),
+        Settings.Boolean({
+          title = LOCALIZATION:get('setting_slots_overlay_images_enabled_title', 'Show images on slot overlays'),
+          tooltip = LOCALIZATION:get('setting_slots_overlay_images_enabled_description', 'If enabled, then context-sensitive images are used in the slot overlays.'),
+          toggle = function()
+            COMPONENTS.SETTINGS:toggleSlotsOverlayImagesEnabled()
+            return true
+          end,
+          getState = function()
+            return COMPONENTS.SETTINGS:getSlotsOverlayImagesEnabled()
+          end
+        }),
+        Settings.Spinner({
+          title = LOCALIZATION:get('setting_slots_overlay_upper_text_title', 'Slot overlay upper text'),
+          tooltip = LOCALIZATION:get('setting_slots_overlay_upper_text_description', 'The text that is shown on the upper half of the slot overlay.'),
+          index = COMPONENTS.SETTINGS:getSlotsOverlayUpperText(),
+          setIndex = function(self, index)
+            if index < 1 then
+              index = #self:getValues()
+            elseif index > #self:getValues() then
+              index = 1
+            end
+            self.index = index
+            return COMPONENTS.SETTINGS:setSlotsOverlayUpperText(index)
+          end,
+          getValues = function(self)
+            return state.slotsOverlayTextOptions
+          end,
+          setValues = function(self) end
+        }),
+        Settings.Spinner({
+          title = LOCALIZATION:get('setting_slots_overlay_lower_text_title', 'Slot overlay lower text'),
+          tooltip = LOCALIZATION:get('setting_slots_overlay_lower_text_description', 'The text that is shown on the lower half of the slot overlay.'),
+          index = COMPONENTS.SETTINGS:getSlotsOverlayLowerText(),
+          setIndex = function(self, index)
+            if index < 1 then
+              index = #self:getValues()
+            elseif index > #self:getValues() then
+              index = 1
+            end
+            self.index = index
+            return COMPONENTS.SETTINGS:setSlotsOverlayLowerText(index)
+          end,
+          getValues = function(self)
+            return state.slotsOverlayTextOptions
+          end,
+          setValues = function(self) end
         }),
         Settings.Spinner({
           title = LOCALIZATION:get('setting_slots_hover_animation_title', 'Slot hover animation'),
@@ -377,6 +461,24 @@ do
           onValueChanged = function(self, value)
             return COMPONENTS.SETTINGS:setNumberOfBackups(value)
           end
+        }),
+        Settings.Spinner({
+          title = LOCALIZATION:get('setting_game_detection_frequency_title', 'Game detection frequency'),
+          tooltip = LOCALIZATION:get('setting_game_detection_frequency_description', 'How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.'),
+          index = COMPONENTS.SETTINGS:getGameDetectionFrequency(),
+          setIndex = function(self, index)
+            if index < 1 then
+              index = #self:getValues()
+            elseif index > #self:getValues() then
+              index = 1
+            end
+            self.index = index
+            return COMPONENTS.SETTINGS:setGameDetectionFrequency(index)
+          end,
+          getValues = function(self)
+            return state.gameDetectionFrequencies
+          end,
+          setValues = function(self) end
         }),
         Settings.Boolean({
           title = LOCALIZATION:get('setting_logging_title', 'Log'),

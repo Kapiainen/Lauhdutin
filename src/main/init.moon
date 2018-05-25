@@ -22,6 +22,7 @@ export STATE = {
 	NUM_SLOTS: 0
 	SCROLL_INDEX: 1
 	SCROLL_STEP: 1
+	SCROLL_INDEX_UPDATED: nil
 	LEFT_CLICK_ACTION: 1
 	PLATFORM_NAMES: {}
 	PLATFORM_RUNNING_STATUS: {}
@@ -112,8 +113,8 @@ startDetectingPlatformGames = () ->
 		else
 			assert(nil, 'main.init.startDetectingPlatformGames')
 
-detectGames = () ->
-	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
+detectPlatforms = () ->
+	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_platforms', 'Detecting platforms'))
 	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
 	log('Num platforms:', #platforms)
 	COMPONENTS.PROCESS\registerPlatforms(platforms)
@@ -129,6 +130,9 @@ detectGames = () ->
 		table.insert(STATE.PLATFORM_QUEUE, platform) if enabled
 		log(' ' .. STATE.PLATFORM_NAMES[platformID] .. ' = ' .. tostring(enabled))
 	assert(#STATE.PLATFORM_QUEUE > 0, 'There are no enabled platforms.')
+
+detectGames = () ->
+	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
 	STATE.BANNER_QUEUE = {}
 	startDetectingPlatformGames()
 
@@ -179,7 +183,6 @@ onInitialized = () ->
 	if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE
 		COMPONENTS.ANIMATIONS\pushSkinSlide(animationType, false)
 		setUpdateDivider(1)
-	COMPONENTS.PROCESS\update()
 	log('Skin initialized')
 
 additionalEnums = () ->
@@ -216,14 +219,19 @@ export Initialize = () ->
 			SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_hiding_games', 'Start hiding games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
+			SKIN\Bang(('[!SetVariable "ContextTitleDetectGames" "%s"]')\format(LOCALIZATION\get('main_context_title_detect_games', 'Detect games')))
 			COMPONENTS.TOOLBAR = require('main.toolbar')(COMPONENTS.SETTINGS)
 			COMPONENTS.TOOLBAR\hide()
 			COMPONENTS.ANIMATIONS = require('main.animations')()
 			STATE.NUM_SLOTS = COMPONENTS.SETTINGS\getLayoutRows() * COMPONENTS.SETTINGS\getLayoutColumns()
 			COMPONENTS.SLOTS = require('main.slots')(COMPONENTS.SETTINGS)
-			COMPONENTS.LIBRARY = require('shared.library')(COMPONENTS.SETTINGS)
 			COMPONENTS.PROCESS = require('main.process')()
-			detectGames()
+			COMPONENTS.LIBRARY = require('shared.library')(COMPONENTS.SETTINGS)
+			detectPlatforms()
+			if COMPONENTS.LIBRARY\getDetectGames() == true
+				detectGames()
+			else
+				onInitialized()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -814,7 +822,20 @@ export OnDumpedDBs = () ->
 			log('Dumped GOG Galaxy databases')
 			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
 			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
-			galaxy = io.readFile(io.joinPaths(cachePath, 'galaxy.txt'))
+			galaxyPath = io.joinPaths(cachePath, 'galaxy.txt')
+			galaxy = io.readFile(galaxyPath)
+			newGalaxy = {}
+			wholeLine = {}
+			lines = galaxy\splitIntoLines()
+			for line in *lines
+				if line\match('^%d+|[^|]+|[^|]+|.+$')
+					table.insert(newGalaxy, table.concat(wholeLine, ''))
+					wholeLine = {}
+				table.insert(wholeLine, line)
+			if #wholeLine > 0
+				table.insert(newGalaxy, table.concat(wholeLine, ''))
+			galaxy = table.concat(newGalaxy, '\n')
+			io.writeFile(galaxyPath, galaxy)
 			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy)
 			OnFinishedDetectingPlatformGames()
 	)
@@ -855,6 +876,82 @@ export OnFinishedDownloadingBanners = () ->
 			onInitialized()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
+
+export ReacquireBanner = (gameID) ->
+	success, err = pcall(
+		() ->
+			games = io.readJSON(STATE.PATHS.GAMES)
+			games = games.games
+			game = games[gameID]
+			if game == nil or game.gameID ~= gameID
+				game = nil
+				for args in *games
+					if args.gameID == gameID
+						game = args
+						break
+			assert(game ~= nil, 'main.init.OnReacquireBanner')
+			game = Game(game)
+			log('Reacquiring a banner for', game\getTitle())
+			platform = nil
+			platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+			platformID = game\getPlatformID()
+			for p in *platforms
+				if p\getPlatformID() == platformID
+					platform = p
+					break
+			if platform == nil
+				log("Failed to get platform for banner reacquisition", platformID)
+				return
+			url = switch platformID
+				when ENUMS.PLATFORM_IDS.STEAM
+					if game\getPlatformOverride() == nil
+						appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+						platform\generateBannerURL(appID)
+					else
+						nil
+				when ENUMS.PLATFORM_IDS.GOG_GALAXY
+					productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+					galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
+					productIDs = {}
+					productIDs[productID] = true
+					titles, bannerURLs = platform\parseGalaxyDB(productIDs, galaxy)
+					bannerURLs[productID]
+				else nil
+			if url == nil
+				log("Failed to get URL for banner reacquisition", gameID)
+				return
+			STATE.BANNER_QUEUE = {game}
+			bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
+			downloadFile(url, bannerPath, 'OnBannerReacquisitionFinished', 'OnBannerReacquisitionError')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnBannerReacquisitionFinished = () ->
+	success, err = pcall(
+		() ->
+			log('Successfully reacquired a banner')
+			game = STATE.BANNER_QUEUE[1]
+			STATE.BANNER_QUEUE = nil
+			downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN\GetMeasure('Downloader')\GetOption('DownloadFile'))
+			bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game\getBanner())
+			os.remove(bannerPath)
+			os.rename(downloadedPath, bannerPath)
+			stopDownloader()
+			STATE.SCROLL_INDEX_UPDATED = false
+			SKIN\Bang('[!UpdateMeasure "Script"]')
+			SKIN\Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnBannerReacquisitionError = () ->
+	success, err = pcall(
+		() ->
+			log('Failed to reacquire a banner')
+			STATE.BANNER_QUEUE = nil
+			stopDownloader()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
 
 -- Context title action
 export ToggleHideGames = () ->
@@ -936,5 +1033,81 @@ export ToggleRemoveGames = () ->
 			return if #STATE.GAMES == 0
 			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_stop_removing_games', 'Stop removing games')))
 			STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export TriggerGameDetection = () ->
+	success, err = pcall(
+		() ->
+			games = io.readJSON(STATE.PATHS.GAMES)
+			games.updated = nil
+			io.writeJSON(STATE.PATHS.GAMES, games)
+			SKIN\Bang("[!Refresh]")
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OpenStorePage = (gameID) ->
+	success, err = pcall(
+		() ->
+			if gameID ~= nil
+				games = io.readJSON(STATE.PATHS.GAMES)
+				games = games.games
+				game = games[gameID]
+				if game == nil or game.gameID ~= gameID
+					game = nil
+					for args in *games
+						if args.gameID == gameID
+							game = args
+							break
+				assert(game ~= nil, 'main.init.OpenStorePage')
+				game = Game(game)
+				platform = nil
+				platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+				platformID = game\getPlatformID()
+				for p in *platforms
+					if p\getPlatformID() == platformID
+						platform = p
+						break
+				if platform == nil
+					log("Failed to get platform for opening the store page", platformID)
+					return
+				url = switch platformID
+					when ENUMS.PLATFORM_IDS.STEAM
+						if game\getPlatformOverride() == nil
+							appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+							('https://store.steampowered.com/app/%s')\format(appID)
+						else
+							nil
+					when ENUMS.PLATFORM_IDS.GOG_GALAXY
+						productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+						galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
+						link = nil
+						for line in *galaxy\splitIntoLines()
+							if line\startsWith(productID)
+								links = line\match('^%d+|[^|]+|[^|]+|(.+)$')
+								if links ~= nil
+									links = json.decode(links\lower())
+									if link == nil and links.store ~= nil
+										if type(links.store.href) == 'string'
+											link = links.store.href
+										elseif type(links.store) == 'string'
+											link = links.store
+									if link == nil and links.forum ~= nil
+										if type(links.forum.href) == 'string'
+											link = links.forum.href\gsub('forum', 'game')
+										elseif type(links.forum) == 'string'
+											link = links.forum\gsub('forum', 'game')
+									if link == nil and links.product_card ~= nil
+										if type(links.product_card.href) == 'string'
+											link = links.product_card.href
+										elseif type(links.product_card) == 'string'
+											link = links.product_card
+								break
+						link
+					else nil
+				if url == nil
+					log("Failed to get URL for opening the store page", gameID)
+					return
+				SKIN\Bang(('[%s]')\format(url))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

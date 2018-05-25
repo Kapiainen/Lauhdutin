@@ -65,19 +65,44 @@ class Library
 		assert(type(regularMode) == 'boolean', 'shared.library.Library')
 		@version = 1
 		@path = 'games.json'
-		if regularMode
-			@numBackups = settings\getNumberOfBackups()
-			@backupFilePattern = 'games_backup_%d.json'
-			@games = {}
-			@oldGames = @load()
-			@currentGameID = 1
-		else
-			games = io.readJSON(@path)
-			@games = [Game(args) for args in *games.games]
-			@oldGames = {}
+		games = if io.fileExists(@path) then io.readJSON(@path) else {}
+		@currentGameID = 1
+		@numBackups = settings\getNumberOfBackups()
+		@backupFilePattern = 'games_backup_%d.json'
 		@filterStack = {}
 		@processedGames = nil
 		@gamesSortedByGameID = nil
+		@detectGames = false
+		@updatedTimestamp = if regularMode == true then os.date('*t') else games.updated
+		if regularMode
+			@detectGames = switch settings\getGameDetectionFrequency()
+				when ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS
+					true
+				when ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+					@updatedTimestamp = os.date('*t')
+					updated = games.updated or {}
+					if updated.year == @updatedTimestamp.year and updated.month == @updatedTimestamp.month and updated.day == @updatedTimestamp.day
+						false
+					else
+						true
+				when ENUMS.GAME_DETECTION_FREQUENCY.NEVER
+					if games.updated == nil
+						true
+					else
+						false
+				else false
+			if @detectGames == true
+				@games = {}
+				@oldGames = @load()
+			else
+				@games = [Game(args) for args in *games.games]
+				@oldGames = {}
+		else
+			@games = [Game(args) for args in *games.games]
+			@oldGames = {}
+
+	getDetectGames: () =>
+		return @detectGames
 
 	createBackup: (path) =>
 		games = io.readJSON(path)
@@ -119,6 +144,7 @@ class Library
 		io.writeJSON(@path, {
 			version: @version
 			games: games
+			updated: @updatedTimestamp
 		})
 
 	migrate: (games, version) =>
@@ -348,6 +374,11 @@ class Library
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				games = [game for game in *gamesToProcess when game\getNotes() ~= nil]
+			when ENUMS.FILTER_TYPES.LACKS_TAG
+				assert(type(args) == 'table', 'shared.library.Library.filter')
+				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
+				tag = args.tag
+				games = [game for game in *gamesToProcess when game\hasTag(tag) ~= true]
 			else
 				assert(nil, 'shared.library.Library.filter')
 		assert(type(games) == 'table', 'shared.library.Library.filter')

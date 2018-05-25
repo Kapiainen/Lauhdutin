@@ -25,6 +25,7 @@ export STATE = {
 	ALL_PLATFORMS: nil
 	HIGHLIGHTED_SLOT_INDEX: 0
 	CENTERED: false
+	ACTIVE_INPUT: false
 }
 
 COMPONENTS = {
@@ -86,6 +87,7 @@ additionalEnums = () ->
 getGamesAndTags = () ->
 	games = io.readJSON(STATE.PATHS.GAMES)
 	STATE.GAMES_VERSION = games.version
+	STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
 	STATE.ALL_GAMES = [Game(args) for args in *games.games]
 	if STATE.ALL_TAGS == nil
 		STATE.ALL_TAGS = {}
@@ -234,25 +236,24 @@ createTagProperties = () ->
 	)
 	return properties
 
-createProperties = (game, platform) ->
-	properties = {}
-	-- Platform
+createPlatformProperty = (game, platform) ->
 	platformOverride = game\getPlatformOverride()
 	platformName = if platformOverride ~= nil then platformOverride .. '*' else platform\getName()
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_platform', 'Platform')
-			value: platformName
-		})
-	)
-	-- Hours played
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('button_label_hours_played', 'Hours played')
-			value: ('%.0f')\format(game\getHoursPlayed())
-		})
-	)
-	-- Last played
+	return Property({
+		title: LOCALIZATION\get('game_platform', 'Platform')
+		value: platformName
+	})
+
+createHoursPlayedProperty = (game) ->
+	f = () => return ('%.0f')\format(game\getHoursPlayed())
+	return Property({
+		title: LOCALIZATION\get('button_label_hours_played', 'Hours played')
+		value: f()
+		action: (index) => StartEditingHoursPlayed(index)
+		update: f
+	})
+
+createLastPlayedProperty = (game) ->
 	f = () =>
 		lastPlayed = game\getLastPlayed()
 		if lastPlayed > 315532800
@@ -262,38 +263,36 @@ createProperties = (game, platform) ->
 				date.hour, date.min, date.sec
 			)
 		return LOCALIZATION\get('game_last_played_never', 'Never')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_last_played', 'Last played')
-			value: f()
-		})
-	)
+	return Property({
+		title: LOCALIZATION\get('game_last_played', 'Last played')
+		value: f()
+	})
+
+createInstalledProperty = (game) ->
 	-- Installed
 	f = () =>
 		if game\isInstalled()
 			return LOCALIZATION\get('button_label_yes', 'Yes')
 		return LOCALIZATION\get('button_label_no', 'No')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_installed', 'Installed')
-			value: f()
-		})
-	)
-	-- Visible
+	return Property({
+		title: LOCALIZATION\get('game_installed', 'Installed')
+		value: f()
+	})
+
+createVisibleProperty = (game) ->
 	f = () =>
 		if game\isVisible()
 			return LOCALIZATION\get('button_label_yes', 'Yes')
 		return LOCALIZATION\get('button_label_no', 'No')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_visible', 'Visible')
-			value: f()
-			action: (index) =>
-				STATE.GAME\toggleVisibility()
-			update: f
-		})
-	)
-	-- Path
+	return Property({
+		title: LOCALIZATION\get('game_visible', 'Visible')
+		value: f()
+		action: (index) =>
+			STATE.GAME\toggleVisibility()
+		update: f
+	})
+
+createPathProperty = (game) ->
 	path = game\getPath()
 	action = nil
 	if path\startsWith('"') and path\endsWith('"')
@@ -303,16 +302,13 @@ createProperties = (game, platform) ->
 		if head ~= nil
 			action = (index) =>
 				SKIN\Bang(('["%s"]')\format(head))
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_path', 'Path')
-			value: ('""%s""')\format(game\getPath())
-			:action
-		})
-	)
-	action = nil
-	path = nil
-	-- Process
+	return Property({
+		title: LOCALIZATION\get('game_path', 'Path')
+		value: ('""%s""')\format(game\getPath())
+		:action
+	})
+
+createProcessProperty = (game) ->
 	f = () =>
 		processOverride = game\getProcessOverride()
 		if processOverride ~= nil and processOverride ~= ''
@@ -321,16 +317,15 @@ createProperties = (game, platform) ->
 		if process ~= nil and process ~= ''
 			return process 
 		return LOCALIZATION\get('game_process_none', 'None')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_process', 'Process')
-			value: f()
-			action: (index) =>
-				StartEditingProcessOverride(index)
-			update: f
-		})
-	)
-	-- Notes
+	return Property({
+		title: LOCALIZATION\get('game_process', 'Process')
+		value: f()
+		action: (index) =>
+			StartEditingProcessOverride(index)
+		update: f
+	})
+
+createNotesProperty = (game) ->
 	f = () =>
 		notes = game\getNotes()
 		if notes ~= nil and notes\len() > 0
@@ -339,16 +334,15 @@ createProperties = (game, platform) ->
 			line ..= '...' if #lines > 1
 			return line
 		return LOCALIZATION\get('game_notes_none', 'None')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_notes', 'Notes')
-			value: f()
-			action: (index) =>
-				StartEditingNotes()
-			update: f
-		})
-	)
-	-- Tags
+	return Property({
+		title: LOCALIZATION\get('game_notes', 'Notes')
+		value: f()
+		action: (index) =>
+			StartEditingNotes()
+		update: f
+	})
+
+createTagsProperty = (game) ->
 	f = () =>
 		tags = {}
 		for tag in *game\getTags()
@@ -368,41 +362,39 @@ createProperties = (game, platform) ->
 			if str ~= ''
 				return str
 		return LOCALIZATION\get('game_tags_none', 'None')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_tags', 'Tags')
-			value: f()
-			action: (index) =>
-				STATE.GAME_TAGS = {tag, state for tag, state in pairs(STATE.ALL_TAGS)}
-				for tag in *game\getTags()
-					STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
-				for tag in *game\getPlatformTags()
-					STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
-				SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_accept', 'Accept')))
-				STATE.TAG_PROPERTIES = createTagProperties()
-				STATE.PROPERTIES = STATE.TAG_PROPERTIES
-				STATE.PREVIOUS_SCROLL_INDEX = STATE.SCROLL_INDEX
-				STATE.SCROLL_INDEX = 1
-				updateScrollbar()
-				updateSlots()
-			update: f
-		})
-	)
-	-- Ignores other bangs
+	return Property({
+		title: LOCALIZATION\get('game_tags', 'Tags')
+		value: f()
+		action: (index) =>
+			STATE.GAME_TAGS = {tag, state for tag, state in pairs(STATE.ALL_TAGS)}
+			for tag in *game\getTags()
+				STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
+			for tag in *game\getPlatformTags()
+				STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
+			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_accept', 'Accept')))
+			STATE.TAG_PROPERTIES = createTagProperties()
+			STATE.PROPERTIES = STATE.TAG_PROPERTIES
+			STATE.PREVIOUS_SCROLL_INDEX = STATE.SCROLL_INDEX
+			STATE.SCROLL_INDEX = 1
+			updateScrollbar()
+			updateSlots()
+		update: f
+	})
+
+createIgnoresOtherBangsProperty = (game) ->
 	f = () =>
 		if game\getIgnoresOtherBangs()
 			return LOCALIZATION\get('button_label_yes', 'Yes')
 		return LOCALIZATION\get('button_label_no', 'No')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('game_ignores_other_bangs', 'Ignores other bangs')
-			value: f()
-			action: (index) =>
-				STATE.GAME\toggleIgnoresOtherBangs()
-			update: f
-		})
-	)
-	-- Starting bangs
+	return Property({
+		title: LOCALIZATION\get('game_ignores_other_bangs', 'Ignores other bangs')
+		value: f()
+		action: (index) =>
+			STATE.GAME\toggleIgnoresOtherBangs()
+		update: f
+	})
+
+createStartingBangsProperty = (game) ->
 	f = () =>
 		bangs = game\getStartingBangs()
 		if bangs and #bangs > 0
@@ -410,16 +402,15 @@ createProperties = (game, platform) ->
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
 		return LOCALIZATION\get('button_label_bangs_none', 'None')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
-			value: f()
-			action: (index) =>
-				StartEditingStartingBangs()
-			update: f
-		})
-	)
-	-- Stopping bangs
+	return Property({
+		title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
+		value: f()
+		action: (index) =>
+			StartEditingStartingBangs()
+		update: f
+	})
+
+createStoppingBangsProperty = (game) ->
 	f = () =>
 		bangs = game\getStoppingBangs()
 		if bangs and #bangs > 0
@@ -427,16 +418,61 @@ createProperties = (game, platform) ->
 			if bangs ~= ''
 				return (bangs\gsub('\"', '\'\''))
 		return LOCALIZATION\get('button_label_bangs_none', 'None')
-	table.insert(properties,
-		Property({
-			title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
-			value: f()
-			action: (index) =>
-				StartEditingStoppingBangs()
-			update: f
-		})
-	)
-	return properties
+	return Property({
+		title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
+		value: f()
+		action: (index) =>
+			StartEditingStoppingBangs()
+		update: f
+	})
+
+createBannerReacquisitionProperty = (game) ->
+	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
+	action = nil
+	switch game\getPlatformID()
+		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
+			if game\getPlatformOverride() == nil
+				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
+				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+	return Property({
+		title: LOCALIZATION\get('button_label_reacquire_banner', 'Reacquire banner')
+		:value
+		:action
+		update: nil
+	})
+
+createOpenStorePageProperty = (game) ->
+	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
+	action = nil
+	switch game\getPlatformID()
+		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
+			if game\getPlatformOverride() == nil
+				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
+				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+	return Property({
+		title: LOCALIZATION\get('button_label_open_store_page', 'Open store page')
+		:value
+		:action
+		update: nil
+	})
+
+createProperties = (game, platform) ->
+	return {
+		createPlatformProperty(game, platform)
+		createHoursPlayedProperty(game)
+		createLastPlayedProperty(game)
+		createInstalledProperty(game)
+		createVisibleProperty(game)
+		createPathProperty(game)
+		createProcessProperty(game)
+		createNotesProperty(game)
+		createTagsProperty(game)
+		createIgnoresOtherBangsProperty(game)
+		createStartingBangsProperty(game)
+		createStoppingBangsProperty(game)
+		createBannerReacquisitionProperty(game)
+		createOpenStorePageProperty(game)
+	}
 
 export Handshake = (gameID) ->
 	success, err = pcall(
@@ -532,9 +568,10 @@ showDefaultProperties = () ->
 export Save = () ->
 	success, err = pcall(
 		() ->
+			return if STATE.ACTIVE_INPUT == true
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
-					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES})
+					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, updated: STATE.GAMES_UPDATED_TIMESTAMP})
 					gameID = STATE.GAME\getGameID()
 					SKIN\Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]')\format(gameID))
 				when STATE.TAG_PROPERTIES
@@ -546,6 +583,7 @@ export Save = () ->
 export Cancel = () ->
 	success, err = pcall(
 		() ->
+			return if STATE.ACTIVE_INPUT == true
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
 					SKIN\Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
@@ -582,16 +620,29 @@ export OpenBanner = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
+export OnDismissedInput = () ->
+	success, err = pcall(
+		() ->
+			STATE.ACTIVE_INPUT = false
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+startEditing = (slotIndex, batchIndex, defaultValue) ->
+	meter = SKIN\GetMeter(('Slot%dValue')\format(slotIndex))
+	SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
+	SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
+	SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
+	SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
+	defaultValue = '' if defaultValue == nil
+	SKIN\Bang(('[!SetOption "Input" "DefaultValue" "%s"]')\format(defaultValue))
+	SKIN\Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]')\format(batchIndex))
+	STATE.ACTIVE_INPUT = true
+
 -- Process override
 export StartEditingProcessOverride = (index) ->
 	success, err = pcall(
 		() ->
-			meter = SKIN\GetMeter(('Slot%dValue')\format(index))
-			SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
-			SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
-			SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
-			SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
-			SKIN\Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
+			startEditing(index, 1, STATE.GAME\getProcessOverride())
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -600,6 +651,24 @@ export OnEditedProcessOverride = (process) ->
 		() ->
 			STATE.GAME\setProcessOverride(process\sub(1, -2))
 			updateSlots()
+			OnDismissedInput()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+-- Hours played
+export StartEditingHoursPlayed = (index) ->
+	success, err = pcall(
+		() ->
+			startEditing(index, 3, STATE.GAME\getHoursPlayed())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnEditedHoursPlayed = (hoursPlayed) ->
+	success, err = pcall(
+		() ->
+			STATE.GAME\setHoursPlayed(tonumber((hoursPlayed\sub(1, -2)\gsub(',', '.'))))
+			updateSlots()
+			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -607,12 +676,7 @@ export OnEditedProcessOverride = (process) ->
 export StartCreatingTag = (index) ->
 	success, err = pcall(
 		() ->
-			meter = SKIN\GetMeter(('Slot%dValue')\format(index))
-			SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
-			SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
-			SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
-			SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
-			SKIN\Bang('[!CommandMeasure "Input" "ExecuteBatch 2"]')
+			startEditing(index, 2)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -629,6 +693,7 @@ export OnCreatedTag = (tag) ->
 			table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
 			updateScrollbar()
 			updateSlots()
+			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -694,5 +759,12 @@ export OnEditedNotes = () ->
 			notes = io.readFile(STATE.PATHS.NOTES)
 			STATE.GAME\setNotes(notes)
 			updateSlots()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnReacquiredBanner = () ->
+	success, err = pcall(
+		() ->
+			updateBanner(STATE.GAME)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

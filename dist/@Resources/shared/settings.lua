@@ -153,6 +153,15 @@ local migrators = {
       settings.steam_personaname = nil
       settings.show_platform = nil
     end
+  },
+  {
+    version = 2,
+    func = function(settings)
+      settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+      settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+      settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+      settings.slots.overlayImagesEnabled = true
+    end
   }
 }
 local Settings
@@ -242,7 +251,7 @@ do
       return self.settings.numberOfBackups or 5
     end,
     setNumberOfBackups = function(self, value)
-      if value < 0 then
+      if value < 1 then
         return 
       end
       self.settings.numberOfBackups = value
@@ -260,10 +269,19 @@ do
       return self.settings.sorting or ENUMS.SORTING_TYPES.ALPHABETICALLY
     end,
     setSorting = function(self, value)
-      if value < 1 then
+      if value < ENUMS.SORTING_TYPES.ALPHABETICALLY or value >= ENUMS.SORTING_TYPES.MAX then
         return 
       end
       self.settings.sorting = value
+    end,
+    getGameDetectionFrequency = function(self)
+      return self.settings.gameDetectionFrequency or ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+    end,
+    setGameDetectionFrequency = function(self, value)
+      if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX then
+        return 
+      end
+      self.settings.gameDetectionFrequency = value
     end,
     getLocalization = function(self)
       return self.settings.localization or 'English'
@@ -424,6 +442,33 @@ do
     end,
     toggleSlotsOverlayEnabled = function(self)
       self.settings.slots.overlayEnabled = not self.settings.slots.overlayEnabled
+    end,
+    getSlotsOverlayUpperText = function(self)
+      return self.settings.slots.overlayUpperText or ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+    end,
+    setSlotsOverlayUpperText = function(self, value)
+      if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX then
+        return 
+      end
+      self.settings.slots.overlayUpperText = value
+    end,
+    getSlotsOverlayLowerText = function(self)
+      return self.settings.slots.overlayLowerText or ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+    end,
+    setSlotsOverlayLowerText = function(self, value)
+      if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX then
+        return 
+      end
+      self.settings.slots.overlayLowerText = value
+    end,
+    getSlotsOverlayImagesEnabled = function(self)
+      if self.settings.slots.overlayImagesEnabled ~= nil then
+        return self.settings.slots.overlayImagesEnabled
+      end
+      return false
+    end,
+    toggleSlotsOverlayImagesEnabled = function(self)
+      self.settings.slots.overlayImagesEnabled = not self.settings.slots.overlayImagesEnabled
     end,
     getSlotsHoverAnimation = function(self)
       return self.settings.slots.hoverAnimation or ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
@@ -658,12 +703,13 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self)
-      self.version = 1
+      self.version = 2
       self.path = 'settings.json'
       self.defaultSettings = {
         numberOfBackups = 5,
         logging = false,
         sorting = ENUMS.SORTING_TYPES.ALPHABETICALLY,
+        gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY,
         bangs = {
           enabled = true,
           global = {
@@ -689,6 +735,9 @@ do
         slots = {
           doubleClickToLaunch = false,
           overlayEnabled = true,
+          overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE,
+          overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES,
+          overlayImagesEnabled = true,
           hoverAnimation = ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN,
           clickAnimation = ENUMS.SLOT_CLICK_ANIMATIONS.SHRINK
         },

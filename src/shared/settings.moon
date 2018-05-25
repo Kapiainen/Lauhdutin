@@ -137,16 +137,25 @@ migrators = {
 			settings.steam_personaname = nil
 			settings.show_platform = nil
 	}
+	{
+		version: 2
+		func: (settings) ->
+			settings.gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+			settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+			settings.slots.overlayImagesEnabled = true
+	}
 }
 
 class Settings
 	new: () =>
-		@version = 1
+		@version = 2
 		@path = 'settings.json'
 		@defaultSettings = {
 			numberOfBackups: 5
 			logging: false -- If true, then extra information is printed to Rainmeter's log. Useful when troubleshooting issues.
 			sorting: ENUMS.SORTING_TYPES.ALPHABETICALLY -- How games are sorted.
+			gameDetectionFrequency: ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY -- How often the skin attempts to detect games when the skin is loaded.
 			bangs: {
 				enabled: true -- Whether or not bangs are executed (applies to global, platform-specific, and game-specific bangs).
 				global: {
@@ -172,6 +181,9 @@ class Settings
 			slots: {
 				doubleClickToLaunch: false
 				overlayEnabled: true
+				overlayUpperText: ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+				overlayLowerText: ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+				overlayImagesEnabled: true
 				hoverAnimation: ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
 				clickAnimation: ENUMS.SLOT_CLICK_ANIMATIONS.SHRINK
 			}
@@ -271,7 +283,7 @@ class Settings
 	getNumberOfBackups: () => return @settings.numberOfBackups or 5
 
 	setNumberOfBackups: (value) =>
-		return if value < 0
+		return if value < 1
 		@settings.numberOfBackups = value
 
 	getLogging: () =>
@@ -284,8 +296,14 @@ class Settings
 	getSorting: () => return @settings.sorting or ENUMS.SORTING_TYPES.ALPHABETICALLY
 
 	setSorting: (value) =>
-		return if value < 1
+		return if value < ENUMS.SORTING_TYPES.ALPHABETICALLY or value >= ENUMS.SORTING_TYPES.MAX
 		@settings.sorting = value
+
+	getGameDetectionFrequency: () => return @settings.gameDetectionFrequency or ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY
+
+	setGameDetectionFrequency: (value) =>
+		return if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX
+		@settings.gameDetectionFrequency = value
 
 	getLocalization: () => return @settings.localization or 'English'
 
@@ -403,6 +421,25 @@ class Settings
 		return true
 
 	toggleSlotsOverlayEnabled: () => @settings.slots.overlayEnabled = not @settings.slots.overlayEnabled
+
+	getSlotsOverlayUpperText: () => return @settings.slots.overlayUpperText or ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
+
+	setSlotsOverlayUpperText: (value) =>
+		return if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX
+		@settings.slots.overlayUpperText = value
+
+	getSlotsOverlayLowerText: () => return @settings.slots.overlayLowerText or ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
+
+	setSlotsOverlayLowerText: (value) =>
+		return if value < ENUMS.OVERLAY_SLOT_TEXT.NONE or value >= ENUMS.OVERLAY_SLOT_TEXT.MAX
+		@settings.slots.overlayLowerText = value
+
+	getSlotsOverlayImagesEnabled: () =>
+		if @settings.slots.overlayImagesEnabled ~= nil
+			return @settings.slots.overlayImagesEnabled
+		return false
+
+	toggleSlotsOverlayImagesEnabled: () => @settings.slots.overlayImagesEnabled = not @settings.slots.overlayImagesEnabled
 
 	getSlotsHoverAnimation: () => return @settings.slots.hoverAnimation or ENUMS.SLOT_HOVER_ANIMATIONS.ZOOM_IN
 	

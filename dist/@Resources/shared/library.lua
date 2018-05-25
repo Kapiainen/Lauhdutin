@@ -70,6 +70,9 @@ local Library
 do
   local _class_0
   local _base_0 = {
+    getDetectGames = function(self)
+      return self.detectGames
+    end,
     createBackup = function(self, path)
       local games = io.readJSON(path)
       local date = os.date('*t')
@@ -148,7 +151,8 @@ do
       end
       return io.writeJSON(self.path, {
         version = self.version,
-        games = games
+        games = games,
+        updated = self.updatedTimestamp
       })
     end,
     migrate = function(self, games, version)
@@ -559,6 +563,22 @@ do
           end
           games = _accum_0
         end
+      elseif ENUMS.FILTER_TYPES.LACKS_TAG == _exp_0 then
+        assert(type(args) == 'table', 'shared.library.Library.filter')
+        assert(type(args.tag) == 'string', 'shared.library.Library.filter')
+        local tag = args.tag
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          for _index_0 = 1, #gamesToProcess do
+            local game = gamesToProcess[_index_0]
+            if game:hasTag(tag) ~= true then
+              _accum_0[_len_0] = game
+              _len_0 = _len_0 + 1
+            end
+          end
+          games = _accum_0
+        end
       else
         assert(nil, 'shared.library.Library.filter')
       end
@@ -597,14 +617,63 @@ do
       assert(type(regularMode) == 'boolean', 'shared.library.Library')
       self.version = 1
       self.path = 'games.json'
-      if regularMode then
-        self.numBackups = settings:getNumberOfBackups()
-        self.backupFilePattern = 'games_backup_%d.json'
-        self.games = { }
-        self.oldGames = self:load()
-        self.currentGameID = 1
+      local games
+      if io.fileExists(self.path) then
+        games = io.readJSON(self.path)
       else
-        local games = io.readJSON(self.path)
+        games = { }
+      end
+      self.currentGameID = 1
+      self.numBackups = settings:getNumberOfBackups()
+      self.backupFilePattern = 'games_backup_%d.json'
+      self.filterStack = { }
+      self.processedGames = nil
+      self.gamesSortedByGameID = nil
+      self.detectGames = false
+      if regularMode == true then
+        self.updatedTimestamp = os.date('*t')
+      else
+        self.updatedTimestamp = games.updated
+      end
+      if regularMode then
+        local _exp_0 = settings:getGameDetectionFrequency()
+        if ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS == _exp_0 then
+          self.detectGames = true
+        elseif ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY == _exp_0 then
+          self.updatedTimestamp = os.date('*t')
+          local updated = games.updated or { }
+          if updated.year == self.updatedTimestamp.year and updated.month == self.updatedTimestamp.month and updated.day == self.updatedTimestamp.day then
+            self.detectGames = false
+          else
+            self.detectGames = true
+          end
+        elseif ENUMS.GAME_DETECTION_FREQUENCY.NEVER == _exp_0 then
+          if games.updated == nil then
+            self.detectGames = true
+          else
+            self.detectGames = false
+          end
+        else
+          self.detectGames = false
+        end
+        if self.detectGames == true then
+          self.games = { }
+          self.oldGames = self:load()
+        else
+          do
+            local _accum_0 = { }
+            local _len_0 = 1
+            local _list_0 = games.games
+            for _index_0 = 1, #_list_0 do
+              local args = _list_0[_index_0]
+              _accum_0[_len_0] = Game(args)
+              _len_0 = _len_0 + 1
+            end
+            self.games = _accum_0
+          end
+          self.oldGames = { }
+        end
+      else
         do
           local _accum_0 = { }
           local _len_0 = 1
@@ -618,9 +687,6 @@ do
         end
         self.oldGames = { }
       end
-      self.filterStack = { }
-      self.processedGames = nil
-      self.gamesSortedByGameID = nil
     end,
     __base = _base_0,
     __name = "Library"

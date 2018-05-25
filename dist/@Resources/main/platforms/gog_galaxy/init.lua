@@ -58,7 +58,7 @@ do
         local _continue_0 = false
         repeat
           local line = lines[_index_0]
-          local productID, title, images = line:match('^(%d+)|([^|]+)|(.+)$')
+          local productID, title, images = line:match('^(%d+)|([^|]+)|([^|]+)|.+$')
           if not (productIDs[productID] == true) then
             _continue_0 = true
             break
