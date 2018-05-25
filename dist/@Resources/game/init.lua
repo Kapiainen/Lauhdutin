@@ -360,9 +360,17 @@ createPlatformProperty = function(game, platform)
 end
 local createHoursPlayedProperty
 createHoursPlayedProperty = function(game)
+  local f
+  f = function(self)
+    return ('%.0f'):format(game:getHoursPlayed())
+  end
   return Property({
     title = LOCALIZATION:get('button_label_hours_played', 'Hours played'),
-    value = ('%.0f'):format(game:getHoursPlayed())
+    value = f(),
+    action = function(self, index)
+      return StartEditingHoursPlayed(index)
+    end,
+    update = f
   })
 end
 local createLastPlayedProperty
@@ -901,6 +909,23 @@ end
 OnEditedProcessOverride = function(process)
   local success, err = pcall(function()
     STATE.GAME:setProcessOverride(process:sub(1, -2))
+    return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+StartEditingHoursPlayed = function(index)
+  local success, err = pcall(function()
+    return startEditing(index, 3, STATE.GAME:getHoursPlayed())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnEditedHoursPlayed = function(hoursPlayed)
+  local success, err = pcall(function()
+    STATE.GAME:setHoursPlayed(tonumber(hoursPlayed:sub(1, -2)))
     return updateSlots()
   end)
   if not (success) then

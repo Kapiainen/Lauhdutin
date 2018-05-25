@@ -244,9 +244,12 @@ createPlatformProperty = (game, platform) ->
 	})
 
 createHoursPlayedProperty = (game) ->
+	f = () => return ('%.0f')\format(game\getHoursPlayed())
 	return Property({
 		title: LOCALIZATION\get('button_label_hours_played', 'Hours played')
-		value: ('%.0f')\format(game\getHoursPlayed())
+		value: f()
+		action: (index) => StartEditingHoursPlayed(index)
+		update: f
 	})
 
 createLastPlayedProperty = (game) ->
@@ -636,6 +639,22 @@ export OnEditedProcessOverride = (process) ->
 	success, err = pcall(
 		() ->
 			STATE.GAME\setProcessOverride(process\sub(1, -2))
+			updateSlots()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+-- Hours played
+export StartEditingHoursPlayed = (index) ->
+	success, err = pcall(
+		() ->
+			startEditing(index, 3, STATE.GAME\getHoursPlayed())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnEditedHoursPlayed = (hoursPlayed) ->
+	success, err = pcall(
+		() ->
+			STATE.GAME\setHoursPlayed(tonumber(hoursPlayed\sub(1, -2)))
 			updateSlots()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

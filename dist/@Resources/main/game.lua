@@ -168,6 +168,11 @@ do
     getHoursPlayed = function(self)
       return self.hoursPlayed or 0
     end,
+    setHoursPlayed = function(self, value)
+      if type(value) == 'number' and value >= 0 then
+        self.hoursPlayed = value
+      end
+    end,
     incrementHoursPlayed = function(self, hours)
       if hours >= 0 then
         if self.hoursPlayed == nil then
