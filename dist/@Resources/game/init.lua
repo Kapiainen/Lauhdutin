@@ -877,14 +877,22 @@ OpenBanner = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+local startEditing
+startEditing = function(slotIndex, batchIndex, defaultValue)
+  local meter = SKIN:GetMeter(('Slot%dValue'):format(slotIndex))
+  SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
+  SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
+  SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
+  SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
+  if defaultValue == nil then
+    defaultValue = ''
+  end
+  SKIN:Bang(('[!SetOption "Input" "DefaultValue" "%s"]'):format(defaultValue))
+  return SKIN:Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]'):format(batchIndex))
+end
 StartEditingProcessOverride = function(index)
   local success, err = pcall(function()
-    local meter = SKIN:GetMeter(('Slot%dValue'):format(index))
-    SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
-    SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
-    SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
-    SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
-    return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
+    return startEditing(index, 1, STATE.GAME:getProcessOverride())
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -901,12 +909,7 @@ OnEditedProcessOverride = function(process)
 end
 StartCreatingTag = function(index)
   local success, err = pcall(function()
-    local meter = SKIN:GetMeter(('Slot%dValue'):format(index))
-    SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
-    SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
-    SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
-    SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
-    return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 2"]')
+    return startEditing(index, 2)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

@@ -614,16 +614,21 @@ export OpenBanner = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
+startEditing = (slotIndex, batchIndex, defaultValue) ->
+	meter = SKIN\GetMeter(('Slot%dValue')\format(slotIndex))
+	SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
+	SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
+	SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
+	SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
+	defaultValue = '' if defaultValue == nil
+	SKIN\Bang(('[!SetOption "Input" "DefaultValue" "%s"]')\format(defaultValue))
+	SKIN\Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]')\format(batchIndex))
+
 -- Process override
 export StartEditingProcessOverride = (index) ->
 	success, err = pcall(
 		() ->
-			meter = SKIN\GetMeter(('Slot%dValue')\format(index))
-			SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
-			SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
-			SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
-			SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
-			SKIN\Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
+			startEditing(index, 1, STATE.GAME\getProcessOverride())
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -639,12 +644,7 @@ export OnEditedProcessOverride = (process) ->
 export StartCreatingTag = (index) ->
 	success, err = pcall(
 		() ->
-			meter = SKIN\GetMeter(('Slot%dValue')\format(index))
-			SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
-			SKIN\Bang(('[!SetOption "Input" "Y" "%d"]')\format(meter\GetY() - 1))
-			SKIN\Bang(('[!SetOption "Input" "W" "%d"]')\format(meter\GetW()))
-			SKIN\Bang(('[!SetOption "Input" "H" "%d"]')\format(20))
-			SKIN\Bang('[!CommandMeasure "Input" "ExecuteBatch 2"]')
+			startEditing(index, 2)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

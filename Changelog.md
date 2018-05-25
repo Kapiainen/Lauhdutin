@@ -6,6 +6,7 @@
 - Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
 - Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
 - Added a `Lacks tag` filter to find games that do **not** have a specific tag.
+- Updated the Game menu so that editable properties use the current value as the default value in the text input box.
 
 **Version 3.0.0 beta 14 - 2018/MM/DD:**
 - Updated error messages related to version numbers of games, settings, and translations.
