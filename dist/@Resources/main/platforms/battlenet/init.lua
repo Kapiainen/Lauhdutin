@@ -19,6 +19,15 @@ do
       SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s"]'):format(self.battlenetPaths[1]))
       return self:getWaitCommand(), '', 'OnIdentifiedBattlenetFolders'
     end,
+    getBanner = function(self, title, bannerURL)
+      local banner = self:getBannerPath(title)
+      if not (banner) then
+        if bannerURL then
+          banner = io.joinPaths(self.cachePath, title .. bannerURL:reverse():match('^([^%.]+%.)'):reverse())
+        end
+      end
+      return banner
+    end,
     generateGames = function(self, output)
       assert(type(output) == 'string')
       table.remove(self.battlenetPaths, 1)
@@ -122,7 +131,7 @@ do
             _continue_0 = true
             break
           end
-          args.banner = self:getBannerPath(args.title)
+          args.banner = self:getBanner(args.title, args.bannerURL)
           if not (args.banner) then
             args.expectedBanner = args.title
           end
