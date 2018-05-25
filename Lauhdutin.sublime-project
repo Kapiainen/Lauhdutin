@@ -5,28 +5,14 @@
 			"path": "."
 		}
 	],
-	"build_systems":
-	[
+	"build_systems": [
 		{
-			"name": "Run YAPF",
-			"selector": "source.python",
-			"cmd":
-			[
-				"yapf",
-				"-i",
-				"--style={based_on_style: pep8, split_arguments_when_comma_terminated: true}",
-				"$file"
-			]
+			"name": "Compile all files",
+			"shell_cmd": "$project_path\\compile_src.bat"
 		},
 		{
-			"name": "Run Python tests",
-			"working_dir": "$project_path/Tests",
-			"cmd":
-			[
-				"python",
-				"$project_path/Tests/RunTests.py",
-				"-b"
-			]
+			"name": "Compile modified or missing files",
+			"cmd": ["python", "$project_path\\partial_compile.py", "$project_path"]
 		}
 	]
 }

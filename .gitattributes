@@ -16,7 +16,5 @@
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
 
-Docs/* linguist-documentation
-Tests/* linguist-documentation
-Lauhdutin/@Resources/Dependencies/* linguist-vendored
+dist/@Resources/lib/* linguist-vendored
 *.inc linguist-vendored

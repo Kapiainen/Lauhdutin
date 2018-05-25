@@ -23,13 +23,6 @@ Have you tried updating to the latest stable version of Rainmeter, if you are no
 -->
 
 
-## Python version
-<!--
-Which version of Python are you using (e.g. 3.5, 3.6, etc.)?
-Which release flavor did you download (e.g. installer or embeddable zip archive)?
--->
-
-
 ## Windows version
 <!--
 Which version of Windows are you using?
@@ -47,10 +40,4 @@ Which, if any, error messages are displayed by the skin and/or Rainmeter's log?
 What triggers the issue? Please provide a step-by-step explanation, if possible.
 -->
 
-
-## Python stack traceback
-<!--
-Try setting the Python path to "python" instead of "pythonw" to show the terminal.
-Reproduce the issue and provide a screenshot or text copy of any stack tracebacks that may have appeared in the terminal.
--->
 

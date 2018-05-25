@@ -1,0 +1,154 @@
+version 1
+button_label_accept	Accept
+button_label_bangs_none	None
+button_label_browse	Browse
+button_label_cancel	Cancel
+button_label_client_path	Client path
+button_label_close	Close
+button_label_disabled	Disabled
+button_label_edit	Edit
+button_label_enabled	Enabled
+button_label_hours_played	Hours played
+button_label_no	No
+button_label_open	Open
+button_label_save	Save
+button_label_starting_bangs	Starting bangs
+button_label_stopping_bangs	Stopping bangs
+button_label_yes	Yes
+filter_back_button_title	Back
+filter_clear_filters	Clear filters
+filter_from_platform	Is on platform
+filter_has_no_tags	Has no tags
+filter_has_notes	Has notes
+filter_has_tag	Has tag
+filter_is_hidden	Is hidden
+filter_is_uninstalled	Is not installed
+filter_never_played	Has never been played
+filter_random	Random game
+filter_window_all_title	Filter
+filter_window_current_title	Filter (current games)
+game_ignores_other_bangs	Ignores other bangs
+game_installed	Installed
+game_last_played	Last played
+game_last_played_never	Never
+game_no_banner	No banner
+game_notes	Notes
+game_notes_none	None
+game_number_of_games	%d games
+game_path	Path
+game_platform	Platform
+game_process	Process
+game_process_none	None
+game_tag_create	Create a new tag
+game_tags	Tags
+game_tags_none	None
+game_visible	Visible
+main_context_title_execute_stopping_bangs	Execute stopping bangs
+main_context_title_open_shortcuts_folder	Open shortcuts folder
+main_context_title_settings	Settings
+main_context_title_start_hiding_games	Start hiding games
+main_context_title_start_removing_games	Start removing games
+main_context_title_start_unhiding_games	Start unhiding games
+main_context_title_stop_hiding_games	Stop hiding games
+main_context_title_stop_removing_games	Stop removing games
+main_context_title_stop_unhiding_games	Stop unhiding games
+main_no_games	No games to show
+main_status_detecting_games	Detecting games
+main_status_detecting_platform_games	Detecting %s games
+main_status_n_banners_to_download	%d banners left to download
+overlay_already_hidden	Already hidden
+overlay_already_visible	Already visible
+overlay_hide	Hide
+overlay_hours_played	%.0f hours played
+overlay_install	Install
+overlay_platform_not_running	%s is not running
+overlay_remove	Remove
+overlay_single_hour_played	%.0f hour played
+overlay_unhide	Unhide
+overlay_uninstalled	Uninstalled
+platform_name_windows_shortcut	Windows shortcut
+search_window_all_title	Search
+search_window_current_title	Search (current games)
+setting_animation_label_jiggle	Jiggle
+setting_animation_label_none	None
+setting_animation_label_shake_left_right	Shake left and right
+setting_animation_label_shake_up_down	Shake up and down
+setting_animation_label_shrink	Shrink
+setting_animation_label_slide_down	Slide downwards
+setting_animation_label_slide_left	Slide to the left
+setting_animation_label_slide_right	Slide to the right
+setting_animation_label_slide_up	Slide upwards
+setting_animation_label_zoom_in	Zoom in
+setting_bangs_enabled_description	If enabled, then the specified Rainmeter bangs are executed when a game starts or terminates.
+setting_bangs_enabled_title	Execute bangs
+setting_bangs_starting_description	These Rainmeter bangs are executed just before any game launches.
+setting_bangs_stopping_description	These Rainmeter bangs are executed just after any game terminates.
+setting_battlenet_add_path	Add path...
+setting_battlenet_enabled_description	If enabled, then games installed via the Blizzard Battle.net client will be included.
+setting_battlenet_paths_description	""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""
+setting_battlenet_paths_title	Paths
+setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
+setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
+setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
+setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
+setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
+setting_gog_galaxy_indirect_launch_title	Launch via client
+setting_gog_galaxy_program_data_path_description	The path where the GOG Galaxy client stores some of its data.
+setting_gog_galaxy_program_data_path_title	ProgramData path
+setting_gog_galaxy_starting_bangs_description	These Rainmeter bangs are executed just before any GOG Galaxy game launches.
+setting_gog_galaxy_stopping_bangs_description	These Rainmeter bangs are executed just after any GOG Galaxy game terminates.
+setting_localization_language_description	Select a language.
+setting_localization_language_title	Language
+setting_logging_description	If enabled, then a bunch of messages are printed to the Rainmeter log. Useful when troubleshooting issues.
+setting_logging_title	Log
+setting_number_of_backups_description	The number of daily backups to keep of the list of games.
+setting_number_of_backups_title	Number of backups
+setting_shortcuts_enabled_description	If enabled, then Windows shortcuts placed in the designated folder will be included.
+setting_shortcuts_open_folder_description	Shortcuts and their banners should be placed in this folder. The banners should be named after their corresponding shortcut.
+setting_shortcuts_open_folder_title	Folder
+setting_shortcuts_starting_bangs_description	These Rainmeter bangs are executed just before any Windows shortcut game launches.
+setting_shortcuts_stopping_bangs_description	These Rainmeter bangs are executed just after any Windows shortcut game terminates.
+setting_shortcuts_title	Windows shortcuts
+setting_skin_animation_description	The animation that is played when the mouse leaves the skin. The animation is played in reverse when the mouse enters the skin\'s enabler edge.
+setting_skin_animation_title	Skin animation
+setting_skin_hide_skin_description	If enabled, then the skin is hidden while playing a game.
+setting_skin_hide_skin_title	Hide skin while playing
+setting_skin_revealing_delay_description	The duration (in milliseconds) before the skin animation is played in order to reveal the skin.
+setting_skin_revealing_delay_title	Revealing delay
+setting_skin_scroll_step_description	The number of games that are scrolled at each scroll event.
+setting_skin_scroll_step_title	Scroll step
+setting_skin_title	Skin
+setting_slots_center_on_monitor_description	If enabled, then some windows (e.g. sort, filter) are centered on the monitor that the main window of this skin is on.
+setting_slots_center_on_monitor_title	Center windows on the current monitor
+setting_slots_click_animation_description	The animation that plays when a slot is clicked.
+setting_slots_click_animation_title	Slot click animation
+setting_slots_columns_description	The number of columns of slots.
+setting_slots_columns_title	Number of columns
+setting_slots_double_click_to_launch_description	If enabled, then a game has to be double-clicked to launched.
+setting_slots_double_click_to_launch_title	Double-click to launch.
+setting_slots_height_description	The height of each slot in pixels.
+setting_slots_height_title	Slot height
+setting_slots_horizontal_orientation_description	If enabled, then slots are placed from left to right. If disabled, then slots are placed from the top to the bottom.
+setting_slots_horizontal_orientation_title	Horizontal orientation
+setting_slots_hover_animation_description	The animation that plays when the mouse is on a slot.
+setting_slots_hover_animation_title	Slot hover animation
+setting_slots_overlay_enabled_description	If enabled, then an overlay with contextual information is displayed when the mouse is on a slot.
+setting_slots_overlay_enabled_title	Show overlay on slots
+setting_slots_rows_description	The number of rows of slots.
+setting_slots_rows_title	Number of rows
+setting_slots_toolbar_at_top_description	If enabled, then the toolbar is at the top of the skin.
+setting_slots_toolbar_at_top_title	Toolbar at the top
+setting_slots_width_description	The width of each slot in pixels.
+setting_slots_width_title	Slot width
+setting_steam_account_description	Choose the Steam account whose games to get.
+setting_steam_account_title	Account
+setting_steam_client_path_description	This should be the folder that contains the Steam client executable.
+setting_steam_community_profile_description	If enabled, then the Steam community profile will be downloaded and parsed to get:\n- All games associated with the chosen account even if not installed at the moment.\n- The total hours played of each game associated with the chosen account.\n\nRequires that the Game details setting in the Steam profile's privacy settings is set as public.
+setting_steam_community_profile_title	Parse community profile
+setting_steam_enabled_description	If enabled, then games installed via the Steam client will be included. Non-Steam game shortcuts that have been added to Steam will also be included.
+setting_steam_starting_bangs_description	These Rainmeter bangs are executed just before any Steam game launches.
+setting_steam_stopping_bangs_description	These Rainmeter bangs are executed just after any Steam game terminates.
+sort_alphabetically	Alphabetically
+sort_last_played	Most recently played
+sort_window_title	Sort
+status_initializing	Initializing
