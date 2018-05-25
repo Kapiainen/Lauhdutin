@@ -25,6 +25,7 @@ export STATE = {
 	ALL_PLATFORMS: nil
 	HIGHLIGHTED_SLOT_INDEX: 0
 	CENTERED: false
+	ACTIVE_INPUT: false
 }
 
 COMPONENTS = {
@@ -567,6 +568,7 @@ showDefaultProperties = () ->
 export Save = () ->
 	success, err = pcall(
 		() ->
+			return if STATE.ACTIVE_INPUT == true
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
 					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, updated: STATE.GAMES_UPDATED_TIMESTAMP})
@@ -581,6 +583,7 @@ export Save = () ->
 export Cancel = () ->
 	success, err = pcall(
 		() ->
+			return if STATE.ACTIVE_INPUT == true
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
 					SKIN\Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
@@ -617,6 +620,13 @@ export OpenBanner = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
+export OnDismissedInput = () ->
+	success, err = pcall(
+		() ->
+			STATE.ACTIVE_INPUT = false
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
 startEditing = (slotIndex, batchIndex, defaultValue) ->
 	meter = SKIN\GetMeter(('Slot%dValue')\format(slotIndex))
 	SKIN\Bang(('[!SetOption "Input" "X" "%d"]')\format(meter\GetX() - 1))
@@ -626,6 +636,7 @@ startEditing = (slotIndex, batchIndex, defaultValue) ->
 	defaultValue = '' if defaultValue == nil
 	SKIN\Bang(('[!SetOption "Input" "DefaultValue" "%s"]')\format(defaultValue))
 	SKIN\Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]')\format(batchIndex))
+	STATE.ACTIVE_INPUT = true
 
 -- Process override
 export StartEditingProcessOverride = (index) ->
@@ -640,6 +651,7 @@ export OnEditedProcessOverride = (process) ->
 		() ->
 			STATE.GAME\setProcessOverride(process\sub(1, -2))
 			updateSlots()
+			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -656,6 +668,7 @@ export OnEditedHoursPlayed = (hoursPlayed) ->
 		() ->
 			STATE.GAME\setHoursPlayed(tonumber(hoursPlayed\sub(1, -2)))
 			updateSlots()
+			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -680,6 +693,7 @@ export OnCreatedTag = (tag) ->
 			table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
 			updateScrollbar()
 			updateSlots()
+			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

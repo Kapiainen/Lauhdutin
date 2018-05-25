@@ -8,6 +8,7 @@
 - Added a `Lacks tag` filter to find games that do **not** have a specific tag.
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.
+- Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
 
 **Version 3.0.0 beta 14 - 2018/MM/DD:**
 - Updated error messages related to version numbers of games, settings, and translations.

@@ -22,7 +22,8 @@ STATE = {
   ALL_TAGS = nil,
   ALL_PLATFORMS = nil,
   HIGHLIGHTED_SLOT_INDEX = 0,
-  CENTERED = false
+  CENTERED = false,
+  ACTIVE_INPUT = false
 }
 local COMPONENTS = {
   STATUS = nil,
@@ -811,6 +812,9 @@ showDefaultProperties = function()
 end
 Save = function()
   local success, err = pcall(function()
+    if STATE.ACTIVE_INPUT == true then
+      return 
+    end
     local _exp_0 = STATE.PROPERTIES
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       io.writeJSON(STATE.PATHS.GAMES, {
@@ -841,6 +845,9 @@ Save = function()
 end
 Cancel = function()
   local success, err = pcall(function()
+    if STATE.ACTIVE_INPUT == true then
+      return 
+    end
     local _exp_0 = STATE.PROPERTIES
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       return SKIN:Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
@@ -885,6 +892,14 @@ OpenBanner = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+OnDismissedInput = function()
+  local success, err = pcall(function()
+    STATE.ACTIVE_INPUT = false
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
 local startEditing
 startEditing = function(slotIndex, batchIndex, defaultValue)
   local meter = SKIN:GetMeter(('Slot%dValue'):format(slotIndex))
@@ -896,7 +911,8 @@ startEditing = function(slotIndex, batchIndex, defaultValue)
     defaultValue = ''
   end
   SKIN:Bang(('[!SetOption "Input" "DefaultValue" "%s"]'):format(defaultValue))
-  return SKIN:Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]'):format(batchIndex))
+  SKIN:Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]'):format(batchIndex))
+  STATE.ACTIVE_INPUT = true
 end
 StartEditingProcessOverride = function(index)
   local success, err = pcall(function()
@@ -909,7 +925,8 @@ end
 OnEditedProcessOverride = function(process)
   local success, err = pcall(function()
     STATE.GAME:setProcessOverride(process:sub(1, -2))
-    return updateSlots()
+    updateSlots()
+    return OnDismissedInput()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -926,7 +943,8 @@ end
 OnEditedHoursPlayed = function(hoursPlayed)
   local success, err = pcall(function()
     STATE.GAME:setHoursPlayed(tonumber(hoursPlayed:sub(1, -2)))
-    return updateSlots()
+    updateSlots()
+    return OnDismissedInput()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -953,7 +971,8 @@ OnCreatedTag = function(tag)
     table.sort(STATE.TAG_PROPERTIES, sortPropertiesByTitle)
     table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
     updateScrollbar()
-    return updateSlots()
+    updateSlots()
+    return OnDismissedInput()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
