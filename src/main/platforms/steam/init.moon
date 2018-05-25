@@ -95,8 +95,8 @@ class Steam extends Platform
 	--
 	--   hash = crc32(path .. title)
 	--   hash = hash | 0x80000000
-    --   hash = hash << 32
-    --   hash = hash | 0x02000000
+	--   hash = hash << 32
+	--   hash = hash | 0x02000000
 	--
 	-- # Issues
 	-- Left-shifting by 32 is not feasible since it results in 0.
@@ -246,6 +246,9 @@ class Steam extends Platform
 		lastPlayed = tonumber(app.lastplayed)
 		return lastPlayed
 
+	generateBannerURL: (appID) =>
+		return ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
+
 	getBanner: (appID) =>
 		banner = @getBannerPath(appID)
 		return banner, nil if banner -- Found an existing copy in the skin's cache
@@ -256,7 +259,7 @@ class Steam extends Platform
 				io.copyFile(gridBannerPath, cacheBannerPath, false)
 				return cacheBannerPath, nil -- Found a custom banner that was assigned via Steam's grid view
 		banner = io.joinPaths(@cachePath, appID .. '.jpg')
-		bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg')\format(appID)
+		bannerURL = @generateBannerURL(appID)
 		return banner, bannerURL -- Download the game's banner
 
 	getPath: (appID) => return ('steam://rungameid/%s')\format(appID)
@@ -339,7 +342,10 @@ class Steam extends Platform
 				continue
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
-			vdf = utility.parseVDF(lines)
+			success, vdf = pcall(utility.parseVDF, lines)
+			unless success
+				log(('Failed to parse "%s": %s')\format(manifest, vdf))
+				continue
 			title = nil
 			if vdf.appstate ~= nil
 				title = vdf.appstate.name

@@ -305,6 +305,69 @@ createTagProperties = function(games, filterStack)
     properties = tagProperties
   }), gamesWithTags
 end
+local createLacksTagProperties
+createLacksTagProperties = function(games, filterStack)
+  local tags = { }
+  for _index_0 = 1, #games do
+    local game = games[_index_0]
+    local skinTags = game:getTags()
+    local platformTags = game:getPlatformTags()
+    local combinedTags = { }
+    for _index_1 = 1, #skinTags do
+      local tag = skinTags[_index_1]
+      combinedTags[tag] = true
+    end
+    for _index_1 = 1, #platformTags do
+      local tag = platformTags[_index_1]
+      combinedTags[tag] = true
+    end
+    for tag, _ in pairs(combinedTags) do
+      local _continue_0 = false
+      repeat
+        local skip = false
+        for _index_1 = 1, #filterStack do
+          local f = filterStack[_index_1]
+          if f.filter == ENUMS.FILTER_TYPES.LACKS_TAG and f.args.tag == tag then
+            skip = true
+            break
+          end
+        end
+        if skip then
+          _continue_0 = true
+          break
+        end
+        if tags[tag] == nil then
+          tags[tag] = 0
+        end
+        tags[tag] = tags[tag] + 1
+        _continue_0 = true
+      until true
+      if not _continue_0 then
+        break
+      end
+    end
+  end
+  local tagProperties = { }
+  for tag, numGames in pairs(tags) do
+    numGames = #games - numGames
+    if numGames > 0 then
+      table.insert(tagProperties, Property({
+        title = tag,
+        value = STATE.NUM_GAMES_PATTERN:format(numGames),
+        arguments = {
+          tag = tag
+        }
+      }))
+    end
+  end
+  table.sort(tagProperties, sortPropertiesByTitle)
+  return Property({
+    title = LOCALIZATION:get('filter_lacks_tag', 'Lacks tag'),
+    value = STATE.NUM_GAMES_PATTERN:format(#games),
+    enum = ENUMS.FILTER_TYPES.LACKS_TAG,
+    properties = tagProperties
+  })
+end
 local createHasNoTagsProperty
 createHasNoTagsProperty = function(numGames)
   return Property({
@@ -487,6 +550,13 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
         table.insert(properties, hasNotesProperty)
       end
     end
+    local lacksTagProperty = createLacksTagProperties(games, filterStack)
+    table.insert(lacksTagProperty.properties, Property({
+      title = STATE.BACK_BUTTON_TITLE,
+      value = ' ',
+      properties = properties
+    }))
+    table.insert(properties, lacksTagProperty)
   end
   table.sort(properties, sortPropertiesByTitle)
   if not (stack) then

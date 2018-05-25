@@ -10,7 +10,14 @@ getUsers = function()
   if not (io.fileExists(path, false)) then
     return nil
   end
-  return utility.parseVDF(io.readFile(path, false)).users
+  local vdf = utility.parseVDF(io.readFile(path, false))
+  if vdf == nil or vdf.users == nil then
+    return nil
+  end
+  for communityID, user in pairs(vdf.users) do
+    user.personaname = utility.replaceUnsupportedChars(user.personaname)
+  end
+  return vdf.users
 end
 local getPersonaName
 getPersonaName = function(accountID)
@@ -29,7 +36,7 @@ getPersonaName = function(accountID)
   if config.friends == nil then
     return nil
   end
-  return config.friends.personaname
+  return utility.replaceUnsupportedChars(config.friends.personaname)
 end
 local updateUsers
 updateUsers = function()
@@ -56,6 +63,7 @@ updateUsers = function()
               personaName = personaName,
               displayValue = personaName
             })
+            users[communityID] = nil
             break
           end
         end

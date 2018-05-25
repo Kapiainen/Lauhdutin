@@ -107,6 +107,10 @@ Stop monitoring the game and execute bangs, if they are enabled and any bangs ar
 
 These context actions change what left-clicking on a game does. This can be used to hide/unhide/remove multiple games quickly without having to go through the Game window (see [Games](#games)) for each individual game.
 
+### Detect games
+
+Force the skin to refresh and detect games.
+
 ## Banners
 
 Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).

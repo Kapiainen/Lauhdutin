@@ -16,7 +16,8 @@ ENUMS = {
     NO_TAGS = 7,
     RANDOM_GAME = 8,
     NEVER_PLAYED = 9,
-    HAS_NOTES = 10
+    HAS_NOTES = 10,
+    LACKS_TAG = 11
   },
   SORTING_TYPES = {
     ALPHABETICALLY = 1,
@@ -48,5 +49,22 @@ ENUMS = {
     SLIDE_DOWN = 4,
     SLIDE_LEFT = 5,
     MAX = 6
+  },
+  GAME_DETECTION_FREQUENCY = {
+    NEVER = 1,
+    ALWAYS = 2,
+    ONCE_PER_DAY = 3,
+    MAX = 4
+  },
+  OVERLAY_SLOT_TEXT = {
+    NONE = 1,
+    GAME_TITLE = 2,
+    GAME_PLATFORM = 3,
+    TIME_PLAYED_HOURS = 4,
+    TIME_PLAYED_HOURS_AND_MINUTES = 5,
+    TIME_PLAYED_HOURS_OR_MINUTES = 6,
+    LAST_PLAYED_YYYYMMDD = 7,
+    NOTES = 8,
+    MAX = 9
   }
 }

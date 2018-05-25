@@ -11,6 +11,7 @@ export STATE = {
 	PATHS: {
 		RESOURCES: nil
 		RAINMETER: nil
+		GAMES: 'games.json'
 	}
 	CURRENT_CONFIG: nil
 	NUM_SLOTS: 4
@@ -133,6 +134,32 @@ requiresRebuilding = () ->
 		return true
 	return false
 
+requiresGameDetection = () ->
+	if COMPONENTS.SETTINGS\getShortcutsEnabled() ~= COMPONENTS.OLD_SETTINGS\getShortcutsEnabled()
+		return true
+	elseif COMPONENTS.SETTINGS\getSteamEnabled() ~= COMPONENTS.OLD_SETTINGS\getSteamEnabled()
+		return true
+	elseif COMPONENTS.SETTINGS\getBattlenetEnabled() ~= COMPONENTS.OLD_SETTINGS\getBattlenetEnabled()
+		return true
+	elseif COMPONENTS.SETTINGS\getGOGGalaxyEnabled() ~= COMPONENTS.OLD_SETTINGS\getGOGGalaxyEnabled()
+		return true
+	elseif COMPONENTS.SETTINGS\getSteamPath() ~= COMPONENTS.OLD_SETTINGS\getSteamPath()
+		return true
+	elseif #COMPONENTS.SETTINGS\getBattlenetPaths() ~= #COMPONENTS.OLD_SETTINGS\getBattlenetPaths()
+		return true
+	elseif #COMPONENTS.SETTINGS\getBattlenetPaths() == #COMPONENTS.OLD_SETTINGS\getBattlenetPaths()
+		newBattlenetPaths = COMPONENTS.SETTINGS\getBattlenetPaths()
+		oldBattlenetPaths = COMPONENTS.OLD_SETTINGS\getBattlenetPaths()
+		for path in *newBattlenetPaths
+			index = table.find(oldBattlenetPaths, path)
+			if index ~= nil
+				table.remove(oldBattlenetPaths, index)
+			else
+				return true
+	elseif COMPONENTS.SETTINGS\getGOGGalaxyClientPath() ~= COMPONENTS.OLD_SETTINGS\getGOGGalaxyClientPath()
+		return true
+	return false
+
 export Close = () ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(
@@ -140,6 +167,10 @@ export Close = () ->
 			if COMPONENTS.SETTINGS\hasChanged(COMPONENTS.OLD_SETTINGS\get())
 				if requiresRebuilding()
 					RebuildMainSlots()
+				if requiresGameDetection()
+					games = io.readJSON(STATE.PATHS.GAMES)
+					games.updated = nil
+					io.writeJSON(STATE.PATHS.GAMES, games)
 				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
 				if mainConfig ~= nil and mainConfig\isActive()
 					SKIN\Bang('[!Refresh "#ROOTCONFIG#]')
@@ -208,7 +239,7 @@ export EditFolderPath = (index, path) ->
 export OnLanguagesListed = () ->
 	unless io.fileExists('cache\\languages.txt')
 		return utility.runLastCommand()
-	setting = COMPONENTS.SLOTS\getSetting(COMPONENTS.SLOTS\getNumSettings() - 2)
+	setting = COMPONENTS.SLOTS\getSetting(COMPONENTS.SLOTS\getNumSettings() - 3) -- Magic number offset
 	setting\setValues()
 	COMPONENTS.SLOTS\scroll()
 	COMPONENTS.STATUS\hide()
@@ -216,7 +247,7 @@ export OnLanguagesListed = () ->
 export OnSteamUsersListed = () ->
 	unless io.fileExists('cache\\steam\\completed.txt')
 		return utility.runLastCommand()
-	COMPONENTS.SLOTS\getSetting(3)\setValues()
+	COMPONENTS.SLOTS\getSetting(3)\setValues() -- Magic number offset
 	COMPONENTS.SLOTS\scroll()
 
 export CycleSpinner = (index, direction) -> COMPONENTS.SLOTS\cycleSpinner(index, direction)

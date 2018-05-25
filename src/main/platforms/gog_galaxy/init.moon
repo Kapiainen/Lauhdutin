@@ -73,7 +73,7 @@ class GOGGalaxy extends Platform
 		titles = {}
 		bannerURLs = {}
 		for line in *lines
-			productID, title, images = line\match('^(%d+)|([^|]+)|(.+)$')
+			productID, title, images = line\match('^(%d+)|([^|]+)|([^|]+)|.+$')
 			continue unless productIDs[productID] == true
 			titles[productID] = title
 			images = json.decode(images\lower())
@@ -93,14 +93,15 @@ class GOGGalaxy extends Platform
 			return nil
 		return json.decode(file)
 
-	getBanner: (productID) =>
+	getBanner: (productID, bannerURLs) =>
 		assert(type(productID) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.getBanner')
 		banner = @getBannerPath(productID)
 		unless banner
 			bannerURL = bannerURLs[productID]
-			banner = io.joinPaths(@cachePath, productID .. bannerURL\reverse()\match('^([^%.]+%.)')\reverse())
-			expectedBanner = productID
-			return banner, bannerURL, expectedBanner
+			if bannerURL
+				banner = io.joinPaths(@cachePath, productID .. bannerURL\reverse()\match('^([^%.]+%.)')\reverse())
+				expectedBanner = productID
+				return banner, bannerURL, expectedBanner
 		return banner, nil, nil
 
 	getExePath: (info) =>
@@ -118,7 +119,7 @@ class GOGGalaxy extends Platform
 		productIDs, paths = @parseIndexDB(indexOutput)
 		titles, bannerURLs = @parseGalaxyDB(productIDs, galaxyOutput)
 		for productID, _ in pairs(productIDs)
-			banner, bannerURL, expectedBanner = @getBanner(productID)
+			banner, bannerURL, expectedBanner = @getBanner(productID, bannerURLs)
 			info = @parseInfo(paths[productID], productID)
 			if type(info) ~= 'table'
 				log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')

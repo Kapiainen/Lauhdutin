@@ -1,3 +1,45 @@
+**Version 3.1.0 beta 1 - YYYY/MM/DD:**
+- Added a setting for how often games should be detected when the skin is loaded.
+- Added a custom skin action to force the skin to refresh and detect games.
+- Added a setting for toggling context-sensitive images in slot overlays.
+- Added settings for the information to show in the upper and lower halves of the slot overlay.
+- Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
+- Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
+- Added a `Lacks tag` filter to find games that do **not** have a specific tag.
+- Updated the Game menu so that the hours played property can be modified.
+- Updated the Game menu so that editable properties use the current value as the default value in the text input box.
+- Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
+
+**Version 3.0.0 - 2018/05/25:**
+- Updated error messages related to version numbers of games, settings, and translations.
+- Updated error messages to clarify that the preceding number is the line number in the Lua file where the error occurred rather than an error code.
+- Fixed a bug where an uninstalled game's last played timestamp could be updated by attempting to start the game even though it should not be updated.
+- Fixed a bug that caused the overlay slot background to be visible despite overlay slots being disabled.
+
+**Version 3.0.0 beta 13 - 2018/05/22:**
+- Fixed a bug where starting to install a Steam game via the skin would trigger bangs as if starting the game.
+- Fixed a bug where installing a Steam game via the skin would not update its state from uninstalled to installed.
+
+**Version 3.0.0 beta 12 - 2018/05/22:**
+- Updated Steam platform to skip games with appmanifests that cause parsing errors and write the issue to the log.
+- Updated Library class to improve how it deals with `games.json` having an unexpected structure.
+
+**Version 3.0.0 beta 11 - 2018/05/20:**
+- Updated the Library class to serialize the list of games in a sorted state.
+- Updated the Main and Game configs to make use of serialized games being sorted.
+- Updated the slot overlay and added a translation string to improve compatibility with some languages.
+- Updated the Game config to have the tags sorted alphabetically in the preview.
+- Refactored parts of the Game config.
+- Fixed a bug in the Game config's slots when all of them cannot be filled.
+- Fixed a bug that caused an error when manually executing stopping bangs while the skin is not monitoring a game process.
+- Fixed a bug that caused newly created tags, which had been disabled, to become enabled when viewing the list of tags.
+- Fixed a bug that caused unsaved changes, which had been made to one game, to be saved when another game was inspected via the Game config without closing the Game config first.
+
+**Version 3.0.0 beta 10 - 2018/05/04:**
+- Updated translations to improve compatibility with various languages.
+- Updated Steam settings page to remove unsupported characters from the profile names of detected accounts.
+- Fixed a bug in the GOG Galaxy platform related to downloading missing banners.
+
 **Version 3.0.0 beta 9 - 2018/04/17:**
 - Finished implementing games' ability to ignore executing bangs other than their own.
 - Fixed a bug in the localization system that caused certain supported characters to be removed from strings.

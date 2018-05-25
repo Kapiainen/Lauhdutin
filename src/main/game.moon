@@ -140,6 +140,10 @@ class Game
 
 	getHoursPlayed: () => return @hoursPlayed or 0
 
+	setHoursPlayed: (value) =>
+		if type(value) == 'number' and value >= 0
+			@hoursPlayed = value
+
 	incrementHoursPlayed: (hours) =>
 		if hours >= 0
 			@hoursPlayed = 0 if @hoursPlayed == nil

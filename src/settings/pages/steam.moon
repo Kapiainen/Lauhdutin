@@ -9,7 +9,11 @@ state = {
 getUsers = () ->
 	path = io.joinPaths(COMPONENTS.SETTINGS\getSteamPath(), 'config\\loginusers.vdf')
 	return nil unless io.fileExists(path, false)
-	return utility.parseVDF(io.readFile(path, false)).users
+	vdf = utility.parseVDF(io.readFile(path, false))
+	return nil if vdf == nil or vdf.users == nil
+	for communityID, user in pairs(vdf.users)
+		user.personaname = utility.replaceUnsupportedChars(user.personaname)
+	return vdf.users
 
 getPersonaName = (accountID) ->
 	path = io.joinPaths(COMPONENTS.SETTINGS\getSteamPath(), 'userdata', accountID, 'config\\localconfig.vdf')
@@ -19,7 +23,7 @@ getPersonaName = (accountID) ->
 	config = vdf.userlocalconfigstore if config == nil
 	return nil if config == nil
 	return nil if config.friends == nil
-	return config.friends.personaname
+	return utility.replaceUnsupportedChars(config.friends.personaname)
 
 updateUsers = () -> 
 	state.accounts = {}
@@ -39,6 +43,7 @@ updateUsers = () ->
 						:personaName
 						displayValue: personaName
 					})
+					users[communityID] = nil
 					break
 	if #state.accounts == 0
 		state.accounts[1] = {

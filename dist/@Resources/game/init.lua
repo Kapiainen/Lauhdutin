@@ -19,9 +19,11 @@ STATE = {
   GAME = nil,
   ALL_GAMES = nil,
   GAMES_VERSION = nil,
+  ALL_TAGS = nil,
   ALL_PLATFORMS = nil,
   HIGHLIGHTED_SLOT_INDEX = 0,
-  CENTERED = false
+  CENTERED = false,
+  ACTIVE_INPUT = false
 }
 local COMPONENTS = {
   STATUS = nil,
@@ -62,7 +64,7 @@ do
       return self:update()
     end,
     update = function(self)
-      if self.property then
+      if self.property ~= nil then
         if self.property.update ~= nil then
           self.property.value = self.property:update()
         end
@@ -77,15 +79,15 @@ do
         end
         return 
       end
-      SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" ""]'):format(self.index))
-      SKIN:Bang(('[!SetOption "Slot%dValue" "Text" ""]'):format(self.index))
+      SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" " "]'):format(self.index))
+      SKIN:Bang(('[!SetOption "Slot%dValue" "Text" " "]'):format(self.index))
       return SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipHidden" "1"]'):format(self.index))
     end,
     hasAction = function(self)
-      return self.property.action ~= nil
+      return self.property ~= nil and self.property.action ~= nil
     end,
     action = function(self)
-      if self.property.action == nil then
+      if self.property == nil or self.property.action == nil then
         return 
       end
       return self.property:action(self.index)
@@ -125,6 +127,40 @@ additionalEnums = function()
     MAX = 4
   }
 end
+local getGamesAndTags
+getGamesAndTags = function()
+  local games = io.readJSON(STATE.PATHS.GAMES)
+  STATE.GAMES_VERSION = games.version
+  STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = games.games
+    for _index_0 = 1, #_list_0 do
+      local args = _list_0[_index_0]
+      _accum_0[_len_0] = Game(args)
+      _len_0 = _len_0 + 1
+    end
+    STATE.ALL_GAMES = _accum_0
+  end
+  if STATE.ALL_TAGS == nil then
+    STATE.ALL_TAGS = { }
+    local _list_0 = STATE.ALL_GAMES
+    for _index_0 = 1, #_list_0 do
+      local game = _list_0[_index_0]
+      local _list_1 = game:getTags()
+      for _index_1 = 1, #_list_1 do
+        local tag = _list_1[_index_1]
+        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+      end
+      local _list_2 = game:getPlatformTags()
+      for _index_1 = 1, #_list_2 do
+        local tag = _list_2[_index_1]
+        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+      end
+    end
+  end
+end
 Initialize = function()
   SKIN:Bang('[!Hide]')
   STATE.PATHS.RESOURCES = SKIN:GetVariable('@')
@@ -151,36 +187,9 @@ Initialize = function()
       end
       STATE.ALL_PLATFORMS = _accum_0
     end
-    local games = io.readJSON(STATE.PATHS.GAMES)
-    STATE.GAMES_VERSION = games.version
-    do
-      local _accum_0 = { }
-      local _len_0 = 1
-      local _list_0 = games.games
-      for _index_0 = 1, #_list_0 do
-        local args = _list_0[_index_0]
-        _accum_0[_len_0] = Game(args)
-        _len_0 = _len_0 + 1
-      end
-      STATE.ALL_GAMES = _accum_0
-    end
+    getGamesAndTags()
     STATE.NUM_SLOTS = 4
     STATE.SCROLL_INDEX = 1
-    STATE.ALL_TAGS = { }
-    local _list_0 = STATE.ALL_GAMES
-    for _index_0 = 1, #_list_0 do
-      local game = _list_0[_index_0]
-      local _list_1 = game:getTags()
-      for _index_1 = 1, #_list_1 do
-        local tag = _list_1[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
-      local _list_2 = game:getPlatformTags()
-      for _index_1 = 1, #_list_2 do
-        local tag = _list_2[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
-    end
     local valueMeter = SKIN:GetMeter('Slot1Value')
     local maxValueStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
     do
@@ -336,9 +345,8 @@ createTagProperties = function()
   }))
   return properties
 end
-local createProperties
-createProperties = function(game, platform)
-  local properties = { }
+local createPlatformProperty
+createPlatformProperty = function(game, platform)
   local platformOverride = game:getPlatformOverride()
   local platformName
   if platformOverride ~= nil then
@@ -346,14 +354,28 @@ createProperties = function(game, platform)
   else
     platformName = platform:getName()
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_platform', 'Platform'),
     value = platformName
-  }))
-  table.insert(properties, Property({
+  })
+end
+local createHoursPlayedProperty
+createHoursPlayedProperty = function(game)
+  local f
+  f = function(self)
+    return ('%.0f'):format(game:getHoursPlayed())
+  end
+  return Property({
     title = LOCALIZATION:get('button_label_hours_played', 'Hours played'),
-    value = ('%.0f'):format(game:getHoursPlayed())
-  }))
+    value = f(),
+    action = function(self, index)
+      return StartEditingHoursPlayed(index)
+    end,
+    update = f
+  })
+end
+local createLastPlayedProperty
+createLastPlayedProperty = function(game)
   local f
   f = function(self)
     local lastPlayed = game:getLastPlayed()
@@ -363,34 +385,45 @@ createProperties = function(game, platform)
     end
     return LOCALIZATION:get('game_last_played_never', 'Never')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_last_played', 'Last played'),
     value = f()
-  }))
+  })
+end
+local createInstalledProperty
+createInstalledProperty = function(game)
+  local f
   f = function(self)
     if game:isInstalled() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_installed', 'Installed'),
     value = f()
-  }))
+  })
+end
+local createVisibleProperty
+createVisibleProperty = function(game)
+  local f
   f = function(self)
     if game:isVisible() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_visible', 'Visible'),
     value = f(),
     action = function(self, index)
       return STATE.GAME:toggleVisibility()
     end,
     update = f
-  }))
+  })
+end
+local createPathProperty
+createPathProperty = function(game)
   local path = game:getPath()
   local action = nil
   if path:startsWith('"') and path:endsWith('"') then
@@ -404,13 +437,15 @@ createProperties = function(game, platform)
       end
     end
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_path', 'Path'),
     value = ('""%s""'):format(game:getPath()),
     action = action
-  }))
-  action = nil
-  path = nil
+  })
+end
+local createProcessProperty
+createProcessProperty = function(game)
+  local f
   f = function(self)
     local processOverride = game:getProcessOverride()
     if processOverride ~= nil and processOverride ~= '' then
@@ -420,16 +455,20 @@ createProperties = function(game, platform)
     if process ~= nil and process ~= '' then
       return process
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_process_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_process', 'Process'),
     value = f(),
     action = function(self, index)
       return StartEditingProcessOverride(index)
     end,
     update = f
-  }))
+  })
+end
+local createNotesProperty
+createNotesProperty = function(game)
+  local f
   f = function(self)
     local notes = game:getNotes()
     if notes ~= nil and notes:len() > 0 then
@@ -440,16 +479,20 @@ createProperties = function(game, platform)
       end
       return line
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_notes_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_notes', 'Notes'),
     value = f(),
     action = function(self, index)
       return StartEditingNotes()
     end,
     update = f
-  }))
+  })
+end
+local createTagsProperty
+createTagsProperty = function(game)
+  local f
   f = function(self)
     local tags = { }
     local _list_0 = game:getTags()
@@ -463,12 +506,28 @@ createProperties = function(game, platform)
       tags[tag] = true
     end
     if tags then
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        for tag, fromPlatform in pairs(tags) do
+          _accum_0[_len_0] = {
+            tag = tag,
+            fromPlatform = fromPlatform
+          }
+          _len_0 = _len_0 + 1
+        end
+        tags = _accum_0
+      end
+      table.sort(tags, function(a, b)
+        return a.tag < b.tag
+      end)
       local str = ''
-      for tag, fromPlatform in pairs(tags) do
-        if fromPlatform then
-          str = str .. (' | %s*'):format(tag)
+      for _index_0 = 1, #tags do
+        local entry = tags[_index_0]
+        if entry.fromPlatform then
+          str = str .. (' | %s*'):format(entry.tag)
         else
-          str = str .. (' | %s'):format(tag)
+          str = str .. (' | %s'):format(entry.tag)
         end
       end
       str = str:sub(4)
@@ -476,9 +535,9 @@ createProperties = function(game, platform)
         return str
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('game_tags_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_tags', 'Tags'),
     value = f(),
     action = function(self, index)
@@ -499,6 +558,7 @@ createProperties = function(game, platform)
         local tag = _list_1[_index_0]
         STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
       end
+      SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_accept', 'Accept')))
       STATE.TAG_PROPERTIES = createTagProperties()
       STATE.PROPERTIES = STATE.TAG_PROPERTIES
       STATE.PREVIOUS_SCROLL_INDEX = STATE.SCROLL_INDEX
@@ -507,21 +567,29 @@ createProperties = function(game, platform)
       return updateSlots()
     end,
     update = f
-  }))
+  })
+end
+local createIgnoresOtherBangsProperty
+createIgnoresOtherBangsProperty = function(game)
+  local f
   f = function(self)
     if game:getIgnoresOtherBangs() then
       return LOCALIZATION:get('button_label_yes', 'Yes')
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('game_ignores_other_bangs', 'Ignores other bangs'),
     value = f(),
     action = function(self, index)
       return STATE.GAME:toggleIgnoresOtherBangs()
     end,
     update = f
-  }))
+  })
+end
+local createStartingBangsProperty
+createStartingBangsProperty = function(game)
+  local f
   f = function(self)
     local bangs = game:getStartingBangs()
     if bangs and #bangs > 0 then
@@ -530,16 +598,20 @@ createProperties = function(game, platform)
         return (bangs:gsub('\"', '\'\''))
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
     value = f(),
     action = function(self, index)
       return StartEditingStartingBangs()
     end,
     update = f
-  }))
+  })
+end
+local createStoppingBangsProperty
+createStoppingBangsProperty = function(game)
+  local f
   f = function(self)
     local bangs = game:getStoppingBangs()
     if bangs and #bangs > 0 then
@@ -548,28 +620,90 @@ createProperties = function(game, platform)
         return (bangs:gsub('\"', '\'\''))
       end
     end
-    return LOCALIZATION:get('button_label_none', 'None')
+    return LOCALIZATION:get('button_label_bangs_none', 'None')
   end
-  table.insert(properties, Property({
+  return Property({
     title = LOCALIZATION:get('button_label_stopping_bangs', 'Stopping bangs'),
     value = f(),
     action = function(self, index)
       return StartEditingStoppingBangs()
     end,
     update = f
-  }))
-  return properties
+  })
+end
+local createBannerReacquisitionProperty
+createBannerReacquisitionProperty = function(game)
+  local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
+  local action = nil
+  local _exp_0 = game:getPlatformID()
+  if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+    if game:getPlatformOverride() == nil then
+      value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
+      action = function()
+        return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+      end
+    end
+  end
+  return Property({
+    title = LOCALIZATION:get('button_label_reacquire_banner', 'Reacquire banner'),
+    value = value,
+    action = action,
+    update = nil
+  })
+end
+local createOpenStorePageProperty
+createOpenStorePageProperty = function(game)
+  local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
+  local action = nil
+  local _exp_0 = game:getPlatformID()
+  if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+    if game:getPlatformOverride() == nil then
+      value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
+      action = function()
+        return SKIN:Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+      end
+    end
+  end
+  return Property({
+    title = LOCALIZATION:get('button_label_open_store_page', 'Open store page'),
+    value = value,
+    action = action,
+    update = nil
+  })
+end
+local createProperties
+createProperties = function(game, platform)
+  return {
+    createPlatformProperty(game, platform),
+    createHoursPlayedProperty(game),
+    createLastPlayedProperty(game),
+    createInstalledProperty(game),
+    createVisibleProperty(game),
+    createPathProperty(game),
+    createProcessProperty(game),
+    createNotesProperty(game),
+    createTagsProperty(game),
+    createIgnoresOtherBangsProperty(game),
+    createStartingBangsProperty(game),
+    createStoppingBangsProperty(game),
+    createBannerReacquisitionProperty(game),
+    createOpenStorePageProperty(game)
+  }
 end
 Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting Game handshake', gameID)
-    local game = nil
-    local _list_0 = STATE.ALL_GAMES
-    for _index_0 = 1, #_list_0 do
-      local candidate = _list_0[_index_0]
-      if candidate:getGameID() == gameID then
-        game = candidate
-        break
+    getGamesAndTags()
+    local game = STATE.ALL_GAMES[gameID]
+    if game == nil or game.gameID ~= gameID then
+      game = nil
+      local _list_0 = STATE.ALL_GAMES
+      for _index_0 = 1, #_list_0 do
+        local candidate = _list_0[_index_0]
+        if candidate:getGameID() == gameID then
+          game = candidate
+          break
+        end
       end
     end
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
@@ -579,9 +713,9 @@ Handshake = function(gameID)
     updateTitle(game, maxStringLength)
     updateBanner(game)
     local platform = nil
-    local _list_1 = STATE.ALL_PLATFORMS
-    for _index_0 = 1, #_list_1 do
-      local p = _list_1[_index_0]
+    local _list_0 = STATE.ALL_PLATFORMS
+    for _index_0 = 1, #_list_0 do
+      local p = _list_0[_index_0]
       if p:getPlatformID() == game:getPlatformID() then
         platform = p
         break
@@ -616,7 +750,7 @@ Handshake = function(gameID)
   end
 end
 Scroll = function(direction)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   local index = STATE.SCROLL_INDEX + direction
@@ -630,17 +764,17 @@ Scroll = function(direction)
   return updateSlots()
 end
 MouseOver = function(index)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   STATE.HIGHLIGHTED_SLOT_INDEX = index
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
 end
 MouseLeave = function(index)
-  if not (COMPONENTS.SLOTS) then
+  if not (COMPONENTS.SLOTS ~= nil) then
     return 
   end
   if index == 0 then
@@ -653,32 +787,40 @@ MouseLeave = function(index)
   end
 end
 MouseLeftPress = function(index)
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
 end
 ButtonAction = function(index)
-  if not (COMPONENTS.SLOTS) then
-    return 
-  end
-  if not (COMPONENTS.SLOTS[index]:hasAction()) then
+  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
     return 
   end
   SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
   COMPONENTS.SLOTS[index]:action()
   return updateSlots()
 end
+local showDefaultProperties
+showDefaultProperties = function()
+  SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save')))
+  SKIN:Bang(('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel')))
+  STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
+  STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
+  STATE.PREVIOUS_SCROLL_INDEX = 1
+  updateScrollbar()
+  return updateSlots()
+end
 Save = function()
   local success, err = pcall(function()
+    if STATE.ACTIVE_INPUT == true then
+      return 
+    end
     local _exp_0 = STATE.PROPERTIES
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       io.writeJSON(STATE.PATHS.GAMES, {
         version = STATE.GAMES_VERSION,
-        games = STATE.ALL_GAMES
+        games = STATE.ALL_GAMES,
+        updated = STATE.GAMES_UPDATED_TIMESTAMP
       })
       local gameID = STATE.GAME:getGameID()
       return SKIN:Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]'):format(gameID))
@@ -694,11 +836,7 @@ Save = function()
         end
         return _accum_0
       end)())
-      STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-      STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-      STATE.PREVIOUS_SCROLL_INDEX = 1
-      updateScrollbar()
-      return updateSlots()
+      return showDefaultProperties()
     end
   end)
   if not (success) then
@@ -707,15 +845,14 @@ Save = function()
 end
 Cancel = function()
   local success, err = pcall(function()
+    if STATE.ACTIVE_INPUT == true then
+      return 
+    end
     local _exp_0 = STATE.PROPERTIES
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       return SKIN:Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
     elseif STATE.TAG_PROPERTIES == _exp_0 then
-      STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
-      STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
-      STATE.PREVIOUS_SCROLL_INDEX = 1
-      updateScrollbar()
-      return updateSlots()
+      return showDefaultProperties()
     end
   end)
   if not (success) then
@@ -755,14 +892,31 @@ OpenBanner = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+OnDismissedInput = function()
+  local success, err = pcall(function()
+    STATE.ACTIVE_INPUT = false
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+local startEditing
+startEditing = function(slotIndex, batchIndex, defaultValue)
+  local meter = SKIN:GetMeter(('Slot%dValue'):format(slotIndex))
+  SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
+  SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
+  SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
+  SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
+  if defaultValue == nil then
+    defaultValue = ''
+  end
+  SKIN:Bang(('[!SetOption "Input" "DefaultValue" "%s"]'):format(defaultValue))
+  SKIN:Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]'):format(batchIndex))
+  STATE.ACTIVE_INPUT = true
+end
 StartEditingProcessOverride = function(index)
   local success, err = pcall(function()
-    local meter = SKIN:GetMeter(('Slot%dValue'):format(index))
-    SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
-    SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
-    SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
-    SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
-    return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
+    return startEditing(index, 1, STATE.GAME:getProcessOverride())
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -771,7 +925,26 @@ end
 OnEditedProcessOverride = function(process)
   local success, err = pcall(function()
     STATE.GAME:setProcessOverride(process:sub(1, -2))
-    return updateSlots()
+    updateSlots()
+    return OnDismissedInput()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+StartEditingHoursPlayed = function(index)
+  local success, err = pcall(function()
+    return startEditing(index, 3, STATE.GAME:getHoursPlayed())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnEditedHoursPlayed = function(hoursPlayed)
+  local success, err = pcall(function()
+    STATE.GAME:setHoursPlayed(tonumber((hoursPlayed:sub(1, -2):gsub(',', '.'))))
+    updateSlots()
+    return OnDismissedInput()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -779,12 +952,7 @@ OnEditedProcessOverride = function(process)
 end
 StartCreatingTag = function(index)
   local success, err = pcall(function()
-    local meter = SKIN:GetMeter(('Slot%dValue'):format(index))
-    SKIN:Bang(('[!SetOption "Input" "X" "%d"]'):format(meter:GetX() - 1))
-    SKIN:Bang(('[!SetOption "Input" "Y" "%d"]'):format(meter:GetY() - 1))
-    SKIN:Bang(('[!SetOption "Input" "W" "%d"]'):format(meter:GetW()))
-    SKIN:Bang(('[!SetOption "Input" "H" "%d"]'):format(20))
-    return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 2"]')
+    return startEditing(index, 2)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -796,14 +964,15 @@ OnCreatedTag = function(tag)
     if STATE.ALL_TAGS[tag] ~= nil then
       return 
     end
-    STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
+    STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
     STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
     local createProperty = table.remove(STATE.TAG_PROPERTIES, 1)
-    table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, ENUMS.TAG_STATES.ENABLED))
+    table.insert(STATE.TAG_PROPERTIES, createTagProperty(tag, STATE.GAME_TAGS[tag]))
     table.sort(STATE.TAG_PROPERTIES, sortPropertiesByTitle)
     table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
     updateScrollbar()
-    return updateSlots()
+    updateSlots()
+    return OnDismissedInput()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -876,6 +1045,14 @@ OnEditedNotes = function()
     local notes = io.readFile(STATE.PATHS.NOTES)
     STATE.GAME:setNotes(notes)
     return updateSlots()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnReacquiredBanner = function()
+  local success, err = pcall(function()
+    return updateBanner(STATE.GAME)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

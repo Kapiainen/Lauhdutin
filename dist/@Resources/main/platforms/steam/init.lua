@@ -309,6 +309,9 @@ do
       lastPlayed = tonumber(app.lastplayed)
       return lastPlayed
     end,
+    generateBannerURL = function(self, appID)
+      return ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
+    end,
     getBanner = function(self, appID)
       local banner = self:getBannerPath(appID)
       if banner then
@@ -325,7 +328,7 @@ do
         end
       end
       banner = io.joinPaths(self.cachePath, appID .. '.jpg')
-      local bannerURL = ('http://cdn.akamai.steamstatic.com/steam/apps/%s/header.jpg'):format(appID)
+      local bannerURL = self:generateBannerURL(appID)
       return banner, bannerURL
     end,
     getPath = function(self, appID)
@@ -456,7 +459,12 @@ do
           end
           file = io.readFile(io.joinPaths(libraryPath, manifest), false)
           local lines = file:splitIntoLines()
-          local vdf = utility.parseVDF(lines)
+          local success, vdf = pcall(utility.parseVDF, lines)
+          if not (success) then
+            log(('Failed to parse "%s": %s'):format(manifest, vdf))
+            _continue_0 = true
+            break
+          end
           local title = nil
           if vdf.appstate ~= nil then
             title = vdf.appstate.name
