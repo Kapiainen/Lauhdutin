@@ -70,8 +70,30 @@ do
           if arguments then
             arguments = arguments:match('^	Arguments=(.-)$')
           end
+          if arguments then
+            arguments = arguments:trim()
+          end
           if arguments ~= nil and arguments ~= '' then
-            arguments = arguments:split('"%s"')
+            local args = { }
+            local attempts = 20
+            while #arguments > 0 and attempts > 0 do
+              local arg = nil
+              if arguments:match('^"') then
+                local starts, ends = arguments:find('"(.-)"')
+                arg = arguments:sub(starts + 1, ends - 1)
+                arguments = arguments:sub(ends + 1):trim()
+              else
+                local starts, ends = arguments:find('([^%s]+)')
+                arg = arguments:sub(starts, ends)
+                arguments = arguments:sub(ends + 1):trim()
+              end
+              if arg == nil then
+                attempts = attempts - 1
+              else
+                table.insert(args, arg)
+              end
+            end
+            arguments = args
             if #arguments > 0 then
               path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
             end
