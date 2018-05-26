@@ -59,8 +59,25 @@ class Shortcuts extends Platform
 			path = ('"%s"')\format(path)
 			arguments = table.remove(lines, 1)
 			arguments = arguments\match('^	Arguments=(.-)$') if arguments
+			arguments = arguments\trim() if arguments
 			if arguments ~= nil and arguments ~= ''
-				arguments = arguments\split('"%s"')
+				args = {}
+				attempts = 20
+				while #arguments > 0 and attempts > 0
+					arg = nil
+					if arguments\match('^"') -- Arguments inside quotation marks
+						starts, ends = arguments\find('"(.-)"')
+						arg = arguments\sub(starts + 1, ends - 1)
+						arguments = arguments\sub(ends + 1)\trim()
+					else -- Single word arguments
+						starts, ends = arguments\find('([^%s]+)')
+						arg = arguments\sub(starts, ends)
+						arguments = arguments\sub(ends + 1)\trim()
+					if arg == nil
+						attempts -= 1
+					else
+						table.insert(args, arg)
+				arguments = args
 				if #arguments > 0
 					path = ('%s "%s"')\format(path, table.concat(arguments, '" "'))
 			if title == nil

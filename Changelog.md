@@ -1,3 +1,6 @@
+**Version 3.0.1 - 2018/05/26:**
+- Fixed the manner in which arguments of Windows shortcuts are parsed.
+
 **Version 3.0.0 - 2018/05/25:**
 - Updated error messages related to version numbers of games, settings, and translations.
 - Updated error messages to clarify that the preceding number is the line number in the Lua file where the error occurred rather than an error code.
