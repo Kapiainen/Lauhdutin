@@ -52,12 +52,11 @@ class OverlaySlot
 			return @multipleHoursMultipleMinutesPlayed\format(numHoursPlayed, numMinutesPlayed)
 		textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES] = (game) =>
 			hoursPlayed = game\getHoursPlayed()
-			numHoursPlayed = math.floor(hoursPlayed)
-			if numHoursPlayed == 1
-				return @singleHourPlayed\format(numHoursPlayed)
-			elseif numHoursPlayed > 0
-				return @multipleHoursPlayed\format(numHoursPlayed)
-			numMinutesPlayed = math.round((hoursPlayed - numHoursPlayed) * 60.0)
+			if hoursPlayed >= 1.0 and hoursPlayed < 1.5
+				return @singleHourPlayed\format(math.floor(hoursPlayed))
+			elseif hoursPlayed >= 1.5
+				return @multipleHoursPlayed\format(math.round(hoursPlayed))
+			numMinutesPlayed = math.round((hoursPlayed - math.floor(hoursPlayed)) * 60.0)
 			if numMinutesPlayed == 1
 				return @singleMinutePlayed\format(numMinutesPlayed)
 			return @multipleMinutesPlayed\format(numMinutesPlayed)
