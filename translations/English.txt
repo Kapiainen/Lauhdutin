@@ -136,6 +136,8 @@ setting_skin_revealing_delay_description	The duration (in milliseconds) before t
 setting_skin_revealing_delay_title	Revealing delay
 setting_skin_scroll_step_description	The number of games that are scrolled at each scroll event.
 setting_skin_scroll_step_title	Scroll step
+setting_skin_show_session_description	If enabled, then a small skin that shows the current system time and session duration in HH:MM format is loaded for the duration of the game.
+setting_skin_show_session_title	Show session skin
 setting_skin_title	Skin
 setting_slots_center_on_monitor_description	If enabled, then some windows (e.g. sort, filter) are centered on the monitor that the main window of this skin is on.
 setting_slots_center_on_monitor_title	Center windows on the current monitor

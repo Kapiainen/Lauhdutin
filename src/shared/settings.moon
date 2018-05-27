@@ -144,6 +144,7 @@ migrators = {
 			settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
 			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
 			settings.slots.overlayImagesEnabled = true
+			settings.showSession = false
 	}
 }
 
@@ -156,6 +157,7 @@ class Settings
 			logging: false -- If true, then extra information is printed to Rainmeter's log. Useful when troubleshooting issues.
 			sorting: ENUMS.SORTING_TYPES.ALPHABETICALLY -- How games are sorted.
 			gameDetectionFrequency: ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY -- How often the skin attempts to detect games when the skin is loaded.
+			showSession: false -- Load a tiny skin that shows the current system time and the current session's duration. Both times are shown in HH:MM format.
 			bangs: {
 				enabled: true -- Whether or not bangs are executed (applies to global, platform-specific, and game-specific bangs).
 				global: {
@@ -304,6 +306,10 @@ class Settings
 	setGameDetectionFrequency: (value) =>
 		return if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX
 		@settings.gameDetectionFrequency = value
+
+	getShowSession: () => return @settings.showSession
+
+	toggleShowSession: () => @settings.showSession = not @settings.showSession
 
 	getLocalization: () => return @settings.localization or 'English'
 

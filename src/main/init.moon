@@ -310,7 +310,10 @@ export GameProcessTerminated = (game) ->
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
 					if COMPONENTS.SETTINGS\getGOGGalaxyIndirectLaunch()
 						SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\closeClient.bat"]')
-			SKIN\Bang('[!ShowFade]') if COMPONENTS.SETTINGS\getHideSkin()
+			if COMPONENTS.SETTINGS\getHideSkin()
+				SKIN\Bang('[!ShowFade]')
+			if COMPONENTS.SETTINGS\getShowSession()
+				SKIN\Bang(('[!DeactivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -551,7 +554,10 @@ launchGame = (game) ->
 				SKIN\Bang(bang) for bang in *platformBangs
 			SKIN\Bang(bang) for bang in *game\getStartingBangs()
 		SKIN\Bang(('[%s]')\format(game\getPath()))
-		SKIN\Bang('[!HideFade]') if COMPONENTS.SETTINGS\getHideSkin()
+		if COMPONENTS.SETTINGS\getHideSkin()
+			SKIN\Bang('[!HideFade]')
+		if COMPONENTS.SETTINGS\getShowSession()
+			SKIN\Bang(('[!ActivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
 	elseif game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
 		game\setLastPlayed(os.time())
 		game\setInstalled(true)

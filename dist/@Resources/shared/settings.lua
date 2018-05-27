@@ -161,6 +161,7 @@ local migrators = {
       settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
       settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
       settings.slots.overlayImagesEnabled = true
+      settings.showSession = false
     end
   }
 }
@@ -282,6 +283,12 @@ do
         return 
       end
       self.settings.gameDetectionFrequency = value
+    end,
+    getShowSession = function(self)
+      return self.settings.showSession
+    end,
+    toggleShowSession = function(self)
+      self.settings.showSession = not self.settings.showSession
     end,
     getLocalization = function(self)
       return self.settings.localization or 'English'
@@ -710,6 +717,7 @@ do
         logging = false,
         sorting = ENUMS.SORTING_TYPES.ALPHABETICALLY,
         gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY,
+        showSession = false,
         bangs = {
           enabled = true,
           global = {

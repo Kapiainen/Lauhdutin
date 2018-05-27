@@ -292,6 +292,15 @@ class Skin extends Page
 					return COMPONENTS.SETTINGS\getHideSkin()
 			})
 			Settings.Boolean({
+				title: LOCALIZATION\get('setting_skin_show_session_title', 'Show session skin')
+				tooltip: LOCALIZATION\get('setting_skin_show_session_description', 'If enabled, then a small skin that shows the current system time and session duration in HH:MM format is loaded for the duration of the game.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleShowSession()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getShowSession()
+			})
+			Settings.Boolean({
 				title: LOCALIZATION\get('setting_bangs_enabled_title', 'Execute bangs')
 				tooltip: LOCALIZATION\get('setting_bangs_enabled_description', 'If enabled, then the specified Rainmeter bangs are executed when a game starts or terminates.')
 				toggle: () =>

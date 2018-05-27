@@ -390,7 +390,10 @@ GameProcessTerminated = function(game)
       end
     end
     if COMPONENTS.SETTINGS:getHideSkin() then
-      return SKIN:Bang('[!ShowFade]')
+      SKIN:Bang('[!ShowFade]')
+    end
+    if COMPONENTS.SETTINGS:getShowSession() then
+      return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(('%s\\Session'):format(STATE.ROOT_CONFIG)))
     end
   end)
   if not (success) then
@@ -744,7 +747,10 @@ launchGame = function(game)
     end
     SKIN:Bang(('[%s]'):format(game:getPath()))
     if COMPONENTS.SETTINGS:getHideSkin() then
-      return SKIN:Bang('[!HideFade]')
+      SKIN:Bang('[!HideFade]')
+    end
+    if COMPONENTS.SETTINGS:getShowSession() then
+      return SKIN:Bang(('[!ActivateConfig "%s"]'):format(('%s\\Session'):format(STATE.ROOT_CONFIG)))
     end
   elseif game:getPlatformID() == ENUMS.PLATFORM_IDS.STEAM then
     game:setLastPlayed(os.time())
