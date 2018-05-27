@@ -189,7 +189,7 @@ class Library
 		gameID = updatedGame\getGameID()
 		for game in *@games
 			if game\getGameID() == gameID
-				game\merge(updatedGame)
+				game\merge(updatedGame, true)
 				return true
 		return false
 

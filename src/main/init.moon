@@ -673,6 +673,7 @@ export UpdateGame = (gameID) ->
 							break
 				assert(game ~= nil, 'main.init.UpdateGame')
 				COMPONENTS.LIBRARY\update(Game(game))
+				STATE.SCROLL_INDEX_UPDATED = false
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

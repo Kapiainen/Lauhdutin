@@ -42,6 +42,9 @@ do
     end,
     getBannerExtensions = function(self)
       return self.bannerExtensions
+    end,
+    getCachePath = function(self)
+      return self.cachePath
     end
   }
   _base_0.__index = _base_0

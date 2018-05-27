@@ -123,7 +123,7 @@ export Initialize = () ->
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')(COMPONENTS.SETTINGS)\getBannerExtensions(), '|')\gsub('%.', '')
+			STATE.SUPPORTED_BANNER_EXTENSIONS = require('main.platforms.platform')(COMPONENTS.SETTINGS)\getBannerExtensions()
 			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
 			SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
 			SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -150,22 +150,23 @@ updateBanner = (game) ->
 		SKIN\Bang(('[!SetOption "BannerMissing" "Text" "%s"]')\format(LOCALIZATION\get('game_no_banner', 'No banner')))
 		expectedBanner = game\getExpectedBanner()
 		if expectedBanner
+			extensions = table.concat(STATE.SUPPORTED_BANNER_EXTENSIONS, '|')\gsub('%.', '')
 			tooltip = switch game\getPlatformID()
 				when ENUMS.PLATFORM_IDS.SHORTCUTS
 					platformOverride = game\getPlatformOverride()
 					if platformOverride ~= nil
-						('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+						('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, extensions)
 					else
-						('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+						('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, extensions)
 				when ENUMS.PLATFORM_IDS.STEAM
 					if game\getPlatformOverride()
-						('\\@Resources\\cache\\steam_shortcuts\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+						('\\@Resources\\cache\\steam_shortcuts\\%s.%s')\format(expectedBanner, extensions)
 					else
-						('\\@Resources\\cache\\steam\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+						('\\@Resources\\cache\\steam\\%s.%s')\format(expectedBanner, extensions)
 				when ENUMS.PLATFORM_IDS.BATTLENET
-					('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+					('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, extensions)
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
-					('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+					('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, extensions)
 			SKIN\Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]')\format(tooltip))
 			SKIN\Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
 			return
@@ -426,19 +427,48 @@ createStoppingBangsProperty = (game) ->
 		update: f
 	})
 
-createBannerReacquisitionProperty = (game) ->
-	value = LOCALIZATION\get('button_label_platform_not_supported', 'Platform not supported')
-	action = nil
-	switch game\getPlatformID()
-		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
-			if game\getPlatformOverride() == nil
-				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
-				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+createBannerReacquisitionProperty = (game, platform) ->
+	title = LOCALIZATION\get('button_label_update_banner', 'Update banner')
+	value = LOCALIZATION\get('button_label_detect_download', 'Detect/download')
+	action = () =>
+		path = game\getBanner()
+		exists = if path == nil then false else io.fileExists(path)
+		unless path ~= nil and exists
+			if path == nil
+				expectedBanner = game\getExpectedBanner()
+				if expectedBanner == nil
+					return
+				path = switch game\getPlatformID()
+					when ENUMS.PLATFORM_IDS.SHORTCUTS
+						platformOverride = game\getPlatformOverride()
+						if platformOverride ~= nil
+							('Shortcuts\\%s\\%s')\format(platformOverride, expectedBanner)
+						else
+							('Shortcuts\\%s')\format(expectedBanner)
+					when ENUMS.PLATFORM_IDS.STEAM
+						if game\getPlatformOverride()
+							('cache\\steam_shortcuts\\%s')\format(expectedBanner)
+				path = io.joinPaths(platform\getCachePath(), expectedBanner) if path == nil
+			else
+				path = path\reverse()\match('^[^%.]+%.(.-)')\reverse()
+			for extension in *STATE.SUPPORTED_BANNER_EXTENSIONS
+				newPath = ('%s%s')\format(path, extension)
+				if io.fileExists(newPath)
+					game\setBanner(newPath)
+					updateBanner(game)
+					return
+		switch game\getPlatformID()
+			when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
+				if game\getPlatformOverride() == nil
+					SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+					return
+		unless exists
+			game\setBanner(nil)
+			updateBanner(game)
 	return Property({
-		title: LOCALIZATION\get('button_label_reacquire_banner', 'Reacquire banner')
+		:title
 		:value
 		:action
-		update: nil
 	})
 
 createOpenStorePageProperty = (game) ->
@@ -470,7 +500,7 @@ createProperties = (game, platform) ->
 		createIgnoresOtherBangsProperty(game)
 		createStartingBangsProperty(game)
 		createStoppingBangsProperty(game)
-		createBannerReacquisitionProperty(game)
+		createBannerReacquisitionProperty(game, platform)
 		createOpenStorePageProperty(game)
 	}
 

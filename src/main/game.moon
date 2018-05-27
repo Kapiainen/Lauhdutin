@@ -30,26 +30,30 @@ class Game
 		@ignoresOtherBangs = args.ignoresOtherBangs
 		@notes = args.notes
 
-	merge: (old) =>
-		assert(old.__class == Game, 'main.game.Game.merge')
-		log('Merging: ' .. old.title)
-		@processOverride = old.processOverride
-		@hidden = old.hidden
+	merge: (other, newer = false) =>
+		assert(other.__class == Game, 'main.game.Game.merge')
+		log('Merging: ' .. other.title)
+		@processOverride = other.processOverride
+		@hidden = other.hidden
 		if @lastPlayed ~= nil
-			if old.lastPlayed ~= nil and old.lastPlayed > @lastPlayed
-				@lastPlayed = old.lastPlayed
+			if other.lastPlayed ~= nil and other.lastPlayed > @lastPlayed
+				@lastPlayed = other.lastPlayed
 		else
-			@lastPlayed = old.lastPlayed
+			@lastPlayed = other.lastPlayed
 		if @hoursPlayed ~= nil
-			if old.hoursPlayed ~= nil and old.hoursPlayed > @hoursPlayed
-				@hoursPlayed = old.hoursPlayed
+			if other.hoursPlayed ~= nil and other.hoursPlayed > @hoursPlayed
+				@hoursPlayed = other.hoursPlayed
 		else
-			@hoursPlayed = old.hoursPlayed
-		@tags = old.tags
-		@startingBangs = old.startingBangs
-		@stoppingBangs = old.stoppingBangs
-		@ignoresOtherBangs = old.ignoresOtherBangs
-		@notes = old.notes
+			@hoursPlayed = other.hoursPlayed
+		@tags = other.tags
+		@startingBangs = other.startingBangs
+		@stoppingBangs = other.stoppingBangs
+		@ignoresOtherBangs = other.ignoresOtherBangs
+		@notes = other.notes
+		if newer == true
+			@banner = other.banner
+			@bannerURL = other.bannerURL
+			@expectedBanner = other.expectedBanner
 
 	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
 	-- the substring 'the' does not lead to a bunch of unrelated games beginning with 'the ' to show up.

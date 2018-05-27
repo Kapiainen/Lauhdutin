@@ -3,6 +3,7 @@
 - Added a custom skin action to force the skin to refresh and detect games.
 - Added a setting for toggling context-sensitive images in slot overlays.
 - Added settings for the information to show in the upper and lower halves of the slot overlay.
+- Added the ability to update a game's banner via the Game menu in case the banner has been removed or replaced with a banner with a different file extension.
 - Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
 - Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
 - Added a `Lacks tag` filter to find games that do **not** have a specific tag.

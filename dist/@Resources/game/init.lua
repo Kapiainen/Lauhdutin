@@ -204,7 +204,7 @@ Initialize = function()
     local scrollbar = SKIN:GetMeter('Scrollbar')
     STATE.SCROLLBAR.START = scrollbar:GetY()
     STATE.SCROLLBAR.MAX_HEIGHT = scrollbar:GetH()
-    STATE.SUPPORTED_BANNER_EXTENSIONS = table.concat(require('main.platforms.platform')(COMPONENTS.SETTINGS):getBannerExtensions(), '|'):gsub('%.', '')
+    STATE.SUPPORTED_BANNER_EXTENSIONS = require('main.platforms.platform')(COMPONENTS.SETTINGS):getBannerExtensions()
     SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save')))
     SKIN:Bang(('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel')))
     SKIN:Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -234,25 +234,26 @@ updateBanner = function(game)
     SKIN:Bang(('[!SetOption "BannerMissing" "Text" "%s"]'):format(LOCALIZATION:get('game_no_banner', 'No banner')))
     local expectedBanner = game:getExpectedBanner()
     if expectedBanner then
+      local extensions = table.concat(STATE.SUPPORTED_BANNER_EXTENSIONS, '|'):gsub('%.', '')
       local tooltip
       local _exp_0 = game:getPlatformID()
       if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
         local platformOverride = game:getPlatformOverride()
         if platformOverride ~= nil then
-          tooltip = ('\\@Resources\\Shortcuts\\%s\\%s.%s'):format(platformOverride, expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+          tooltip = ('\\@Resources\\Shortcuts\\%s\\%s.%s'):format(platformOverride, expectedBanner, extensions)
         else
-          tooltip = ('\\@Resources\\Shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+          tooltip = ('\\@Resources\\Shortcuts\\%s.%s'):format(expectedBanner, extensions)
         end
       elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
         if game:getPlatformOverride() then
-          tooltip = ('\\@Resources\\cache\\steam_shortcuts\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+          tooltip = ('\\@Resources\\cache\\steam_shortcuts\\%s.%s'):format(expectedBanner, extensions)
         else
-          tooltip = ('\\@Resources\\cache\\steam\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+          tooltip = ('\\@Resources\\cache\\steam\\%s.%s'):format(expectedBanner, extensions)
         end
       elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
-        tooltip = ('\\@Resources\\cache\\battlenet\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        tooltip = ('\\@Resources\\cache\\battlenet\\%s.%s'):format(expectedBanner, extensions)
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-        tooltip = ('\\@Resources\\cache\\gog_galaxy\\%s.%s'):format(expectedBanner, STATE.SUPPORTED_BANNER_EXTENSIONS)
+        tooltip = ('\\@Resources\\cache\\gog_galaxy\\%s.%s'):format(expectedBanner, extensions)
       end
       SKIN:Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]'):format(tooltip))
       SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
@@ -632,23 +633,70 @@ createStoppingBangsProperty = function(game)
   })
 end
 local createBannerReacquisitionProperty
-createBannerReacquisitionProperty = function(game)
-  local value = LOCALIZATION:get('button_label_platform_not_supported', 'Platform not supported')
-  local action = nil
-  local _exp_0 = game:getPlatformID()
-  if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-    if game:getPlatformOverride() == nil then
-      value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
-      action = function()
-        return SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+createBannerReacquisitionProperty = function(game, platform)
+  local title = LOCALIZATION:get('button_label_update_banner', 'Update banner')
+  local value = LOCALIZATION:get('button_label_detect_download', 'Detect/download')
+  local action
+  action = function(self)
+    local path = game:getBanner()
+    local exists
+    if path == nil then
+      exists = false
+    else
+      exists = io.fileExists(path)
+    end
+    if not (path ~= nil and exists) then
+      if path == nil then
+        local expectedBanner = game:getExpectedBanner()
+        if expectedBanner == nil then
+          return 
+        end
+        local _exp_0 = game:getPlatformID()
+        if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
+          local platformOverride = game:getPlatformOverride()
+          if platformOverride ~= nil then
+            path = ('Shortcuts\\%s\\%s'):format(platformOverride, expectedBanner)
+          else
+            path = ('Shortcuts\\%s'):format(expectedBanner)
+          end
+        elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
+          if game:getPlatformOverride() then
+            path = ('cache\\steam_shortcuts\\%s'):format(expectedBanner)
+          end
+        end
+        if path == nil then
+          path = io.joinPaths(platform:getCachePath(), expectedBanner)
+        end
+      else
+        path = path:reverse():match('^[^%.]+%.(.-)'):reverse()
       end
+      local _list_0 = STATE.SUPPORTED_BANNER_EXTENSIONS
+      for _index_0 = 1, #_list_0 do
+        local extension = _list_0[_index_0]
+        local newPath = ('%s%s'):format(path, extension)
+        if io.fileExists(newPath) then
+          game:setBanner(newPath)
+          updateBanner(game)
+          return 
+        end
+      end
+    end
+    local _exp_0 = game:getPlatformID()
+    if ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+      if game:getPlatformOverride() == nil then
+        SKIN:Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+        return 
+      end
+    end
+    if not (exists) then
+      game:setBanner(nil)
+      return updateBanner(game)
     end
   end
   return Property({
-    title = LOCALIZATION:get('button_label_reacquire_banner', 'Reacquire banner'),
+    title = title,
     value = value,
-    action = action,
-    update = nil
+    action = action
   })
 end
 local createOpenStorePageProperty
@@ -686,7 +734,7 @@ createProperties = function(game, platform)
     createIgnoresOtherBangsProperty(game),
     createStartingBangsProperty(game),
     createStoppingBangsProperty(game),
-    createBannerReacquisitionProperty(game),
+    createBannerReacquisitionProperty(game, platform),
     createOpenStorePageProperty(game)
   }
 end

@@ -912,7 +912,8 @@ UpdateGame = function(gameID)
         end
       end
       assert(game ~= nil, 'main.init.UpdateGame')
-      return COMPONENTS.LIBRARY:update(Game(game))
+      COMPONENTS.LIBRARY:update(Game(game))
+      STATE.SCROLL_INDEX_UPDATED = false
     end
   end)
   if not (success) then

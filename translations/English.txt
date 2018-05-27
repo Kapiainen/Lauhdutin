@@ -5,6 +5,7 @@ button_label_browse	Browse
 button_label_cancel	Cancel
 button_label_client_path	Client path
 button_label_close	Close
+button_label_detect_download	Detect/download
 button_label_disabled	Disabled
 button_label_edit	Edit
 button_label_enabled	Enabled
@@ -14,10 +15,10 @@ button_label_open	Open
 button_label_open_store_page	Open store page
 button_label_platform_not_supported	Platform not supported
 button_label_platform_supported	Platform supported
-button_label_reacquire_banner	Reacquire banner
 button_label_save	Save
 button_label_starting_bangs	Starting bangs
 button_label_stopping_bangs	Stopping bangs
+button_label_update_banner	Update banner
 button_label_yes	Yes
 filter_back_button_title	Back
 filter_clear_filters	Clear filters

@@ -32,4 +32,6 @@ class Platform
 
 	getBannerExtensions: () => return @bannerExtensions
 
+	getCachePath: () => return @cachePath
+
 return Platform

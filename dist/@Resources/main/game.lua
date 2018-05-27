@@ -3,30 +3,38 @@ local Game
 do
   local _class_0
   local _base_0 = {
-    merge = function(self, old)
-      assert(old.__class == Game, 'main.game.Game.merge')
-      log('Merging: ' .. old.title)
-      self.processOverride = old.processOverride
-      self.hidden = old.hidden
+    merge = function(self, other, newer)
+      if newer == nil then
+        newer = false
+      end
+      assert(other.__class == Game, 'main.game.Game.merge')
+      log('Merging: ' .. other.title)
+      self.processOverride = other.processOverride
+      self.hidden = other.hidden
       if self.lastPlayed ~= nil then
-        if old.lastPlayed ~= nil and old.lastPlayed > self.lastPlayed then
-          self.lastPlayed = old.lastPlayed
+        if other.lastPlayed ~= nil and other.lastPlayed > self.lastPlayed then
+          self.lastPlayed = other.lastPlayed
         end
       else
-        self.lastPlayed = old.lastPlayed
+        self.lastPlayed = other.lastPlayed
       end
       if self.hoursPlayed ~= nil then
-        if old.hoursPlayed ~= nil and old.hoursPlayed > self.hoursPlayed then
-          self.hoursPlayed = old.hoursPlayed
+        if other.hoursPlayed ~= nil and other.hoursPlayed > self.hoursPlayed then
+          self.hoursPlayed = other.hoursPlayed
         end
       else
-        self.hoursPlayed = old.hoursPlayed
+        self.hoursPlayed = other.hoursPlayed
       end
-      self.tags = old.tags
-      self.startingBangs = old.startingBangs
-      self.stoppingBangs = old.stoppingBangs
-      self.ignoresOtherBangs = old.ignoresOtherBangs
-      self.notes = old.notes
+      self.tags = other.tags
+      self.startingBangs = other.startingBangs
+      self.stoppingBangs = other.stoppingBangs
+      self.ignoresOtherBangs = other.ignoresOtherBangs
+      self.notes = other.notes
+      if newer == true then
+        self.banner = other.banner
+        self.bannerURL = other.bannerURL
+        self.expectedBanner = other.expectedBanner
+      end
     end,
     _moveThe = function(self, title)
       if title:lower():startsWith('the ') then

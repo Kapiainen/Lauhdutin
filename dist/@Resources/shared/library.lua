@@ -217,7 +217,7 @@ do
       for _index_0 = 1, #_list_0 do
         local game = _list_0[_index_0]
         if game:getGameID() == gameID then
-          game:merge(updatedGame)
+          game:merge(updatedGame, true)
           return true
         end
       end
