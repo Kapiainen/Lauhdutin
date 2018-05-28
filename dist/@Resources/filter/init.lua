@@ -361,6 +361,9 @@ createLacksTagProperties = function(games, filterStack)
     end
   end
   table.sort(tagProperties, sortPropertiesByTitle)
+  if #tagProperties == 0 then
+    return nil
+  end
   return Property({
     title = LOCALIZATION:get('filter_lacks_tag', 'Lacks tag'),
     value = STATE.NUM_GAMES_PATTERN:format(#games),
@@ -551,12 +554,14 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
       end
     end
     local lacksTagProperty = createLacksTagProperties(games, filterStack)
-    table.insert(lacksTagProperty.properties, Property({
-      title = STATE.BACK_BUTTON_TITLE,
-      value = ' ',
-      properties = properties
-    }))
-    table.insert(properties, lacksTagProperty)
+    if lacksTagProperty ~= nil then
+      table.insert(lacksTagProperty.properties, Property({
+        title = STATE.BACK_BUTTON_TITLE,
+        value = ' ',
+        properties = properties
+      }))
+      table.insert(properties, lacksTagProperty)
+    end
   end
   table.sort(properties, sortPropertiesByTitle)
   if not (stack) then

@@ -237,6 +237,7 @@ createLacksTagProperties = (games, filterStack) ->
 				}
 			}))
 	table.sort(tagProperties, sortPropertiesByTitle)
+	return nil if #tagProperties == 0
 	return Property({
 		title: LOCALIZATION\get('filter_lacks_tag', 'Lacks tag')
 		value: STATE.NUM_GAMES_PATTERN\format(#games)
@@ -388,12 +389,13 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 			if hasNotesProperty
 				table.insert(properties, hasNotesProperty)
 		lacksTagProperty = createLacksTagProperties(games, filterStack)
-		table.insert(lacksTagProperty.properties, Property({
-			title: STATE.BACK_BUTTON_TITLE
-			value: ' '
-			properties: properties
-		}))
-		table.insert(properties, lacksTagProperty)
+		if lacksTagProperty ~= nil
+			table.insert(lacksTagProperty.properties, Property({
+				title: STATE.BACK_BUTTON_TITLE
+				value: ' '
+				properties: properties
+			}))
+			table.insert(properties, lacksTagProperty)
 	table.sort(properties, sortPropertiesByTitle)
 	unless stack
 		table.insert(properties, createClearProperty())
