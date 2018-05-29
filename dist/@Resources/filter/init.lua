@@ -596,6 +596,7 @@ end
 Handshake = function(stack, appliedFilters)
   local success, err = pcall(function()
     log('Accepting Filter handshake', stack)
+    STATE.SCROLL_INDEX = 1
     STATE.STACK = stack
     local platforms
     do

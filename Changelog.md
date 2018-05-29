@@ -11,6 +11,7 @@
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.
 - Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
+- Fixed a bug in the Filter menu that could cause scrolling to no longer function when switching between filtering all games and the current list of games (i.e. when stacking filters) without closing the menu first.
 
 **Version 3.0.1 - 2018/05/26:**
 - Fixed the manner in which arguments of Windows shortcuts are parsed.

@@ -424,6 +424,7 @@ export Handshake = (stack, appliedFilters) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Filter handshake', stack)
+			STATE.SCROLL_INDEX = 1
 			STATE.STACK = stack
 			platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
 			games = nil
