@@ -604,6 +604,8 @@ do
     remove = function(self, game)
       local i = table.find(self.games, game)
       table.remove(self.games, i)
+      i = table.find(self.gamesSortedByGameID, game)
+      table.remove(self.gamesSortedByGameID, i)
       return self:save()
     end
   }

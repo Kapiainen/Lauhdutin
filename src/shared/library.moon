@@ -400,6 +400,8 @@ class Library
 	remove: (game) =>
 		i = table.find(@games, game)
 		table.remove(@games, i)
+		i = table.find(@gamesSortedByGameID, game)
+		table.remove(@gamesSortedByGameID, i)
 		@save()
 
 return Library
