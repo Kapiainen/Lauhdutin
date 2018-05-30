@@ -103,15 +103,31 @@ do
     getExePath = function(self, info)
       assert(type(info) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.getExePath')
       if type(info.playTasks) ~= 'table' then
-        return nil
+        return nil, nil
       end
-      if type(info.playTasks[1]) ~= 'table' then
-        return nil
+      local task = nil
+      local _list_0 = info.playTasks
+      for _index_0 = 1, #_list_0 do
+        local t = _list_0[_index_0]
+        if t.isPrimary == true then
+          task = t
+          break
+        end
       end
-      if type(info.playTasks[1].path) ~= 'string' then
-        return nil
+      if task == nil then
+        if type(info.playTasks[1]) ~= 'table' then
+          return nil, nil
+        end
+        if type(info.playTasks[1].path) ~= 'string' then
+          return nil, nil
+        end
+        task = info.playTasks[1]
       end
-      return (info.playTasks[1].path:gsub('//', '\\'))
+      local path = (task.path:gsub('//', '\\'))
+      if task.arguments ~= nil then
+        return path, task.arguments
+      end
+      return path, nil
     end,
     generateGames = function(self, indexOutput, galaxyOutput)
       assert(type(indexOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
@@ -129,7 +145,7 @@ do
             _continue_0 = true
             break
           end
-          local exePath = self:getExePath(info)
+          local exePath, arguments = self:getExePath(info)
           if type(exePath) ~= 'string' then
             log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
             _continue_0 = true
@@ -144,7 +160,11 @@ do
             if not (io.fileExists(fullPath, false)) then
               path = nil
             else
-              path = ('"%s"'):format(fullPath)
+              if arguments == nil then
+                path = ('"%s"'):format(fullPath)
+              else
+                path = ('"%s" "%s"'):format(fullPath, arguments)
+              end
             end
           end
           local title = titles[productID]
