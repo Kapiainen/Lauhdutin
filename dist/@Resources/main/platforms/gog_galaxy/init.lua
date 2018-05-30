@@ -7,8 +7,7 @@ do
   local _parent_0 = Platform
   local _base_0 = {
     validate = function(self)
-      assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-      assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+      assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
       if self.clientPath ~= nil then
         self.clientPath = io.joinPaths(self.clientPath, 'GalaxyClient.exe')
         if self.indirectLaunch then
@@ -28,7 +27,6 @@ do
       assert(self.programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
       local indexDBPath = io.joinPaths(self.programDataPath, 'storage\\index.db')
       local galaxyDBPath = io.joinPaths(self.programDataPath, 'storage\\galaxy.db')
-      assert(io.fileExists(indexDBPath, false) == true, ('"%s" does not exist.'):format(indexDBPath))
       assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.'):format(galaxyDBPath))
       local sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
       assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".'):format(sqlitePath))

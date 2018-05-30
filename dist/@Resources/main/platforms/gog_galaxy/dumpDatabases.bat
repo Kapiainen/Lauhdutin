@@ -13,7 +13,14 @@ set "galaxy="%cd%\galaxy.txt""
 if exist %galaxy% del %galaxy%
 cd ..\..\
 set "sqlite="%cd%\sqlite3.exe""
-start /B "" %sqlite% %1 "select productId, localpath from Products;" > %index%
+:: index.db has been removed and the data has been moved into galaxy.db.
+:: This is just to support the scenarios where the client has not been
+:: updated and where the client has been updated.
+if exist %1 (
+	start /B "" %sqlite% %1 "select productId, localpath from Products;" > %index%
+) else (
+	start /B "" %sqlite% %2 "select productId, installationPath from InstalledBaseProducts;" > %index%
+)
 start /B "" %sqlite% %2 "select productId, title, images from LimitedDetails;" > %galaxy%
 echo "" > %completed%
 ::pause
