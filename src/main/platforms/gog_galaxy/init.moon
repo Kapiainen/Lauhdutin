@@ -2,9 +2,14 @@ Platform = require('main.platforms.platform')
 Game = require('main.game')
 json = require('lib.json')
 
--- Dump "productId" and "localpath" columns from the "Products" table of "index.db":
--- - productId: Unique ID associated with a game.
--- - localpath: The absolute path to the folder containing the game.
+-- New version
+--   Dump "productId" and "installationPath" columns from the "InstalledBaseProducts" table of "galaxy.db":
+--   - productId: Unique ID associated with a game.
+--   - installationPath: The absolute path to the folder containing the game.
+-- Old version
+--   Dump "productId" and "localpath" columns from the "Products" table of "index.db":
+--   - productId: Unique ID associated with a game.
+--   - localpath: The absolute path to the folder containing the game.
 --
 -- Dump "productId", "title", and "images" columns from the "LimitedDetails" table of "galaxy.db"
 -- - productId: Same as above.
@@ -31,8 +36,7 @@ class GOGGalaxy extends Platform
 		@games = {}
 
 	validate: () =>
-		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\index.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
 		if @clientPath ~= nil
 			@clientPath = io.joinPaths(@clientPath, 'GalaxyClient.exe')
 			if @indirectLaunch
@@ -48,7 +52,6 @@ class GOGGalaxy extends Platform
 		assert(@programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
 		indexDBPath = io.joinPaths(@programDataPath, 'storage\\index.db')
 		galaxyDBPath = io.joinPaths(@programDataPath, 'storage\\galaxy.db')
-		assert(io.fileExists(indexDBPath, false) == true, ('"%s" does not exist.')\format(indexDBPath))
 		assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.')\format(galaxyDBPath))
 		sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
 		assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".')\format(sqlitePath))

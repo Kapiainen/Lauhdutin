@@ -1,3 +1,6 @@
+**Version 3.0.2 - 2018/05/30:**
+- Updated to support the latest version of GOG Galaxy.
+
 **Version 3.0.1 - 2018/05/26:**
 - Fixed the manner in which arguments of Windows shortcuts are parsed.
 
