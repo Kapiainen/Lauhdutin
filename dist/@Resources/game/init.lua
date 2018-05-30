@@ -705,7 +705,8 @@ createOpenStorePageProperty = function(game)
     if game:getPlatformOverride() == nil then
       value = LOCALIZATION:get('button_label_platform_supported', 'Platform supported')
       action = function()
-        return SKIN:Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+        SKIN:Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]'):format(game:getGameID()))
+        return SKIN:Bang('[!DeactivateConfig]')
       end
     end
   end

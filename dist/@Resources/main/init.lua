@@ -1463,18 +1463,18 @@ OpenStorePage = function(gameID)
                   link = links.store
                 end
               end
-              if link == nil and links.forum ~= nil then
-                if type(links.forum.href) == 'string' then
-                  link = links.forum.href:gsub('forum', 'game')
-                elseif type(links.forum) == 'string' then
-                  link = links.forum:gsub('forum', 'game')
-                end
-              end
               if link == nil and links.product_card ~= nil then
                 if type(links.product_card.href) == 'string' then
                   link = links.product_card.href
                 elseif type(links.product_card) == 'string' then
                   link = links.product_card
+                end
+              end
+              if link == nil and links.forum ~= nil then
+                if type(links.forum.href) == 'string' then
+                  link = links.forum.href:gsub('forum', 'game')
+                elseif type(links.forum) == 'string' then
+                  link = links.forum:gsub('forum', 'game')
                 end
               end
             end

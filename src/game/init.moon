@@ -476,7 +476,9 @@ createOpenStorePageProperty = (game) ->
 		when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
 			if game\getPlatformOverride() == nil
 				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
-				action = () -> SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+				action = () ->
+					SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+					SKIN\Bang('[!DeactivateConfig]')
 	return Property({
 		title: LOCALIZATION\get('button_label_open_store_page', 'Open store page')
 		:value

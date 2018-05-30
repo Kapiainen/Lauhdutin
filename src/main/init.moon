@@ -1099,16 +1099,16 @@ export OpenStorePage = (gameID) ->
 											link = links.store.href
 										elseif type(links.store) == 'string'
 											link = links.store
-									if link == nil and links.forum ~= nil
-										if type(links.forum.href) == 'string'
-											link = links.forum.href\gsub('forum', 'game')
-										elseif type(links.forum) == 'string'
-											link = links.forum\gsub('forum', 'game')
 									if link == nil and links.product_card ~= nil
 										if type(links.product_card.href) == 'string'
 											link = links.product_card.href
 										elseif type(links.product_card) == 'string'
 											link = links.product_card
+									if link == nil and links.forum ~= nil
+										if type(links.forum.href) == 'string'
+											link = links.forum.href\gsub('forum', 'game')
+										elseif type(links.forum) == 'string'
+											link = links.forum\gsub('forum', 'game')
 								break
 						link
 					else nil
