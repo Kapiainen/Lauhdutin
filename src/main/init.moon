@@ -638,11 +638,11 @@ export OnMiddleClickSlot = (index) ->
 			game = COMPONENTS.SLOTS\middleClick(index)
 			return if game == nil
 			configName = ('%s\\Game')\format(STATE.ROOT_CONFIG)
-			if STATE.GAME_BEING_MODIFIED ~= nil and game == STATE.GAME_BEING_MODIFIED
+			config = utility.getConfig(configName)
+			if STATE.GAME_BEING_MODIFIED == game and config\isActive()
 				STATE.GAME_BEING_MODIFIED = nil
 				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
 			STATE.GAME_BEING_MODIFIED = game
-			config = utility.getConfig(configName)
 			if config == nil or not config\isActive()
 				SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
 			else
@@ -656,7 +656,6 @@ export HandshakeGame = () ->
 		() ->
 			log('HandshakeGame')
 			gameID = STATE.GAME_BEING_MODIFIED\getGameID()
-			STATE.GAME_BEING_MODIFIED = nil
 			assert(gameID ~= nil, 'main.init.HandshakeGame')
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]')\format(gameID))
 	)

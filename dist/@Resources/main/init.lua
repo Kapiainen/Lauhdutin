@@ -866,12 +866,12 @@ OnMiddleClickSlot = function(index)
       return 
     end
     local configName = ('%s\\Game'):format(STATE.ROOT_CONFIG)
-    if STATE.GAME_BEING_MODIFIED ~= nil and game == STATE.GAME_BEING_MODIFIED then
+    local config = utility.getConfig(configName)
+    if STATE.GAME_BEING_MODIFIED == game and config:isActive() then
       STATE.GAME_BEING_MODIFIED = nil
       return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))
     end
     STATE.GAME_BEING_MODIFIED = game
-    local config = utility.getConfig(configName)
     if config == nil or not config:isActive() then
       return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
     else
@@ -889,7 +889,6 @@ HandshakeGame = function()
   local success, err = pcall(function()
     log('HandshakeGame')
     local gameID = STATE.GAME_BEING_MODIFIED:getGameID()
-    STATE.GAME_BEING_MODIFIED = nil
     assert(gameID ~= nil, 'main.init.HandshakeGame')
     return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Game"]'):format(gameID))
   end)
