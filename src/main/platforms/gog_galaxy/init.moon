@@ -109,10 +109,20 @@ class GOGGalaxy extends Platform
 
 	getExePath: (info) =>
 		assert(type(info) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.getExePath')
-		return nil if type(info.playTasks) ~= 'table'
-		return nil if type(info.playTasks[1]) ~= 'table'
-		return nil if type(info.playTasks[1].path) ~= 'string'
-		return (info.playTasks[1].path\gsub('//', '\\'))
+		return nil, nil if type(info.playTasks) ~= 'table'
+		task = nil
+		for t in *info.playTasks
+			if t.isPrimary == true
+				task = t
+				break
+		if task == nil
+			return nil, nil if type(info.playTasks[1]) ~= 'table'
+			return nil, nil if type(info.playTasks[1].path) ~= 'string'
+			task = info.playTasks[1]
+		path = (task.path\gsub('//', '\\'))
+		if task.arguments ~= nil
+			return path, task.arguments
+		return path, nil
 
 	-- TODO: Refactor to allow for tests
 	generateGames: (indexOutput, galaxyOutput) =>
@@ -127,7 +137,7 @@ class GOGGalaxy extends Platform
 			if type(info) ~= 'table'
 				log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
 				continue
-			exePath = @getExePath(info)
+			exePath, arguments = @getExePath(info)
 			if type(exePath) ~= 'string'
 				log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
 				continue
@@ -139,7 +149,10 @@ class GOGGalaxy extends Platform
 					unless io.fileExists(fullPath, false)
 						nil
 					else
-						('"%s"')\format(fullPath)
+						if arguments == nil
+							('"%s"')\format(fullPath)
+						else
+							('"%s" "%s"')\format(fullPath, arguments)
 			title = titles[productID]
 			if title == nil
 				log('Skipping GOG Galaxy game', productID, 'because title could not be found')
