@@ -398,12 +398,9 @@ createProperties = function(game, platform)
     end,
     update = f
   }))
-  local path = game:getPath()
   local action = nil
-  if path:startsWith('"') and path:endsWith('"') then
-    path = path:sub(2, -2)
-  end
-  if io.fileExists(path, false) then
+  local path = game:getPath():match('"(.-)"')
+  if path ~= nil and io.fileExists(path, false) then
     local head, tail = io.splitPath(path)
     if head ~= nil then
       action = function(self, index)

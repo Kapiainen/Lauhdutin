@@ -294,11 +294,9 @@ createProperties = (game, platform) ->
 		})
 	)
 	-- Path
-	path = game\getPath()
 	action = nil
-	if path\startsWith('"') and path\endsWith('"')
-		path = path\sub(2, -2)
-	if io.fileExists(path, false)
+	path = game\getPath()\match('"(.-)"')
+	if path ~= nil and io.fileExists(path, false)
 		head, tail = io.splitPath(path)
 		if head ~= nil
 			action = (index) =>

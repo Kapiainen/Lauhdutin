@@ -1,3 +1,6 @@
+**Version 3.0.3 - 2018/05/30:**
+- Updated GOG Galaxy support to include arguments in the paths of games.
+
 **Version 3.0.2 - 2018/05/30:**
 - Updated to support the latest version of GOG Galaxy.
 
