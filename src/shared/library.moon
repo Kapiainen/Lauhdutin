@@ -283,7 +283,17 @@ class Library
 				matchString(word, patternChars)
 		return if score >= 0 then score else 0
 
-	filter: (filter, args) =>
+	filterGames: (games, condition) =>
+		result = {}
+		i = 1
+		while i <= #games
+			if condition(games[i]) == true
+				table.insert(result, table.remove(games, i))
+			else
+				i += 1
+		return result
+
+	filter: (filter, args = {}) =>
 		assert(type(filter) == 'number' and filter % 1 == 0, 'shared.library.Library.filter')
 		gamesToProcess = nil
 		if args ~= nil and args.stack == true
@@ -337,50 +347,46 @@ class Library
 				platformID = args.platformID
 				platformOverride = args.platformOverride
 				if platformOverride ~= nil
-					games = [game for game in *gamesToProcess when game\getPlatformID() == platformID and game\getPlatformOverride() == platformOverride]
+					games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == platformOverride)
 				else
-					games = [game for game in *gamesToProcess when game\getPlatformID() == platformID and game\getPlatformOverride() == nil]
+					games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == nil)
 			when ENUMS.FILTER_TYPES.TAG
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
 				tag = args.tag
-				games = [game for game in *gamesToProcess when game\hasTag(tag) == true]
+				games = @filterGames(gamesToProcess, (game) -> return game\hasTag(tag) == true)
 			when ENUMS.FILTER_TYPES.HIDDEN
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				state = args.state
-				games = [game for game in *gamesToProcess when game\isVisible() ~= state]
+				games = @filterGames(gamesToProcess, (game) -> return game\isVisible() ~= state)
 			when ENUMS.FILTER_TYPES.UNINSTALLED
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				state = args.state
-				games = [game for game in *gamesToProcess when game\isInstalled() ~= state]
+				games = @filterGames(gamesToProcess, (game) -> return game\isInstalled() ~= state)
 			when ENUMS.FILTER_TYPES.NO_TAGS
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				if args.state
-					games = [game for game in *gamesToProcess when #game\getTags() == 0 and #game\getPlatformTags() == 0]
+					games = @filterGames(gamesToProcess, (game) -> return #game\getTags() == 0 and #game\getPlatformTags() == 0)
 				else
-					games = [game for game in *gamesToProcess when #game\getTags() > 0 or #game\getPlatformTags() > 0]
+					games = @filterGames(gamesToProcess, (game) -> return #game\getTags() > 0 or #game\getPlatformTags() > 0)
 			when ENUMS.FILTER_TYPES.RANDOM_GAME
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
-				games = {gamesToProcess[math.random(1, #gamesToProcess)]}
+				games = {table.remove(gamesToProcess, math.random(1, #gamesToProcess))}
 			when ENUMS.FILTER_TYPES.NEVER_PLAYED
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
-				games = [game for game in *gamesToProcess when game\getHoursPlayed() == 0]
+				games = @filterGames(gamesToProcess, (game) -> return game\getHoursPlayed() == 0)
 			when ENUMS.FILTER_TYPES.HAS_NOTES
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
-				games = [game for game in *gamesToProcess when game\getNotes() ~= nil]
-			when ENUMS.FILTER_TYPES.LACKS_TAG
-				assert(type(args) == 'table', 'shared.library.Library.filter')
-				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
-				tag = args.tag
-				games = [game for game in *gamesToProcess when game\hasTag(tag) ~= true]
+				games = @filterGames(gamesToProcess, (game) -> return game\getNotes() ~= nil)
 			else
 				assert(nil, 'shared.library.Library.filter')
+		games = gamesToProcess if args.inverse == true
 		assert(type(games) == 'table', 'shared.library.Library.filter')
 		@processedGames = games
 

@@ -22,6 +22,8 @@ export STATE = {
 	STACK: false
 	SCROLL_INDEX: nil
 	PROPERTIES: nil
+	DEFAULT_PROPERTIES: nil
+	INVERSE_PROPERTIES: nil
 	FILTER_TYPE: nil
 	ARGUMENTS: {}
 	NUM_GAMES_PATTERN: ''
@@ -76,9 +78,8 @@ class Slot
 			@property\action()
 			return true
 		filter = STATE.FILTER_TYPE
-		stack = tostring(STATE.STACK)
 		arguments = json.encode(STATE.ARGUMENTS)\gsub('"', '|')
-		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter, stack, arguments))
+		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter, tostring(STATE.STACK), arguments))
 		return false
 
 Game = nil
@@ -121,7 +122,7 @@ sortPropertiesByTitle = (a, b) ->
 	return true if a.title\lower() < b.title\lower()
 	return false
 
-createPlatformProperties = (games, platforms) ->
+createPlatformProperties = (games, platforms, inverse) ->
 	platformProperties = {}
 	for platform in *platforms
 		platformGames = 0
@@ -132,9 +133,10 @@ createPlatformProperties = (games, platforms) ->
 		if platformGames > 0
 			table.insert(platformProperties, Property({
 				title: platform\getName()
-				value: STATE.NUM_GAMES_PATTERN\format(platformGames)
+				value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(#games - platformGames) else STATE.NUM_GAMES_PATTERN\format(platformGames)
 				arguments: {
 					platformID: platformID
+					:inverse
 				}
 			}))
 	platformOverrides = {}
@@ -149,21 +151,22 @@ createPlatformProperties = (games, platforms) ->
 		if params.numGames > 0
 			table.insert(platformProperties, Property({
 				title: platformOverride .. '*'
-				value: STATE.NUM_GAMES_PATTERN\format(params.numGames)
+				value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(#games - params.numGames) else STATE.NUM_GAMES_PATTERN\format(params.numGames)
 				arguments: {
 					platformID: params.platformID
 					platformOverride: platformOverride
+					:inverse
 				}
 			}))
 	table.sort(platformProperties, sortPropertiesByTitle)
 	return Property({
-		title: LOCALIZATION\get('filter_from_platform', 'Is on platform')
+		title: if inverse == true then LOCALIZATION\get('filter_from_platform_inverse', 'Is not on platform X') else LOCALIZATION\get('filter_from_platform', 'Is on platform X')
 		value: STATE.NUM_GAMES_PATTERN\format(#games)
 		enum: ENUMS.FILTER_TYPES.PLATFORM
 		properties: platformProperties
 	})
 
-createTagProperties = (games, filterStack) ->
+createTagProperties = (games, filterStack, inverse) ->
 	tags = {}
 	gamesWithTags = 0
 	for game in *games
@@ -191,125 +194,96 @@ createTagProperties = (games, filterStack) ->
 		if numGames > 0
 			table.insert(tagProperties, Property({
 				title: tag
-				value: STATE.NUM_GAMES_PATTERN\format(numGames)
+				value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(#games - numGames) else STATE.NUM_GAMES_PATTERN\format(numGames)
 				arguments: {
 					tag: tag
+					:inverse
 				}
 			}))
 	return nil, gamesWithTags if #tagProperties < 1
 	table.sort(tagProperties, sortPropertiesByTitle)
 	return Property({
-		title: LOCALIZATION\get('filter_has_tag', 'Has tag')
-		value: STATE.NUM_GAMES_PATTERN\format(gamesWithTags)
+		title: if inverse == true then LOCALIZATION\get('filter_has_tag_inverse', 'Does not have tag X') else LOCALIZATION\get('filter_has_tag', 'Has tag X')
+		value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(#games) else STATE.NUM_GAMES_PATTERN\format(gamesWithTags)
 		enum: ENUMS.FILTER_TYPES.TAG
 		properties: tagProperties
 	}), gamesWithTags
 
-createLacksTagProperties = (games, filterStack) ->
-	tags = {}
-	for game in *games
-		skinTags = game\getTags()
-		platformTags = game\getPlatformTags()
-		combinedTags = {}
-		for tag in *skinTags
-			combinedTags[tag] = true
-		for tag in *platformTags
-			combinedTags[tag] = true
-		for tag, _ in pairs(combinedTags)
-			skip = false
-			for f in *filterStack
-				if f.filter == ENUMS.FILTER_TYPES.LACKS_TAG and f.args.tag == tag
-					skip = true
-					break
-			continue if skip
-			if tags[tag] == nil
-				tags[tag] = 0
-			tags[tag] += 1
-	tagProperties = {}
-	for tag, numGames in pairs(tags)
-		numGames = #games - numGames
-		if numGames > 0
-			table.insert(tagProperties, Property({
-				title: tag
-				value: STATE.NUM_GAMES_PATTERN\format(numGames)
-				arguments: {
-					tag: tag
-				}
-			}))
-	table.sort(tagProperties, sortPropertiesByTitle)
-	return nil if #tagProperties == 0
+createHasNoTagsProperty = (numGamesWithoutTags, numGamesWithTags, inverse) ->
 	return Property({
-		title: LOCALIZATION\get('filter_lacks_tag', 'Lacks tag')
-		value: STATE.NUM_GAMES_PATTERN\format(#games)
-		enum: ENUMS.FILTER_TYPES.LACKS_TAG
-		properties: tagProperties
-	})
-
-createHasNoTagsProperty = (numGames) ->
-	return Property({
-		title: LOCALIZATION\get('filter_has_no_tags', 'Has no tags')
-		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		title: if inverse == true then LOCALIZATION\get('filter_has_no_tags_inverse', 'Has one or more tags') else LOCALIZATION\get('filter_has_no_tags', 'Has no tags')
+		value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(numGamesWithTags) else STATE.NUM_GAMES_PATTERN\format(numGamesWithoutTags)
 		enum: ENUMS.FILTER_TYPES.NO_TAGS
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
-createHiddenProperty = (numGames) ->
+createHiddenProperty = (numHiddenGames, numVisibleGames, inverse) ->
 	return Property({
-		title: LOCALIZATION\get('filter_is_hidden', 'Is hidden')
-		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		title: if inverse == true then LOCALIZATION\get('filter_is_hidden_inverse', 'Is not hidden') else LOCALIZATION\get('filter_is_hidden', 'Is hidden')
+		value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(numVisibleGames) else STATE.NUM_GAMES_PATTERN\format(numHiddenGames)
 		enum: ENUMS.FILTER_TYPES.HIDDEN
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
-createRandomProperty = (numGames) ->
+createRandomProperty = (numGames, inverse) ->
 	return Property({
-		title: LOCALIZATION\get('filter_random', 'Random game')
+		title: if inverse == true then LOCALIZATION\get('filter_random_inverse', 'Remove a random game') else LOCALIZATION\get('filter_random', 'Pick a random game')
 		value: STATE.NUM_GAMES_PATTERN\format(numGames)
 		enum: ENUMS.FILTER_TYPES.RANDOM_GAME
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
-createNeverPlayedProperty = (games) ->
+createNeverPlayedProperty = (games, inverse) ->
 	numGames = 0
 	for game in *games
 		numGames += 1 if game\getHoursPlayed() == 0
+	if inverse == true
+		numGames = #games - numGames
 	return nil if numGames < 1
 	return Property({
-		title: LOCALIZATION\get('filter_never_played', 'Has never been played')
+		title: if inverse == true then LOCALIZATION\get('filter_never_played_inverse', 'Has been played') else LOCALIZATION\get('filter_never_played', 'Has never been played')
 		value: STATE.NUM_GAMES_PATTERN\format(numGames)
 		enum: ENUMS.FILTER_TYPES.NEVER_PLAYED
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
-createHasNotesProperty = (games) ->
+createHasNotesProperty = (games, inverse) ->
 	numGames = 0
 	for game in *games
 		numGames += 1 if game\getNotes() ~= nil
+	if inverse == true
+		numGames = #games - numGames
 	return nil if numGames < 1
 	return Property({
-		title: LOCALIZATION\get('filter_has_notes', 'Has notes')
+		title: if inverse == true then LOCALIZATION\get('filter_has_notes_inverse', 'Does not have notes') else LOCALIZATION\get('filter_has_notes', 'Has notes')
 		value: STATE.NUM_GAMES_PATTERN\format(numGames)
 		enum: ENUMS.FILTER_TYPES.HAS_NOTES
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
-createUninstalledProperty = (numGames) ->
+createUninstalledProperty = (numUninstalledGames, numInstalledGames, inverse) ->
 	return Property({
-		title: LOCALIZATION\get('filter_is_uninstalled', 'Is not installed')
-		value: STATE.NUM_GAMES_PATTERN\format(numGames)
+		title: if inverse == true then LOCALIZATION\get('filter_is_uninstalled_inverse', 'Is installed') else LOCALIZATION\get('filter_is_uninstalled', 'Is not installed')
+		value: if inverse == true then STATE.NUM_GAMES_PATTERN\format(numInstalledGames) else STATE.NUM_GAMES_PATTERN\format(numUninstalledGames)
 		enum: ENUMS.FILTER_TYPES.UNINSTALLED
 		arguments: {
 			state: true
+			:inverse
 		}
 	})
 
@@ -328,12 +302,12 @@ createCancelProperty = () ->
 			SKIN\Bang('[!DeactivateConfig]')
 	})
 
-createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filterStack) ->
+createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filterStack, inverse) ->
 	properties = {}
 	if #hiddenGames > 0
-		table.insert(properties, createHiddenProperty(#hiddenGames))
+		table.insert(properties, createHiddenProperty(#hiddenGames, #games, inverse))
 	if #uninstalledGames > 0
-		table.insert(properties, createUninstalledProperty(#uninstalledGames))
+		table.insert(properties, createUninstalledProperty(#uninstalledGames, #games, inverse))
 	if #games > 0
 		skipPlatforms = false
 		skipTags = false
@@ -350,13 +324,13 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 				when ENUMS.FILTER_TYPES.TAG
 					skipNoTags = true
 				when ENUMS.FILTER_TYPES.RANDOM_GAME
-					skipRandom = true
+					skipRandom = true if #games < 2
 				when ENUMS.FILTER_TYPES.NEVER_PLAYED
 					skipNeverPlayed = true
 				when ENUMS.FILTER_TYPES.HAS_NOTES
 					skipHasNotes = true
 		unless skipPlatforms
-			platformsProperty = createPlatformProperties(games, platforms)
+			platformsProperty = createPlatformProperties(games, platforms, inverse)
 			if platformsProperty
 				table.insert(platformsProperty.properties, Property({
 					title: STATE.BACK_BUTTON_TITLE
@@ -366,7 +340,7 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 				table.insert(properties, platformsProperty)
 		gamesWithTags = 0
 		unless skipTags
-			tagsProperty, gamesWithTags = createTagProperties(games, filterStack)
+			tagsProperty, gamesWithTags = createTagProperties(games, filterStack, inverse)
 			if tagsProperty
 				table.insert(tagsProperty.properties, Property({
 					title: STATE.BACK_BUTTON_TITLE
@@ -377,26 +351,27 @@ createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filt
 		unless skipNoTags
 			numGamesWithoutTags = #games - gamesWithTags
 			if numGamesWithoutTags > 0
-				table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags))
+				table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags, gamesWithTags, inverse))
 		if not skipRandom and #games > 1
-			table.insert(properties, createRandomProperty(#games))
+			table.insert(properties, createRandomProperty(#games, inverse))
 		unless skipNeverPlayed
-			neverPlayedProperty = createNeverPlayedProperty(games)
+			neverPlayedProperty = createNeverPlayedProperty(games, inverse)
 			if neverPlayedProperty
 				table.insert(properties, neverPlayedProperty)
 		unless skipHasNotes
-			hasNotesProperty = createHasNotesProperty(games)
+			hasNotesProperty = createHasNotesProperty(games, inverse)
 			if hasNotesProperty
 				table.insert(properties, hasNotesProperty)
-		lacksTagProperty = createLacksTagProperties(games, filterStack)
-		if lacksTagProperty ~= nil
-			table.insert(lacksTagProperty.properties, Property({
-				title: STATE.BACK_BUTTON_TITLE
-				value: ' '
-				properties: properties
-			}))
-			table.insert(properties, lacksTagProperty)
 	table.sort(properties, sortPropertiesByTitle)
+	table.insert(properties, 1, Property({
+		title: LOCALIZATION\get('filter_window_invert_filters', 'Invert filters')
+		value: ' '
+		action: () =>
+			if STATE.PROPERTIES == STATE.DEFAULT_PROPERTIES
+				STATE.PROPERTIES = STATE.INVERSE_PROPERTIES
+			else
+				STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
+	}))
 	unless stack
 		table.insert(properties, createClearProperty())
 	table.insert(properties, createCancelProperty())
@@ -469,7 +444,9 @@ export Handshake = (stack, appliedFilters) ->
 						table.insert(hiddenGames, table.remove(games, i))
 					elseif not games[i]\isInstalled()
 						table.insert(uninstalledGames, table.remove(games, i))
-			STATE.PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack)
+			STATE.DEFAULT_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack, false)
+			STATE.INVERSE_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack, true)
+			STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
 			updateScrollbar()
 			updateSlots()
 			if COMPONENTS.SETTINGS\getCenterOnMonitor()

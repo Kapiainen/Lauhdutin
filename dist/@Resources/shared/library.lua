@@ -333,7 +333,22 @@ do
         return 0
       end
     end,
+    filterGames = function(self, games, condition)
+      local result = { }
+      local i = 1
+      while i <= #games do
+        if condition(games[i]) == true then
+          table.insert(result, table.remove(games, i))
+        else
+          i = i + 1
+        end
+      end
+      return result
+    end,
     filter = function(self, filter, args)
+      if args == nil then
+        args = { }
+      end
       assert(type(filter) == 'number' and filter % 1 == 0, 'shared.library.Library.filter')
       local gamesToProcess = nil
       if args ~= nil and args.stack == true then
@@ -423,164 +438,70 @@ do
         local platformID = args.platformID
         local platformOverride = args.platformOverride
         if platformOverride ~= nil then
-          do
-            local _accum_0 = { }
-            local _len_0 = 1
-            for _index_0 = 1, #gamesToProcess do
-              local game = gamesToProcess[_index_0]
-              if game:getPlatformID() == platformID and game:getPlatformOverride() == platformOverride then
-                _accum_0[_len_0] = game
-                _len_0 = _len_0 + 1
-              end
-            end
-            games = _accum_0
-          end
+          games = self:filterGames(gamesToProcess, function(game)
+            return game:getPlatformID() == platformID and game:getPlatformOverride() == platformOverride
+          end)
         else
-          do
-            local _accum_0 = { }
-            local _len_0 = 1
-            for _index_0 = 1, #gamesToProcess do
-              local game = gamesToProcess[_index_0]
-              if game:getPlatformID() == platformID and game:getPlatformOverride() == nil then
-                _accum_0[_len_0] = game
-                _len_0 = _len_0 + 1
-              end
-            end
-            games = _accum_0
-          end
+          games = self:filterGames(gamesToProcess, function(game)
+            return game:getPlatformID() == platformID and game:getPlatformOverride() == nil
+          end)
         end
       elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.tag) == 'string', 'shared.library.Library.filter')
         local tag = args.tag
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:hasTag(tag) == true then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:hasTag(tag) == true
+        end)
       elseif ENUMS.FILTER_TYPES.HIDDEN == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         local state = args.state
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:isVisible() ~= state then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:isVisible() ~= state
+        end)
       elseif ENUMS.FILTER_TYPES.UNINSTALLED == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         local state = args.state
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:isInstalled() ~= state then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:isInstalled() ~= state
+        end)
       elseif ENUMS.FILTER_TYPES.NO_TAGS == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         if args.state then
-          do
-            local _accum_0 = { }
-            local _len_0 = 1
-            for _index_0 = 1, #gamesToProcess do
-              local game = gamesToProcess[_index_0]
-              if #game:getTags() == 0 and #game:getPlatformTags() == 0 then
-                _accum_0[_len_0] = game
-                _len_0 = _len_0 + 1
-              end
-            end
-            games = _accum_0
-          end
+          games = self:filterGames(gamesToProcess, function(game)
+            return #game:getTags() == 0 and #game:getPlatformTags() == 0
+          end)
         else
-          do
-            local _accum_0 = { }
-            local _len_0 = 1
-            for _index_0 = 1, #gamesToProcess do
-              local game = gamesToProcess[_index_0]
-              if #game:getTags() > 0 or #game:getPlatformTags() > 0 then
-                _accum_0[_len_0] = game
-                _len_0 = _len_0 + 1
-              end
-            end
-            games = _accum_0
-          end
+          games = self:filterGames(gamesToProcess, function(game)
+            return #game:getTags() > 0 or #game:getPlatformTags() > 0
+          end)
         end
       elseif ENUMS.FILTER_TYPES.RANDOM_GAME == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         games = {
-          gamesToProcess[math.random(1, #gamesToProcess)]
+          table.remove(gamesToProcess, math.random(1, #gamesToProcess))
         }
       elseif ENUMS.FILTER_TYPES.NEVER_PLAYED == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:getHoursPlayed() == 0 then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:getHoursPlayed() == 0
+        end)
       elseif ENUMS.FILTER_TYPES.HAS_NOTES == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:getNotes() ~= nil then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
-      elseif ENUMS.FILTER_TYPES.LACKS_TAG == _exp_0 then
-        assert(type(args) == 'table', 'shared.library.Library.filter')
-        assert(type(args.tag) == 'string', 'shared.library.Library.filter')
-        local tag = args.tag
-        do
-          local _accum_0 = { }
-          local _len_0 = 1
-          for _index_0 = 1, #gamesToProcess do
-            local game = gamesToProcess[_index_0]
-            if game:hasTag(tag) ~= true then
-              _accum_0[_len_0] = game
-              _len_0 = _len_0 + 1
-            end
-          end
-          games = _accum_0
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:getNotes() ~= nil
+        end)
       else
         assert(nil, 'shared.library.Library.filter')
+      end
+      if args.inverse == true then
+        games = gamesToProcess
       end
       assert(type(games) == 'table', 'shared.library.Library.filter')
       self.processedGames = games

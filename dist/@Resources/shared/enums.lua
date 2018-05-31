@@ -16,8 +16,7 @@ ENUMS = {
     NO_TAGS = 7,
     RANDOM_GAME = 8,
     NEVER_PLAYED = 9,
-    HAS_NOTES = 10,
-    LACKS_TAG = 11
+    HAS_NOTES = 10
   },
   SORTING_TYPES = {
     ALPHABETICALLY = 1,
