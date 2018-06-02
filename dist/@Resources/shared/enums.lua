@@ -4,7 +4,8 @@ ENUMS = {
     STEAM = 2,
     BATTLENET = 3,
     GOG_GALAXY = 4,
-    MAX = 5
+    CUSTOM = 5,
+    MAX = 6
   },
   FILTER_TYPES = {
     NONE = 1,
