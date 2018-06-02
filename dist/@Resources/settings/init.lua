@@ -324,45 +324,57 @@ EditInteger = function(index, value)
   end
   return COMPONENTS.SLOTS:setInteger(index, value)
 end
+local readBangs
+readBangs = function()
+  return io.readFile('cache\\bangs.txt')
+end
 OnEditedGlobalStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGlobalStartingBangs(bangs:splitIntoLines())
 end
 OnEditedGlobalStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGlobalStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedShortcutsStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setShortcutsStartingBangs(bangs:splitIntoLines())
 end
 OnEditedShortcutsStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setShortcutsStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedSteamStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setSteamStartingBangs(bangs:splitIntoLines())
 end
 OnEditedSteamStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setSteamStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedBattlenetStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setBattlenetStartingBangs(bangs:splitIntoLines())
 end
 OnEditedBattlenetStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setBattlenetStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedGOGGalaxyStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGOGGalaxyStartingBangs(bangs:splitIntoLines())
 end
 OnEditedGOGGalaxyStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGOGGalaxyStoppingBangs(bangs:splitIntoLines())
+end
+OnEditedCustomStartingBangs = function()
+  local bangs = readBangs()
+  return COMPONENTS.SETTINGS:setCustomStartingBangs(bangs:splitIntoLines())
+end
+OnEditedCustomStoppingBangs = function()
+  local bangs = readBangs()
+  return COMPONENTS.SETTINGS:setCustomStoppingBangs(bangs:splitIntoLines())
 end
 CycleFolderPathSpinner = function(index, direction)
   return COMPONENTS.SLOTS:cycleFolderPathSpinner(index, direction)

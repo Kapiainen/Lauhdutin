@@ -274,45 +274,55 @@ export EditInteger = (index, value) ->
 	return if type(value) ~= 'number' or value % 1 ~= 0
 	COMPONENTS.SLOTS\setInteger(index, value)
 
+readBangs = () -> return io.readFile('cache\\bangs.txt')
+
 export OnEditedGlobalStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGlobalStartingBangs(bangs\splitIntoLines())
 
 export OnEditedGlobalStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGlobalStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedShortcutsStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setShortcutsStartingBangs(bangs\splitIntoLines())
 
 export OnEditedShortcutsStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setShortcutsStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedSteamStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setSteamStartingBangs(bangs\splitIntoLines())
 
 export OnEditedSteamStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setSteamStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedBattlenetStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setBattlenetStartingBangs(bangs\splitIntoLines())
 
 export OnEditedBattlenetStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setBattlenetStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedGOGGalaxyStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGOGGalaxyStartingBangs(bangs\splitIntoLines())
 
 export OnEditedGOGGalaxyStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGOGGalaxyStoppingBangs(bangs\splitIntoLines())
+
+export OnEditedCustomStartingBangs = () ->
+	bangs = readBangs()
+	COMPONENTS.SETTINGS\setCustomStartingBangs(bangs\splitIntoLines())
+
+export OnEditedCustomStoppingBangs = () ->
+	bangs = readBangs()
+	COMPONENTS.SETTINGS\setCustomStoppingBangs(bangs\splitIntoLines())
 
 export CycleFolderPathSpinner = (index, direction) -> COMPONENTS.SLOTS\cycleFolderPathSpinner(index, direction)
 
