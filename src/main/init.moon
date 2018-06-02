@@ -220,6 +220,7 @@ export Initialize = () ->
 			SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
 			SKIN\Bang(('[!SetVariable "ContextTitleDetectGames" "%s"]')\format(LOCALIZATION\get('main_context_title_detect_games', 'Detect games')))
+			SKIN\Bang(('[!SetVariable "ContextTitleAddGame" "%s"]')\format(LOCALIZATION\get('main_context_title_add_game', 'Add a game')))
 			COMPONENTS.TOOLBAR = require('main.toolbar')(COMPONENTS.SETTINGS)
 			COMPONENTS.TOOLBAR\hide()
 			COMPONENTS.ANIMATIONS = require('main.animations')()
