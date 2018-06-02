@@ -734,7 +734,7 @@ export OnFinishedDetectingPlatformGames = () ->
 			platform = table.remove(STATE.PLATFORM_QUEUE, 1)
 			games = platform\getGames()
 			log(('Found %d %s games')\format(#games, platform\getName()))
-			COMPONENTS.LIBRARY\add(games)
+			COMPONENTS.LIBRARY\extend(games)
 			for game in *games
 				if game\getBannerURL() ~= nil
 					if game\getBanner() == nil

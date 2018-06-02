@@ -170,17 +170,17 @@ do
       end
       return true
     end,
-    add = function(self, games)
+    extend = function(self, games)
       if games == nil then
         return false
       end
-      assert(type(games) == 'table', 'shared.library.Library.add')
+      assert(type(games) == 'table', 'shared.library.Library.extend')
       if #games == 0 then
         return false
       end
       for _index_0 = 1, #games do
         local game = games[_index_0]
-        assert(game.__class == Game, 'shared.library.Library.add')
+        assert(game.__class == Game, 'shared.library.Library.extend')
         for i, oldGame in ipairs(self.oldGames) do
           if game:getPlatformID() == oldGame:getPlatformID() and game:getTitle() == oldGame:getTitle() then
             game:merge(oldGame)

@@ -998,7 +998,7 @@ OnFinishedDetectingPlatformGames = function()
     local platform = table.remove(STATE.PLATFORM_QUEUE, 1)
     local games = platform:getGames()
     log(('Found %d %s games'):format(#games, platform:getName()))
-    COMPONENTS.LIBRARY:add(games)
+    COMPONENTS.LIBRARY:extend(games)
     for _index_0 = 1, #games do
       local game = games[_index_0]
       if game:getBannerURL() ~= nil then

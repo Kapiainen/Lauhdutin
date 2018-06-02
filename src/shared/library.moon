@@ -157,12 +157,12 @@ class Library
 				migrator.func(games)
 		return true
 
-	add: (games) =>
+	extend: (games) =>
 		return false if games == nil
-		assert(type(games) == 'table', 'shared.library.Library.add')
+		assert(type(games) == 'table', 'shared.library.Library.extend')
 		return false if #games == 0
 		for game in *games
-			assert(game.__class == Game, 'shared.library.Library.add')
+			assert(game.__class == Game, 'shared.library.Library.extend')
 			for i, oldGame in ipairs(@oldGames)
 				if game\getPlatformID() == oldGame\getPlatformID() and game\getTitle() == oldGame\getTitle()
 					game\merge(oldGame)
