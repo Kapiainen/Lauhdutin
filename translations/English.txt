@@ -10,6 +10,7 @@ button_label_disabled	Disabled
 button_label_edit	Edit
 button_label_enabled	Enabled
 button_label_hours_played	Hours played
+button_label_next	Next
 button_label_no	No
 button_label_open	Open
 button_label_open_store_page	Open store page
@@ -56,7 +57,9 @@ game_process_none	None
 game_tag_create	Create a new tag
 game_tags	Tags
 game_tags_none	None
+game_title	Title
 game_visible	Visible
+main_context_title_add_game	Add a game
 main_context_title_detect_games	Detect games
 main_context_title_execute_stopping_bangs	Execute stopping bangs
 main_context_title_open_shortcuts_folder	Open shortcuts folder
@@ -72,6 +75,10 @@ main_status_detecting_games	Detecting games
 main_status_detecting_platform_games	Detecting %s games
 main_status_detecting_platforms	Detecting platforms
 main_status_n_banners_to_download	%d banners left to download
+newgame_game_with_same_title_exists	A game with that title already exists!#CRLF##CRLF#Click to close.
+newgame_missing_path	A path has not been defined!#CRLF##CRLF#Click to close.
+newgame_missing_title	A title has not been defined!#CRLF##CRLF#Click to close.
+newgame_window_title	New game
 overlay_already_hidden	Already hidden
 overlay_already_visible	Already visible
 overlay_hide	Hide
@@ -88,6 +95,7 @@ overlay_single_hour_single_minute_played	%.0f hour %.0f minute played
 overlay_single_minute_played	%.0f minute played
 overlay_unhide	Unhide
 overlay_uninstalled	Uninstalled
+platform_name_custom	Custom
 platform_name_windows_shortcut	Windows shortcut
 search_window_all_title	Search
 search_window_current_title	Search (current games)
