@@ -846,7 +846,8 @@ OnLeftClickSlot = function(index)
       if game:isInstalled() == true then
         result = launchGame
       else
-        if game:getPlatformID() == ENUMS.PLATFORM_IDS.STEAM then
+        local platformID = game:getPlatformID()
+        if platformID == ENUMS.PLATFORM_IDS.STEAM and game:getPlatformOverride() == nil then
           result = installGame
         end
       end

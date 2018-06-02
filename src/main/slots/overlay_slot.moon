@@ -112,7 +112,7 @@ class OverlaySlot
 					image = images.error
 				elseif game\isInstalled() == false
 					upperText = game\getTitle()
-					if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
+					if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
 						lowerText = @installGame
 						image = images.install
 					else

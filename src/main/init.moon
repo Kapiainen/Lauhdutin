@@ -632,7 +632,8 @@ export OnLeftClickSlot = (index) ->
 					if game\isInstalled() == true
 						result = launchGame
 					else
-						if game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
+						platformID = game\getPlatformID()
+						if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
 							result = installGame
 					result
 				when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame

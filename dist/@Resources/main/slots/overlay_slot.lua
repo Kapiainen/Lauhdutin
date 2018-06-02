@@ -48,7 +48,7 @@ do
           image = images.error
         elseif game:isInstalled() == false then
           upperText = game:getTitle()
-          if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
+          if platformID == ENUMS.PLATFORM_IDS.STEAM and game:getPlatformOverride() == nil then
             lowerText = self.installGame
             image = images.install
           else

@@ -16,6 +16,7 @@
 - Fixed a bug in the Filter menu that could cause scrolling to no longer function when switching between filtering all games and the current list of games (i.e. when stacking filters) without closing the menu first.
 - Fixed a bug that prevented the `Open shortcuts folder` custom skin action from opening the folder if there was whitespace in the path.
 - Fixed a bug that allowed uninstalled games from platforms other than Steam to play the slot click animations when clicked.
+- Fixed a bug that caused the overlay slot to show that unsupported games could be installed via the skin.
 
 **Version 3.0.3 - 2018/05/30:**
 - Updated GOG Galaxy support to include arguments in the paths of games.
