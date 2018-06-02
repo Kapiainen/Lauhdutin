@@ -658,7 +658,7 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
   table.sort(defaultProperties, sortPropertiesByTitle)
   table.sort(inverseProperties, sortPropertiesByTitle)
   local invertFilters = Property({
-    title = LOCALIZATION:get('filter_window_invert_filters', 'Invert filters'),
+    title = LOCALIZATION:get('filter_invert_filters', 'Invert filters'),
     value = ' ',
     action = function(self)
       if STATE.PROPERTIES == STATE.DEFAULT_PROPERTIES then

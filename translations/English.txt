@@ -30,6 +30,7 @@ filter_has_notes	Has notes
 filter_has_notes_inverse	Does not have notes
 filter_has_tag	Has tag X
 filter_has_tag_inverse	Does not have tag X
+filter_invert_filters	Invert filters
 filter_is_hidden	Is hidden
 filter_is_hidden_inverse	Is not hidden
 filter_is_uninstalled	Is not installed
@@ -40,7 +41,6 @@ filter_random	Pick a random game
 filter_random_inverse	Remove a random game
 filter_window_all_title	Filter
 filter_window_current_title	Filter (current games)
-filter_window_invert_filters	Invert filters
 game_ignores_other_bangs	Ignores other bangs
 game_installed	Installed
 game_last_played	Last played
