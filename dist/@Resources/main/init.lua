@@ -1514,3 +1514,44 @@ OpenStorePage = function(gameID)
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+StartAddingGame = function()
+  local success, err = pcall(function()
+    return SKIN:Bang('[!ActivateConfig "#ROOTCONFIG#\\NewGame"]')
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+HandshakeNewGame = function()
+  local success, err = pcall(function()
+    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\NewGame"]'):format(COMPONENTS.LIBRARY:getNextAvailableGameID()))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnAddGame = function(gameID)
+  local success, err = pcall(function()
+    if gameID == nil then
+      return 
+    end
+    local games = io.readJSON(STATE.PATHS.GAMES)
+    games = games.games
+    local game = games[gameID]
+    if game == nil or game.gameID ~= gameID then
+      game = nil
+      for _index_0 = 1, #games do
+        local args = games[_index_0]
+        if args.gameID == gameID then
+          game = args
+          break
+        end
+      end
+    end
+    assert(game ~= nil, 'main.init.OnAddGame')
+    return COMPONENTS.LIBRARY:insert(Game(game))
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end

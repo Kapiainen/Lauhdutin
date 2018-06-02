@@ -73,6 +73,12 @@ do
     getDetectGames = function(self)
       return self.detectGames
     end,
+    getNextAvailableGameID = function(self)
+      return self.currentGameID
+    end,
+    getOldGames = function(self)
+      return self.oldGames
+    end,
     createBackup = function(self, path)
       local games = io.readJSON(path)
       local date = os.date('*t')
@@ -191,8 +197,32 @@ do
         game:setGameID(self.currentGameID)
         self.currentGameID = self.currentGameID + 1
         table.insert(self.games, game)
+        table.insert(self.gamesSortedByGameID, game)
       end
       return true
+    end,
+    updateSortedList = function(self)
+      return table.sort(self.gamesSortedByGameID, function(a, b)
+        return a.gameID < b.gameID
+      end)
+    end,
+    insert = function(self, game)
+      assert(game.__class == Game, 'shared.library.Library.insert')
+      local title = game:getTitle()
+      local platformID = game:getPlatformID()
+      local _list_0 = self.games
+      for _index_0 = 1, #_list_0 do
+        local g = _list_0[_index_0]
+        if g:getTitle() == title and g:getPlatformID() == platformID then
+          return 
+        end
+      end
+      game:setGameID(self.currentGameID)
+      self.currentGameID = self.currentGameID + 1
+      table.insert(self.games, game)
+      table.insert(self.gamesSortedByGameID, game)
+      self:updateSortedList()
+      return self:save()
     end,
     finalize = function(self, platformEnabledStatus)
       assert(type(platformEnabledStatus) == 'table', 'shared.library.Library.finalize')
@@ -206,12 +236,16 @@ do
         game:setGameID(self.currentGameID)
         self.currentGameID = self.currentGameID + 1
         table.insert(self.games, game)
+        table.insert(self.gamesSortedByGameID, game)
       end
       self.oldGames = nil
-      self.gamesSortedByGameID = table.shallowCopy(self.games)
-      return table.sort(self.gamesSortedByGameID, function(a, b)
-        return a.gameID < b.gameID
-      end)
+      if #self.gamesSortedByGameID ~= #self.games then
+        self.gamesSortedByGameID = table.shallowCopy(self.games)
+      end
+      self:updateSortedList()
+      if #self.gamesSortedByGameID then
+        self.currentGameID = self.gamesSortedByGameID[#self.gamesSortedByGameID]:getGameID() + 1
+      end
     end,
     update = function(self, updatedGame)
       local gameID = updatedGame:getGameID()
@@ -439,15 +473,9 @@ do
         assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
         local platformID = args.platformID
         local platformOverride = args.platformOverride
-        if platformOverride ~= nil then
-          games = self:filterGames(gamesToProcess, function(game)
-            return game:getPlatformID() == platformID and game:getPlatformOverride() == platformOverride
-          end)
-        else
-          games = self:filterGames(gamesToProcess, function(game)
-            return game:getPlatformID() == platformID and game:getPlatformOverride() == nil
-          end)
-        end
+        games = self:filterGames(gamesToProcess, function(game)
+          return game:getPlatformID() == platformID and game:getPlatformOverride() == platformOverride
+        end)
       elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.tag) == 'string', 'shared.library.Library.filter')
@@ -553,7 +581,7 @@ do
       self.backupFilePattern = 'games_backup_%d.json'
       self.filterStack = { }
       self.processedGames = nil
-      self.gamesSortedByGameID = nil
+      self.gamesSortedByGameID = { }
       self.detectGames = false
       if regularMode == true then
         self.updatedTimestamp = os.date('*t')

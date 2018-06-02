@@ -71,7 +71,7 @@ class Library
 		@backupFilePattern = 'games_backup_%d.json'
 		@filterStack = {}
 		@processedGames = nil
-		@gamesSortedByGameID = nil
+		@gamesSortedByGameID = {}
 		@detectGames = false
 		@updatedTimestamp = if regularMode == true then os.date('*t') else games.updated
 		if regularMode
@@ -103,6 +103,11 @@ class Library
 
 	getDetectGames: () =>
 		return @detectGames
+
+	getNextAvailableGameID: () =>
+		return @currentGameID
+
+	getOldGames: () => return @oldGames
 
 	createBackup: (path) =>
 		games = io.readJSON(path)
@@ -171,7 +176,24 @@ class Library
 			game\setGameID(@currentGameID)
 			@currentGameID += 1
 			table.insert(@games, game)
+			table.insert(@gamesSortedByGameID, game)
 		return true
+
+	updateSortedList: () => table.sort(@gamesSortedByGameID, (a, b) -> return a.gameID < b.gameID)
+
+	insert: (game) =>
+		assert(game.__class == Game, 'shared.library.Library.insert')
+		title = game\getTitle()
+		platformID = game\getPlatformID()
+		for g in *@games
+			if g\getTitle() == title and g\getPlatformID() == platformID
+				return
+		game\setGameID(@currentGameID)
+		@currentGameID += 1
+		table.insert(@games, game)
+		table.insert(@gamesSortedByGameID, game)
+		@updateSortedList()
+		@save()
 
 	finalize: (platformEnabledStatus) =>
 		assert(type(platformEnabledStatus) == 'table', 'shared.library.Library.finalize')
@@ -181,9 +203,13 @@ class Library
 			game\setGameID(@currentGameID)
 			@currentGameID += 1
 			table.insert(@games, game)
+			table.insert(@gamesSortedByGameID, game)
 		@oldGames = nil
-		@gamesSortedByGameID = table.shallowCopy(@games)
-		table.sort(@gamesSortedByGameID, (a, b) -> return a.gameID < b.gameID)
+		if #@gamesSortedByGameID ~= #@games
+			@gamesSortedByGameID = table.shallowCopy(@games)
+		@updateSortedList()
+		if #@gamesSortedByGameID
+			@currentGameID = @gamesSortedByGameID[#@gamesSortedByGameID]\getGameID() + 1
 
 	update: (updatedGame) =>
 		gameID = updatedGame\getGameID()
@@ -346,10 +372,7 @@ class Library
 				assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
 				platformID = args.platformID
 				platformOverride = args.platformOverride
-				if platformOverride ~= nil
-					games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == platformOverride)
-				else
-					games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == nil)
+				games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == platformOverride)
 			when ENUMS.FILTER_TYPES.TAG
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.tag) == 'string', 'shared.library.Library.filter')

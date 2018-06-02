@@ -1133,3 +1133,35 @@ export OpenStorePage = (gameID) ->
 				SKIN\Bang(('[%s]')\format(url))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
+
+export StartAddingGame = () ->
+	success, err = pcall(
+		() ->
+			SKIN\Bang('[!ActivateConfig "#ROOTCONFIG#\\NewGame"]')
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export HandshakeNewGame = () ->
+	success, err = pcall(
+		() ->
+			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\NewGame"]')\format(COMPONENTS.LIBRARY\getNextAvailableGameID()))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnAddGame = (gameID) ->
+	success, err = pcall(
+		() ->
+			return if gameID == nil
+			games = io.readJSON(STATE.PATHS.GAMES)
+			games = games.games
+			game = games[gameID]
+			if game == nil or game.gameID ~= gameID
+				game = nil
+				for args in *games
+					if args.gameID == gameID
+						game = args
+						break
+			assert(game ~= nil, 'main.init.OnAddGame')
+			COMPONENTS.LIBRARY\insert(Game(game))
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
