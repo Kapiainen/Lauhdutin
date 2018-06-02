@@ -288,10 +288,7 @@ updateSlots = function()
 end
 local sortPropertiesByTitle
 sortPropertiesByTitle = function(a, b)
-  if a.title:lower() < b.title:lower() then
-    return true
-  end
-  return false
+  return a.title:lower() < b.title:lower()
 end
 local createTagProperty
 createTagProperty = function(tag, state)

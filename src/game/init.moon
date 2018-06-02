@@ -191,9 +191,7 @@ updateSlots = () ->
 			else
 				MouseLeave(i)
 
-sortPropertiesByTitle = (a, b) ->
-		return true if a.title\lower() < b.title\lower()
-		return false
+sortPropertiesByTitle = (a, b) -> return a.title\lower() < b.title\lower()
 
 createTagProperty = (tag, state) ->
 	f = () ->
