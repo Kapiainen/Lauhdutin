@@ -529,44 +529,44 @@ export Filter = (filterType, stack, arguments) ->
 
 -- Slots
 launchGame = (game) ->
-	if game\isInstalled() == true
-		game\setLastPlayed(os.time())
-		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
-		COMPONENTS.LIBRARY\save()
-		STATE.GAMES = COMPONENTS.LIBRARY\get()
-		STATE.SCROLL_INDEX = 1
-		updateSlots()
-		COMPONENTS.PROCESS\monitor(game)
-		if COMPONENTS.SETTINGS\getBangsEnabled()
-			unless game\getIgnoresOtherBangs()
-				SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
-				platformBangs = switch game\getPlatformID()
-					when ENUMS.PLATFORM_IDS.SHORTCUTS
-						COMPONENTS.SETTINGS\getShortcutsStartingBangs()
-					when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
-						COMPONENTS.SETTINGS\getSteamStartingBangs()
-					when ENUMS.PLATFORM_IDS.BATTLENET
-						COMPONENTS.SETTINGS\getBattlenetStartingBangs()
-					when ENUMS.PLATFORM_IDS.GOG_GALAXY
-						COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
-					else
-						assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
-				SKIN\Bang(bang) for bang in *platformBangs
-			SKIN\Bang(bang) for bang in *game\getStartingBangs()
-		SKIN\Bang(('[%s]')\format(game\getPath()))
-		if COMPONENTS.SETTINGS\getHideSkin()
-			SKIN\Bang('[!HideFade]')
-		if COMPONENTS.SETTINGS\getShowSession()
-			SKIN\Bang(('[!ActivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
-	elseif game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
-		game\setLastPlayed(os.time())
-		game\setInstalled(true)
-		COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
-		COMPONENTS.LIBRARY\save()
-		STATE.GAMES = COMPONENTS.LIBRARY\get()
-		STATE.SCROLL_INDEX = 1
-		updateSlots()
-		SKIN\Bang(('[%s]')\format(game\getPath()))
+	game\setLastPlayed(os.time())
+	COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
+	COMPONENTS.LIBRARY\save()
+	STATE.GAMES = COMPONENTS.LIBRARY\get()
+	STATE.SCROLL_INDEX = 1
+	updateSlots()
+	COMPONENTS.PROCESS\monitor(game)
+	if COMPONENTS.SETTINGS\getBangsEnabled()
+		unless game\getIgnoresOtherBangs()
+			SKIN\Bang(bang) for bang in *COMPONENTS.SETTINGS\getGlobalStartingBangs()
+			platformBangs = switch game\getPlatformID()
+				when ENUMS.PLATFORM_IDS.SHORTCUTS
+					COMPONENTS.SETTINGS\getShortcutsStartingBangs()
+				when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
+					COMPONENTS.SETTINGS\getSteamStartingBangs()
+				when ENUMS.PLATFORM_IDS.BATTLENET
+					COMPONENTS.SETTINGS\getBattlenetStartingBangs()
+				when ENUMS.PLATFORM_IDS.GOG_GALAXY
+					COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
+				else
+					assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
+			SKIN\Bang(bang) for bang in *platformBangs
+		SKIN\Bang(bang) for bang in *game\getStartingBangs()
+	SKIN\Bang(('[%s]')\format(game\getPath()))
+	if COMPONENTS.SETTINGS\getHideSkin()
+		SKIN\Bang('[!HideFade]')
+	if COMPONENTS.SETTINGS\getShowSession()
+		SKIN\Bang(('[!ActivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
+
+installGame = (game) ->
+	game\setLastPlayed(os.time())
+	game\setInstalled(true)
+	COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
+	COMPONENTS.LIBRARY\save()
+	STATE.GAMES = COMPONENTS.LIBRARY\get()
+	STATE.SCROLL_INDEX = 1
+	updateSlots()
+	SKIN\Bang(('[%s]')\format(game\getPath()))
 
 hideGame = (game) ->
 	return if game\isVisible() == false
@@ -616,12 +616,20 @@ export OnLeftClickSlot = (index) ->
 			game = COMPONENTS.SLOTS\leftClick(index)
 			return unless game
 			action = switch STATE.LEFT_CLICK_ACTION
-				when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME then launchGame
+				when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
+					result = nil
+					if game\isInstalled() == true
+						result = launchGame
+					else
+						if game\getPlatformID() == ENUMS.PLATFORM_IDS.STEAM
+							result = installGame
+					result
 				when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame
 				when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
 				when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
 				else
 					assert(nil, 'main.init.OnLeftClickSlot')
+			return unless action
 			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
 			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
 				action(game)
