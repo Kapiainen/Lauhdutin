@@ -113,6 +113,7 @@ startDetectingPlatformGames = () ->
 			log('Starting to detect GOG Galaxy games')
 			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
 		when ENUMS.PLATFORM_IDS.CUSTOM
+			log('Starting to detect Custom games')
 			STATE.PLATFORM_QUEUE[1]\detectBanners(COMPONENTS.LIBRARY\getOldGames())
 			OnFinishedDetectingPlatformGames()
 		else
