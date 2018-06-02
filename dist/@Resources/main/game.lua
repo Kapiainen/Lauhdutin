@@ -31,6 +31,7 @@ do
       self.ignoresOtherBangs = other.ignoresOtherBangs
       self.notes = other.notes
       if newer == true then
+        self.path = other.path
         self.platformOverride = other.platformOverride
         self.banner = other.banner
         self.bannerURL = other.bannerURL
@@ -68,6 +69,9 @@ do
       return self.platformOverride
     end,
     setPlatformOverride = function(self, platform)
+      if not (self:getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM) then
+        return 
+      end
       if platform == nil then
         self.platformOverride = nil
       elseif type(platform) == 'string' then
@@ -81,6 +85,19 @@ do
     end,
     getPath = function(self)
       return self.path
+    end,
+    setPath = function(self, path)
+      if not (self:getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM) then
+        return 
+      end
+      path = path:trim()
+      if path == '' then
+        return 
+      end
+      if (path:find('%s') == nil) then
+        path = ('"%s"'):format(path)
+      end
+      self.path = path
     end,
     getProcess = function(self, skipOverride)
       if skipOverride == nil then

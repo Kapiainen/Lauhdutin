@@ -440,18 +440,29 @@ end
 local createPathProperty
 createPathProperty = function(game)
   local action = nil
-  local path = game:getPath():match('"(.-)"')
-  if path ~= nil and io.fileExists(path, false) then
-    local head, tail = io.splitPath(path)
-    if head ~= nil then
-      action = function(self, index)
-        return SKIN:Bang(('["%s"]'):format(head))
+  if game:getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM then
+    action = function(self, index)
+      return StartEditingPath(index)
+    end
+  else
+    local path = game:getPath():match('"(.-)"')
+    if path ~= nil and io.fileExists(path, false) then
+      local head, tail = io.splitPath(path)
+      if head ~= nil then
+        action = function(self, index)
+          return SKIN:Bang(('["%s"]'):format(head))
+        end
       end
     end
   end
+  local get
+  get = function(self)
+    return ('""%s""'):format(game:getPath())
+  end
   return Property({
     title = LOCALIZATION:get('game_path', 'Path'),
-    value = ('""%s""'):format(game:getPath()),
+    value = get(),
+    update = get,
     action = action
   })
 end
@@ -1000,6 +1011,24 @@ end
 OnEditedPlatformOverride = function(platform)
   local success, err = pcall(function()
     STATE.GAME:setPlatformOverride(platform:sub(1, -2))
+    updateSlots()
+    return OnDismissedInput()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+StartEditingPath = function(index)
+  local success, err = pcall(function()
+    return startEditing(index, 5, STATE.GAME:getPath())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnEditedPath = function(path)
+  local success, err = pcall(function()
+    STATE.GAME:setPath(path:sub(1, -2))
     updateSlots()
     return OnDismissedInput()
   end)

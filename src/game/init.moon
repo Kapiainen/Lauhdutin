@@ -301,15 +301,19 @@ createVisibleProperty = (game) ->
 
 createPathProperty = (game) ->
 	action = nil
-	path = game\getPath()\match('"(.-)"')
-	if path ~= nil and io.fileExists(path, false)
-		head, tail = io.splitPath(path)
-		if head ~= nil
-			action = (index) =>
-				SKIN\Bang(('["%s"]')\format(head))
+	if game\getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM
+		action = (index) => StartEditingPath(index)
+	else
+		path = game\getPath()\match('"(.-)"')
+		if path ~= nil and io.fileExists(path, false)
+			head, tail = io.splitPath(path)
+			if head ~= nil
+				action = (index) => SKIN\Bang(('["%s"]')\format(head))
+	get = () => ('""%s""')\format(game\getPath())
 	return Property({
 		title: LOCALIZATION\get('game_path', 'Path')
-		value: ('""%s""')\format(game\getPath())
+		value: get()
+		update: get
 		:action
 	})
 
@@ -696,6 +700,23 @@ export OnEditedPlatformOverride = (platform) ->
 	success, err = pcall(
 		() ->
 			STATE.GAME\setPlatformOverride(platform\sub(1, -2))
+			updateSlots()
+			OnDismissedInput()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+-- Path
+export StartEditingPath = (index) ->
+	success, err = pcall(
+		() ->
+			startEditing(index, 5, STATE.GAME\getPath())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnEditedPath = (path) ->
+	success, err = pcall(
+		() ->
+			STATE.GAME\setPath(path\sub(1, -2))
 			updateSlots()
 			OnDismissedInput()
 	)

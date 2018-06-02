@@ -51,6 +51,7 @@ class Game
 		@ignoresOtherBangs = other.ignoresOtherBangs
 		@notes = other.notes
 		if newer == true
+			@path = other.path
 			@platformOverride = other.platformOverride
 			@banner = other.banner
 			@bannerURL = other.bannerURL
@@ -88,6 +89,7 @@ class Game
 	getPlatformOverride: () => return @platformOverride
 
 	setPlatformOverride: (platform) =>
+		return unless @getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM
 		if platform == nil
 			@platformOverride = nil
 		elseif type(platform) == 'string'
@@ -95,6 +97,14 @@ class Game
 			@platformOverride = if platform == '' then nil else platform
 
 	getPath: () => return @path
+
+	setPath: (path) =>
+		return unless @getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM
+		path = path\trim()
+		return if path == ''
+		if (path\find('%s') == nil)
+			path = ('"%s"')\format(path)
+		@path = path
 
 	getProcess: (skipOverride = false) => return if @processOverride and skipOverride == false then @processOverride else @process
 
