@@ -162,6 +162,12 @@ local migrators = {
       settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
       settings.slots.overlayImagesEnabled = true
       settings.showSession = false
+      settings.platforms.custom = { }
+      settings.platforms.custom.enabled = true
+      settings.platforms.custom.bangs = {
+        starting = { },
+        stopping = { }
+      }
     end
   }
 }
@@ -705,6 +711,40 @@ do
         end
       end
       self.settings.platforms.gogGalaxy.bangs.stopping = bangs
+    end,
+    getCustomEnabled = function(self)
+      return self.settings.platforms.custom.enabled or true
+    end,
+    toggleCustomEnabled = function(self)
+      self.settings.platforms.custom.enabled = not self.settings.platforms.custom.enabled
+    end,
+    getCustomStartingBangs = function(self)
+      return self.settings.platforms.custom.bangs.starting or { }
+    end,
+    setCustomStartingBangs = function(self, tbl)
+      local bangs = { }
+      for _index_0 = 1, #tbl do
+        local bang = tbl[_index_0]
+        bang = bang:trim()
+        if bang ~= '' then
+          table.insert(bangs, bang)
+        end
+      end
+      self.settings.platforms.custom.bangs.starting = bangs
+    end,
+    getCustomStoppingBangs = function(self)
+      return self.settings.platforms.custom.bangs.stopping or { }
+    end,
+    setCustomStoppingBangs = function(self, tbl)
+      local bangs = { }
+      for _index_0 = 1, #tbl do
+        local bang = tbl[_index_0]
+        bang = bang:trim()
+        if bang ~= '' then
+          table.insert(bangs, bang)
+        end
+      end
+      self.settings.platforms.custom.bangs.stopping = bangs
     end
   }
   _base_0.__index = _base_0

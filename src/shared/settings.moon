@@ -145,6 +145,12 @@ migrators = {
 			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
 			settings.slots.overlayImagesEnabled = true
 			settings.showSession = false
+			settings.platforms.custom = {}
+			settings.platforms.custom.enabled = true
+			settings.platforms.custom.bangs = {
+				starting: {}
+				stopping: {}
+			}
 	}
 }
 
@@ -610,5 +616,29 @@ class Settings
 			bang = bang\trim()
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.platforms.gogGalaxy.bangs.stopping = bangs
+
+	-- Custom games
+	getCustomEnabled: () => return @settings.platforms.custom.enabled or true
+
+	toggleCustomEnabled: () =>
+		@settings.platforms.custom.enabled = not @settings.platforms.custom.enabled
+
+	getCustomStartingBangs: () => return @settings.platforms.custom.bangs.starting or {}
+
+	setCustomStartingBangs: (tbl) =>
+		bangs = {}
+		for bang in *tbl
+			bang = bang\trim()
+			table.insert(bangs, bang) if bang ~= ''
+		@settings.platforms.custom.bangs.starting = bangs
+
+	getCustomStoppingBangs: () => return @settings.platforms.custom.bangs.stopping or {}
+
+	setCustomStoppingBangs: (tbl) =>
+		bangs = {}
+		for bang in *tbl
+			bang = bang\trim()
+			table.insert(bangs, bang) if bang ~= ''
+		@settings.platforms.custom.bangs.stopping = bangs
 
 return Settings
