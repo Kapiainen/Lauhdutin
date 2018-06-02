@@ -163,7 +163,6 @@ local migrators = {
       settings.slots.overlayImagesEnabled = true
       settings.showSession = false
       settings.platforms.custom = { }
-      settings.platforms.custom.enabled = true
       settings.platforms.custom.bangs = {
         starting = { },
         stopping = { }
@@ -711,12 +710,6 @@ do
         end
       end
       self.settings.platforms.gogGalaxy.bangs.stopping = bangs
-    end,
-    getCustomEnabled = function(self)
-      return self.settings.platforms.custom.enabled or true
-    end,
-    toggleCustomEnabled = function(self)
-      self.settings.platforms.custom.enabled = not self.settings.platforms.custom.enabled
     end,
     getCustomStartingBangs = function(self)
       return self.settings.platforms.custom.bangs.starting or { }

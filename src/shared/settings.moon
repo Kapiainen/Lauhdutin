@@ -146,7 +146,6 @@ migrators = {
 			settings.slots.overlayImagesEnabled = true
 			settings.showSession = false
 			settings.platforms.custom = {}
-			settings.platforms.custom.enabled = true
 			settings.platforms.custom.bangs = {
 				starting: {}
 				stopping: {}
@@ -618,11 +617,6 @@ class Settings
 		@settings.platforms.gogGalaxy.bangs.stopping = bangs
 
 	-- Custom games
-	getCustomEnabled: () => return @settings.platforms.custom.enabled or true
-
-	toggleCustomEnabled: () =>
-		@settings.platforms.custom.enabled = not @settings.platforms.custom.enabled
-
 	getCustomStartingBangs: () => return @settings.platforms.custom.bangs.starting or {}
 
 	setCustomStartingBangs: (tbl) =>

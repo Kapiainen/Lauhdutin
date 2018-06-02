@@ -8,7 +8,7 @@ class Custom extends Platform
 		@platformID = ENUMS.PLATFORM_IDS.CUSTOM
 		@name = LOCALIZATION\get('platform_name_custom', 'Custom')
 		@cachePath = 'cache\\custom\\'
-		@enabled = settings\getCustomEnabled()
+		@enabled = true
 
 	validate: () => return
 

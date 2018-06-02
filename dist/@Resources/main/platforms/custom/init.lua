@@ -27,7 +27,7 @@ do
       self.platformID = ENUMS.PLATFORM_IDS.CUSTOM
       self.name = LOCALIZATION:get('platform_name_custom', 'Custom')
       self.cachePath = 'cache\\custom\\'
-      self.enabled = settings:getCustomEnabled()
+      self.enabled = true
     end,
     __base = _base_0,
     __name = "Custom",
