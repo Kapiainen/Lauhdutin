@@ -171,14 +171,12 @@ end
 Update = function() end
 local sortPropertiesByTitle
 sortPropertiesByTitle = function(a, b)
-  if a.title:lower() < b.title:lower() then
-    return true
-  end
-  return false
+  return a.title:lower() < b.title:lower()
 end
 local createPlatformProperties
-createPlatformProperties = function(games, platforms, inverse)
+createPlatformProperties = function(games, platforms)
   local platformProperties = { }
+  local platformInverseProperties = { }
   for _index_0 = 1, #platforms do
     local platform = platforms[_index_0]
     local platformGames = 0
@@ -190,18 +188,20 @@ createPlatformProperties = function(games, platforms, inverse)
       end
     end
     if platformGames > 0 then
+      local title = platform:getName()
       table.insert(platformProperties, Property({
-        title = platform:getName(),
-        value = (function()
-          if inverse == true then
-            return STATE.NUM_GAMES_PATTERN:format(#games - platformGames)
-          else
-            return STATE.NUM_GAMES_PATTERN:format(platformGames)
-          end
-        end)(),
+        title = title,
+        value = STATE.NUM_GAMES_PATTERN:format(platformGames),
+        arguments = {
+          platformID = platformID
+        }
+      }))
+      table.insert(platformInverseProperties, Property({
+        title = title,
+        value = STATE.NUM_GAMES_PATTERN:format(#games - platformGames),
         arguments = {
           platformID = platformID,
-          inverse = inverse
+          inverse = true
         }
       }))
     end
@@ -223,39 +223,54 @@ createPlatformProperties = function(games, platforms, inverse)
   end
   for platformOverride, params in pairs(platformOverrides) do
     if params.numGames > 0 then
+      local title = platformOverride .. '*'
       table.insert(platformProperties, Property({
-        title = platformOverride .. '*',
-        value = (function()
-          if inverse == true then
-            return STATE.NUM_GAMES_PATTERN:format(#games - params.numGames)
-          else
-            return STATE.NUM_GAMES_PATTERN:format(params.numGames)
-          end
-        end)(),
+        title = title,
+        value = STATE.NUM_GAMES_PATTERN:format(params.numGames),
+        arguments = {
+          platformID = params.platformID,
+          platformOverride = platformOverride
+        }
+      }))
+      table.insert(platformInverseProperties, Property({
+        title = title,
+        value = STATE.NUM_GAMES_PATTERN:format(#games - params.numGames),
         arguments = {
           platformID = params.platformID,
           platformOverride = platformOverride,
-          inverse = inverse
+          inverse = true
         }
       }))
     end
   end
   table.sort(platformProperties, sortPropertiesByTitle)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_from_platform_inverse', 'Is not on platform X')
-      else
-        return LOCALIZATION:get('filter_from_platform', 'Is on platform X')
-      end
-    end)(),
-    value = STATE.NUM_GAMES_PATTERN:format(#games),
-    enum = ENUMS.FILTER_TYPES.PLATFORM,
-    properties = platformProperties
-  })
+  table.sort(platformInverseProperties, sortPropertiesByTitle)
+  local default
+  if #games < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_from_platform', 'Is on platform X'),
+      value = STATE.NUM_GAMES_PATTERN:format(#games),
+      enum = ENUMS.FILTER_TYPES.PLATFORM,
+      properties = platformProperties
+    })
+  end
+  local inverse
+  if #games < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_from_platform_inverse', 'Is not on platform X'),
+      value = STATE.NUM_GAMES_PATTERN:format(#games),
+      enum = ENUMS.FILTER_TYPES.PLATFORM,
+      properties = platformInverseProperties
+    })
+  end
+  return default, inverse
 end
 local createTagProperties
-createTagProperties = function(games, filterStack, inverse)
+createTagProperties = function(games, filterStack)
   local tags = { }
   local gamesWithTags = 0
   for _index_0 = 1, #games do
@@ -300,119 +315,148 @@ createTagProperties = function(games, filterStack, inverse)
       end
     end
   end
-  if gamesWithTags < 1 then
-    return nil, gamesWithTags
-  end
   local tagProperties = { }
+  local tagInverseProperties = { }
   for tag, numGames in pairs(tags) do
     if numGames > 0 then
       table.insert(tagProperties, Property({
         title = tag,
-        value = (function()
-          if inverse == true then
-            return STATE.NUM_GAMES_PATTERN:format(#games - numGames)
-          else
-            return STATE.NUM_GAMES_PATTERN:format(numGames)
-          end
-        end)(),
+        value = STATE.NUM_GAMES_PATTERN:format(numGames),
+        arguments = {
+          tag = tag
+        }
+      }))
+      table.insert(tagInverseProperties, Property({
+        title = tag,
+        value = STATE.NUM_GAMES_PATTERN:format(#games - numGames),
         arguments = {
           tag = tag,
-          inverse = inverse
+          inverse = true
         }
       }))
     end
   end
-  if #tagProperties < 1 then
-    return nil, gamesWithTags
-  end
   table.sort(tagProperties, sortPropertiesByTitle)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_has_tag_inverse', 'Does not have tag X')
-      else
-        return LOCALIZATION:get('filter_has_tag', 'Has tag X')
-      end
-    end)(),
-    value = (function()
-      if inverse == true then
-        return STATE.NUM_GAMES_PATTERN:format(#games)
-      else
-        return STATE.NUM_GAMES_PATTERN:format(gamesWithTags)
-      end
-    end)(),
-    enum = ENUMS.FILTER_TYPES.TAG,
-    properties = tagProperties
-  }), gamesWithTags
+  table.sort(tagInverseProperties, sortPropertiesByTitle)
+  local default
+  if #tagProperties < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_has_tag', 'Has tag X'),
+      value = STATE.NUM_GAMES_PATTERN:format(gamesWithTags),
+      enum = ENUMS.FILTER_TYPES.TAG,
+      properties = tagProperties
+    })
+  end
+  local inverse
+  if #tagInverseProperties < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_has_tag_inverse', 'Does not have tag X'),
+      value = STATE.NUM_GAMES_PATTERN:format(#games),
+      enum = ENUMS.FILTER_TYPES.TAG,
+      properties = tagInverseProperties
+    })
+  end
+  return default, inverse, gamesWithTags
 end
 local createHasNoTagsProperty
-createHasNoTagsProperty = function(numGamesWithoutTags, numGamesWithTags, inverse)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_has_no_tags_inverse', 'Has one or more tags')
-      else
-        return LOCALIZATION:get('filter_has_no_tags', 'Has no tags')
-      end
-    end)(),
-    value = (function()
-      if inverse == true then
-        return STATE.NUM_GAMES_PATTERN:format(numGamesWithTags)
-      else
-        return STATE.NUM_GAMES_PATTERN:format(numGamesWithoutTags)
-      end
-    end)(),
-    enum = ENUMS.FILTER_TYPES.NO_TAGS,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
+createHasNoTagsProperty = function(numGamesWithoutTags, numGamesWithTags)
+  local default
+  if numGamesWithoutTags < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_has_no_tags', 'Has no tags'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGamesWithoutTags),
+      enum = ENUMS.FILTER_TYPES.NO_TAGS,
+      arguments = {
+        state = true
+      }
+    })
+  end
+  local inverse
+  if numGamesWithTags < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_has_no_tags_inverse', 'Has one or more tags'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGamesWithTags),
+      enum = ENUMS.FILTER_TYPES.NO_TAGS,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createHiddenProperty
-createHiddenProperty = function(numHiddenGames, numVisibleGames, inverse)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_is_hidden_inverse', 'Is not hidden')
-      else
-        return LOCALIZATION:get('filter_is_hidden', 'Is hidden')
-      end
-    end)(),
-    value = (function()
-      if inverse == true then
-        return STATE.NUM_GAMES_PATTERN:format(numVisibleGames)
-      else
-        return STATE.NUM_GAMES_PATTERN:format(numHiddenGames)
-      end
-    end)(),
-    enum = ENUMS.FILTER_TYPES.HIDDEN,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
+createHiddenProperty = function(numHiddenGames, numVisibleGames)
+  local default
+  if numHiddenGames < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_is_hidden', 'Is hidden'),
+      value = STATE.NUM_GAMES_PATTERN:format(numHiddenGames),
+      enum = ENUMS.FILTER_TYPES.HIDDEN,
+      arguments = {
+        state = true
+      }
+    })
+  end
+  local inverse
+  if numVisibleGames < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_is_hidden_inverse', 'Is not hidden'),
+      value = STATE.NUM_GAMES_PATTERN:format(numVisibleGames),
+      enum = ENUMS.FILTER_TYPES.HIDDEN,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createRandomProperty
-createRandomProperty = function(numGames, inverse)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_random_inverse', 'Remove a random game')
-      else
-        return LOCALIZATION:get('filter_random', 'Pick a random game')
-      end
-    end)(),
-    value = STATE.NUM_GAMES_PATTERN:format(numGames),
-    enum = ENUMS.FILTER_TYPES.RANDOM_GAME,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
+createRandomProperty = function(numGames)
+  local default
+  if numGames < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_random', 'Pick a random game'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGames),
+      enum = ENUMS.FILTER_TYPES.RANDOM_GAME,
+      arguments = {
+        state = true
+      }
+    })
+  end
+  local inverse
+  if numGames < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_random_inverse', 'Remove a random game'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGames),
+      enum = ENUMS.FILTER_TYPES.RANDOM_GAME,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createNeverPlayedProperty
-createNeverPlayedProperty = function(games, inverse)
+createNeverPlayedProperty = function(games)
   local numGames = 0
   for _index_0 = 1, #games do
     local game = games[_index_0]
@@ -420,30 +464,38 @@ createNeverPlayedProperty = function(games, inverse)
       numGames = numGames + 1
     end
   end
-  if inverse == true then
-    numGames = #games - numGames
-  end
+  local default
   if numGames < 1 then
-    return nil
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_never_played', 'Has never been played'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGames),
+      enum = ENUMS.FILTER_TYPES.NEVER_PLAYED,
+      arguments = {
+        state = true
+      }
+    })
   end
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_never_played_inverse', 'Has been played')
-      else
-        return LOCALIZATION:get('filter_never_played', 'Has never been played')
-      end
-    end)(),
-    value = STATE.NUM_GAMES_PATTERN:format(numGames),
-    enum = ENUMS.FILTER_TYPES.NEVER_PLAYED,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
+  local numGamesInverse = #games - numGames
+  local inverse
+  if numGamesInverse < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_never_played_inverse', 'Has been played'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGamesInverse),
+      enum = ENUMS.FILTER_TYPES.NEVER_PLAYED,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createHasNotesProperty
-createHasNotesProperty = function(games, inverse)
+createHasNotesProperty = function(games)
   local numGames = 0
   for _index_0 = 1, #games do
     local game = games[_index_0]
@@ -451,79 +503,77 @@ createHasNotesProperty = function(games, inverse)
       numGames = numGames + 1
     end
   end
-  if inverse == true then
-    numGames = #games - numGames
-  end
+  local default
   if numGames < 1 then
-    return nil
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_has_notes', 'Has notes'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGames),
+      enum = ENUMS.FILTER_TYPES.HAS_NOTES,
+      arguments = {
+        state = true
+      }
+    })
   end
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_has_notes_inverse', 'Does not have notes')
-      else
-        return LOCALIZATION:get('filter_has_notes', 'Has notes')
-      end
-    end)(),
-    value = STATE.NUM_GAMES_PATTERN:format(numGames),
-    enum = ENUMS.FILTER_TYPES.HAS_NOTES,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
+  local numGamesInverse = #games - numGames
+  local inverse
+  if numGamesInverse < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_has_notes_inverse', 'Does not have notes'),
+      value = STATE.NUM_GAMES_PATTERN:format(numGamesInverse),
+      enum = ENUMS.FILTER_TYPES.HAS_NOTES,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createUninstalledProperty
-createUninstalledProperty = function(numUninstalledGames, numInstalledGames, inverse)
-  return Property({
-    title = (function()
-      if inverse == true then
-        return LOCALIZATION:get('filter_is_uninstalled_inverse', 'Is installed')
-      else
-        return LOCALIZATION:get('filter_is_uninstalled', 'Is not installed')
-      end
-    end)(),
-    value = (function()
-      if inverse == true then
-        return STATE.NUM_GAMES_PATTERN:format(numInstalledGames)
-      else
-        return STATE.NUM_GAMES_PATTERN:format(numUninstalledGames)
-      end
-    end)(),
-    enum = ENUMS.FILTER_TYPES.UNINSTALLED,
-    arguments = {
-      state = true,
-      inverse = inverse
-    }
-  })
-end
-local createClearProperty
-createClearProperty = function()
-  return Property({
-    title = LOCALIZATION:get('filter_clear_filters', 'Clear filters'),
-    value = ' ',
-    enum = ENUMS.FILTER_TYPES.NONE
-  })
-end
-local createCancelProperty
-createCancelProperty = function()
-  return Property({
-    title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
-    value = ' ',
-    action = function(self)
-      return SKIN:Bang('[!DeactivateConfig]')
-    end
-  })
+createUninstalledProperty = function(numUninstalledGames, numInstalledGames)
+  local default
+  if numUninstalledGames < 1 then
+    default = nil
+  else
+    default = Property({
+      title = LOCALIZATION:get('filter_is_uninstalled', 'Is not installed'),
+      value = STATE.NUM_GAMES_PATTERN:format(numUninstalledGames),
+      enum = ENUMS.FILTER_TYPES.UNINSTALLED,
+      arguments = {
+        state = true
+      }
+    })
+  end
+  local inverse
+  if numInstalledGames < 1 then
+    inverse = nil
+  else
+    inverse = Property({
+      title = LOCALIZATION:get('filter_is_uninstalled_inverse', 'Is installed'),
+      value = STATE.NUM_GAMES_PATTERN:format(numInstalledGames),
+      enum = ENUMS.FILTER_TYPES.UNINSTALLED,
+      arguments = {
+        state = true,
+        inverse = true
+      }
+    })
+  end
+  return default, inverse
 end
 local createProperties
-createProperties = function(games, hiddenGames, uninstalledGames, platforms, stack, filterStack, inverse)
-  local properties = { }
-  if #hiddenGames > 0 then
-    table.insert(properties, createHiddenProperty(#hiddenGames, #games, inverse))
-  end
-  if #uninstalledGames > 0 then
-    table.insert(properties, createUninstalledProperty(#uninstalledGames, #games, inverse))
-  end
+createProperties = function(games, hiddenGames, uninstalledGames, platforms, stack, filterStack)
+  local defaultProperties = { }
+  local inverseProperties = { }
+  local hiddenDefault, hiddenInverse = createHiddenProperty(#hiddenGames, #games)
+  table.insert(defaultProperties, hiddenDefault)
+  table.insert(inverseProperties, hiddenInverse)
+  local uninstalledDefault, uninstalledInverse = createUninstalledProperty(#uninstalledGames, #games)
+  table.insert(defaultProperties, uninstalledDefault)
+  table.insert(inverseProperties, uninstalledInverse)
   if #games > 0 then
     local skipPlatforms = false
     local skipTags = false
@@ -550,54 +600,64 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
         skipHasNotes = true
       end
     end
+    local backDefault = Property({
+      title = STATE.BACK_BUTTON_TITLE,
+      value = ' ',
+      properties = defaultProperties
+    })
+    local backInverse = Property({
+      title = STATE.BACK_BUTTON_TITLE,
+      value = ' ',
+      properties = inverseProperties
+    })
     if not (skipPlatforms) then
-      local platformsProperty = createPlatformProperties(games, platforms, inverse)
-      if platformsProperty then
-        table.insert(platformsProperty.properties, Property({
-          title = STATE.BACK_BUTTON_TITLE,
-          value = ' ',
-          properties = properties
-        }))
-        table.insert(properties, platformsProperty)
+      local platformsDefault, platformsInverse = createPlatformProperties(games, platforms)
+      if platformsDefault then
+        table.insert(platformsDefault.properties, backDefault)
+        table.insert(defaultProperties, platformsDefault)
+      end
+      if platformsInverse then
+        table.insert(platformsInverse.properties, backInverse)
+        table.insert(inverseProperties, platformsInverse)
       end
     end
     local gamesWithTags = 0
     if not (skipTags) then
-      local tagsProperty
-      tagsProperty, gamesWithTags = createTagProperties(games, filterStack, inverse)
-      if tagsProperty then
-        table.insert(tagsProperty.properties, Property({
-          title = STATE.BACK_BUTTON_TITLE,
-          value = ' ',
-          properties = properties
-        }))
-        table.insert(properties, tagsProperty)
+      local tagsDefault, tagsInverse
+      tagsDefault, tagsInverse, gamesWithTags = createTagProperties(games, filterStack)
+      if tagsDefault then
+        table.insert(tagsDefault.properties, backDefault)
+        table.insert(defaultProperties, tagsDefault)
+      end
+      if tagsInverse then
+        table.insert(tagsInverse.properties, backInverse)
+        table.insert(inverseProperties, tagsInverse)
       end
     end
     if not (skipNoTags) then
-      local numGamesWithoutTags = #games - gamesWithTags
-      if numGamesWithoutTags > 0 then
-        table.insert(properties, createHasNoTagsProperty(numGamesWithoutTags, gamesWithTags, inverse))
-      end
+      local withoutTagsDefault, withoutTagsInverse = createHasNoTagsProperty(#games - gamesWithTags, gamesWithTags)
+      table.insert(defaultProperties, withoutTagsDefault)
+      table.insert(inverseProperties, withoutTagsInverse)
     end
     if not skipRandom and #games > 1 then
-      table.insert(properties, createRandomProperty(#games, inverse))
+      local randomDefault, randomInverse = createRandomProperty(#games)
+      table.insert(defaultProperties, randomDefault)
+      table.insert(inverseProperties, randomInverse)
     end
     if not (skipNeverPlayed) then
-      local neverPlayedProperty = createNeverPlayedProperty(games, inverse)
-      if neverPlayedProperty then
-        table.insert(properties, neverPlayedProperty)
-      end
+      local neverPlayedDefault, neverPlayedInverse = createNeverPlayedProperty(games)
+      table.insert(defaultProperties, neverPlayedDefault)
+      table.insert(inverseProperties, neverPlayedInverse)
     end
     if not (skipHasNotes) then
-      local hasNotesProperty = createHasNotesProperty(games, inverse)
-      if hasNotesProperty then
-        table.insert(properties, hasNotesProperty)
-      end
+      local hasNotesDefault, hasNotesInverse = createHasNotesProperty(games)
+      table.insert(defaultProperties, hasNotesDefault)
+      table.insert(inverseProperties, hasNotesInverse)
     end
   end
-  table.sort(properties, sortPropertiesByTitle)
-  table.insert(properties, 1, Property({
+  table.sort(defaultProperties, sortPropertiesByTitle)
+  table.sort(inverseProperties, sortPropertiesByTitle)
+  local invertFilters = Property({
     title = LOCALIZATION:get('filter_window_invert_filters', 'Invert filters'),
     value = ' ',
     action = function(self)
@@ -607,12 +667,28 @@ createProperties = function(games, hiddenGames, uninstalledGames, platforms, sta
         STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
       end
     end
-  }))
+  })
+  table.insert(defaultProperties, 1, invertFilters)
+  table.insert(inverseProperties, 1, invertFilters)
   if not (stack) then
-    table.insert(properties, createClearProperty())
+    local clear = Property({
+      title = LOCALIZATION:get('filter_clear_filters', 'Clear filters'),
+      value = ' ',
+      enum = ENUMS.FILTER_TYPES.NONE
+    })
+    table.insert(defaultProperties, clear)
+    table.insert(inverseProperties, clear)
   end
-  table.insert(properties, createCancelProperty())
-  return properties
+  local cancel = Property({
+    title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
+    value = ' ',
+    action = function(self)
+      return SKIN:Bang('[!DeactivateConfig]')
+    end
+  })
+  table.insert(defaultProperties, cancel)
+  table.insert(inverseProperties, cancel)
+  return defaultProperties, inverseProperties
 end
 local updateScrollbar
 updateScrollbar = function()
@@ -729,8 +805,7 @@ Handshake = function(stack, appliedFilters)
         end
       end
     end
-    STATE.DEFAULT_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack, false)
-    STATE.INVERSE_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack, true)
+    STATE.DEFAULT_PROPERTIES, STATE.INVERSE_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack)
     STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
     updateScrollbar()
     updateSlots()
