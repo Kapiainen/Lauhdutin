@@ -51,6 +51,7 @@ class Game
 		@ignoresOtherBangs = other.ignoresOtherBangs
 		@notes = other.notes
 		if newer == true
+			@platformOverride = other.platformOverride
 			@banner = other.banner
 			@bannerURL = other.bannerURL
 			@expectedBanner = other.expectedBanner
@@ -85,6 +86,13 @@ class Game
 	getPlatformID: () => return @platformID
 
 	getPlatformOverride: () => return @platformOverride
+
+	setPlatformOverride: (platform) =>
+		if platform == nil
+			@platformOverride = nil
+		elseif type(platform) == 'string'
+			platform = platform\trim()
+			@platformOverride = if platform == '' then nil else platform
 
 	getPath: () => return @path
 

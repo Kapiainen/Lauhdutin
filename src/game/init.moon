@@ -237,12 +237,16 @@ createTagProperties = () ->
 	)
 	return properties
 
-createPlatformProperty = (game, platform) ->
-	platformOverride = game\getPlatformOverride()
-	platformName = if platformOverride ~= nil then platformOverride .. '*' else platform\getName()
+createPlatformProperty = (game, platform) ->	
+	get = () ->
+		platformOverride = game\getPlatformOverride()
+		return if platformOverride ~= nil then platformOverride .. '*' else platform\getName()
+	action = if platform\getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then nil else (index) => StartEditingPlatformOverride(index)
 	return Property({
 		title: LOCALIZATION\get('game_platform', 'Platform')
-		value: platformName
+		value: get()
+		update: get
+		:action
 	})
 
 createHoursPlayedProperty = (game) ->
@@ -677,6 +681,23 @@ startEditing = (slotIndex, batchIndex, defaultValue) ->
 	SKIN\Bang(('[!SetOption "Input" "DefaultValue" "%s"]')\format(defaultValue))
 	SKIN\Bang(('[!CommandMeasure "Input" "ExecuteBatch %d"]')\format(batchIndex))
 	STATE.ACTIVE_INPUT = true
+
+-- Platform override
+export StartEditingPlatformOverride = (index) ->
+	success, err = pcall(
+		() ->
+			startEditing(index, 4, STATE.GAME\getPlatformOverride())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnEditedPlatformOverride = (platform) ->
+	success, err = pcall(
+		() ->
+			STATE.GAME\setPlatformOverride(platform\sub(1, -2))
+			updateSlots()
+			OnDismissedInput()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 -- Process override
 export StartEditingProcessOverride = (index) ->

@@ -31,6 +31,7 @@ do
       self.ignoresOtherBangs = other.ignoresOtherBangs
       self.notes = other.notes
       if newer == true then
+        self.platformOverride = other.platformOverride
         self.banner = other.banner
         self.bannerURL = other.bannerURL
         self.expectedBanner = other.expectedBanner
@@ -65,6 +66,18 @@ do
     end,
     getPlatformOverride = function(self)
       return self.platformOverride
+    end,
+    setPlatformOverride = function(self, platform)
+      if platform == nil then
+        self.platformOverride = nil
+      elseif type(platform) == 'string' then
+        platform = platform:trim()
+        if platform == '' then
+          self.platformOverride = nil
+        else
+          self.platformOverride = platform
+        end
+      end
     end,
     getPath = function(self)
       return self.path
