@@ -474,7 +474,10 @@ do
         local platformID = args.platformID
         local platformOverride = args.platformOverride
         games = self:filterGames(gamesToProcess, function(game)
-          return game:getPlatformID() == platformID and game:getPlatformOverride() == platformOverride
+          if platformOverride == nil then
+            return platformID == game:getPlatformID() and game:getPlatformOverride() == nil
+          end
+          return platformOverride == game:getPlatformOverride()
         end)
       elseif ENUMS.FILTER_TYPES.TAG == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')

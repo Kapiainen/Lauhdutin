@@ -372,7 +372,11 @@ class Library
 				assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
 				platformID = args.platformID
 				platformOverride = args.platformOverride
-				games = @filterGames(gamesToProcess, (game) -> return game\getPlatformID() == platformID and game\getPlatformOverride() == platformOverride)
+				games = @filterGames(gamesToProcess, (game) -> 
+					if platformOverride == nil
+						return platformID == game\getPlatformID() and game\getPlatformOverride() == nil
+					return platformOverride == game\getPlatformOverride()
+				)
 			when ENUMS.FILTER_TYPES.TAG
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
