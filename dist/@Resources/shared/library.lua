@@ -200,7 +200,9 @@ do
       local _list_0 = self.oldGames
       for _index_0 = 1, #_list_0 do
         local game = _list_0[_index_0]
-        game:setInstalled(false)
+        if game:getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then
+          game:setInstalled(false)
+        end
         game:setGameID(self.currentGameID)
         self.currentGameID = self.currentGameID + 1
         table.insert(self.games, game)

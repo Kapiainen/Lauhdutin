@@ -167,6 +167,8 @@ updateBanner = (game) ->
 					('\\@Resources\\cache\\battlenet\\%s.%s')\format(expectedBanner, extensions)
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
 					('\\@Resources\\cache\\gog_galaxy\\%s.%s')\format(expectedBanner, extensions)
+				when ENUMS.PLATFORM_IDS.CUSTOM
+					('\\@Resources\\cache\\custom\\%s.%s')\format(expectedBanner, extensions)
 			SKIN\Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]')\format(tooltip))
 			SKIN\Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
 			return
@@ -652,6 +654,8 @@ export OpenBanner = () ->
 						'cache\\battlenet\\'
 					when ENUMS.PLATFORM_IDS.GOG_GALAXY
 						'cache\\gog_galaxy\\'
+					when ENUMS.PLATFORM_IDS.CUSTOM
+						'cache\\custom\\'
 				SKIN\Bang(('"#@#%s"')\format(path))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

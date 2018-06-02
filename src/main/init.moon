@@ -110,6 +110,9 @@ startDetectingPlatformGames = () ->
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
 			log('Starting to detect GOG Galaxy games')
 			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
+		when ENUMS.PLATFORM_IDS.CUSTOM
+			STATE.PLATFORM_QUEUE[1]\detectBanners(COMPONENTS.LIBRARY\getOldGames())
+			OnFinishedDetectingPlatformGames()
 		else
 			assert(nil, 'main.init.startDetectingPlatformGames')
 
@@ -303,6 +306,8 @@ export GameProcessTerminated = (game) ->
 							COMPONENTS.SETTINGS\getBattlenetStoppingBangs()
 						when ENUMS.PLATFORM_IDS.GOG_GALAXY
 							COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
+						when ENUMS.PLATFORM_IDS.CUSTOM
+							COMPONENTS.SETTINGS\getCustomStoppingBangs()
 						else
 							assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
 					SKIN\Bang(bang) for bang in *platformBangs
@@ -549,6 +554,8 @@ launchGame = (game) ->
 					COMPONENTS.SETTINGS\getBattlenetStartingBangs()
 				when ENUMS.PLATFORM_IDS.GOG_GALAXY
 					COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
+				when ENUMS.PLATFORM_IDS.CUSTOM
+					COMPONENTS.SETTINGS\getCustomStartingBangs()
 				else
 					assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
 			SKIN\Bang(bang) for bang in *platformBangs

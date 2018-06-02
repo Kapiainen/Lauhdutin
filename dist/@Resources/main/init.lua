@@ -113,6 +113,9 @@ startDetectingPlatformGames = function()
   elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
     log('Starting to detect GOG Galaxy games')
     return utility.runCommand(STATE.PLATFORM_QUEUE[1]:dumpDatabases())
+  elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+    STATE.PLATFORM_QUEUE[1]:detectBanners(COMPONENTS.LIBRARY:getOldGames())
+    return OnFinishedDetectingPlatformGames()
   else
     return assert(nil, 'main.init.startDetectingPlatformGames')
   end
@@ -370,6 +373,8 @@ GameProcessTerminated = function(game)
           platformBangs = COMPONENTS.SETTINGS:getBattlenetStoppingBangs()
         elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
           platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
+        elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+          platformBangs = COMPONENTS.SETTINGS:getCustomStoppingBangs()
         else
           platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
         end
@@ -731,6 +736,8 @@ launchGame = function(game)
         platformBangs = COMPONENTS.SETTINGS:getBattlenetStartingBangs()
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
         platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStartingBangs()
+      elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getCustomStartingBangs()
       else
         platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific starting bangs.')
       end

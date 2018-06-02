@@ -254,6 +254,8 @@ updateBanner = function(game)
         tooltip = ('\\@Resources\\cache\\battlenet\\%s.%s'):format(expectedBanner, extensions)
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
         tooltip = ('\\@Resources\\cache\\gog_galaxy\\%s.%s'):format(expectedBanner, extensions)
+      elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+        tooltip = ('\\@Resources\\cache\\custom\\%s.%s'):format(expectedBanner, extensions)
       end
       SKIN:Bang(('[!SetOption "BannerMissing" "ToolTipText" "%s"]'):format(tooltip))
       SKIN:Bang('[!SetOption "BannerMissing" "ToolTipHidden" "0"]')
@@ -940,6 +942,8 @@ OpenBanner = function()
         path = 'cache\\battlenet\\'
       elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
         path = 'cache\\gog_galaxy\\'
+      elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+        path = 'cache\\custom\\'
       end
       return SKIN:Bang(('"#@#%s"'):format(path))
     end

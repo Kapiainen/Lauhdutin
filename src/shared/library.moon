@@ -177,7 +177,7 @@ class Library
 		assert(type(platformEnabledStatus) == 'table', 'shared.library.Library.finalize')
 		@platformEnabledStatus = platformEnabledStatus
 		for game in *@oldGames
-			game\setInstalled(false)
+			game\setInstalled(false) if game\getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM
 			game\setGameID(@currentGameID)
 			@currentGameID += 1
 			table.insert(@games, game)
