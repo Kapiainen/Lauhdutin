@@ -414,9 +414,19 @@ createInstalledProperty = function(game)
     end
     return LOCALIZATION:get('button_label_no', 'No')
   end
+  local action
+  if game:getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then
+    action = nil
+  else
+    action = function(self)
+      return game:setInstalled(not game:isInstalled())
+    end
+  end
   return Property({
     title = LOCALIZATION:get('game_installed', 'Installed'),
-    value = f()
+    value = f(),
+    update = f,
+    action = action
   })
 end
 local createVisibleProperty

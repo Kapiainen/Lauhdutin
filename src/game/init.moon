@@ -281,9 +281,13 @@ createInstalledProperty = (game) ->
 		if game\isInstalled()
 			return LOCALIZATION\get('button_label_yes', 'Yes')
 		return LOCALIZATION\get('button_label_no', 'No')
+	action = if game\getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then nil else () =>
+		game\setInstalled(not game\isInstalled())
 	return Property({
 		title: LOCALIZATION\get('game_installed', 'Installed')
 		value: f()
+		update: f
+		:action
 	})
 
 createVisibleProperty = (game) ->

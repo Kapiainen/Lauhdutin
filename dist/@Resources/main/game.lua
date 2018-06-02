@@ -31,6 +31,7 @@ do
       self.ignoresOtherBangs = other.ignoresOtherBangs
       self.notes = other.notes
       if newer == true then
+        self.uninstalled = other.uninstalled
         self.path = other.path
         self.platformOverride = other.platformOverride
         self.banner = other.banner

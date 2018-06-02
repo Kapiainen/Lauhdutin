@@ -51,6 +51,7 @@ class Game
 		@ignoresOtherBangs = other.ignoresOtherBangs
 		@notes = other.notes
 		if newer == true
+			@uninstalled = other.uninstalled
 			@path = other.path
 			@platformOverride = other.platformOverride
 			@banner = other.banner
