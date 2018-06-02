@@ -502,48 +502,56 @@ createProperties = (game, platform) ->
 		createOpenStorePageProperty(game)
 	}
 
+centerConfig = () ->
+	return if STATE.CENTERED == true
+	STATE.CENTERED = true
+	return if not COMPONENTS.SETTINGS\getCenterOnMonitor()
+	meter = SKIN\GetMeter('WindowShadow')
+	skinWidth = meter\GetW()
+	skinHeight = meter\GetH()
+	mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+	monitorIndex = nil
+	if mainConfig ~= nil
+		monitorIndex = utility.getConfigMonitor(mainConfig) or 1
+	else
+		monitorIndex = 1
+	x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
+	SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
+
+getPlatform = (game) ->
+	platformID = game\getPlatformID()
+	for p in *STATE.ALL_PLATFORMS
+		if p\getPlatformID() == platformID
+			return p
+	return nil
+
+getGame = (gameID) ->
+	game = STATE.ALL_GAMES[gameID]
+	if game == nil or game\getGameID() ~= gameID
+		for game in *STATE.ALL_GAMES
+			if game\getGameID() == gameID
+				return game
+	return game
+
 export Handshake = (gameID) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Game handshake', gameID)
 			getGamesAndTags()
-			game = STATE.ALL_GAMES[gameID]
-			if game == nil or game.gameID ~= gameID
-				game = nil
-				for candidate in *STATE.ALL_GAMES
-					if candidate\getGameID() == gameID
-						game = candidate
-						break
+			game = getGame(gameID)
 			assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
 			STATE.GAME = game
 			valueMeter = SKIN\GetMeter('PageTitle')
 			maxStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
 			updateTitle(game, maxStringLength)
 			updateBanner(game)
-			platform = nil
-			for p in *STATE.ALL_PLATFORMS
-				if p\getPlatformID() == game\getPlatformID()
-					platform = p
-					break
+			platform = getPlatform(game)
 			assert(platform ~= nil, 'Could not find the game\'s platform.')
 			STATE.DEFAULT_PROPERTIES = createProperties(game, platform)
 			STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
 			updateScrollbar()
 			updateSlots()
-			if STATE.CENTERED == false
-				STATE.CENTERED = true
-				if COMPONENTS.SETTINGS\getCenterOnMonitor()
-					meter = SKIN\GetMeter('WindowShadow')
-					skinWidth = meter\GetW()
-					skinHeight = meter\GetH()
-					mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
-					monitorIndex = nil
-					if mainConfig ~= nil
-						monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-					else
-						monitorIndex = 1
-					x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-					SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
+			centerConfig()
 			SKIN\Bang('[!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

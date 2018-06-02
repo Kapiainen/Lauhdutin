@@ -733,59 +733,72 @@ createProperties = function(game, platform)
     createOpenStorePageProperty(game)
   }
 end
+local centerConfig
+centerConfig = function()
+  if STATE.CENTERED == true then
+    return 
+  end
+  STATE.CENTERED = true
+  if not COMPONENTS.SETTINGS:getCenterOnMonitor() then
+    return 
+  end
+  local meter = SKIN:GetMeter('WindowShadow')
+  local skinWidth = meter:GetW()
+  local skinHeight = meter:GetH()
+  local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
+  local monitorIndex = nil
+  if mainConfig ~= nil then
+    monitorIndex = utility.getConfigMonitor(mainConfig) or 1
+  else
+    monitorIndex = 1
+  end
+  local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
+  return SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
+end
+local getPlatform
+getPlatform = function(game)
+  local platformID = game:getPlatformID()
+  local _list_0 = STATE.ALL_PLATFORMS
+  for _index_0 = 1, #_list_0 do
+    local p = _list_0[_index_0]
+    if p:getPlatformID() == platformID then
+      return p
+    end
+  end
+  return nil
+end
+local getGame
+getGame = function(gameID)
+  local game = STATE.ALL_GAMES[gameID]
+  if game == nil or game:getGameID() ~= gameID then
+    local _list_0 = STATE.ALL_GAMES
+    for _index_0 = 1, #_list_0 do
+      local game = _list_0[_index_0]
+      if game:getGameID() == gameID then
+        return game
+      end
+    end
+  end
+  return game
+end
 Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting Game handshake', gameID)
     getGamesAndTags()
-    local game = STATE.ALL_GAMES[gameID]
-    if game == nil or game.gameID ~= gameID then
-      game = nil
-      local _list_0 = STATE.ALL_GAMES
-      for _index_0 = 1, #_list_0 do
-        local candidate = _list_0[_index_0]
-        if candidate:getGameID() == gameID then
-          game = candidate
-          break
-        end
-      end
-    end
+    local game = getGame(gameID)
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
     STATE.GAME = game
     local valueMeter = SKIN:GetMeter('PageTitle')
     local maxStringLength = math.round(valueMeter:GetW() / valueMeter:GetOption('FontSize'))
     updateTitle(game, maxStringLength)
     updateBanner(game)
-    local platform = nil
-    local _list_0 = STATE.ALL_PLATFORMS
-    for _index_0 = 1, #_list_0 do
-      local p = _list_0[_index_0]
-      if p:getPlatformID() == game:getPlatformID() then
-        platform = p
-        break
-      end
-    end
+    local platform = getPlatform(game)
     assert(platform ~= nil, 'Could not find the game\'s platform.')
     STATE.DEFAULT_PROPERTIES = createProperties(game, platform)
     STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
     updateScrollbar()
     updateSlots()
-    if STATE.CENTERED == false then
-      STATE.CENTERED = true
-      if COMPONENTS.SETTINGS:getCenterOnMonitor() then
-        local meter = SKIN:GetMeter('WindowShadow')
-        local skinWidth = meter:GetW()
-        local skinHeight = meter:GetH()
-        local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
-        local monitorIndex = nil
-        if mainConfig ~= nil then
-          monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-        else
-          monitorIndex = 1
-        end
-        local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-        SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
-      end
-    end
+    centerConfig()
     return SKIN:Bang('[!Show]')
   end)
   if not (success) then
