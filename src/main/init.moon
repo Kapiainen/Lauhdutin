@@ -45,6 +45,8 @@ export COMPONENTS = {
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 
+export HideStatus = () -> COMPONENTS.STATUS\hide()
+
 downloadFile = (url, path, finishCallback, errorCallback) ->
 	log('Attempting to download file:', url, path, finishCallback, errorCallback)
 	assert(type(url) == 'string', 'main.init.downloadFile')

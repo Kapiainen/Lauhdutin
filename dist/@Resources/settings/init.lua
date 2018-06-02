@@ -27,6 +27,9 @@ log = function(...)
     return print(...)
   end
 end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
+end
 RebuildSettingsSlots = function()
   if not (STATE.INITIALIZED) then
     return 

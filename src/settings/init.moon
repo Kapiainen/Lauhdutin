@@ -28,6 +28,8 @@ export COMPONENTS = {
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 
+export HideStatus = () -> COMPONENTS.STATUS\hide()
+
 export RebuildSettingsSlots = () -> -- For development only
 	return unless STATE.INITIALIZED
 	success, err = pcall(

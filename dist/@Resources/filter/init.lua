@@ -130,6 +130,9 @@ log = function(...)
     return print(...)
   end
 end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
+end
 Initialize = function()
   SKIN:Bang('[!Hide]')
   STATE.PATHS.RESOURCES = SKIN:GetVariable('@')

@@ -118,6 +118,9 @@ log = function(...)
     return print(...)
   end
 end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
+end
 local additionalEnums
 additionalEnums = function()
   ENUMS.TAG_STATES = {

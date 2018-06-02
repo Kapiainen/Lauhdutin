@@ -41,6 +41,9 @@ log = function(...)
     return print(...)
   end
 end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
+end
 local downloadFile
 downloadFile = function(url, path, finishCallback, errorCallback)
   log('Attempting to download file:', url, path, finishCallback, errorCallback)

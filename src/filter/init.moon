@@ -86,6 +86,8 @@ Game = nil
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 
+export HideStatus = () -> COMPONENTS.STATUS\hide()
+
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
 	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')

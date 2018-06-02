@@ -76,6 +76,8 @@ Game = nil
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 
+export HideStatus = () -> COMPONENTS.STATUS\hide()
+
 additionalEnums = () ->
 	ENUMS.TAG_STATES = {
 		DISABLED: 1
