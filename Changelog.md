@@ -8,7 +8,8 @@
 - Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
 - Added the ability to invert filters (i.e. `Has notes` becomes `Does not have notes`).
 - Added an optional Session skin that shows the current system time and the current gaming session's duration in HH:MM format while playing a game. Can be enabled/disabled via a setting.
-- Added a new `Add a game` custom skin action, which can be used to add a game by inputting information into a new menu.
+- Added a new `Custom` platform.
+- Added a new `Add a game` custom skin action, which can be used to add a game (`Custom` platform) by inputting information into a new menu.
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.
 - Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
