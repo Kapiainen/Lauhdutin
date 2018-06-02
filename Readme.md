@@ -111,6 +111,10 @@ These context actions change what left-clicking on a game does. This can be used
 
 Force the skin to refresh and detect games.
 
+### Add a game
+
+Brings up a menu where you can input information about a game that you want to add. The game is considered to belong to the *Custom* platform, which has a few more modifiable properties in the Game window (see [Games](#games)) compared to the other platforms.
+
 ## Banners
 
 Banners for **Windows shortcuts** can be added to the same folder as the shortcuts and must have the same name as the corresponding shortcut (e.g. `Spelunky.jpg` if the shortcut is called `Spelunky.lnk`).
