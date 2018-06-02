@@ -119,6 +119,8 @@ setting_battlenet_paths_description	""Define the absolute paths to folders, whic
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
 setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
+setting_custom_starting_bangs_description	These Rainmeter bangs are executed just before any Custom game launches.
+setting_custom_stopping_bangs_description	These Rainmeter bangs are executed just after any Custom game terminates.
 setting_game_detection_frequency_always	Always
 setting_game_detection_frequency_description	How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.
 setting_game_detection_frequency_never	Never

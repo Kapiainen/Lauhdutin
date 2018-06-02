@@ -6,6 +6,7 @@ class Pages
 			require('settings.pages.steam')()
 			require('settings.pages.battlenet')()
 			require('settings.pages.gog_galaxy')()
+			require('settings.pages.custom')()
 		}
 		@currentPage = nil
 

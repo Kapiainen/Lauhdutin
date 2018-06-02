@@ -20,7 +20,8 @@ do
         require('settings.pages.shortcuts')(),
         require('settings.pages.steam')(),
         require('settings.pages.battlenet')(),
-        require('settings.pages.gog_galaxy')()
+        require('settings.pages.gog_galaxy')(),
+        require('settings.pages.custom')()
       }
       self.currentPage = nil
     end,
