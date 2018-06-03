@@ -397,6 +397,8 @@ do
         })
       else
         gamesToProcess = { }
+        local uninstalledGamesEnabled = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
+        local hiddenGamesEnabled = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
         local _list_0 = self.games
         for _index_0 = 1, #_list_0 do
           local _continue_0 = false
@@ -407,9 +409,7 @@ do
               break
             end
             if not game:isVisible() then
-              local hiddenGamesEnabled = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
               if not game:isInstalled() and hiddenGamesEnabled == true then
-                local uninstalledGamesEnabled = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
                 if not (uninstalledGamesEnabled == true) then
                   _continue_0 = true
                   break
@@ -420,7 +420,6 @@ do
                 break
               end
             elseif not game:isInstalled() then
-              local uninstalledGamesEnabled = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
               if not (filter == ENUMS.FILTER_TYPES.UNINSTALLED or filter == ENUMS.FILTER_TYPES.TITLE and uninstalledGamesEnabled == true) then
                 _continue_0 = true
                 break
