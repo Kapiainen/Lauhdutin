@@ -145,6 +145,9 @@ migrators = {
 			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
 			settings.slots.overlayImagesEnabled = true
 			settings.showSession = false
+			settings.search = {}
+			settings.search.uninstalledGamesEnabled = false
+			settings.search.hiddenGamesEnabled = false
 			settings.platforms.custom = {}
 			settings.platforms.custom.bangs = {
 				starting: {}
@@ -169,6 +172,10 @@ class Settings
 					starting: {} -- Bangs that are executed by ALL games when a game is launched.
 					stopping: {} -- Bangs that are executed by ALL games when a game terminates.
 				}
+			}
+			search: {
+				uninstalledGamesEnabled: false
+				hiddenGamesEnabled: false
 			}
 			layout: {
 				rows: 1 -- The number of rows of slots.
@@ -345,6 +352,15 @@ class Settings
 			bang = bang\trim()
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.bangs.global.stopping = bangs
+
+	-- Search
+	getSearchUninstalledGamesEnabled: () => return @settings.search.uninstalledGamesEnabled or false
+
+	toggleSearchUninstalledGamesEnabled: () => @settings.search.uninstalledGamesEnabled = not @settings.search.uninstalledGamesEnabled
+
+	getSearchHiddenGamesEnabled: () => return @settings.search.hiddenGamesEnabled or false
+
+	toggleSearchHiddenGamesEnabled: () => @settings.search.hiddenGamesEnabled = not @settings.search.hiddenGamesEnabled
 
 	-- Layout
 	getLayoutRows: () => return @settings.layout.rows or 1

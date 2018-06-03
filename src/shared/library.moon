@@ -335,9 +335,14 @@ class Library
 			for game in *@games
 				continue unless @platformEnabledStatus[game\getPlatformID()] == true
 				if not game\isVisible()
-					continue unless filter == ENUMS.FILTER_TYPES.HIDDEN
+					hiddenGamesEnabled = COMPONENTS.SETTINGS\getSearchHiddenGamesEnabled()
+					if not game\isInstalled() and hiddenGamesEnabled == true
+						uninstalledGamesEnabled = COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
+						continue unless uninstalledGamesEnabled == true
+					continue unless filter == ENUMS.FILTER_TYPES.HIDDEN or filter == ENUMS.FILTER_TYPES.TITLE and hiddenGamesEnabled == true
 				elseif not game\isInstalled()
-					continue unless filter == ENUMS.FILTER_TYPES.UNINSTALLED
+					uninstalledGamesEnabled = COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
+					continue unless filter == ENUMS.FILTER_TYPES.UNINSTALLED or filter == ENUMS.FILTER_TYPES.TITLE and uninstalledGamesEnabled == true
 				table.insert(gamesToProcess, game)
 			if filter == ENUMS.FILTER_TYPES.NONE
 				@filterStack = {}

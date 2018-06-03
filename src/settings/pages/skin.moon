@@ -329,6 +329,24 @@ class Skin extends Page
 					io.writeFile(path, table.concat(bangs, '\n'))
 					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStoppingBangs')
 			})
+			Settings.Boolean({
+				title: LOCALIZATION\get('setting_search_uninstalled_games_enabled_title', 'Uninstalled games on search')
+				tooltip: LOCALIZATION\get('setting_search_uninstalled_games_enabled_description', 'If enabled, then uninstalled games will be showed when searching with left-click action.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleSearchUninstalledGamesEnabled()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
+			})
+			Settings.Boolean({
+				title: LOCALIZATION\get('setting_search_hidden_games_enabled_title', 'Hidden games on search')
+				tooltip: LOCALIZATION\get('setting_search_hidden_games_enabled_description', 'If enabled, then hidden games will be showed when searching with left-click action.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleSearchHiddenGamesEnabled()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getSearchHiddenGamesEnabled()
+			})
 			Settings.Spinner({
 				title: LOCALIZATION\get('setting_localization_language_title', 'Language')
 				tooltip: LOCALIZATION\get('setting_localization_language_description', 'Select a language.')

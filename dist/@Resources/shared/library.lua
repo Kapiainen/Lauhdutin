@@ -407,12 +407,21 @@ do
               break
             end
             if not game:isVisible() then
-              if not (filter == ENUMS.FILTER_TYPES.HIDDEN) then
+              local hiddenGamesEnabled = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
+              if not game:isInstalled() and hiddenGamesEnabled == true then
+                local uninstalledGamesEnabled = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
+                if not (uninstalledGamesEnabled == true) then
+                  _continue_0 = true
+                  break
+                end
+              end
+              if not (filter == ENUMS.FILTER_TYPES.HIDDEN or filter == ENUMS.FILTER_TYPES.TITLE and hiddenGamesEnabled == true) then
                 _continue_0 = true
                 break
               end
             elseif not game:isInstalled() then
-              if not (filter == ENUMS.FILTER_TYPES.UNINSTALLED) then
+              local uninstalledGamesEnabled = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
+              if not (filter == ENUMS.FILTER_TYPES.UNINSTALLED or filter == ENUMS.FILTER_TYPES.TITLE and uninstalledGamesEnabled == true) then
                 _continue_0 = true
                 break
               end

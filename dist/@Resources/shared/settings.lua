@@ -162,6 +162,9 @@ local migrators = {
       settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
       settings.slots.overlayImagesEnabled = true
       settings.showSession = false
+      settings.search = { }
+      settings.search.uninstalledGamesEnabled = false
+      settings.search.hiddenGamesEnabled = false
       settings.platforms.custom = { }
       settings.platforms.custom.bangs = {
         starting = { },
@@ -337,6 +340,18 @@ do
         end
       end
       self.settings.bangs.global.stopping = bangs
+    end,
+    getSearchUninstalledGamesEnabled = function(self)
+      return self.settings.search.uninstalledGamesEnabled or false
+    end,
+    toggleSearchUninstalledGamesEnabled = function(self)
+      self.settings.search.uninstalledGamesEnabled = not self.settings.search.uninstalledGamesEnabled
+    end,
+    getSearchHiddenGamesEnabled = function(self)
+      return self.settings.search.hiddenGamesEnabled or false
+    end,
+    toggleSearchHiddenGamesEnabled = function(self)
+      self.settings.search.hiddenGamesEnabled = not self.settings.search.hiddenGamesEnabled
     end,
     getLayoutRows = function(self)
       return self.settings.layout.rows or 1
@@ -757,6 +772,10 @@ do
             starting = { },
             stopping = { }
           }
+        },
+        search = {
+          uninstalledGamesEnabled = false,
+          hiddenGamesEnabled = false
         },
         layout = {
           rows = 1,
