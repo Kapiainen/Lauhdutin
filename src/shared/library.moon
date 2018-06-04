@@ -208,7 +208,7 @@ class Library
 		if #@gamesSortedByGameID ~= #@games
 			@gamesSortedByGameID = table.shallowCopy(@games)
 		@updateSortedList()
-		if #@gamesSortedByGameID
+		if #@gamesSortedByGameID > 0
 			@currentGameID = @gamesSortedByGameID[#@gamesSortedByGameID]\getGameID() + 1
 
 	update: (updatedGame) =>

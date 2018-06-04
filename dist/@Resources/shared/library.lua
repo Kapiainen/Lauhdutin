@@ -243,7 +243,7 @@ do
         self.gamesSortedByGameID = table.shallowCopy(self.games)
       end
       self:updateSortedList()
-      if #self.gamesSortedByGameID then
+      if #self.gamesSortedByGameID > 0 then
         self.currentGameID = self.gamesSortedByGameID[#self.gamesSortedByGameID]:getGameID() + 1
       end
     end,
