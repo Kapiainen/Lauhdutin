@@ -1162,17 +1162,8 @@ export HandshakeNewGame = () ->
 export OnAddGame = (gameID) ->
 	success, err = pcall(
 		() ->
-			return if gameID == nil
-			games = io.readJSON(STATE.PATHS.GAMES)
-			games = games.games
-			game = games[gameID]
-			if game == nil or game.gameID ~= gameID
-				game = nil
-				for args in *games
-					if args.gameID == gameID
-						game = args
-						break
+			game = getGameByID(gameID)
 			assert(game ~= nil, 'main.init.OnAddGame')
-			COMPONENTS.LIBRARY\insert(Game(game))
+			COMPONENTS.LIBRARY\insert(game)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

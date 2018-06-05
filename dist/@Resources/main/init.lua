@@ -1545,24 +1545,9 @@ HandshakeNewGame = function()
 end
 OnAddGame = function(gameID)
   local success, err = pcall(function()
-    if gameID == nil then
-      return 
-    end
-    local games = io.readJSON(STATE.PATHS.GAMES)
-    games = games.games
-    local game = games[gameID]
-    if game == nil or game.gameID ~= gameID then
-      game = nil
-      for _index_0 = 1, #games do
-        local args = games[_index_0]
-        if args.gameID == gameID then
-          game = args
-          break
-        end
-      end
-    end
+    local game = getGameByID(gameID)
     assert(game ~= nil, 'main.init.OnAddGame')
-    return COMPONENTS.LIBRARY:insert(Game(game))
+    return COMPONENTS.LIBRARY:insert(game)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
