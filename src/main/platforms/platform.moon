@@ -34,6 +34,8 @@ class Platform
 
 	getCachePath: () => return @cachePath
 
+	getStorePageURL: (game) => return nil
+
 	getBannerURL: (game) => return nil
 
 return Platform

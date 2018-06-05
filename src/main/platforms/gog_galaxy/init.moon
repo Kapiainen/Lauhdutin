@@ -171,6 +171,34 @@ class GOGGalaxy extends Platform
 			})
 		@games = [Game(args) for args in *games]
 
+	getStorePageURL: (game) =>
+		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.gog_galaxy.init.getStorePageURL')
+		productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+		galaxy = io.readFile(io.joinPaths(@cachePath, 'galaxy.txt'))
+		url = nil
+		for line in *galaxy\splitIntoLines()
+			if line\startsWith(productID)
+				urls = line\match('^%d+|[^|]+|[^|]+|(.+)$')
+				if urls ~= nil
+					urls = json.decode(urls\lower())
+					if url == nil and urls.store ~= nil
+						if type(urls.store.href) == 'string'
+							url = urls.store.href
+						elseif type(urls.store) == 'string'
+							url = urls.store
+					if url == nil and urls.product_card ~= nil
+						if type(urls.product_card.href) == 'string'
+							url = urls.product_card.href
+						elseif type(urls.product_card) == 'string'
+							url = urls.product_card
+					if url == nil and urls.forum ~= nil
+						if type(urls.forum.href) == 'string'
+							url = urls.forum.href\gsub('forum', 'game')
+						elseif type(urls.forum) == 'string'
+							url = urls.forum\gsub('forum', 'game')
+				break
+		return url
+
 	getBannerURL: (game) =>
 		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.gog_galaxy.init.getBannerURL')
 		productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()

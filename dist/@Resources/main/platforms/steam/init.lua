@@ -551,6 +551,14 @@ do
         table.insert(self.games, Game(args))
       end
     end,
+    getStorePageURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.steam.init.getStorePageURL')
+      if game:getPlatformOverride() == nil then
+        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        return ('https://store.steampowered.com/app/%s'):format(appID)
+      end
+      return nil
+    end,
     getBannerURL = function(self, game)
       assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.steam.init.getBannerURL')
       if game:getPlatformOverride() == nil then

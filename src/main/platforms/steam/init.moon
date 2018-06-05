@@ -399,6 +399,13 @@ class Steam extends Platform
 		for appID, args in pairs(games)
 			table.insert(@games, Game(args))
 
+	getStorePageURL: (game) =>
+		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.steam.init.getStorePageURL')
+		if game\getPlatformOverride() == nil
+			appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+			return ('https://store.steampowered.com/app/%s')\format(appID)
+		return nil
+
 	getBannerURL: (game) =>
 		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.steam.init.getBannerURL')
 		if game\getPlatformOverride() == nil

@@ -46,6 +46,9 @@ do
     getCachePath = function(self)
       return self.cachePath
     end,
+    getStorePageURL = function(self, game)
+      return nil
+    end,
     getBannerURL = function(self, game)
       return nil
     end

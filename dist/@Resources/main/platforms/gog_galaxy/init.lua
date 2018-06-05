@@ -203,6 +203,45 @@ do
         self.games = _accum_0
       end
     end,
+    getStorePageURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.gog_galaxy.init.getStorePageURL')
+      local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+      local galaxy = io.readFile(io.joinPaths(self.cachePath, 'galaxy.txt'))
+      local url = nil
+      local _list_0 = galaxy:splitIntoLines()
+      for _index_0 = 1, #_list_0 do
+        local line = _list_0[_index_0]
+        if line:startsWith(productID) then
+          local urls = line:match('^%d+|[^|]+|[^|]+|(.+)$')
+          if urls ~= nil then
+            urls = json.decode(urls:lower())
+            if url == nil and urls.store ~= nil then
+              if type(urls.store.href) == 'string' then
+                url = urls.store.href
+              elseif type(urls.store) == 'string' then
+                url = urls.store
+              end
+            end
+            if url == nil and urls.product_card ~= nil then
+              if type(urls.product_card.href) == 'string' then
+                url = urls.product_card.href
+              elseif type(urls.product_card) == 'string' then
+                url = urls.product_card
+              end
+            end
+            if url == nil and urls.forum ~= nil then
+              if type(urls.forum.href) == 'string' then
+                url = urls.forum.href:gsub('forum', 'game')
+              elseif type(urls.forum) == 'string' then
+                url = urls.forum:gsub('forum', 'game')
+              end
+            end
+          end
+          break
+        end
+      end
+      return url
+    end,
     getBannerURL = function(self, game)
       assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.gog_galaxy.init.getBannerURL')
       local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
