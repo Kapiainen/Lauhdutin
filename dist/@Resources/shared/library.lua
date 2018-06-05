@@ -397,8 +397,12 @@ do
         })
       else
         gamesToProcess = { }
-        local searchUninstalledGames = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
-        local searchHiddenGames = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
+        local searchUninstalledGames = false
+        local searchHiddenGames = false
+        if COMPONENTS ~= nil then
+          searchUninstalledGames = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
+          searchHiddenGames = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
+        end
         local _list_0 = self.games
         for _index_0 = 1, #_list_0 do
           local _continue_0 = false
