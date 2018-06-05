@@ -1,3 +1,4 @@
+local utility = require('shared.utility')
 local Slot
 do
   local _class_0
@@ -19,7 +20,7 @@ do
         SKIN:Bang(('[!SetOption "Slot%dText" "Text" ""]'):format(self.index))
         return SKIN:Bang(('[!SetOption "Slot%dImage" "ImageName" "#@#%s"]'):format(self.index, banner))
       else
-        SKIN:Bang(('[!SetOption "Slot%dText" "Text" "%s"]'):format(self.index, game:getTitle()))
+        SKIN:Bang(('[!SetOption "Slot%dText" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(game:getTitle())))
         return SKIN:Bang(('[!SetOption "Slot%dImage" "ImageName" ""]'):format(self.index))
       end
     end

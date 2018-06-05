@@ -1,3 +1,5 @@
+utility = require('shared.utility')
+
 class Slot
 	new: (index) =>
 		assert(type(index) == 'number' and index % 1 == 0, 'main.slots.slot.Slot')
@@ -19,7 +21,7 @@ class Slot
 			SKIN\Bang(('[!SetOption "Slot%dText" "Text" ""]')\format(@index))
 			SKIN\Bang(('[!SetOption "Slot%dImage" "ImageName" "#@#%s"]')\format(@index, banner))
 		else
-			SKIN\Bang(('[!SetOption "Slot%dText" "Text" "%s"]')\format(@index, game\getTitle()))
+			SKIN\Bang(('[!SetOption "Slot%dText" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(game\getTitle())))
 			SKIN\Bang(('[!SetOption "Slot%dImage" "ImageName" ""]')\format(@index))
 
 return Slot
