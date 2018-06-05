@@ -7,6 +7,7 @@
 - Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
 - Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
 - Added the ability to invert filters (i.e. `Has notes` becomes `Does not have notes`).
+- Added the ability to search on uninstalled and / or hidden games besides installed games when left-clicking search button.
 - Added an optional Session skin that shows the current system time and the current gaming session's duration in HH:MM format while playing a game. Can be enabled/disabled via a setting.
 - Added a new `Custom` platform and settings for it.
 - Added a new `Add a game` custom skin action, which can be used to add a game (`Custom` platform) by inputting information into a new menu.

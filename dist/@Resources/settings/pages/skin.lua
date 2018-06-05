@@ -441,6 +441,28 @@ do
             return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStoppingBangs')
           end
         }),
+        Settings.Boolean({
+          title = LOCALIZATION:get('setting_search_uninstalled_games_enabled_title', 'Uninstalled games on search'),
+          tooltip = LOCALIZATION:get('setting_search_uninstalled_games_enabled_description', 'If enabled, then uninstalled games will be showed when searching with left-click action.'),
+          toggle = function()
+            COMPONENTS.SETTINGS:toggleSearchUninstalledGamesEnabled()
+            return true
+          end,
+          getState = function()
+            return COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
+          end
+        }),
+        Settings.Boolean({
+          title = LOCALIZATION:get('setting_search_hidden_games_enabled_title', 'Hidden games on search'),
+          tooltip = LOCALIZATION:get('setting_search_hidden_games_enabled_description', 'If enabled, then hidden games will be showed when searching with left-click action.'),
+          toggle = function()
+            COMPONENTS.SETTINGS:toggleSearchHiddenGamesEnabled()
+            return true
+          end,
+          getState = function()
+            return COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
+          end
+        }),
         Settings.Spinner({
           title = LOCALIZATION:get('setting_localization_language_title', 'Language'),
           tooltip = LOCALIZATION:get('setting_localization_language_description', 'Select a language.'),
