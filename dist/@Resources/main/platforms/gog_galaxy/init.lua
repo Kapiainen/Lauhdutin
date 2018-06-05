@@ -202,6 +202,15 @@ do
         end
         self.games = _accum_0
       end
+    end,
+    getBannerURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.gog_galaxy.init.getBannerURL')
+      local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+      local galaxy = io.readFile(io.joinPaths(self.cachePath, 'galaxy.txt'))
+      local productIDs = { }
+      productIDs[productID] = true
+      local titles, bannerURLs = platform:parseGalaxyDB(productIDs, galaxy)
+      return bannerURLs[productID]
     end
   }
   _base_0.__index = _base_0

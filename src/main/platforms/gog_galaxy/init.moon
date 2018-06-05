@@ -171,6 +171,15 @@ class GOGGalaxy extends Platform
 			})
 		@games = [Game(args) for args in *games]
 
+	getBannerURL: (game) =>
+		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.gog_galaxy.init.getBannerURL')
+		productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+		galaxy = io.readFile(io.joinPaths(@cachePath, 'galaxy.txt'))
+		productIDs = {}
+		productIDs[productID] = true
+		titles, bannerURLs = platform\parseGalaxyDB(productIDs, galaxy)
+		return bannerURLs[productID]
+
 if RUN_TESTS
 	assertionMessage = 'GOG Galaxy test failed!'
 	settings = {

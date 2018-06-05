@@ -910,46 +910,25 @@ export OnFinishedDownloadingBanners = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
+getPlatformByGame = (game) ->
+	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+	platformID = game\getPlatformID()
+	for platform in *platforms
+		if platform\getPlatformID() == platformID
+			return platform
+	log("Failed to get platform based on the game", platformID)
+	return nil
+
 export ReacquireBanner = (gameID) ->
 	success, err = pcall(
 		() ->
-			games = io.readJSON(STATE.PATHS.GAMES)
-			games = games.games
-			game = games[gameID]
-			if game == nil or game.gameID ~= gameID
-				game = nil
-				for args in *games
-					if args.gameID == gameID
-						game = args
-						break
+			log('ReacquireBanner', gameID)
+			game = getGameByID(gameID)
 			assert(game ~= nil, 'main.init.OnReacquireBanner')
-			game = Game(game)
 			log('Reacquiring a banner for', game\getTitle())
-			platform = nil
-			platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
-			platformID = game\getPlatformID()
-			for p in *platforms
-				if p\getPlatformID() == platformID
-					platform = p
-					break
-			if platform == nil
-				log("Failed to get platform for banner reacquisition", platformID)
-				return
-			url = switch platformID
-				when ENUMS.PLATFORM_IDS.STEAM
-					if game\getPlatformOverride() == nil
-						appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
-						platform\generateBannerURL(appID)
-					else
-						nil
-				when ENUMS.PLATFORM_IDS.GOG_GALAXY
-					productID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
-					galaxy = io.readFile(io.joinPaths(platform\getCachePath(), 'galaxy.txt'))
-					productIDs = {}
-					productIDs[productID] = true
-					titles, bannerURLs = platform\parseGalaxyDB(productIDs, galaxy)
-					bannerURLs[productID]
-				else nil
+			platform = getPlatformByGame(game)
+			assert(platform ~= nil, 'main.init.ReacquireBanner')
+			url = platform\getBannerURL(game)
 			if url == nil
 				log("Failed to get URL for banner reacquisition", gameID)
 				return

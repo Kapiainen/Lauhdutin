@@ -550,6 +550,14 @@ do
       for appID, args in pairs(games) do
         table.insert(self.games, Game(args))
       end
+    end,
+    getBannerURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.steam.init.getBannerURL')
+      if game:getPlatformOverride() == nil then
+        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        return self:generateBannerURL(appID)
+      end
+      return nil
     end
   }
   _base_0.__index = _base_0

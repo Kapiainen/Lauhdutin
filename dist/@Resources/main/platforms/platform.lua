@@ -45,6 +45,9 @@ do
     end,
     getCachePath = function(self)
       return self.cachePath
+    end,
+    getBannerURL = function(self, game)
+      return nil
     end
   }
   _base_0.__index = _base_0

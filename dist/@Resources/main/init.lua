@@ -1202,68 +1202,39 @@ OnFinishedDownloadingBanners = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+local getPlatformByGame
+getPlatformByGame = function(game)
+  local platforms
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = require('main.platforms')
+    for _index_0 = 1, #_list_0 do
+      local Platform = _list_0[_index_0]
+      _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
+      _len_0 = _len_0 + 1
+    end
+    platforms = _accum_0
+  end
+  local platformID = game:getPlatformID()
+  for _index_0 = 1, #platforms do
+    local platform = platforms[_index_0]
+    if platform:getPlatformID() == platformID then
+      return platform
+    end
+  end
+  log("Failed to get platform based on the game", platformID)
+  return nil
+end
 ReacquireBanner = function(gameID)
   local success, err = pcall(function()
-    local games = io.readJSON(STATE.PATHS.GAMES)
-    games = games.games
-    local game = games[gameID]
-    if game == nil or game.gameID ~= gameID then
-      game = nil
-      for _index_0 = 1, #games do
-        local args = games[_index_0]
-        if args.gameID == gameID then
-          game = args
-          break
-        end
-      end
-    end
+    log('ReacquireBanner', gameID)
+    local game = getGameByID(gameID)
     assert(game ~= nil, 'main.init.OnReacquireBanner')
-    game = Game(game)
     log('Reacquiring a banner for', game:getTitle())
-    local platform = nil
-    local platforms
-    do
-      local _accum_0 = { }
-      local _len_0 = 1
-      local _list_0 = require('main.platforms')
-      for _index_0 = 1, #_list_0 do
-        local Platform = _list_0[_index_0]
-        _accum_0[_len_0] = Platform(COMPONENTS.SETTINGS)
-        _len_0 = _len_0 + 1
-      end
-      platforms = _accum_0
-    end
-    local platformID = game:getPlatformID()
-    for _index_0 = 1, #platforms do
-      local p = platforms[_index_0]
-      if p:getPlatformID() == platformID then
-        platform = p
-        break
-      end
-    end
-    if platform == nil then
-      log("Failed to get platform for banner reacquisition", platformID)
-      return 
-    end
-    local url
-    local _exp_0 = platformID
-    if ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
-      if game:getPlatformOverride() == nil then
-        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
-        url = platform:generateBannerURL(appID)
-      else
-        url = nil
-      end
-    elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-      local productID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
-      local galaxy = io.readFile(io.joinPaths(platform:getCachePath(), 'galaxy.txt'))
-      local productIDs = { }
-      productIDs[productID] = true
-      local titles, bannerURLs = platform:parseGalaxyDB(productIDs, galaxy)
-      url = bannerURLs[productID]
-    else
-      url = nil
-    end
+    local platform = getPlatformByGame(game)
+    assert(platform ~= nil, 'main.init.ReacquireBanner')
+    local url = platform:getBannerURL(game)
     if url == nil then
       log("Failed to get URL for banner reacquisition", gameID)
       return 

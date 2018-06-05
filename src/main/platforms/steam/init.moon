@@ -399,6 +399,13 @@ class Steam extends Platform
 		for appID, args in pairs(games)
 			table.insert(@games, Game(args))
 
+	getBannerURL: (game) =>
+		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.steam.init.getBannerURL')
+		if game\getPlatformOverride() == nil
+			appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+			return @generateBannerURL(appID)
+		return nil
+
 if RUN_TESTS
 	assertionMessage = 'Steam test failed!'
 	settings = {
