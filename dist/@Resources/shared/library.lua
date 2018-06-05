@@ -397,8 +397,6 @@ do
         })
       else
         gamesToProcess = { }
-        local searchUninstalledGames = COMPONENTS.SETTINGS:getSearchUninstalledGamesEnabled()
-        local searchHiddenGames = COMPONENTS.SETTINGS:getSearchHiddenGamesEnabled()
         local _list_0 = self.games
         for _index_0 = 1, #_list_0 do
           local _continue_0 = false
@@ -409,18 +407,18 @@ do
               break
             end
             if not game:isVisible() then
-              if not game:isInstalled() and searchHiddenGames == true then
-                if not (searchUninstalledGames == true) then
+              if not game:isInstalled() and self.searchHiddenGames == true then
+                if not (self.searchUninstalledGames == true) then
                   _continue_0 = true
                   break
                 end
               end
-              if not (filter == ENUMS.FILTER_TYPES.HIDDEN or filter == ENUMS.FILTER_TYPES.TITLE and searchHiddenGames == true) then
+              if not (filter == ENUMS.FILTER_TYPES.HIDDEN or filter == ENUMS.FILTER_TYPES.TITLE and self.searchHiddenGames == true) then
                 _continue_0 = true
                 break
               end
             elseif not game:isInstalled() then
-              if not (filter == ENUMS.FILTER_TYPES.UNINSTALLED or filter == ENUMS.FILTER_TYPES.TITLE and searchUninstalledGames == true) then
+              if not (filter == ENUMS.FILTER_TYPES.UNINSTALLED or filter == ENUMS.FILTER_TYPES.TITLE and self.searchUninstalledGames == true) then
                 _continue_0 = true
                 break
               end
@@ -590,6 +588,8 @@ do
       self.currentGameID = 1
       self.numBackups = settings:getNumberOfBackups()
       self.backupFilePattern = 'games_backup_%d.json'
+      self.searchUninstalledGames = settings:getSearchUninstalledGamesEnabled()
+      self.searchHiddenGames = settings:getSearchHiddenGamesEnabled()
       self.filterStack = { }
       self.processedGames = nil
       self.gamesSortedByGameID = { }
