@@ -248,7 +248,7 @@ do
       local galaxy = io.readFile(io.joinPaths(self.cachePath, 'galaxy.txt'))
       local productIDs = { }
       productIDs[productID] = true
-      local titles, bannerURLs = platform:parseGalaxyDB(productIDs, galaxy)
+      local titles, bannerURLs = self:parseGalaxyDB(productIDs, galaxy)
       return bannerURLs[productID]
     end
   }

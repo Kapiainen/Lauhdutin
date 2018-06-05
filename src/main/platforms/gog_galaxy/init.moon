@@ -205,7 +205,7 @@ class GOGGalaxy extends Platform
 		galaxy = io.readFile(io.joinPaths(@cachePath, 'galaxy.txt'))
 		productIDs = {}
 		productIDs[productID] = true
-		titles, bannerURLs = platform\parseGalaxyDB(productIDs, galaxy)
+		titles, bannerURLs = @parseGalaxyDB(productIDs, galaxy)
 		return bannerURLs[productID]
 
 if RUN_TESTS
