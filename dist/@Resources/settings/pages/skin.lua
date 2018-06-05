@@ -442,8 +442,8 @@ do
           end
         }),
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_search_uninstalled_games_enabled_title', 'Uninstalled games on search'),
-          tooltip = LOCALIZATION:get('setting_search_uninstalled_games_enabled_description', 'If enabled, then uninstalled games will be showed when searching with left-click action.'),
+          title = LOCALIZATION:get('setting_search_uninstalled_games_enabled_title', 'Include uninstalled games in search results'),
+          tooltip = LOCALIZATION:get('setting_search_uninstalled_games_enabled_description', 'If enabled, then uninstalled games are included in the results when searching by name among all games.'),
           toggle = function()
             COMPONENTS.SETTINGS:toggleSearchUninstalledGamesEnabled()
             return true
@@ -453,8 +453,8 @@ do
           end
         }),
         Settings.Boolean({
-          title = LOCALIZATION:get('setting_search_hidden_games_enabled_title', 'Hidden games on search'),
-          tooltip = LOCALIZATION:get('setting_search_hidden_games_enabled_description', 'If enabled, then hidden games will be showed when searching with left-click action.'),
+          title = LOCALIZATION:get('setting_search_hidden_games_enabled_title', 'Include hidden games in search results'),
+          tooltip = LOCALIZATION:get('setting_search_hidden_games_enabled_description', 'If enabled, then hidden games are included in the results when searching by name among all games.'),
           toggle = function()
             COMPONENTS.SETTINGS:toggleSearchHiddenGamesEnabled()
             return true
