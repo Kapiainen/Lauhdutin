@@ -332,8 +332,11 @@ class Library
 			})
 		else
 			gamesToProcess = {}
-			searchUninstalledGames = COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
-			searchHiddenGames = COMPONENTS.SETTINGS\getSearchHiddenGamesEnabled()
+			searchUninstalledGames = false
+			searchHiddenGames = false
+			if COMPONENTS ~= nil then
+				searchUninstalledGames = COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
+				searchHiddenGames = COMPONENTS.SETTINGS\getSearchHiddenGamesEnabled()
 			for game in *@games
 				continue unless @platformEnabledStatus[game\getPlatformID()] == true
 				if not game\isVisible()
