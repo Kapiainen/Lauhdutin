@@ -642,7 +642,7 @@ export Cancel = () ->
 			return if STATE.ACTIVE_INPUT == true
 			switch STATE.PROPERTIES
 				when STATE.DEFAULT_PROPERTIES
-					SKIN\Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
+					SKIN\Bang('[!DeactivateConfig]')
 				when STATE.TAG_PROPERTIES
 					showDefaultProperties()
 	)

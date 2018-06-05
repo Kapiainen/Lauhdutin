@@ -952,7 +952,7 @@ Cancel = function()
     end
     local _exp_0 = STATE.PROPERTIES
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
-      return SKIN:Bang('[!CommandMeasure "Script" "UpdateGame()" "#ROOTCONFIG#"][!DeactivateConfig]')
+      return SKIN:Bang('[!DeactivateConfig]')
     elseif STATE.TAG_PROPERTIES == _exp_0 then
       return showDefaultProperties()
     end

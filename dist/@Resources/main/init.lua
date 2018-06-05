@@ -920,30 +920,38 @@ HandshakeGame = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
+local getGameByID
+getGameByID = function(gameID)
+  assert(type(gameID) == 'number' and gameID % 1 == 0, 'main.init.getGameByID')
+  local games = io.readJSON(STATE.PATHS.GAMES)
+  games = games.games
+  local game = games[gameID]
+  if game == nil or game.gameID ~= gameID then
+    game = nil
+    for _index_0 = 1, #games do
+      local args = games[_index_0]
+      if args.gameID == gameID then
+        game = args
+        break
+      end
+    end
+  end
+  if game == nil then
+    log('Failed to get game by gameID:', gameID)
+    return nil
+  end
+  return Game(game)
+end
 UpdateGame = function(gameID)
   if not (STATE.INITIALIZED) then
     return 
   end
   local success, err = pcall(function()
-    log('UpdateGame')
-    if gameID ~= nil then
-      local games = io.readJSON(STATE.PATHS.GAMES)
-      games = games.games
-      local game = games[gameID]
-      if game == nil or game.gameID ~= gameID then
-        game = nil
-        for _index_0 = 1, #games do
-          local args = games[_index_0]
-          if args.gameID == gameID then
-            game = args
-            break
-          end
-        end
-      end
-      assert(game ~= nil, 'main.init.UpdateGame')
-      COMPONENTS.LIBRARY:update(Game(game))
-      STATE.SCROLL_INDEX_UPDATED = false
-    end
+    log('UpdateGame', gameID)
+    local game = getGameByID(gameID)
+    assert(game ~= nil, 'main.init.UpdateGame')
+    COMPONENTS.LIBRARY:update(game)
+    STATE.SCROLL_INDEX_UPDATED = false
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

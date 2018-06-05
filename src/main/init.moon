@@ -681,24 +681,31 @@ export HandshakeGame = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
+getGameByID = (gameID) ->
+	assert(type(gameID) == 'number' and gameID % 1 == 0, 'main.init.getGameByID')
+	games = io.readJSON(STATE.PATHS.GAMES)
+	games = games.games
+	game = games[gameID] -- gameID should also be the index of the game since the games table in games.json should be sorted according to the gameIDs.
+	if game == nil or game.gameID ~= gameID -- Backup approach in case we didn't find the right game.
+		game = nil
+		for args in *games
+			if args.gameID == gameID
+				game = args
+				break
+	if game == nil
+		log('Failed to get game by gameID:', gameID)
+		return nil
+	return Game(game)
+
 export UpdateGame = (gameID) ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(
 		() ->
-			log('UpdateGame')
-			if gameID ~= nil
-				games = io.readJSON(STATE.PATHS.GAMES)
-				games = games.games
-				game = games[gameID] -- gameID should also be the index of the game since the games table in games.json should be sorted according to the gameIDs.
-				if game == nil or game.gameID ~= gameID
-					game = nil
-					for args in *games
-						if args.gameID == gameID
-							game = args
-							break
-				assert(game ~= nil, 'main.init.UpdateGame')
-				COMPONENTS.LIBRARY\update(Game(game))
-				STATE.SCROLL_INDEX_UPDATED = false
+			log('UpdateGame', gameID)
+			game = getGameByID(gameID)
+			assert(game ~= nil, 'main.init.UpdateGame')
+			COMPONENTS.LIBRARY\update(game)
+			STATE.SCROLL_INDEX_UPDATED = false
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
