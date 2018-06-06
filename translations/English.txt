@@ -127,6 +127,10 @@ setting_game_detection_frequency_never	Never
 setting_game_detection_frequency_once_per_day	Once per day
 setting_game_detection_frequency_title	Game detection frequency
 setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
+setting_gog_galaxy_community_profile_description	If enabled, then the GOG community profile will be downloaded and parsed to get all games associated with the chosen account even if not installed at the moment.\n\nRequires that the profile is set as public.
+setting_gog_galaxy_community_profile_name_description	The name of the GOG profile to download and parse.
+setting_gog_galaxy_community_profile_name_title	Community profile name
+setting_gog_galaxy_community_profile_title	Parse community profile
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
 setting_gog_galaxy_indirect_launch_title	Launch via client

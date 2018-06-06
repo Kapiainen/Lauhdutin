@@ -170,6 +170,8 @@ local migrators = {
         starting = { },
         stopping = { }
       }
+      settings.platforms.gogGalaxy.useCommunityProfile = false
+      settings.platforms.gogGalaxy.profileName = nil
     end
   }
 }
@@ -698,6 +700,28 @@ do
     toggleGOGGalaxyIndirectLaunch = function(self)
       self.settings.platforms.gogGalaxy.indirectLaunch = not self.settings.platforms.gogGalaxy.indirectLaunch
     end,
+    getGOGGalaxyParseCommunityProfile = function(self)
+      return self.settings.platforms.gogGalaxy.useCommunityProfile or false
+    end,
+    toggleGOGGalaxyParseCommunityProfile = function(self)
+      self.settings.platforms.gogGalaxy.useCommunityProfile = not self.settings.platforms.gogGalaxy.useCommunityProfile
+    end,
+    getGOGGalaxyProfileName = function(self)
+      return self.settings.platforms.gogGalaxy.profileName or nil
+    end,
+    setGOGGalaxyProfileName = function(self, value)
+      print(value)
+      if value == nil then
+        return false
+      end
+      value = value:trim()
+      if value == '' then
+        self.settings.platforms.gogGalaxy.profileName = nil
+      else
+        self.settings.platforms.gogGalaxy.profileName = value
+      end
+      return true
+    end,
     getGOGGalaxyStartingBangs = function(self)
       return self.settings.platforms.gogGalaxy.bangs.starting or { }
     end,
@@ -836,7 +860,9 @@ do
             },
             clientPath = '',
             programDataPath = 'C:\\ProgramData\\GOG.com\\Galaxy',
-            indirectLaunch = false
+            indirectLaunch = false,
+            useCommunityProfile = false,
+            profileName = nil
           }
         }
       }

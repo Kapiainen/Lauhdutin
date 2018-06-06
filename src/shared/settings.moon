@@ -153,6 +153,8 @@ migrators = {
 				starting: {}
 				stopping: {}
 			}
+			settings.platforms.gogGalaxy.useCommunityProfile = false
+			settings.platforms.gogGalaxy.profileName = nil
 	}
 }
 
@@ -237,6 +239,8 @@ class Settings
 					clientPath: '' -- The absolute path to the folder containing the GOG Galaxy executable. Needed only if games are launched via the GOG Galaxy client rather than directly via a game's executable.
 					programDataPath: 'C:\\ProgramData\\GOG.com\\Galaxy' -- The absolute path to the ProgramData folder (usually "C:\ProgramData\GOG.com\Galaxy"), which contains some of the local files that are used to figure out which games are installed.
 					indirectLaunch: false -- If true, then games are launched via the GOG Galaxy client, which enables the use of the GOG Galaxy overlay and tracking time played in the GOG Galaxy client. If false, then games are launched directly via their executables.
+					useCommunityProfile: false -- If true, then PhantomJS is used to download and parse the GOG profile's games page provided that the profile is public.
+					profileName: nil -- The name of the GOG profile.
 				}
 			}
 		}
@@ -613,6 +617,22 @@ class Settings
 	getGOGGalaxyIndirectLaunch: () => return @settings.platforms.gogGalaxy.indirectLaunch or false
 
 	toggleGOGGalaxyIndirectLaunch: () => @settings.platforms.gogGalaxy.indirectLaunch = not @settings.platforms.gogGalaxy.indirectLaunch
+
+	getGOGGalaxyParseCommunityProfile: () => return @settings.platforms.gogGalaxy.useCommunityProfile or false
+
+	toggleGOGGalaxyParseCommunityProfile: () => @settings.platforms.gogGalaxy.useCommunityProfile = not @settings.platforms.gogGalaxy.useCommunityProfile
+
+	getGOGGalaxyProfileName: () => return @settings.platforms.gogGalaxy.profileName or nil
+
+	setGOGGalaxyProfileName: (value) =>
+		print(value)
+		return false if value == nil
+		value = value\trim()
+		if value == ''
+			@settings.platforms.gogGalaxy.profileName = nil
+		else
+			@settings.platforms.gogGalaxy.profileName = value
+		return true
 
 	getGOGGalaxyStartingBangs: () => return @settings.platforms.gogGalaxy.bangs.starting or {}
 
