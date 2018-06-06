@@ -171,9 +171,10 @@ export Close = () ->
 				if requiresRebuilding()
 					RebuildMainSlots()
 				if requiresGameDetection()
-					games = io.readJSON(STATE.PATHS.GAMES)
-					games.updated = nil
-					io.writeJSON(STATE.PATHS.GAMES, games)
+					if io.fileExists(STATE.PATHS.GAMES)
+						games = io.readJSON(STATE.PATHS.GAMES)
+						games.updated = nil
+						io.writeJSON(STATE.PATHS.GAMES, games)
 				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
 				if mainConfig ~= nil and mainConfig\isActive()
 					SKIN\Bang('[!Refresh "#ROOTCONFIG#]')

@@ -195,9 +195,11 @@ Close = function()
         RebuildMainSlots()
       end
       if requiresGameDetection() then
-        local games = io.readJSON(STATE.PATHS.GAMES)
-        games.updated = nil
-        io.writeJSON(STATE.PATHS.GAMES, games)
+        if io.fileExists(STATE.PATHS.GAMES) then
+          local games = io.readJSON(STATE.PATHS.GAMES)
+          games.updated = nil
+          io.writeJSON(STATE.PATHS.GAMES, games)
+        end
       end
       local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
       if mainConfig ~= nil and mainConfig:isActive() then
