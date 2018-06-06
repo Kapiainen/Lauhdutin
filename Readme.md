@@ -71,7 +71,7 @@ Parsing the Steam community profile for information (e.g. hours played) requires
 ### GOG Galaxy
 
 Support includes:
-- Acquire a list of games installed via GOG Galaxy (requires SQLite3) and games that are not currently installed (requires PhantomJS).
+- Acquire a list of games installed via GOG Galaxy (requires SQLite3) and games that are not currently installed (requires PhantomJS and that the GOG profile is public).
 - Launch games directly via the game's executable or via the GOG Galaxy client.
 - Automatically download banners for games that were found.
 
