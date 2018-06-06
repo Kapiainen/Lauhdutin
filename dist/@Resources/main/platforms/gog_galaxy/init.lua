@@ -295,8 +295,8 @@ do
         self.platformProcess = 'GalaxyClient.exe'
       end
       self.clientPath = settings:getGOGGalaxyClientPath()
-      self.useCommunityProfile = false
-      self.communityProfileName = nil
+      self.useCommunityProfile = settings:getGOGGalaxyParseCommunityProfile()
+      self.communityProfileName = settings:getGOGGalaxyProfileName()
       self.communityProfileJavaScriptPath = io.joinPaths('main', 'platforms', 'gog_galaxy', 'profile.js')
       self.phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
       self.games = { }

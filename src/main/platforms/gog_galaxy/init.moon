@@ -34,8 +34,8 @@ class GOGGalaxy extends Platform
 		@indirectLaunch = settings\getGOGGalaxyIndirectLaunch()
 		@platformProcess = 'GalaxyClient.exe' if @indirectLaunch
 		@clientPath = settings\getGOGGalaxyClientPath()
-		@useCommunityProfile = false -- TODO: Implement setting
-		@communityProfileName = nil -- TODO: Implement setting
+		@useCommunityProfile = settings\getGOGGalaxyParseCommunityProfile()
+		@communityProfileName = settings\getGOGGalaxyProfileName()
 		@communityProfileJavaScriptPath = io.joinPaths('main','platforms', 'gog_galaxy', 'profile.js')
 		@phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
 		@games = {}
