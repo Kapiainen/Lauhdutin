@@ -28,7 +28,9 @@ A Rainmeter skin for aggregating games from different platforms and launching th
  - Windows Script Host 5.8 or later
    - Should be included by default in all versions of Windows that are supported by Rainmeter 4.0 and later.
  - [SQLite3 command-line tool](http://www.sqlite.org/download.html) (optional)
-   - Required for GOG Galaxy support.
+   - Required for basic GOG Galaxy support.
+ - [PhantomJS](http://phantomjs.org/download.html) (optional)
+   - Required for downloading and parsing GOG profiles.
 
 # Installing
 - Install Rainmeter, if you do not already have it.
@@ -69,11 +71,13 @@ Parsing the Steam community profile for information (e.g. hours played) requires
 ### GOG Galaxy
 
 Support includes:
-- Acquire a list of games installed via GOG Galaxy.
+- Acquire a list of games installed via GOG Galaxy (requires SQLite3) and games that are not currently installed (requires PhantomJS).
 - Launch games directly via the game's executable or via the GOG Galaxy client.
 - Automatically download banners for games that were found.
 
 **NOTE:** GOG Galaxy support requires the command-line tool `sqlite3.exe`, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable must be placed in Lauhdutin's `@Resources` folder.
+
+Acquiring a list of all games associated with a GOG account requires PhantomJS, which can be downloaded [here](http://phantomjs.org/download.html). The executable must be placed in Lauhdutin's `@Resources` folder.
 
 ### Blizzard Battle.net
 
