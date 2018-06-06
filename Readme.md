@@ -58,7 +58,7 @@ The various files that store e.g. settings or games now include a version number
 ### Steam
 
 Support includes:
-- Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
+- Acquire a list of installed games and games that are not currently installed (requires that the Steam community profile and game details are public).
 - Acquire a list of games that have been added to Steam as a 'non-Steam game'.
 - Launch games via the Steam client.
 - Install Steam games that are not currently installed.
