@@ -21,6 +21,7 @@ json = require('lib.json')
 --
 -- Games can be launched via the GOG Galaxy client with:
 -- 	"GALAXYPATH\GalaxyClient.exe" /command=runGame /gameId=IDNUMBER /path="GAMEPATH"
+--  The game can also be brought up in GOG Galaxy client if the game is not currently installed.
 
 class GOGGalaxy extends Platform
 	new: (settings) =>
@@ -33,18 +34,34 @@ class GOGGalaxy extends Platform
 		@indirectLaunch = settings\getGOGGalaxyIndirectLaunch()
 		@platformProcess = 'GalaxyClient.exe' if @indirectLaunch
 		@clientPath = settings\getGOGGalaxyClientPath()
+		@useCommunityProfile = false -- TODO: Implement setting
+		@communityProfileName = nil -- TODO: Implement setting
+		@communityProfileJavaScriptPath = io.joinPaths('main','platforms', 'gog_galaxy', 'profile.js')
+		@phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
 		@games = {}
 
 	validate: () =>
 		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+		sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
+		assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".')\format(sqlitePath))
 		if @clientPath ~= nil
 			@clientPath = io.joinPaths(@clientPath, 'GalaxyClient.exe')
 			if @indirectLaunch
 				assert(io.fileExists(@clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
 		elseif @indirectLaunch
 			assert(@clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
+		if @useCommunityProfile == true
+			assert(type(@communityProfileName) == 'string' and #@communityProfileName > 0, 'A GOG profile name has not been defined.')
+			assert(io.fileExists(@phantomjsPath, false) == true, ('PhantomJS is missing. Expected the path to be "%s".')\format(@phantomjsPath))
+			assert(io.fileExists(@communityProfileJavaScriptPath) == true, ('The JavaScript file for downloading and parsing the GOG community profile is missing. Expected the path to be "%s".')\format(@communityProfileJavaScriptPath))
 
-	getCachePath: () => return @cachePath
+	downloadCommunityProfile: () =>
+		return nil unless @useCommunityProfile
+		parameter = ('""%s" "\\%s""')\format(@phantomjsPath, @communityProfileJavaScriptPath)
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s"]')\format(@communityProfileName))
+		return @getWaitCommand(), '', 'OnDownloadedGOGCommunityProfile'
+
+	hasdownloadedCommunityProfile: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
 	hasDumpedDatabases: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
@@ -53,8 +70,6 @@ class GOGGalaxy extends Platform
 		indexDBPath = io.joinPaths(@programDataPath, 'storage\\index.db')
 		galaxyDBPath = io.joinPaths(@programDataPath, 'storage\\galaxy.db')
 		assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.')\format(galaxyDBPath))
-		sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
-		assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".')\format(sqlitePath))
 		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s"]')\format(indexDBPath, galaxyDBPath))
 		return @getWaitCommand(), '', 'OnDumpedDBs'
 
@@ -69,6 +84,13 @@ class GOGGalaxy extends Platform
 			paths[productID] = path
 		return productIDs, paths
 
+	parseProfile: (output, productIDs) =>
+		return if output == nil
+		lines = output\splitIntoLines()
+		for id in *lines
+			if id ~= '' and productIDs[id] == nil
+				productIDs[id] = false
+
 	parseGalaxyDB: (productIDs, output) =>
 		assert(type(productIDs) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
 		assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
@@ -77,7 +99,7 @@ class GOGGalaxy extends Platform
 		bannerURLs = {}
 		for line in *lines
 			productID, title, images = line\match('^(%d+)|([^|]+)|([^|]+)|.+$')
-			continue unless productIDs[productID] == true
+			continue if productIDs[productID] == nil
 			titles[productID] = title
 			images = json.decode(images\lower())
 			bannerURLs[productID] = images.logo\gsub('_glx_logo', '_392')
@@ -125,34 +147,36 @@ class GOGGalaxy extends Platform
 		return path, nil
 
 	-- TODO: Refactor to allow for tests
-	generateGames: (indexOutput, galaxyOutput) =>
+	generateGames: (indexOutput, galaxyOutput, profileOutput) =>
 		assert(type(indexOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
 		assert(type(galaxyOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
 		games = {}
 		productIDs, paths = @parseIndexDB(indexOutput)
+		@parseProfile(profileOutput, productIDs)
 		titles, bannerURLs = @parseGalaxyDB(productIDs, galaxyOutput)
-		for productID, _ in pairs(productIDs)
+		for productID, installed in pairs(productIDs)
 			banner, bannerURL, expectedBanner = @getBanner(productID, bannerURLs)
-			info = @parseInfo(paths[productID], productID)
-			if type(info) ~= 'table'
-				log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
-				continue
-			exePath, arguments = @getExePath(info)
-			if type(exePath) ~= 'string'
-				log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
-				continue
-			path = switch @indirectLaunch
-				when true
-					('"%s" "/command=runGame" "/gameId=%s"')\format(@clientPath, productID)
-				else
+			path = ('"%s" "/command=runGame" "/gameId=%s"')\format(@clientPath, productID)
+			process = nil
+			if installed
+				info = @parseInfo(paths[productID], productID)
+				if type(info) ~= 'table'
+					log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
+					continue
+				exePath, arguments = @getExePath(info)
+				if type(exePath) ~= 'string'
+					log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
+					continue
+				process = exePath\reverse()\match('^([^\\]+)')\reverse()
+				unless @indirectLaunch
 					fullPath = io.joinPaths(paths[productID], exePath)
 					unless io.fileExists(fullPath, false)
-						nil
+						path = nil
 					else
 						if arguments == nil
-							('"%s"')\format(fullPath)
+							path = ('"%s"')\format(fullPath)
 						else
-							('"%s" "%s"')\format(fullPath, arguments)
+							path = ('"%s" "%s"')\format(fullPath, arguments)
 			title = titles[productID]
 			if title == nil
 				log('Skipping GOG Galaxy game', productID, 'because title could not be found')
@@ -166,8 +190,9 @@ class GOGGalaxy extends Platform
 				:expectedBanner
 				:title
 				:path
+				uninstalled: not installed
 				platformID: @platformID
-				process: exePath\reverse()\match('^([^\\]+)')\reverse()
+				:process
 			})
 		@games = [Game(args) for args in *games]
 

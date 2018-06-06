@@ -8,17 +8,32 @@ do
   local _base_0 = {
     validate = function(self)
       assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
+      local sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
+      assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".'):format(sqlitePath))
       if self.clientPath ~= nil then
         self.clientPath = io.joinPaths(self.clientPath, 'GalaxyClient.exe')
         if self.indirectLaunch then
-          return assert(io.fileExists(self.clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
+          assert(io.fileExists(self.clientPath, false) == true, 'The path to the GOG Galaxy client is not valid.')
         end
       elseif self.indirectLaunch then
-        return assert(self.clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
+        assert(self.clientPath ~= nil, 'A path to the GOG Galaxy client has not been defined.')
+      end
+      if self.useCommunityProfile == true then
+        assert(type(self.communityProfileName) == 'string' and #self.communityProfileName > 0, 'A GOG profile name has not been defined.')
+        assert(io.fileExists(self.phantomjsPath, false) == true, ('PhantomJS is missing. Expected the path to be "%s".'):format(self.phantomjsPath))
+        return assert(io.fileExists(self.communityProfileJavaScriptPath) == true, ('The JavaScript file for downloading and parsing the GOG community profile is missing. Expected the path to be "%s".'):format(self.communityProfileJavaScriptPath))
       end
     end,
-    getCachePath = function(self)
-      return self.cachePath
+    downloadCommunityProfile = function(self)
+      if not (self.useCommunityProfile) then
+        return nil
+      end
+      local parameter = ('""%s" "\\%s""'):format(self.phantomjsPath, self.communityProfileJavaScriptPath)
+      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s"]'):format(self.communityProfileName))
+      return self:getWaitCommand(), '', 'OnDownloadedGOGCommunityProfile'
+    end,
+    hasdownloadedCommunityProfile = function(self)
+      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
     end,
     hasDumpedDatabases = function(self)
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
@@ -28,8 +43,6 @@ do
       local indexDBPath = io.joinPaths(self.programDataPath, 'storage\\index.db')
       local galaxyDBPath = io.joinPaths(self.programDataPath, 'storage\\galaxy.db')
       assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.'):format(galaxyDBPath))
-      local sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
-      assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".'):format(sqlitePath))
       SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s"]'):format(indexDBPath, galaxyDBPath))
       return self:getWaitCommand(), '', 'OnDumpedDBs'
     end,
@@ -46,6 +59,18 @@ do
       end
       return productIDs, paths
     end,
+    parseProfile = function(self, output, productIDs)
+      if output == nil then
+        return 
+      end
+      local lines = output:splitIntoLines()
+      for _index_0 = 1, #lines do
+        local id = lines[_index_0]
+        if id ~= '' and productIDs[id] == nil then
+          productIDs[id] = false
+        end
+      end
+    end,
     parseGalaxyDB = function(self, productIDs, output)
       assert(type(productIDs) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
       assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
@@ -57,7 +82,7 @@ do
         repeat
           local line = lines[_index_0]
           local productID, title, images = line:match('^(%d+)|([^|]+)|([^|]+)|.+$')
-          if not (productIDs[productID] == true) then
+          if productIDs[productID] == nil then
             _continue_0 = true
             break
           end
@@ -129,41 +154,43 @@ do
       end
       return path, nil
     end,
-    generateGames = function(self, indexOutput, galaxyOutput)
+    generateGames = function(self, indexOutput, galaxyOutput, profileOutput)
       assert(type(indexOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
       assert(type(galaxyOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
       local games = { }
       local productIDs, paths = self:parseIndexDB(indexOutput)
+      self:parseProfile(profileOutput, productIDs)
       local titles, bannerURLs = self:parseGalaxyDB(productIDs, galaxyOutput)
-      for productID, _ in pairs(productIDs) do
+      for productID, installed in pairs(productIDs) do
         local _continue_0 = false
         repeat
           local banner, bannerURL, expectedBanner = self:getBanner(productID, bannerURLs)
-          local info = self:parseInfo(paths[productID], productID)
-          if type(info) ~= 'table' then
-            log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
-            _continue_0 = true
-            break
-          end
-          local exePath, arguments = self:getExePath(info)
-          if type(exePath) ~= 'string' then
-            log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
-            _continue_0 = true
-            break
-          end
-          local path
-          local _exp_0 = self.indirectLaunch
-          if true == _exp_0 then
-            path = ('"%s" "/command=runGame" "/gameId=%s"'):format(self.clientPath, productID)
-          else
-            local fullPath = io.joinPaths(paths[productID], exePath)
-            if not (io.fileExists(fullPath, false)) then
-              path = nil
-            else
-              if arguments == nil then
-                path = ('"%s"'):format(fullPath)
+          local path = ('"%s" "/command=runGame" "/gameId=%s"'):format(self.clientPath, productID)
+          local process = nil
+          if installed then
+            local info = self:parseInfo(paths[productID], productID)
+            if type(info) ~= 'table' then
+              log('Skipping GOG Galaxy game', productID, 'because the info file could not be found')
+              _continue_0 = true
+              break
+            end
+            local exePath, arguments = self:getExePath(info)
+            if type(exePath) ~= 'string' then
+              log('Skipping GOG Galaxy game', productID, 'because the path to the executable could not be found')
+              _continue_0 = true
+              break
+            end
+            process = exePath:reverse():match('^([^\\]+)'):reverse()
+            if not (self.indirectLaunch) then
+              local fullPath = io.joinPaths(paths[productID], exePath)
+              if not (io.fileExists(fullPath, false)) then
+                path = nil
               else
-                path = ('"%s" "%s"'):format(fullPath, arguments)
+                if arguments == nil then
+                  path = ('"%s"'):format(fullPath)
+                else
+                  path = ('"%s" "%s"'):format(fullPath, arguments)
+                end
               end
             end
           end
@@ -183,8 +210,9 @@ do
             expectedBanner = expectedBanner,
             title = title,
             path = path,
+            uninstalled = not installed,
             platformID = self.platformID,
-            process = exePath:reverse():match('^([^\\]+)'):reverse()
+            process = process
           })
           _continue_0 = true
         until true
@@ -267,6 +295,10 @@ do
         self.platformProcess = 'GalaxyClient.exe'
       end
       self.clientPath = settings:getGOGGalaxyClientPath()
+      self.useCommunityProfile = false
+      self.communityProfileName = nil
+      self.communityProfileJavaScriptPath = io.joinPaths('main', 'platforms', 'gog_galaxy', 'profile.js')
+      self.phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
       self.games = { }
     end,
     __base = _base_0,

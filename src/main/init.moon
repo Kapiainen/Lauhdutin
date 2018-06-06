@@ -111,7 +111,11 @@ startDetectingPlatformGames = () ->
 				OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
 			log('Starting to detect GOG Galaxy games')
-			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
+			parameter, output, callback = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
+			if parameter ~= nil
+				utility.runCommand(parameter, output, callback)
+			else
+				utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
 		when ENUMS.PLATFORM_IDS.CUSTOM
 			log('Starting to detect Custom games')
 			STATE.PLATFORM_QUEUE[1]\detectBanners(COMPONENTS.LIBRARY\getOldGames())
@@ -847,6 +851,16 @@ export OnIdentifiedBattlenetFolders = () ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 -- Game detection -> GOG Galaxy
+export OnDownloadedGOGCommunityProfile = () ->
+	success, err = pcall(
+		() ->
+			unless STATE.PLATFORM_QUEUE[1]\hasdownloadedCommunityProfile()
+				return utility.runLastCommand()
+			log('Downloaded GOG community profile')
+			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
 export OnDumpedDBs = () ->
 	success, err = pcall(
 		() ->
@@ -869,7 +883,9 @@ export OnDumpedDBs = () ->
 				table.insert(newGalaxy, table.concat(wholeLine, ''))
 			galaxy = table.concat(newGalaxy, '\n')
 			io.writeFile(galaxyPath, galaxy)
-			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy)
+			profilePath = io.joinPaths(cachePath, 'profile.txt')
+			profile = if io.fileExists(profilePath) then io.readFile(profilePath) else nil
+			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy, profile)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
