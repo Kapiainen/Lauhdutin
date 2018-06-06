@@ -30,7 +30,7 @@ A Rainmeter skin for aggregating games from different platforms and launching th
  - [SQLite3 command-line tool](http://www.sqlite.org/download.html) (optional)
    - Required for basic GOG Galaxy support.
  - [PhantomJS](http://phantomjs.org/download.html) (optional)
-   - Required for downloading and parsing GOG profiles.
+   - Required for extended GOG Galaxy support.
 
 # Installing
 - Install Rainmeter, if you do not already have it.
