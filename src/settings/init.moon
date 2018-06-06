@@ -62,7 +62,8 @@ additionalEnums = () ->
 		SPINNER: 4
 		INTEGER: 5
 		FOLDER_PATH_SPINNER: 6
-		MAX: 7
+		STRING: 7
+		MAX: 8
 	}
 
 export Initialize = () ->
@@ -237,6 +238,21 @@ export BrowseFolderPath = (index) ->
 export EditFolderPath = (index, path) ->
 	path = path\sub(1, -2) if path\endsWith(';')
 	COMPONENTS.SLOTS\editFolderPath(index, path)
+
+export StartEditingString = (index) ->
+	valueMeter = SKIN\GetMeter(('Slot%dStringValue')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "DefaultValue" "%s"]')\format(valueMeter\GetOption('Text')))
+	SKIN\Bang(('[!SetOption "StringInput" "X" "([Slot%dStringValue:X])"]')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "Y" "([Slot%dStringValue:Y] + 18)"]')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "W" "([Slot%dStringValue:W])"]')\format(index))
+	SKIN\Bang('[!SetOption "StringInput" "H" "32"]')
+	SKIN\Bang(('[!SetOption "StringInput" "SolidColor" "%s"]')\format(valueMeter\GetOption('SolidColor')))
+	SKIN\Bang(('[!CommandMeasure "StringInput" "ExecuteBatch %d"]')\format(index))
+	return log('StartEditingString ' .. index)
+
+export EditString = (index, value) ->
+	value = value\sub(1, -2) if value\endsWith(';')
+	COMPONENTS.SLOTS\editString(index, value)
 
 export OnLanguagesListed = () ->
 	unless io.fileExists('cache\\languages.txt')

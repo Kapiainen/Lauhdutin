@@ -70,7 +70,8 @@ additionalEnums = function()
     SPINNER = 4,
     INTEGER = 5,
     FOLDER_PATH_SPINNER = 6,
-    MAX = 7
+    STRING = 7,
+    MAX = 8
   }
 end
 Initialize = function()
@@ -280,6 +281,23 @@ EditFolderPath = function(index, path)
     path = path:sub(1, -2)
   end
   return COMPONENTS.SLOTS:editFolderPath(index, path)
+end
+StartEditingString = function(index)
+  local valueMeter = SKIN:GetMeter(('Slot%dStringValue'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "DefaultValue" "%s"]'):format(valueMeter:GetOption('Text')))
+  SKIN:Bang(('[!SetOption "StringInput" "X" "([Slot%dStringValue:X])"]'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "Y" "([Slot%dStringValue:Y] + 18)"]'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "W" "([Slot%dStringValue:W])"]'):format(index))
+  SKIN:Bang('[!SetOption "StringInput" "H" "32"]')
+  SKIN:Bang(('[!SetOption "StringInput" "SolidColor" "%s"]'):format(valueMeter:GetOption('SolidColor')))
+  SKIN:Bang(('[!CommandMeasure "StringInput" "ExecuteBatch %d"]'):format(index))
+  return log('StartEditingString ' .. index)
+end
+EditString = function(index, value)
+  if value:endsWith(';') then
+    value = value:sub(1, -2)
+  end
+  return COMPONENTS.SLOTS:editString(index, value)
 end
 OnLanguagesListed = function()
   if not (io.fileExists('cache\\languages.txt')) then

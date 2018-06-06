@@ -648,11 +648,77 @@ do
   end
   FolderPathSpinner = _class_0
 end
+local String
+do
+  local _class_0
+  local _parent_0 = Base
+  local _base_0 = {
+    getInc = function(self, index)
+      return table.concat({
+        ('[Slot%dStringValue]'):format(index),
+        'Text=UNDEFINED',
+        'Meter=String',
+        'SolidColor=#SettingInputFieldBackgroundColor#',
+        ('X=([Slot%dTitle:X])'):format(index),
+        ('Y=([Slot%dTitle:Y] + [Slot%dTitle:H] + ([Slot%dBoundingBox:H] - [Slot%dTitle:H]) / 2)'):format(index, index, index, index),
+        ('W=([Slot%dTitle:W])'):format(index, index),
+        'H=#ButtonHeight#',
+        'StringAlign=LeftCenter',
+        'StringStyle=Bold',
+        'FontSize=16',
+        'AntiAlias=1',
+        'DynamicVariables=1',
+        ('LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(%d)"]'):format(index),
+        ('Group=Slot%d|Slot%dSettings|Slot%dSettingString'):format(index, index, index),
+        '\n'
+      }, '\n')
+    end
+  }
+  _base_0.__index = _base_0
+  setmetatable(_base_0, _parent_0.__base)
+  _class_0 = setmetatable({
+    __init = function(self, args)
+      if args.type == nil then
+        args.type = ENUMS.SETTING_TYPES.STRING
+      end
+      _class_0.__parent.__init(self, args)
+      self.getValue = args.getValue
+      self.setValue = args.setValue
+      self.dialogTitle = args.dialogTitle or 'Select a folder'
+    end,
+    __base = _base_0,
+    __name = "String",
+    __parent = _parent_0
+  }, {
+    __index = function(cls, name)
+      local val = rawget(_base_0, name)
+      if val == nil then
+        local parent = rawget(cls, "__parent")
+        if parent then
+          return parent[name]
+        end
+      else
+        return val
+      end
+    end,
+    __call = function(cls, ...)
+      local _self_0 = setmetatable({}, _base_0)
+      cls.__init(_self_0, ...)
+      return _self_0
+    end
+  })
+  _base_0.__class = _class_0
+  if _parent_0.__inherited then
+    _parent_0.__inherited(_parent_0, _class_0)
+  end
+  String = _class_0
+end
 return {
   Action = Action,
   Boolean = Boolean,
   Integer = Integer,
   FolderPath = FolderPath,
   Spinner = Spinner,
-  FolderPathSpinner = FolderPathSpinner
+  FolderPathSpinner = FolderPathSpinner,
+  String = String
 }

@@ -373,6 +373,34 @@ class FolderPathSpinner extends Spinner
 			'\n'
 		}, '\n')
 
+class String extends Base
+	new: (args) =>
+		args.type = ENUMS.SETTING_TYPES.STRING if args.type == nil
+		super(args)
+		@getValue = args.getValue
+		@setValue = args.setValue
+		@dialogTitle = args.dialogTitle or 'Select a folder'
+
+	getInc: (index) =>
+		return table.concat({
+			('[Slot%dStringValue]')\format(index)
+			'Text=UNDEFINED'
+			'Meter=String'
+			'SolidColor=#SettingInputFieldBackgroundColor#'
+			('X=([Slot%dTitle:X])')\format(index)
+			('Y=([Slot%dTitle:Y] + [Slot%dTitle:H] + ([Slot%dBoundingBox:H] - [Slot%dTitle:H]) / 2)')\format(index, index, index, index)
+			('W=([Slot%dTitle:W])')\format(index, index)
+			'H=#ButtonHeight#'
+			'StringAlign=LeftCenter'
+			'StringStyle=Bold'
+			'FontSize=16'
+			'AntiAlias=1'
+			'DynamicVariables=1'
+			('LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(%d)"]')\format(index)
+			('Group=Slot%d|Slot%dSettings|Slot%dSettingString')\format(index, index, index)
+			'\n'
+		}, '\n')
+
 return {
 	:Action
 	:Boolean
@@ -380,4 +408,5 @@ return {
 	:FolderPath
 	:Spinner
 	:FolderPathSpinner
+	:String
 }

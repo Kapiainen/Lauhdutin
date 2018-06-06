@@ -78,6 +78,10 @@ do
       local setting = self:getSetting(index)
       setting:setPath(setting.index, path)
       return self:updateSlot(index)
+    end,
+    editString = function(self, index, value)
+      self:getSetting(index):setValue(value)
+      return self:updateSlot(index)
     end
   }
   _base_0.__index = _base_0
