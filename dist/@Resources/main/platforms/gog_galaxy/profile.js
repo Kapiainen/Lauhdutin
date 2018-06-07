@@ -1,3 +1,4 @@
+// Serialization of results to a file.
 var productIDs = [];
 var times = [];
 var fs = require('fs');
@@ -13,7 +14,7 @@ function serialize() {
 	console.log(productIDs.length + ' games found');
 	fs.write('cache\\gog_galaxy\\profile.txt', output, 'w');
 }
-// Get the name of the GOG profile so that the URL can be generated or exit early if the name is missing
+// Get the name of the GOG profile so that the URL can be generated or exit early if the name is missing.
 var system = require('system')
 var args = system.args;
 if (args.length < 2) {
@@ -22,6 +23,7 @@ if (args.length < 2) {
 }
 var url = 'https://www.gog.com/u/' + args[1] + '/games';
 console.log('URL: ' + url);
+// Parsing page contents.
 var regexGame = /prof-game-statistics-game-id="(\d+)"><[\s\S]*?<span ng-bind="gameStatistics.playtime[\s\S]*?>([\s\S]*?)<\/span>/g;
 var regexDays = /(\d+)d/g;
 var regexHours = /(\d+)h/g;
@@ -49,6 +51,7 @@ function parse(contents) {
 	} while(game);
 	return foundNewIDs;
 }
+// Downloading and navigating the page.
 var page = require('webpage').create();
 var processing = false;
 var scrollPos = 0;
