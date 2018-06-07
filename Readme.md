@@ -45,11 +45,20 @@ A Rainmeter skin for aggregating games from different platforms and launching th
 
 If you are using the previous major version (2.x.x) of Lauhdutin, then you may be able to migrate your settings and/or games to the new major version (3.x.x). Settings and games from version 2.7.1 should be possible to migrate with a minimal amount of issues though some may arise from e.g. changes in the folder structure.
 
-Copy `games.json` and `settings.json` from the `@Resources` folder of the old version of Lauhdutin and paste them in the `@Resources` folder of the new version of Lauhdutin. Load **Main.ini**.
+Copy `games.json` and `settings.json` from the `@Resources` folder of the old version of Lauhdutin and paste them into the `@Resources` folder of the new version of Lauhdutin. Load **Main.ini**.
 
 ## 3.x.x to 3.y.y
 
 The various files that store e.g. settings or games now include a version number that is used to implement the migration of files between versions, which should allow for major changes in the structures of such files without loss of data.
+
+Copy the following folders and files from the `@Resources` folder of the old version and paste them into the corresponding folder of the new version:
+- `Shortcuts/`
+- `cache/`
+- `games.json`
+- `games_backup_*.json`
+- `settings.json`
+
+Copy any additional dependencies (e.g. `sqlite3.exe`) over as well.
 
 # Features
 
@@ -58,40 +67,48 @@ The various files that store e.g. settings or games now include a version number
 ### Steam
 
 Support includes:
-- Acquire a list of installed games and games that are not currently installed (requires that the Steam community profile and game details are public).
-- Acquire a list of games that have been added to Steam as a 'non-Steam game'.
+- Get installed games.
+- Get games that are not currently installed.\*
+- Get games that have been added to Steam as 'non-Steam games'.
+- Get the last played timestamp for each game.
+- Get the amount of hours played for each game.\*
+- Automatically copy custom grid images assigned in Steam to be used as banners.
+- Automatically download banners for Steam games that were detected.
 - Launch games via the Steam client.
 - Install Steam games that are not currently installed.
-- Automatically copy custom grid images assigned in Steam as banners.
-- Automatically download banners for Steam games that were found.
-- Integrate the total amount of hours played and last played timestamp, which are tracked for each game by Steam into Lauhdutin's corresponding system.
 
-Parsing the Steam community profile for information (e.g. hours played) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
+#### \*Parsing the Steam community profile for information (e.g. hours played and games that are not currently installed) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
 
 ### GOG Galaxy
 
 Support includes:
-- Acquire a list of games installed via GOG Galaxy (requires SQLite3) and games that are not currently installed (requires PhantomJS and that the GOG profile is public).
+- Get games installed via the client.\*
+- Get games that are not currently installed via the client.\*\*
+- Get the amount of hours played for each game.\*\*
+- Automatically download banners for games that were detected.
 - Launch games directly via the game's executable or via the GOG Galaxy client.
-- Automatically download banners for games that were found.
 
-**NOTE:** GOG Galaxy support requires the command-line tool `sqlite3.exe`, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable must be placed in Lauhdutin's `@Resources` folder.
+#### \*Requires the SQLite3 command-line tool, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable (`sqlite3.exe`) must be placed in Lauhdutin's `@Resources` folder.
 
-Acquiring a list of all games associated with a GOG account requires PhantomJS, which can be downloaded [here](http://phantomjs.org/download.html). The executable must be placed in Lauhdutin's `@Resources` folder.
+#### \*\*Requires PhantomJS, which can be downloaded [here](http://phantomjs.org/download.html), and that the GOG profile is public. The executable (`phantomjs.exe`) must be placed in Lauhdutin's `@Resources` folder.
 
 ### Blizzard Battle.net
 
 Support includes:
-- Acquire a list of games installed via Blizzard Battle.net.
+- Get installed games.\*
 - Launch games via the Blizzard Battle.net client.
 
-Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
+#### \*Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
 
-### Windows shortcuts and other platforms
+### Windows shortcuts
 
 Windows shortcuts (.lnk and .url files) can be added to the `\@Resources\Shortcuts` folder. This folder can also be opened via the context menu in the main config or via the settings page for Windows shortcuts.
 
+### Other platforms
+
 Additional platforms might be supported in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing shortcuts for them in `\@Resources\Shortcuts`. If the shortcuts are placed in a subfolder, then the name of the subfolder will then be used as an override for the name of the games' platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
+
+Alternatively, you can add games via the context menu action `Add a game`. These games are considered to be a part of a platform called `Custom`, but you can modify the platform later.
 
 ## Context menu actions
 
