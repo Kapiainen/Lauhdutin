@@ -588,7 +588,7 @@ hideGame = (game) ->
 	game\setVisible(false)
 	COMPONENTS.LIBRARY\save()
 	i = table.find(STATE.GAMES, game)
-	table.remove(STATE.GAMES, i)
+	table.remove(STATE.GAMES, i) if i ~= nil
 	if #STATE.GAMES == 0
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
@@ -601,7 +601,7 @@ unhideGame = (game) ->
 	game\setVisible(true)
 	COMPONENTS.LIBRARY\save()
 	i = table.find(STATE.GAMES, game)
-	table.remove(STATE.GAMES, i)
+	table.remove(STATE.GAMES, i) if i ~= nil
 	if #STATE.GAMES == 0
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
@@ -610,11 +610,9 @@ unhideGame = (game) ->
 	updateSlots()
 
 removeGame = (game) ->
-	i = table.find(STATE.GAMES, game)
-	table.remove(STATE.GAMES, i)
 	COMPONENTS.LIBRARY\remove(game)
 	i = table.find(STATE.GAMES, game)
-	table.remove(STATE.GAMES, i)
+	table.remove(STATE.GAMES, i) if i ~= nil
 	if #STATE.GAMES == 0
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()

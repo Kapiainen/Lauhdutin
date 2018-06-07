@@ -788,7 +788,9 @@ hideGame = function(game)
   game:setVisible(false)
   COMPONENTS.LIBRARY:save()
   local i = table.find(STATE.GAMES, game)
-  table.remove(STATE.GAMES, i)
+  if i ~= nil then
+    table.remove(STATE.GAMES, i)
+  end
   if #STATE.GAMES == 0 then
     COMPONENTS.LIBRARY:filter(ENUMS.FILTER_TYPES.NONE)
     STATE.GAMES = COMPONENTS.LIBRARY:get()
@@ -805,7 +807,9 @@ unhideGame = function(game)
   game:setVisible(true)
   COMPONENTS.LIBRARY:save()
   local i = table.find(STATE.GAMES, game)
-  table.remove(STATE.GAMES, i)
+  if i ~= nil then
+    table.remove(STATE.GAMES, i)
+  end
   if #STATE.GAMES == 0 then
     COMPONENTS.LIBRARY:filter(ENUMS.FILTER_TYPES.NONE)
     STATE.GAMES = COMPONENTS.LIBRARY:get()
@@ -816,11 +820,11 @@ unhideGame = function(game)
 end
 local removeGame
 removeGame = function(game)
-  local i = table.find(STATE.GAMES, game)
-  table.remove(STATE.GAMES, i)
   COMPONENTS.LIBRARY:remove(game)
-  i = table.find(STATE.GAMES, game)
-  table.remove(STATE.GAMES, i)
+  local i = table.find(STATE.GAMES, game)
+  if i ~= nil then
+    table.remove(STATE.GAMES, i)
+  end
   if #STATE.GAMES == 0 then
     COMPONENTS.LIBRARY:filter(ENUMS.FILTER_TYPES.NONE)
     STATE.GAMES = COMPONENTS.LIBRARY:get()
