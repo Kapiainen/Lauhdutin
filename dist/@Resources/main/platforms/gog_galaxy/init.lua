@@ -60,16 +60,17 @@ do
       return productIDs, paths
     end,
     parseProfile = function(self, output, productIDs)
+      local hoursPlayed = { }
       if output == nil then
-        return 
+        return hoursPlayed
       end
-      local lines = output:splitIntoLines()
-      for _index_0 = 1, #lines do
-        local id = lines[_index_0]
-        if id ~= '' and productIDs[id] == nil then
+      for id, hours in output:gmatch('(%d+)|([%d%.]+)') do
+        if productIDs[id] == nil then
           productIDs[id] = false
         end
+        hoursPlayed[id] = tonumber(hours)
       end
+      return hoursPlayed
     end,
     parseGalaxyDB = function(self, productIDs, output)
       assert(type(productIDs) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
@@ -159,7 +160,7 @@ do
       assert(type(galaxyOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
       local games = { }
       local productIDs, paths = self:parseIndexDB(indexOutput)
-      self:parseProfile(profileOutput, productIDs)
+      local hoursPlayed = self:parseProfile(profileOutput, productIDs)
       local titles, bannerURLs = self:parseGalaxyDB(productIDs, galaxyOutput)
       for productID, installed in pairs(productIDs) do
         local _continue_0 = false
@@ -212,7 +213,8 @@ do
             path = path,
             uninstalled = not installed,
             platformID = self.platformID,
-            process = process
+            process = process,
+            hoursPlayed = hoursPlayed[productID]
           })
           _continue_0 = true
         until true

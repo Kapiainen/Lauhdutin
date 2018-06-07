@@ -1,6 +1,6 @@
 @echo off
 cls
-echo Downloading GOG community profile
+echo Downloading and parsing GOG community profile
 cd "%~dp0"
 set "profilejs="%cd%\profile.js""
 cd ..\..\..\cache

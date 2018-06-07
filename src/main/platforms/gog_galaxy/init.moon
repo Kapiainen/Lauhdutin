@@ -85,11 +85,13 @@ class GOGGalaxy extends Platform
 		return productIDs, paths
 
 	parseProfile: (output, productIDs) =>
-		return if output == nil
-		lines = output\splitIntoLines()
-		for id in *lines
-			if id ~= '' and productIDs[id] == nil
+		hoursPlayed = {}
+		return hoursPlayed if output == nil
+		for id, hours in output\gmatch('(%d+)|([%d%.]+)')
+			if productIDs[id] == nil
 				productIDs[id] = false
+			hoursPlayed[id] = tonumber(hours)
+		return hoursPlayed
 
 	parseGalaxyDB: (productIDs, output) =>
 		assert(type(productIDs) == 'table', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseGalaxyDB')
@@ -152,7 +154,7 @@ class GOGGalaxy extends Platform
 		assert(type(galaxyOutput) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.generateGames')
 		games = {}
 		productIDs, paths = @parseIndexDB(indexOutput)
-		@parseProfile(profileOutput, productIDs)
+		hoursPlayed = @parseProfile(profileOutput, productIDs)
 		titles, bannerURLs = @parseGalaxyDB(productIDs, galaxyOutput)
 		for productID, installed in pairs(productIDs)
 			banner, bannerURL, expectedBanner = @getBanner(productID, bannerURLs)
@@ -193,6 +195,7 @@ class GOGGalaxy extends Platform
 				uninstalled: not installed
 				platformID: @platformID
 				:process
+				hoursPlayed: hoursPlayed[productID]
 			})
 		@games = [Game(args) for args in *games]
 
