@@ -163,7 +163,6 @@ Initialize = function()
     local scrollbar = SKIN:GetMeter('Scrollbar')
     STATE.SCROLLBAR.START = scrollbar:GetY()
     STATE.SCROLLBAR.MAX_HEIGHT = scrollbar:GetH()
-    SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_all_title', 'Filter')))
     SKIN:Bang('[!CommandMeasure "Script" "HandshakeFilter()" "#ROOTCONFIG#"]')
     return COMPONENTS.STATUS:hide()
   end)
@@ -784,6 +783,7 @@ Handshake = function(stack, appliedFilters)
         end
       end
     else
+      SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('filter_window_all_title', 'Filter')))
       do
         local _accum_0 = { }
         local _len_0 = 1

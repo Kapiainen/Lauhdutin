@@ -111,7 +111,6 @@ export Initialize = () ->
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_all_title', 'Filter')))
 			SKIN\Bang('[!CommandMeasure "Script" "HandshakeFilter()" "#ROOTCONFIG#"]')
 			COMPONENTS.STATUS\hide()
 	)
@@ -542,6 +541,7 @@ export Handshake = (stack, appliedFilters) ->
 					elseif not games[i]\isInstalled() and not (showUninstalledGames or showHiddenGames)
 						table.insert(uninstalledGames, table.remove(games, i))
 			else
+				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_all_title', 'Filter')))
 				platforms = [platform for platform in *platforms when platform\isEnabled()]
 				games = io.readJSON('games.json')
 				games = [Game(args) for args in *games.games]

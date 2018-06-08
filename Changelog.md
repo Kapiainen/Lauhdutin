@@ -21,6 +21,7 @@
 - Fixed a bug that allowed uninstalled games from platforms other than Steam to play the slot click animations when clicked.
 - Fixed a bug that caused the overlay slot to show that unsupported games could be installed via the skin.
 - Fixed a bug where game slots would not correctly replace unsupported characters when displaying a game's title because there is no banner to display.
+- Fixed a bug where the title of the Filter window would not update correctly under certain circumstances.
 - Fixed bugs that could cause division by zero when updating scrollbars.
 
 **Version 3.0.3 - 2018/05/30:**
