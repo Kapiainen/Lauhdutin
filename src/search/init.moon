@@ -11,6 +11,7 @@ STATE = {
 		RESOURCES: nil
 	}
 	STACK: false
+	VARIANT: nil
 }
 
 COMPONENTS = {
@@ -36,7 +37,9 @@ export Initialize = () ->
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			SKIN\Bang(('[!SetOption "WindowTitle" "Text" "%s"]')\format(LOCALIZATION\get('search_window_all_title', 'Search')))
 			COMPONENTS.STATUS\hide()
-			SKIN\Bang('[!CommandMeasure "Script" "HandshakeSearch()" "#ROOTCONFIG#"]')
+			STATE.VARIANT = SKIN\GetVariable('Variant', nil)
+			STATE.VARIANT = if STATE.VARIANT ~= nil and STATE.VARIANT ~= '' then ('\\%s')\format(STATE.VARIANT) else ''
+			SKIN\Bang(('[!CommandMeasure "Script" "HandshakeSearch()" "#ROOTCONFIG#%s"]')\format(STATE.VARIANT))
 	)
 	return COMPONENTS.STATUS\show(err, true) unless success
 
@@ -52,7 +55,7 @@ export Handshake = (stack) ->
 			meter = SKIN\GetMeter('WindowShadow')
 			skinWidth = meter\GetW()
 			skinHeight = meter\GetH()
-			mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+			mainConfig = utility.getConfig(('%s%s')\format(SKIN\GetVariable('ROOTCONFIG'), STATE.VARIANT))
 			monitorIndex = nil
 			if mainConfig ~= nil
 				monitorIndex = utility.getConfigMonitor(mainConfig) or 1
@@ -68,7 +71,7 @@ export Handshake = (stack) ->
 export SetInput = (str) ->
 	success, err = pcall(
 		() ->
-			SKIN\Bang(('[!CommandMeasure "Script" "Search(\'%s\', %s)" "#ROOTCONFIG#"]')\format(str\sub(1, -2), tostring(STATE.STACK)))
+			SKIN\Bang(('[!CommandMeasure "Script" "Search(\'%s\', %s)" "#ROOTCONFIG#%s"]')\format(str\sub(1, -2), tostring(STATE.STACK), STATE.VARIANT))
 			SKIN\Bang('[!DeactivateConfig]')
 	)
 	return COMPONENTS.STATUS\show(err, true) unless success

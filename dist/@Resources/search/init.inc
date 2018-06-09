@@ -1,16 +1,3 @@
-[Metadata]
-Name=Lauhdutin - search
-Author=Kapiainen
-Information=
-Version=
-License=MIT
-
-[Rainmeter]
-Update=32
-AccurateText=1
-OnUnfocusAction=[!DeactivateConfig]
-Group=LauhdutinSubconfigs
-
 [Script]
 Measure=Script
 ScriptFile=#@#search\init.lua

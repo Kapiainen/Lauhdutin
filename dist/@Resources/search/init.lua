@@ -8,7 +8,8 @@ local STATE = {
   PATHS = {
     RESOURCES = nil
   },
-  STACK = false
+  STACK = false,
+  VARIANT = nil
 }
 local COMPONENTS = {
   STATUS = nil
@@ -34,7 +35,13 @@ Initialize = function()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     SKIN:Bang(('[!SetOption "WindowTitle" "Text" "%s"]'):format(LOCALIZATION:get('search_window_all_title', 'Search')))
     COMPONENTS.STATUS:hide()
-    return SKIN:Bang('[!CommandMeasure "Script" "HandshakeSearch()" "#ROOTCONFIG#"]')
+    STATE.VARIANT = SKIN:GetVariable('Variant', nil)
+    if STATE.VARIANT ~= nil and STATE.VARIANT ~= '' then
+      STATE.VARIANT = ('\\%s'):format(STATE.VARIANT)
+    else
+      STATE.VARIANT = ''
+    end
+    return SKIN:Bang(('[!CommandMeasure "Script" "HandshakeSearch()" "#ROOTCONFIG#%s"]'):format(STATE.VARIANT))
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -50,7 +57,7 @@ Handshake = function(stack)
     local meter = SKIN:GetMeter('WindowShadow')
     local skinWidth = meter:GetW()
     local skinHeight = meter:GetH()
-    local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
+    local mainConfig = utility.getConfig(('%s%s'):format(SKIN:GetVariable('ROOTCONFIG'), STATE.VARIANT))
     local monitorIndex = nil
     if mainConfig ~= nil then
       monitorIndex = utility.getConfigMonitor(mainConfig) or 1
@@ -68,7 +75,7 @@ Handshake = function(stack)
 end
 SetInput = function(str)
   local success, err = pcall(function()
-    SKIN:Bang(('[!CommandMeasure "Script" "Search(\'%s\', %s)" "#ROOTCONFIG#"]'):format(str:sub(1, -2), tostring(STATE.STACK)))
+    SKIN:Bang(('[!CommandMeasure "Script" "Search(\'%s\', %s)" "#ROOTCONFIG#%s"]'):format(str:sub(1, -2), tostring(STATE.STACK), STATE.VARIANT))
     return SKIN:Bang('[!DeactivateConfig]')
   end)
   if not (success) then
