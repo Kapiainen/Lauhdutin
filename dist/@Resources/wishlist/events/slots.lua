@@ -14,6 +14,7 @@ OnLeftClickSlot = function(index)
     return 
   end
   local success, err = pcall(function()
+    log('OnLeftClickSlot', index)
     local game = COMPONENTS.SLOTS:leftClick(index)
     if not (game) then
       return 
