@@ -1,6 +1,5 @@
 Platform = require('main.platforms.platform')
 Game = require('main.game')
-json = require('lib.json')
 
 -- New version
 --   Dump "productId" and "installationPath" columns from the "InstalledBaseProducts" table of "galaxy.db":

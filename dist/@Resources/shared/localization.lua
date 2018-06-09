@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local migrators = {
   {
     version = 1,

@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local bit = require('lib.bit.numberlua')
 local digest = require('lib.digest.crc32')
 local Platform = require('main.platforms.platform')

@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
 local GOGGalaxy

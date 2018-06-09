@@ -2,8 +2,8 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
-local json = nil
+utility = nil
+json = nil
 LOCALIZATION = nil
 STATE = {
   PATHS = {

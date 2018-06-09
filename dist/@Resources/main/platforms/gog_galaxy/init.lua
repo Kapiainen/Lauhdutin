@@ -1,6 +1,5 @@
 local Platform = require('main.platforms.platform')
 local Game = require('main.game')
-local json = require('lib.json')
 local GOGGalaxy
 do
   local _class_0

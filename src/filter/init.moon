@@ -2,8 +2,8 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
-json = nil
+export utility = nil
+export json = nil
 
 export LOCALIZATION = nil
 

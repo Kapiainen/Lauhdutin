@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 bit = require('lib.bit.numberlua')
 digest = require('lib.digest.crc32')
 Platform = require('main.platforms.platform')

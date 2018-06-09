@@ -2,7 +2,7 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
+export utility = nil
 
 export LOCALIZATION = nil
 

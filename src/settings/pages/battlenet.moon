@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
 

@@ -1,5 +1,3 @@
-utility = require('shared.utility')
-
 class Game
 	new: (args) =>
 		assert(type(args.title) == 'string' and args.title\trim() ~= '', 'main.game.Game')

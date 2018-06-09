@@ -2,7 +2,7 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
+utility = nil
 LOCALIZATION = nil
 STATE = {
   PATHS = {

@@ -1,5 +1,3 @@
-utility = require('shared.utility')
-
 -- A process measure regularly sends update events.
 -- If a specific process is being monitored, then that process' state is updated.
 -- Else the statuses of the various supported platforms' client processes are updated.
