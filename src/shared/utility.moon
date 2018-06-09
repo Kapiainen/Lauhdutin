@@ -147,6 +147,21 @@ parseVDF = (lines, start = 1) ->
 					assert(nil, ('"parseVDF" encountered unexpected input on line %d: %s.')\format(i, lines[i]))		
 	return result, i
 
+downloadFile = (url, path, finishCallback, errorCallback) ->
+	log('Attempting to download file:', url, path, finishCallback, errorCallback)
+	assert(type(url) == 'string', 'utility.downloadFile')
+	assert(type(path) == 'string', 'utility.downloadFile')
+	assert(type(finishCallback) == 'string', 'utility.downloadFile')
+	assert(type(errorCallback) == 'string', 'utility.downloadFile')
+	SKIN\Bang(('[!SetOption "Downloader" "URL" "%s"]')\format(url))
+	SKIN\Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]')\format(path))
+	SKIN\Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]')\format(finishCallback))
+	SKIN\Bang(('[!SetOption "Downloader" "OnConnectErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
+	SKIN\Bang(('[!SetOption "Downloader" "OnRegExpErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
+	SKIN\Bang(('[!SetOption "Downloader" "OnDownloadErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
+	SKIN\Bang('[!SetOption "Downloader" "UpdateDivider" "63"]')
+	SKIN\Bang('[!SetOption "Downloader" "Disabled" "0"]')
+	SKIN\Bang('[!UpdateMeasure "Downloader"]')
 
 titleAdjustments = {
 	['&lt;']: '<'
@@ -273,4 +288,18 @@ return {
 		for pattern, replacement in pairs(titleAdjustments)
 			title = title\gsub(pattern, replacement)
 		return title
+
+	downloadFile: (url, path, finishCallback, errorCallback) -> downloadFile(url, path, finishCallback, errorCallback)
+
+	stopDownloader: () ->
+		log('Stopping downloader')
+		SKIN\Bang('[!SetOption "Downloader" "UpdateDivider" "-1"]')
+		SKIN\Bang('[!SetOption "Downloader" "Disabled" "1"]')
+		SKIN\Bang('[!UpdateMeasure "Downloader"]')
+
+	downloadBanner: (game) ->
+		log('Downloading a banner for', game\getTitle())
+		assert(game ~= nil, 'utility.downloadBanner')
+		bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
+		downloadFile(game\getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 }

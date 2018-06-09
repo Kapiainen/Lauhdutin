@@ -485,6 +485,23 @@ parseVDF = function(lines, start)
   end
   return result, i
 end
+local downloadFile
+downloadFile = function(url, path, finishCallback, errorCallback)
+  log('Attempting to download file:', url, path, finishCallback, errorCallback)
+  assert(type(url) == 'string', 'utility.downloadFile')
+  assert(type(path) == 'string', 'utility.downloadFile')
+  assert(type(finishCallback) == 'string', 'utility.downloadFile')
+  assert(type(errorCallback) == 'string', 'utility.downloadFile')
+  SKIN:Bang(('[!SetOption "Downloader" "URL" "%s"]'):format(url))
+  SKIN:Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]'):format(path))
+  SKIN:Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]'):format(finishCallback))
+  SKIN:Bang(('[!SetOption "Downloader" "OnConnectErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
+  SKIN:Bang(('[!SetOption "Downloader" "OnRegExpErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
+  SKIN:Bang(('[!SetOption "Downloader" "OnDownloadErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
+  SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "63"]')
+  SKIN:Bang('[!SetOption "Downloader" "Disabled" "0"]')
+  return SKIN:Bang('[!UpdateMeasure "Downloader"]')
+end
 local titleAdjustments = {
   ['&lt;'] = '<',
   ['&gt;'] = '>',
@@ -681,5 +698,20 @@ return {
       title = title:gsub(pattern, replacement)
     end
     return title
+  end,
+  downloadFile = function(url, path, finishCallback, errorCallback)
+    return downloadFile(url, path, finishCallback, errorCallback)
+  end,
+  stopDownloader = function()
+    log('Stopping downloader')
+    SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "-1"]')
+    SKIN:Bang('[!SetOption "Downloader" "Disabled" "1"]')
+    return SKIN:Bang('[!UpdateMeasure "Downloader"]')
+  end,
+  downloadBanner = function(game)
+    log('Downloading a banner for', game:getTitle())
+    assert(game ~= nil, 'utility.downloadBanner')
+    local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
+    return downloadFile(game:getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
   end
 }

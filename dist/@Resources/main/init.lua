@@ -42,38 +42,6 @@ end
 HideStatus = function()
   return COMPONENTS.STATUS:hide()
 end
-local downloadFile
-downloadFile = function(url, path, finishCallback, errorCallback)
-  log('Attempting to download file:', url, path, finishCallback, errorCallback)
-  assert(type(url) == 'string', 'main.init.downloadFile')
-  assert(type(path) == 'string', 'main.init.downloadFile')
-  assert(type(finishCallback) == 'string', 'main.init.downloadFile')
-  assert(type(errorCallback) == 'string', 'main.init.downloadFile')
-  SKIN:Bang(('[!SetOption "Downloader" "URL" "%s"]'):format(url))
-  SKIN:Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]'):format(path))
-  SKIN:Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]'):format(finishCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnConnectErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnRegExpErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnDownloadErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "63"]')
-  SKIN:Bang('[!SetOption "Downloader" "Disabled" "0"]')
-  return SKIN:Bang('[!UpdateMeasure "Downloader"]')
-end
-local stopDownloader
-stopDownloader = function()
-  log('Stopping downloader')
-  SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "-1"]')
-  SKIN:Bang('[!SetOption "Downloader" "Disabled" "1"]')
-  return SKIN:Bang('[!UpdateMeasure "Downloader"]')
-end
-local downloadBanner
-downloadBanner = function(game)
-  log('Downloading a banner for', game:getTitle())
-  assert(game ~= nil, 'main.init.downloadBanner')
-  assert(game.__class == Game, 'main.init.downloadBanner')
-  local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
-  return downloadFile(game:getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
-end
 setUpdateDivider = function(value)
   assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
   SKIN:Bang(('[!SetOption "Script" "UpdateDivider" "%d"]'):format(value))
@@ -90,7 +58,7 @@ startDetectingPlatformGames = function()
     local url, path, finishCallback, errorCallback = STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()
     if url ~= nil then
       log('Attempting to download and parse the Steam community profile')
-      return downloadFile(url, path, finishCallback, errorCallback)
+      return utility.downloadFile(url, path, finishCallback, errorCallback)
     else
       log('Starting to detect Steam games')
       STATE.PLATFORM_QUEUE[1]:getLibraries()
@@ -193,7 +161,7 @@ startDownloadingBanner = function()
   if #STATE.BANNER_QUEUE > 0 then
     log('Starting to download a banner')
     COMPONENTS.STATUS:show(LOCALIZATION:get('main_status_n_banners_to_download', '%d banners left to download'):format(#STATE.BANNER_QUEUE))
-    return downloadBanner(STATE.BANNER_QUEUE[1])
+    return utility.downloadBanner(STATE.BANNER_QUEUE[1])
   else
     STATE.BANNER_QUEUE = nil
     return OnFinishedDownloadingBanners()
