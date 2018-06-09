@@ -23,7 +23,8 @@ ENUMS = {
     ALPHABETICALLY = 1,
     LAST_PLAYED = 2,
     HOURS_PLAYED = 3,
-    MAX = 4
+    PRICE = 4,
+    MAX = 5
   },
   SLOT_HOVER_ANIMATIONS = {
     NONE = 1,

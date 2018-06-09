@@ -229,6 +229,32 @@ class Library
 				comp = (a, b) -> return a\getLastPlayed() > b\getLastPlayed()
 			when ENUMS.SORTING_TYPES.HOURS_PLAYED
 				comp = (a, b) -> return a\getHoursPlayed() > b\getHoursPlayed()
+			when ENUMS.SORTING_TYPES.PRICE
+				comp = (a, b) ->
+					aTitle = a\getTitle()\lower()
+					bTitle = b\getTitle()\lower()
+					-- Prerelease
+					aPre = a\getPrerelease()
+					bPre = b\getPrerelease()
+					if aPre == bPre
+						if aPre == true
+							return aTitle < bTitle
+					else
+						return aPre == false
+					-- Free
+					aFree = a\getFree()
+					bFree = b\getFree()
+					if aFree == bFree
+						if aFree == true
+							return aTitle < bTitle
+					else
+						return aFree == true
+					-- Price
+					aPrice = a\getFinalPrice()
+					bPrice = b\getFinalPrice()
+					if aPrice == bPrice
+						return aTitle < bTitle
+					return aPrice < bPrice
 			else
 				assert(nil, 'Unknown sorting type.')
 		assert(type(comp) == 'function', 'shared.library.Library.sort')

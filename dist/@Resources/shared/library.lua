@@ -277,6 +277,35 @@ do
         comp = function(a, b)
           return a:getHoursPlayed() > b:getHoursPlayed()
         end
+      elseif ENUMS.SORTING_TYPES.PRICE == _exp_0 then
+        comp = function(a, b)
+          local aTitle = a:getTitle():lower()
+          local bTitle = b:getTitle():lower()
+          local aPre = a:getPrerelease()
+          local bPre = b:getPrerelease()
+          if aPre == bPre then
+            if aPre == true then
+              return aTitle < bTitle
+            end
+          else
+            return aPre == false
+          end
+          local aFree = a:getFree()
+          local bFree = b:getFree()
+          if aFree == bFree then
+            if aFree == true then
+              return aTitle < bTitle
+            end
+          else
+            return aFree == true
+          end
+          local aPrice = a:getFinalPrice()
+          local bPrice = b:getFinalPrice()
+          if aPrice == bPrice then
+            return aTitle < bTitle
+          end
+          return aPrice < bPrice
+        end
       else
         assert(nil, 'Unknown sorting type.')
       end
