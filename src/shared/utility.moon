@@ -23,6 +23,11 @@ class Config
 
 -- May have to look into selective loading of lookup tables for various character sets.
 lookup = {
+	[194]: {
+		[162]: {'¢', '\162'}
+		[163]: {'£', '\163'}
+		[165]: {'¥', '\165'}
+	}
 	[195]: {
 		[96]: {' ', '\160'}
 		[97]: {'¡', '\161'}
