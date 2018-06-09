@@ -516,6 +516,7 @@ export Handshake = (stack, appliedFilters, variant) ->
 			filterStack = json.decode(appliedFilters)
 			Game = switch variant
 				when 'Main' then require('main.game')
+				when 'Wishlist' then require('wishlist.game')
 				else
 					assert(nil, 'Unsupported variant')
 			if stack
@@ -523,6 +524,7 @@ export Handshake = (stack, appliedFilters, variant) ->
 				library = require('shared.library')
 				library = switch variant
 					when 'Main' then library(COMPONENTS.SETTINGS, nil, nil, false)
+					when 'Wishlist' then library(COMPONENTS, 'wishlist.json', false)
 					else
 						assert(nil, 'Unsupported variant')
 				platformsEnabledStatus = {}
@@ -555,6 +557,7 @@ export Handshake = (stack, appliedFilters, variant) ->
 				platforms = [platform for platform in *platforms when platform\isEnabled()]
 				games = switch variant
 					when 'Main' then io.readJSON('games.json')
+					when 'Wishlist' then io.readJSON('wishlist.json')
 					else
 						assert(nil, 'Unsupported variant')
 				games = [Game(args) for args in *games.games]

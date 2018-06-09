@@ -754,6 +754,8 @@ Handshake = function(stack, appliedFilters, variant)
     local _exp_0 = variant
     if 'Main' == _exp_0 then
       Game = require('main.game')
+    elseif 'Wishlist' == _exp_0 then
+      Game = require('wishlist.game')
     else
       Game = assert(nil, 'Unsupported variant')
     end
@@ -763,6 +765,8 @@ Handshake = function(stack, appliedFilters, variant)
       local _exp_1 = variant
       if 'Main' == _exp_1 then
         library = library(COMPONENTS.SETTINGS, nil, nil, false)
+      elseif 'Wishlist' == _exp_1 then
+        library = library(COMPONENTS, 'wishlist.json', false)
       else
         library = assert(nil, 'Unsupported variant')
       end
@@ -817,6 +821,8 @@ Handshake = function(stack, appliedFilters, variant)
       local _exp_1 = variant
       if 'Main' == _exp_1 then
         games = io.readJSON('games.json')
+      elseif 'Wishlist' == _exp_1 then
+        games = io.readJSON('wishlist.json')
       else
         games = assert(nil, 'Unsupported variant')
       end
