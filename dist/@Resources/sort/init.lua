@@ -14,7 +14,8 @@ STATE = {
     HEIGHT = nil,
     STEP = nil
   },
-  NUM_SLOTS = 5
+  NUM_SLOTS = 5,
+  VARIANT = nil
 }
 local COMPONENTS = {
   STATUS = nil,
@@ -77,7 +78,7 @@ do
         self.property:action()
         return true
       end
-      SKIN:Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#"]'):format(self.property.enum))
+      SKIN:Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#%s"]'):format(self.property.enum, STATE.VARIANT))
       return false
     end
   }
@@ -135,7 +136,13 @@ Initialize = function()
     STATE.SCROLLBAR.START = scrollbar:GetY()
     STATE.SCROLLBAR.MAX_HEIGHT = scrollbar:GetH()
     SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(LOCALIZATION:get('sort_window_title', 'Sort')))
-    SKIN:Bang('[!CommandMeasure "Script" "HandshakeSort()" "#ROOTCONFIG#"]')
+    STATE.VARIANT = SKIN:GetVariable('Variant', nil)
+    if STATE.VARIANT ~= nil and STATE.VARIANT ~= '' then
+      STATE.VARIANT = ('\\%s'):format(STATE.VARIANT)
+    else
+      STATE.VARIANT = ''
+    end
+    SKIN:Bang(('[!CommandMeasure "Script" "HandshakeSort()" "#ROOTCONFIG#%s"]'):format(STATE.VARIANT))
     return COMPONENTS.STATUS:hide()
   end)
   if not (success) then
@@ -143,8 +150,12 @@ Initialize = function()
   end
 end
 Update = function() end
-local createProperties
-createProperties = function(game, platform)
+local sortByTitle
+sortByTitle = function(a, b)
+  return a.title:lower() < b.title:lower()
+end
+local createMainProperties
+createMainProperties = function()
   local properties = { }
   table.insert(properties, Property({
     title = LOCALIZATION:get('sort_alphabetically', 'Alphabetically'),
@@ -161,12 +172,16 @@ createProperties = function(game, platform)
     value = ' ',
     enum = ENUMS.SORTING_TYPES.HOURS_PLAYED
   }))
-  table.sort(properties, function(a, b)
-    if a.title:lower() < b.title:lower() then
-      return true
+  table.sort(properties, sortByTitle)
+  table.insert(properties, Property({
+    title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
+    value = ' ',
+    action = function(self)
+      return SKIN:Bang('[!DeactivateConfig]')
     end
-    return false
-  end)
+  }))
+  return properties
+end
   table.insert(properties, Property({
     title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
     value = ' ',
@@ -207,17 +222,22 @@ updateSlots = function()
     end
   end
 end
-Handshake = function(currentSortingType)
+Handshake = function(currentSortingType, variant)
   local success, err = pcall(function()
     log('Accepting Sort handshake', currentSortingType)
-    STATE.PROPERTIES = createProperties()
+    local _exp_0 = variant
+    if 'Main' == _exp_0 then
+      STATE.PROPERTIES = createMainProperties()
+    else
+      STATE.PROPERTIES = assert(nil, 'Unsupported sorting variant')
+    end
     updateScrollbar()
     updateSlots()
     if COMPONENTS.SETTINGS:getCenterOnMonitor() then
       local meter = SKIN:GetMeter('WindowShadow')
       local skinWidth = meter:GetW()
       local skinHeight = meter:GetH()
-      local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
+      local mainConfig = utility.getConfig(('%s%s'):format(SKIN:GetVariable('ROOTCONFIG'), STATE.VARIANT))
       local monitorIndex = nil
       if mainConfig ~= nil then
         monitorIndex = utility.getConfigMonitor(mainConfig) or 1

@@ -17,6 +17,7 @@ export STATE = {
 		STEP: nil
 	}
 	NUM_SLOTS: 5
+	VARIANT: nil
 }
 
 COMPONENTS = {
@@ -59,7 +60,7 @@ class Slot
 		if @property.action ~= nil
 			@property\action()
 			return true
-		SKIN\Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#"]')\format(@property.enum))
+		SKIN\Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#%s"]')\format(@property.enum, STATE.VARIANT))
 		return false
 
 export log = (...) -> print(...) if STATE.LOGGING == true
@@ -86,7 +87,9 @@ export Initialize = () ->
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
 			SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('sort_window_title', 'Sort')))
-			SKIN\Bang('[!CommandMeasure "Script" "HandshakeSort()" "#ROOTCONFIG#"]')
+			STATE.VARIANT = SKIN\GetVariable('Variant', nil)
+			STATE.VARIANT = if STATE.VARIANT ~= nil and STATE.VARIANT ~= '' then ('\\%s')\format(STATE.VARIANT) else ''
+			SKIN\Bang(('[!CommandMeasure "Script" "HandshakeSort()" "#ROOTCONFIG#%s"]')\format(STATE.VARIANT))
 			COMPONENTS.STATUS\hide()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -94,7 +97,9 @@ export Initialize = () ->
 export Update = () ->
 	return
 
-createProperties = (game, platform) ->
+sortByTitle = (a, b) -> return a.title\lower() < b.title\lower()
+
+createMainProperties = () ->
 	properties = {}
 	table.insert(properties,
 		Property({
@@ -117,10 +122,16 @@ createProperties = (game, platform) ->
 			enum: ENUMS.SORTING_TYPES.HOURS_PLAYED
 		})
 	)
-	table.sort(properties, (a, b) ->
-		if a.title\lower() < b.title\lower()
-			return true
-		return false
+	table.sort(properties, sortByTitle)
+	table.insert(properties,
+		Property({
+			title: LOCALIZATION\get('button_label_cancel', 'Cancel')
+			value: ' '
+			action: () =>
+				SKIN\Bang('[!DeactivateConfig]')
+		})
+	)
+	return properties
 	)
 	table.insert(properties,
 		Property({
@@ -154,18 +165,21 @@ updateSlots = () ->
 		if i == STATE.HIGHLIGHTED_SLOT_INDEX
 			MouseOver(i)
 
-export Handshake = (currentSortingType) ->
+export Handshake = (currentSortingType, variant) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Sort handshake', currentSortingType)
-			STATE.PROPERTIES = createProperties()
+			STATE.PROPERTIES = switch variant
+				when 'Main' then createMainProperties()
+				else
+					assert(nil, 'Unsupported sorting variant')
 			updateScrollbar()
 			updateSlots()
 			if COMPONENTS.SETTINGS\getCenterOnMonitor()
 				meter = SKIN\GetMeter('WindowShadow')
 				skinWidth = meter\GetW()
 				skinHeight = meter\GetH()
-				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+				mainConfig = utility.getConfig(('%s%s')\format(SKIN\GetVariable('ROOTCONFIG'), STATE.VARIANT))
 				monitorIndex = nil
 				if mainConfig ~= nil
 					monitorIndex = utility.getConfigMonitor(mainConfig) or 1
