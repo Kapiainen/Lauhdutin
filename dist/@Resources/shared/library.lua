@@ -570,14 +570,17 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, settings, regularMode)
+    __init = function(self, settings, path, regularMode)
+      if path == nil then
+        path = 'games.json'
+      end
       if regularMode == nil then
         regularMode = true
       end
       assert(type(settings) == 'table', 'shared.library.Library')
       assert(type(regularMode) == 'boolean', 'shared.library.Library')
       self.version = 1
-      self.path = 'games.json'
+      self.path = path
       local games
       if io.fileExists(self.path) then
         games = io.readJSON(self.path)

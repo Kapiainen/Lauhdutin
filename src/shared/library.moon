@@ -56,13 +56,13 @@ migrators = {
 }
 
 class Library
-	new: (settings, regularMode = true) =>
+	new: (settings, path = 'games.json', regularMode = true) =>
 	-- regularMode is true, if the instance of Library is being created for the main config
 	-- regularMode should be false in all other cases (e.g. in the filter config)
 		assert(type(settings) == 'table', 'shared.library.Library')
 		assert(type(regularMode) == 'boolean', 'shared.library.Library')
 		@version = 1
-		@path = 'games.json'
+		@path = path
 		games = if io.fileExists(@path) then io.readJSON(@path) else {}
 		@currentGameID = 1
 		@numBackups = settings\getNumberOfBackups()
