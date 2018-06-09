@@ -1,4 +1,3 @@
-local Game = require('main.game')
 local migrators = {
   {
     version = 1,

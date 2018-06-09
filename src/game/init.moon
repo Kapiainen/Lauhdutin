@@ -72,7 +72,7 @@ class Slot
 		return if @property == nil or @property.action == nil
 		@property\action(@index)
 
-Game = nil
+export Game = nil
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 

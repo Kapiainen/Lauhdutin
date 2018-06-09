@@ -1,5 +1,4 @@
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local Shortcuts
 do
   local _class_0

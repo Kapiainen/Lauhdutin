@@ -5,7 +5,7 @@ if RUN_TESTS
 export utility = nil
 export json = nil
 
-Game = nil
+export Game = nil
 
 export LOCALIZATION = nil
 

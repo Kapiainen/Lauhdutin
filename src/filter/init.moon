@@ -82,7 +82,7 @@ class Slot
 		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter, tostring(STATE.STACK), arguments))
 		return false
 
-Game = nil
+export Game = nil
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 

@@ -1,7 +1,6 @@
 bit = require('lib.bit.numberlua')
 digest = require('lib.digest.crc32')
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 
 -- Regular Steam games
 -- Optional: Parse the Steam community profile, which must be set to public, to get a list of all Steam games (AppIDs, titles, and hours played) associated with the chosen account.

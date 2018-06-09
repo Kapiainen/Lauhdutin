@@ -104,7 +104,7 @@ do
   _base_0.__class = _class_0
   Slot = _class_0
 end
-local Game = nil
+Game = nil
 log = function(...)
   if STATE.LOGGING == true then
     return print(...)

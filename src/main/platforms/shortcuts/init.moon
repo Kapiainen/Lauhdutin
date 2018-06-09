@@ -1,5 +1,4 @@
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 
 -- Dump a list of .lnk and .url files along with their target and argument properties.
 

@@ -1,7 +1,6 @@
 local bit = require('lib.bit.numberlua')
 local digest = require('lib.digest.crc32')
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local lookupTable
 do
   local _accum_0 = { }

@@ -1,5 +1,3 @@
-Game = require('main.game')
-
 -- A migrator is a table with the following fields:
 -- - "version":
 --   The version number (an integer) of the file that stores games in JSON.
