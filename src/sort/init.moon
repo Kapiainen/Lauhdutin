@@ -132,7 +132,24 @@ createMainProperties = () ->
 		})
 	)
 	return properties
+
+createWishlistProperties = () ->
+	properties = {}
+	table.insert(properties,
+		Property({
+			title: LOCALIZATION\get('sort_alphabetically', 'Alphabetically')
+			value: ' '
+			enum: ENUMS.SORTING_TYPES.ALPHABETICALLY
+		})
 	)
+	table.insert(properties,
+		Property({
+			title: LOCALIZATION\get('sort_price', 'Price')
+			value: ' '
+			enum: ENUMS.SORTING_TYPES.PRICE
+		})
+	)
+	table.sort(properties, sortByTitle)
 	table.insert(properties,
 		Property({
 			title: LOCALIZATION\get('button_label_cancel', 'Cancel')
@@ -171,6 +188,7 @@ export Handshake = (currentSortingType, variant) ->
 			log('Accepting Sort handshake', currentSortingType)
 			STATE.PROPERTIES = switch variant
 				when 'Main' then createMainProperties()
+				when 'Wishlist' then createWishlistProperties()
 				else
 					assert(nil, 'Unsupported sorting variant')
 			updateScrollbar()

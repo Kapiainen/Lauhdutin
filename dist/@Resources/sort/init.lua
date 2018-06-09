@@ -182,6 +182,20 @@ createMainProperties = function()
   }))
   return properties
 end
+local createWishlistProperties
+createWishlistProperties = function()
+  local properties = { }
+  table.insert(properties, Property({
+    title = LOCALIZATION:get('sort_alphabetically', 'Alphabetically'),
+    value = ' ',
+    enum = ENUMS.SORTING_TYPES.ALPHABETICALLY
+  }))
+  table.insert(properties, Property({
+    title = LOCALIZATION:get('sort_price', 'Price'),
+    value = ' ',
+    enum = ENUMS.SORTING_TYPES.PRICE
+  }))
+  table.sort(properties, sortByTitle)
   table.insert(properties, Property({
     title = LOCALIZATION:get('button_label_cancel', 'Cancel'),
     value = ' ',
@@ -228,6 +242,8 @@ Handshake = function(currentSortingType, variant)
     local _exp_0 = variant
     if 'Main' == _exp_0 then
       STATE.PROPERTIES = createMainProperties()
+    elseif 'Wishlist' == _exp_0 then
+      STATE.PROPERTIES = createWishlistProperties()
     else
       STATE.PROPERTIES = assert(nil, 'Unsupported sorting variant')
     end
