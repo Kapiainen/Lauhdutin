@@ -29,6 +29,12 @@ do
     getPrerelease = function(self)
       return self.isPrerelease
     end,
+    getURL = function(self)
+      return self.url
+    end,
+    getClientCommand = function(self)
+      return self.clientCommand
+    end,
     getTitle = function(self)
       return self.title
     end,

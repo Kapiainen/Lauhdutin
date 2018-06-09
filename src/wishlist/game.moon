@@ -42,6 +42,10 @@ class Game
 
 	getPrerelease: () => return @isPrerelease
 
+	getURL: () => return @url
+
+	getClientCommand: () => return @clientCommand
+
 	getTitle: () => return @title
 
 	getPlatformID: () => return @platformID
