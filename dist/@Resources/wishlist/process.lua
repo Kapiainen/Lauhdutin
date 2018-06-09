@@ -2,8 +2,10 @@ local Process
 do
   local _class_0
   local _base_0 = {
-    getActiveProcesses = function(self)
-      return utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', { }, 'Hide', 'UTF8')
+    getActiveProcesses = function(self, gameID)
+      return utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', {
+        tostring(gameID)
+      }, 'Hide', 'UTF8')
     end,
     isPlatformRunning = function(self, platform)
       local process = platform:getPlatformProcess()

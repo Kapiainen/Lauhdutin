@@ -1,32 +1,25 @@
 require('main.events.slots')
+
+openStorePage = (game) -> COMPONENTS.PROCESS\getActiveProcesses(game\getGameID())
+
 export OnLeftClickSlot = (index) ->
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	return if index < 1 or index > STATE.NUM_SLOTS
 	success, err = pcall(
 		() ->
-			return
-			--game = COMPONENTS.SLOTS\leftClick(index)
-			--return unless game
-			--action = switch STATE.LEFT_CLICK_ACTION
-			--	when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-			--		result = nil
-			--		if game\isInstalled() == true
-			--			result = launchGame
-			--		else
-			--			platformID = game\getPlatformID()
-			--			if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
-			--				result = installGame
-			--		result
-			--	when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame
-			--	when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
-			--	when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
-			--	else
-			--		assert(nil, 'main.init.OnLeftClickSlot')
-			--return unless action
+			log('OnLeftClickSlot', index)
+			game = COMPONENTS.SLOTS\leftClick(index)
+			return unless game
+			action = switch STATE.LEFT_CLICK_ACTION
+				when ENUMS.LEFT_CLICK_ACTIONS.OPEN_STORE_PAGE then openStorePage
+				else
+					assert(nil, 'wishlist.init.OnLeftClickSlot')
+			return unless action
 			--animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
 			--unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
 			--	action(game)
+			action(game)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

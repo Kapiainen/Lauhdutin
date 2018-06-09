@@ -2,8 +2,8 @@ class Process
 	new: () =>
 		@commandMeasure = SKIN\GetMeasure('Command')
 
-	getActiveProcesses: () =>
-		utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', {}, 'Hide', 'UTF8')
+	getActiveProcesses: (gameID) =>
+		utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', {tostring(gameID)}, 'Hide', 'UTF8')
 
 	isPlatformRunning: (platform) =>
 		process = platform\getPlatformProcess()
