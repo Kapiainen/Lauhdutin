@@ -1,5 +1,3 @@
-local Slot = require('main.slots.slot')
-local OverlaySlot = require('main.slots.overlay_slot')
 local Slots
 do
   local _class_0
@@ -76,7 +74,7 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, settings)
+    __init = function(self, settings, Slot, OverlaySlot)
       assert(type(settings) == 'table', 'main.slots.init.Slots')
       do
         local _accum_0 = { }

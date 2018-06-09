@@ -1,8 +1,5 @@
-Slot = require('main.slots.slot')
-OverlaySlot = require('main.slots.overlay_slot')
-
 class Slots
-	new: (settings) =>
+	new: (settings, Slot, OverlaySlot) =>
 		assert(type(settings) == 'table', 'main.slots.init.Slots')
 		@slots = [Slot(i) for i = 1, STATE.NUM_SLOTS]
 		@overlaySlot = OverlaySlot(settings)
