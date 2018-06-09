@@ -174,6 +174,16 @@ additionalEnums = () ->
 		REMOVE_GAME: 4
 	}
 
+updateContextTitles = () ->
+	SKIN\Bang(('[!SetVariable "ContextTitleSettings" "%s"]')\format(LOCALIZATION\get('main_context_title_settings', 'Settings')))
+	SKIN\Bang(('[!SetVariable "ContextTitleOpenShortcutsFolder" "%s"]')\format(LOCALIZATION\get('main_context_title_open_shortcuts_folder', 'Open shortcuts folder')))
+	SKIN\Bang(('[!SetVariable "ContextTitleExecuteStoppingBangs" "%s"]')\format(LOCALIZATION\get('main_context_title_execute_stopping_bangs', 'Execute stopping bangs')))
+	SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_hiding_games', 'Start hiding games')))
+	SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
+	SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
+	SKIN\Bang(('[!SetVariable "ContextTitleDetectGames" "%s"]')\format(LOCALIZATION\get('main_context_title_detect_games', 'Detect games')))
+	SKIN\Bang(('[!SetVariable "ContextTitleAddGame" "%s"]')\format(LOCALIZATION\get('main_context_title_add_game', 'Add a game')))
+
 export Initialize = () ->
 	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
 	STATE.PATHS.DOWNLOADFILE = SKIN\GetVariable('CURRENTPATH') .. 'DownloadFile\\'
@@ -193,6 +203,7 @@ export Initialize = () ->
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
 			log('Initializing skin')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
+			updateContextTitles()
 			COMPONENTS.STATUS\show(LOCALIZATION\get('status_initializing', 'Initializing'))
 			SKIN\Bang(('[!SetVariable "ContextTitleSettings" "%s"]')\format(LOCALIZATION\get('main_context_title_settings', 'Settings')))
 			SKIN\Bang(('[!SetVariable "ContextTitleOpenShortcutsFolder" "%s"]')\format(LOCALIZATION\get('main_context_title_open_shortcuts_folder', 'Open shortcuts folder')))
