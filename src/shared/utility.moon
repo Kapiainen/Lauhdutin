@@ -289,6 +289,11 @@ return {
 			title = title\gsub(pattern, replacement)
 		return title
 
+	bannerExtensions: {
+		'.jpg'
+		'.png'
+	}
+
 	downloadFile: (url, path, finishCallback, errorCallback) -> downloadFile(url, path, finishCallback, errorCallback)
 
 	stopDownloader: () ->

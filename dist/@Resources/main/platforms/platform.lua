@@ -55,10 +55,7 @@ do
   _class_0 = setmetatable({
     __init = function(self, settings)
       assert(type(settings) == 'table', 'main.platforms.platform.Platform')
-      self.bannerExtensions = {
-        '.jpg',
-        '.png'
-      }
+      self.bannerExtensions = utility.bannerExtensions
     end,
     __base = _base_0,
     __name = "Platform"

@@ -699,6 +699,10 @@ return {
     end
     return title
   end,
+  bannerExtensions = {
+    '.jpg',
+    '.png'
+  },
   downloadFile = function(url, path, finishCallback, errorCallback)
     return downloadFile(url, path, finishCallback, errorCallback)
   end,

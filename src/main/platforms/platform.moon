@@ -1,10 +1,7 @@
 class Platform
 	new: (settings) =>
 		assert(type(settings) == 'table', 'main.platforms.platform.Platform')
-		@bannerExtensions = {
-			'.jpg'
-			'.png'
-		}
+		@bannerExtensions = utility.bannerExtensions
 
 	validate: () => assert(nil, 'Platform has not implemented the validate method.')
 
