@@ -1,7 +1,7 @@
 class Game
 	new: (args) =>
 		assert(type(args.title) == 'string' and args.title\trim() ~= '', 'main.game.Game')
-		@title = @_moveThe(args.title)
+		@title = utility.adjustTitle(args.title)
 		assert(type(args.path) == 'string', 'main.game.Game')
 		@path = args.path
 		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
@@ -55,14 +55,6 @@ class Game
 			@banner = other.banner
 			@bannerURL = other.bannerURL
 			@expectedBanner = other.expectedBanner
-
-	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
-	-- the substring 'the' does not lead to a bunch of unrelated games beginning with 'the ' to show up.
-	-- Also helps when alphabetically sorting games.
-	_moveThe: (title) =>
-		if title\lower()\startsWith('the ')
-			title = ('%s, %s')\format(title\sub(5), title\sub(1, 3))
-		return title
 
 	_parseProcess: (path) =>
 		-- If no process is specified, then try to fall back on using the name of the game executable.

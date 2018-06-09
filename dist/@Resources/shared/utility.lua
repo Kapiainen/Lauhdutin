@@ -485,6 +485,11 @@ parseVDF = function(lines, start)
   end
   return result, i
 end
+local titleAdjustments = {
+  ['&lt;'] = '<',
+  ['&gt;'] = '>',
+  ['&amp;'] = '&'
+}
 return {
   createJSONHelpers = function()
     local json = require('lib.json')
@@ -667,5 +672,14 @@ return {
     local x = math.round(monitorX + (monitorWidth - width) / 2)
     local y = math.round(monitorY + (monitorHeight - height) / 2)
     return x, y
+  end,
+  adjustTitle = function(title)
+    if title:lower():startsWith('the ') then
+      title = ('%s, %s'):format(title:sub(5), title:sub(1, 3))
+    end
+    for pattern, replacement in pairs(titleAdjustments) do
+      title = title:gsub(pattern, replacement)
+    end
+    return title
   end
 }

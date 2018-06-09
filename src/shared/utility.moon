@@ -147,6 +147,13 @@ parseVDF = (lines, start = 1) ->
 					assert(nil, ('"parseVDF" encountered unexpected input on line %d: %s.')\format(i, lines[i]))		
 	return result, i
 
+
+titleAdjustments = {
+	['&lt;']: '<'
+	['&gt;']: '>'
+	['&amp;']: '&'
+}
+
 return {
 	createJSONHelpers: () ->
 		json = require('lib.json')
@@ -259,4 +266,11 @@ return {
 		x = math.round(monitorX + (monitorWidth - width) / 2)
 		y = math.round(monitorY + (monitorHeight - height) / 2)
 		return x, y
+
+	adjustTitle: (title) ->
+		if title\lower()\startsWith('the ')
+			title = ('%s, %s')\format(title\sub(5), title\sub(1, 3))
+		for pattern, replacement in pairs(titleAdjustments)
+			title = title\gsub(pattern, replacement)
+		return title
 }

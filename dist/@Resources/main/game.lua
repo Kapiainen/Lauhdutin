@@ -38,12 +38,6 @@ do
         self.expectedBanner = other.expectedBanner
       end
     end,
-    _moveThe = function(self, title)
-      if title:lower():startsWith('the ') then
-        title = ('%s, %s'):format(title:sub(5), title:sub(1, 3))
-      end
-      return title
-    end,
     _parseProcess = function(self, path)
       path = path:gsub("\\", "/"):gsub("//", "/"):reverse()
       local process = path:match("(exe%p[^\\/:%*?<>|]+)/")
@@ -311,7 +305,7 @@ do
   _class_0 = setmetatable({
     __init = function(self, args)
       assert(type(args.title) == 'string' and args.title:trim() ~= '', 'main.game.Game')
-      self.title = self:_moveThe(args.title)
+      self.title = utility.adjustTitle(args.title)
       assert(type(args.path) == 'string', 'main.game.Game')
       self.path = args.path
       assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
