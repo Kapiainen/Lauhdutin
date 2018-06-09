@@ -1,17 +1,3 @@
-[Metadata]
-Name=Lauhdutin - filter
-Author=Kapiainen
-Information=
-Version=
-License=MIT
-
-[Rainmeter]
-Update=32
-AccurateText=1
-OnUnfocusAction=[!DeactivateConfig]
-Group=LauhdutinSubconfigs
-;DefaultUpdateDivider=-1
-
 [Script]
 Measure=Script
 ScriptFile=#@#filter\init.lua

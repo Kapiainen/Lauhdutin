@@ -28,6 +28,7 @@ export STATE = {
 	ARGUMENTS: {}
 	NUM_GAMES_PATTERN: ''
 	BACK_BUTTON_TITLE: ''
+	VARIANT: nil
 }
 
 COMPONENTS = {
@@ -79,7 +80,7 @@ class Slot
 			return true
 		filter = STATE.FILTER_TYPE
 		arguments = json.encode(STATE.ARGUMENTS)\gsub('"', '|')
-		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter, tostring(STATE.STACK), arguments))
+		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#%s"]')\format(filter, tostring(STATE.STACK), arguments, STATE.VARIANT))
 		return false
 
 export Game = nil
@@ -105,13 +106,14 @@ export Initialize = () ->
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			STATE.NUM_GAMES_PATTERN = LOCALIZATION\get('game_number_of_games', '%d games')
 			STATE.BACK_BUTTON_TITLE = LOCALIZATION\get('filter_back_button_title', 'Back')
-			Game = require('main.game')
 			STATE.SCROLL_INDEX = 1
 			COMPONENTS.SLOTS = [Slot(i) for i = 1, STATE.NUM_SLOTS]
 			scrollbar = SKIN\GetMeter('Scrollbar')
 			STATE.SCROLLBAR.START = scrollbar\GetY()
 			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			SKIN\Bang('[!CommandMeasure "Script" "HandshakeFilter()" "#ROOTCONFIG#"]')
+			STATE.VARIANT = SKIN\GetVariable('Variant', nil)
+			STATE.VARIANT = if STATE.VARIANT ~= nil and STATE.VARIANT ~= '' then ('\\%s')\format(STATE.VARIANT) else ''
+			SKIN\Bang(('[!CommandMeasure "Script" "HandshakeFilter()" "#ROOTCONFIG#%s"]')\format(STATE.VARIANT))
 			COMPONENTS.STATUS\hide()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -500,7 +502,7 @@ updateSlots = () ->
 		if i == STATE.HIGHLIGHTED_SLOT_INDEX
 			MouseOver(i)
 
-export Handshake = (stack, appliedFilters) ->
+export Handshake = (stack, appliedFilters, variant) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Filter handshake', stack)
@@ -512,9 +514,17 @@ export Handshake = (stack, appliedFilters) ->
 			uninstalledGames = {}
 			appliedFilters = appliedFilters\gsub('|', '"')
 			filterStack = json.decode(appliedFilters)
+			Game = switch variant
+				when 'Main' then require('main.game')
+				else
+					assert(nil, 'Unsupported variant')
 			if stack
 				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_current_title', 'Filter (current games)')))
-				library = require('shared.library')(COMPONENTS.SETTINGS, false)
+				library = require('shared.library')
+				library = switch variant
+					when 'Main' then library(COMPONENTS.SETTINGS, nil, nil, false)
+					else
+						assert(nil, 'Unsupported variant')
 				platformsEnabledStatus = {}
 				temp = {}
 				for platform in *platforms
@@ -543,7 +553,10 @@ export Handshake = (stack, appliedFilters) ->
 			else
 				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_all_title', 'Filter')))
 				platforms = [platform for platform in *platforms when platform\isEnabled()]
-				games = io.readJSON('games.json')
+				games = switch variant
+					when 'Main' then io.readJSON('games.json')
+					else
+						assert(nil, 'Unsupported variant')
 				games = [Game(args) for args in *games.games]
 				for i = #games, 1, -1
 					if not games[i]\isVisible()
@@ -558,7 +571,7 @@ export Handshake = (stack, appliedFilters) ->
 				meter = SKIN\GetMeter('WindowShadow')
 				skinWidth = meter\GetW()
 				skinHeight = meter\GetH()
-				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+				mainConfig = utility.getConfig(('%s%s')\format(SKIN\GetVariable('ROOTCONFIG'), STATE.VARIANT))
 				monitorIndex = nil
 				if mainConfig ~= nil
 					monitorIndex = utility.getConfigMonitor(mainConfig) or 1
