@@ -618,7 +618,7 @@ do
       end
       self.currentGameID = 1
       self.numBackups = settings:getNumberOfBackups()
-      self.backupFilePattern = 'games_backup_%d.json'
+      self.backupFilePattern = path:sub(1, path:find('%.') - 1) .. '_backup_%d.json'
       self.searchUninstalledGames = settings:getSearchUninstalledGamesEnabled()
       self.searchHiddenGames = settings:getSearchHiddenGamesEnabled()
       self.filterStack = { }

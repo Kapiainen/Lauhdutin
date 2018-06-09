@@ -66,7 +66,7 @@ class Library
 		games = if io.fileExists(@path) then io.readJSON(@path) else {}
 		@currentGameID = 1
 		@numBackups = settings\getNumberOfBackups()
-		@backupFilePattern = 'games_backup_%d.json'
+		@backupFilePattern = path\sub(1, path\find('%.') - 1) .. '_backup_%d.json'
 		@searchUninstalledGames = settings\getSearchUninstalledGamesEnabled()
 		@searchHiddenGames = settings\getSearchHiddenGamesEnabled()
 		@filterStack = {}
