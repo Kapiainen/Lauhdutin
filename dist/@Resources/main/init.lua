@@ -87,7 +87,7 @@ startDetectingPlatformGames = function()
   local _exp_0 = STATE.PLATFORM_QUEUE[1]:getPlatformID()
   if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
     log('Starting to detect Windows shortcuts')
-    return utility.runCommand(STATE.PLATFORM_QUEUE[1]:parseShortcuts())
+    return STATE.PLATFORM_QUEUE[1]:parseShortcuts()
   elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
     local url, path, finishCallback, errorCallback = STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()
     if url ~= nil then
@@ -1055,9 +1055,6 @@ OnFinishedDetectingPlatformGames = function()
 end
 OnParsedShortcuts = function()
   local success, err = pcall(function()
-    if not (STATE.PLATFORM_QUEUE[1]:hasParsedShortcuts()) then
-      return utility.runLastCommand()
-    end
     log('Parsed Windows shortcuts')
     local output = ''
     local path = STATE.PLATFORM_QUEUE[1]:getOutputPath()

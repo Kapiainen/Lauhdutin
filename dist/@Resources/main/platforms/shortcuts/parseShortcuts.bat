@@ -8,8 +8,6 @@ if not exist "%cd%\Shortcuts" mkdir "%cd%\Shortcuts"
 cd cache
 if not exist "%cd%\shortcuts" mkdir "%cd%\shortcuts"
 cd shortcuts
-set "completed="%cd%\completed.txt""
-if exist %completed% del %completed%
 set "output="%cd%\output.txt""
 cd %1
 for /R %%F in (*.lnk) do (
@@ -20,5 +18,6 @@ for /R %%F in (*.url) do (
 	echo %%F >> %output%
 	wscript %parser% "%%~fF" >> %output%
 )
-echo "" > %completed%
+set "rainmeter="%~2\Rainmeter.exe""
+start /B "" %rainmeter% !CommandMeasure "Script" "OnParsedShortcuts()" %3
 ::pause

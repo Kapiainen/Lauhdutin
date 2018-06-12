@@ -18,8 +18,7 @@ class Shortcuts extends Platform
 	parseShortcuts: () =>
 		if io.fileExists(@outputPath)
 			io.writeFile(@outputPath, '')
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s"]')\format(@shortcutsPath))
-		return @getWaitCommand(), '', 'OnParsedShortcuts'
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@shortcutsPath))
 
 	hasParsedShortcuts: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 

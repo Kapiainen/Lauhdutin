@@ -10,8 +10,7 @@ do
       if io.fileExists(self.outputPath) then
         io.writeFile(self.outputPath, '')
       end
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s"]'):format(self.shortcutsPath))
-      return self:getWaitCommand(), '', 'OnParsedShortcuts'
+      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.shortcutsPath))
     end,
     hasParsedShortcuts = function(self)
       return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))

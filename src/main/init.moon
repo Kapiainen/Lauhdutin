@@ -86,7 +86,7 @@ startDetectingPlatformGames = () ->
 	switch STATE.PLATFORM_QUEUE[1]\getPlatformID()
 		when ENUMS.PLATFORM_IDS.SHORTCUTS
 			log('Starting to detect Windows shortcuts')
-			utility.runCommand(STATE.PLATFORM_QUEUE[1]\parseShortcuts())
+			STATE.PLATFORM_QUEUE[1]\parseShortcuts()
 		when ENUMS.PLATFORM_IDS.STEAM
 			url, path, finishCallback, errorCallback = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
 			if url ~= nil
@@ -776,8 +776,6 @@ export OnFinishedDetectingPlatformGames = () ->
 export OnParsedShortcuts = () ->
 	success, err = pcall(
 		() ->
-			unless STATE.PLATFORM_QUEUE[1]\hasParsedShortcuts()
-				return utility.runLastCommand()
 			log('Parsed Windows shortcuts')
 			output = ''
 			path = STATE.PLATFORM_QUEUE[1]\getOutputPath()
