@@ -524,7 +524,7 @@ class Settings
 	setSteamPath: (path) =>
 		return false unless io.fileExists(io.joinPaths(path, 'Steam.exe'), false)
 		@settings.platforms.steam.path = path
-		SKIN\Bang(('["#@#windowless.vbs" "#@#settings\\platforms\\steam\\listUsers.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#\\Session"]')\format(io.joinPaths(path, 'userdata')))
+		SKIN\Bang(('["#@#windowless.vbs" "#@#settings\\platforms\\steam\\listUsers.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#\\Settings"]')\format(io.joinPaths(path, 'userdata')))
 		return true
 
 	getSteamAccountID: () => return @settings.platforms.steam.accountID or nil
