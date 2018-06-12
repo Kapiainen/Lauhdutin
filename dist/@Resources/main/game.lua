@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Game
 do
   local _class_0

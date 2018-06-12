@@ -1,5 +1,3 @@
-utility = require('shared.utility')
-
 class Slot
 	new: (index) =>
 		assert(type(index) == 'number' and index % 1 == 0, 'main.slots.slot.Slot')

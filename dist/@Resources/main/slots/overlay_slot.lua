@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local images = {
   play = 'overlay_slot_play.png',
   error = 'overlay_slot_error.png',

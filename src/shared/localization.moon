@@ -1,5 +1,3 @@
-utility = require('shared.utility')
-
 migrators = {
 	{
 		version: 1
