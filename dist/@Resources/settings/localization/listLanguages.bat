@@ -10,4 +10,6 @@ if not exist "%cd%\custom" mkdir "%cd%\custom"
 set "output="%cd%\languages.txt""
 cd ..\Languages
 dir /a:-d /o:n /b > %output%
+set "rainmeter="%~1\Rainmeter.exe""
+start /B "" %rainmeter% !CommandMeasure "Script" "OnLanguagesListed()" %2
 ::pause

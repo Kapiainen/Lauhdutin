@@ -91,8 +91,7 @@ export Initialize = () ->
 			STATE.SCROLL_INDEX = 1
 			STATE.MAX_SCROLL_INDEX = COMPONENTS.SLOTS\update(settings)
 			os.remove(io.absolutePath('cache\\languages.txt'))
-			SKIN\Bang('["#@#windowless.vbs" "#@#settings\\localization\\listLanguages.bat"]')
-			utility.runCommand(utility.waitCommand, '', 'OnLanguagesListed')
+			SKIN\Bang('["#@#windowless.vbs" "#@#settings\\localization\\listLanguages.bat" "#PROGRAMPATH#" "#ROOTCONFIG#\\Settings"]')
 	)
 	return COMPONENTS.STATUS\show(err, true) unless success
 	STATE.INITIALIZED = true
@@ -256,16 +255,12 @@ export EditString = (index, value) ->
 	COMPONENTS.SLOTS\editString(index, value)
 
 export OnLanguagesListed = () ->
-	unless io.fileExists('cache\\languages.txt')
-		return utility.runLastCommand()
 	setting = COMPONENTS.SLOTS\getSetting(COMPONENTS.SLOTS\getNumSettings() - 3) -- Magic number offset
 	setting\setValues()
 	COMPONENTS.SLOTS\scroll()
 	COMPONENTS.STATUS\hide()
 
 export OnSteamUsersListed = () ->
-	unless io.fileExists('cache\\steam\\completed.txt')
-		return utility.runLastCommand()
 	COMPONENTS.SLOTS\getSetting(3)\setValues() -- Magic number offset
 	COMPONENTS.SLOTS\scroll()
 

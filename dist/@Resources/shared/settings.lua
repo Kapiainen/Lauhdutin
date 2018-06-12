@@ -571,8 +571,7 @@ do
         return false
       end
       self.settings.platforms.steam.path = path
-      SKIN:Bang(('["#@#windowless.vbs" "#@#settings\\platforms\\steam\\listUsers.bat" "%s"]'):format(io.joinPaths(path, 'userdata')))
-      utility.runCommand(utility.waitCommand, '', 'OnSteamUsersListed')
+      SKIN:Bang(('["#@#windowless.vbs" "#@#settings\\platforms\\steam\\listUsers.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#\\Session"]'):format(io.joinPaths(path, 'userdata')))
       return true
     end,
     getSteamAccountID = function(self)
