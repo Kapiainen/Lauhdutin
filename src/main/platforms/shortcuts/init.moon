@@ -20,8 +20,6 @@ class Shortcuts extends Platform
 			io.writeFile(@outputPath, '')
 		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@shortcutsPath))
 
-	hasParsedShortcuts: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
-
 	getOutputPath: () => return @outputPath
 
 	generateGames: (output) =>

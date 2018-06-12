@@ -12,9 +12,6 @@ do
       end
       return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.shortcutsPath))
     end,
-    hasParsedShortcuts = function(self)
-      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
-    end,
     getOutputPath = function(self)
       return self.outputPath
     end,
