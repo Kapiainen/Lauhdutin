@@ -427,7 +427,7 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getGlobalStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStartingBangs')
+            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGlobalStartingBangs')
           end
         }),
         Settings.Action({
@@ -438,7 +438,7 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getGlobalStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStoppingBangs')
+            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGlobalStoppingBangs')
           end
         }),
         Settings.Boolean({

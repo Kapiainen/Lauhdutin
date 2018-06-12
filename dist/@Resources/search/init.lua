@@ -5,9 +5,6 @@ end
 local utility = nil
 LOCALIZATION = nil
 local STATE = {
-  PATHS = {
-    RESOURCES = nil
-  },
   STACK = false,
   CENTERED = false
 }
@@ -24,8 +21,7 @@ HideStatus = function()
 end
 Initialize = function()
   SKIN:Bang('[!Hide]')
-  STATE.PATHS.RESOURCES = SKIN:GetVariable('@')
-  dofile(('%s%s'):format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+  dofile(('%s%s'):format(SKIN:GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     require('shared.string')

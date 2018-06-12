@@ -9,7 +9,7 @@ class Shortcuts extends Platform
 		@platformID = ENUMS.PLATFORM_IDS.SHORTCUTS
 		@name = LOCALIZATION\get('platform_name_windows_shortcut', 'Windows shortcut')
 		@cachePath = 'cache\\shortcuts\\'
-		@shortcutsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')
+		@shortcutsPath = io.absolutePath(io.joinPaths('Shortcuts\\'))
 		@outputPath = io.joinPaths(@cachePath, 'output.txt')
 		@enabled = settings\getShortcutsEnabled()
 

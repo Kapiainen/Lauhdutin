@@ -37,12 +37,12 @@ class GOGGalaxy extends Platform
 		@useCommunityProfile = settings\getGOGGalaxyParseCommunityProfile()
 		@communityProfileName = settings\getGOGGalaxyProfileName()
 		@communityProfileJavaScriptPath = io.joinPaths('main','platforms', 'gog_galaxy', 'profile.js')
-		@phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
+		@phantomjsPath = io.absolutePath(io.joinPaths('phantomjs.exe'))
 		@games = {}
 
 	validate: () =>
 		assert(io.fileExists(io.joinPaths(@programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-		sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
+		sqlitePath = io.absolutePath(io.joinPaths('sqlite3.exe'))
 		assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".')\format(sqlitePath))
 		if @clientPath ~= nil
 			@clientPath = io.joinPaths(@clientPath, 'GalaxyClient.exe')

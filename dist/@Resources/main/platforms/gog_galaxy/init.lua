@@ -8,7 +8,7 @@ do
   local _base_0 = {
     validate = function(self)
       assert(io.fileExists(io.joinPaths(self.programDataPath, 'storage\\galaxy.db'), false), 'The path to GOG Galaxy\'s ProgramData directory is not valid.')
-      local sqlitePath = io.joinPaths(STATE.PATHS.RESOURCES, 'sqlite3.exe')
+      local sqlitePath = io.absolutePath(io.joinPaths('sqlite3.exe'))
       assert(io.fileExists(sqlitePath, false) == true, ('SQLite3 CLI tool is missing. Expected the path to be "%s".'):format(sqlitePath))
       if self.clientPath ~= nil then
         self.clientPath = io.joinPaths(self.clientPath, 'GalaxyClient.exe')
@@ -292,7 +292,7 @@ do
       self.useCommunityProfile = settings:getGOGGalaxyParseCommunityProfile()
       self.communityProfileName = settings:getGOGGalaxyProfileName()
       self.communityProfileJavaScriptPath = io.joinPaths('main', 'platforms', 'gog_galaxy', 'profile.js')
-      self.phantomjsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'phantomjs.exe')
+      self.phantomjsPath = io.absolutePath(io.joinPaths('phantomjs.exe'))
       self.games = { }
     end,
     __base = _base_0,

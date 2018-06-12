@@ -21,7 +21,7 @@ class Shortcuts extends Page
 				tooltip: LOCALIZATION\get('setting_shortcuts_open_folder_description', 'Shortcuts and their banners should be placed in this folder. The banners should be named after their corresponding shortcut.')
 				label: LOCALIZATION\get('button_label_open', 'Open')
 				perform:() =>
-					SKIN\Bang(('[%s]')\format(io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')))
+					SKIN\Bang(('[%s]')\format(io.absolutePath(io.joinPaths('Shortcuts\\'))))
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
@@ -31,7 +31,7 @@ class Shortcuts extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getShortcutsStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedShortcutsStartingBangs')
+					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStartingBangs')
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
@@ -41,7 +41,7 @@ class Shortcuts extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getShortcutsStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedShortcutsStoppingBangs')
+					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStoppingBangs')
 			})
 		}
 

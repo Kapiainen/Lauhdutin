@@ -9,8 +9,6 @@ LOCALIZATION = nil
 STATE = {
   INITIALIZED = false,
   PATHS = {
-    RESOURCES = nil,
-    DOWNLOADFILE = nil,
     GAMES = 'games.json'
   },
   ROOT_CONFIG = nil,
@@ -227,10 +225,8 @@ additionalEnums = function()
   }
 end
 Initialize = function()
-  STATE.PATHS.RESOURCES = SKIN:GetVariable('@')
-  STATE.PATHS.DOWNLOADFILE = SKIN:GetVariable('CURRENTPATH') .. 'DownloadFile\\'
   STATE.ROOT_CONFIG = SKIN:GetVariable('ROOTCONFIG')
-  dofile(('%s%s'):format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+  dofile(('%s%s'):format(SKIN:GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     require('shared.string')

@@ -29,7 +29,7 @@ do
           tooltip = LOCALIZATION:get('setting_shortcuts_open_folder_description', 'Shortcuts and their banners should be placed in this folder. The banners should be named after their corresponding shortcut.'),
           label = LOCALIZATION:get('button_label_open', 'Open'),
           perform = function(self)
-            return SKIN:Bang(('[%s]'):format(io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')))
+            return SKIN:Bang(('[%s]'):format(io.absolutePath(io.joinPaths('Shortcuts\\'))))
           end
         }),
         Settings.Action({
@@ -40,7 +40,7 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getShortcutsStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedShortcutsStartingBangs')
+            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStartingBangs')
           end
         }),
         Settings.Action({
@@ -51,7 +51,7 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedShortcutsStoppingBangs')
+            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStoppingBangs')
           end
         })
       }

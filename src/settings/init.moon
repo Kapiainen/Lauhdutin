@@ -9,7 +9,6 @@ export LOCALIZATION = nil
 export STATE = {
 	INITIALIZED: false
 	PATHS: {
-		RESOURCES: nil
 		RAINMETER: nil
 		GAMES: 'games.json'
 	}
@@ -67,10 +66,8 @@ additionalEnums = () ->
 	}
 
 export Initialize = () ->
-	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
-	STATE.PATHS.RAINMETER = SKIN\GetVariable('PROGRAMPATH') .. 'Rainmeter.exe'
 	STATE.CURRENT_CONFIG = SKIN\GetVariable('CURRENTCONFIG')
-	dofile(('%s%s')\format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+	dofile(('%s%s')\format(SKIN\GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->

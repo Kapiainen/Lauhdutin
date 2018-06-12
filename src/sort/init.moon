@@ -7,9 +7,6 @@ utility = nil
 export LOCALIZATION = nil
 
 export STATE = {
-	PATHS: {
-		RESOURCES: nil
-	}
 	SCROLLBAR: {
 		START: nil
 		MAX_HEIGHT: nil
@@ -69,8 +66,7 @@ export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
-	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
-	dofile(('%s%s')\format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+	dofile(('%s%s')\format(SKIN\GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->

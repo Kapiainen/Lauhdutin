@@ -7,9 +7,6 @@ utility = nil
 export LOCALIZATION = nil
 
 STATE = {
-	PATHS: {
-		RESOURCES: nil
-	}
 	STACK: false
 	CENTERED: false
 }
@@ -25,8 +22,7 @@ export HideStatus = () -> COMPONENTS.STATUS\hide()
 -- TODO: Have a look at the possibility of being able to use Lua patterns (square brackets seem to cause issues, but dot works just fine)
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
-	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
-	dofile(('%s%s')\format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+	dofile(('%s%s')\format(SKIN\GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->

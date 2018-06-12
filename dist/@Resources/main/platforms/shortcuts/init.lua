@@ -138,7 +138,7 @@ do
       self.platformID = ENUMS.PLATFORM_IDS.SHORTCUTS
       self.name = LOCALIZATION:get('platform_name_windows_shortcut', 'Windows shortcut')
       self.cachePath = 'cache\\shortcuts\\'
-      self.shortcutsPath = io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')
+      self.shortcutsPath = io.absolutePath(io.joinPaths('Shortcuts\\'))
       self.outputPath = io.joinPaths(self.cachePath, 'output.txt')
       self.enabled = settings:getShortcutsEnabled()
     end,

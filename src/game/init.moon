@@ -101,8 +101,7 @@ getGamesAndTags = () ->
 
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
-	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
-	dofile(('%s%s')\format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
+	dofile(('%s%s')\format(SKIN\GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
@@ -797,7 +796,7 @@ export StartEditingStartingBangs = () ->
 		() ->
 			bangs = STATE.GAME\getStartingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStartingBangs')
+			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStartingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -816,7 +815,7 @@ export StartEditingStoppingBangs = () ->
 		() ->
 			bangs = STATE.GAME\getStoppingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStoppingBangs')
+			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStoppingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -843,7 +842,7 @@ export StartEditingNotes = () ->
 			notes = STATE.GAME\getNotes()
 			notes = '' if notes == nil
 			io.writeFile(STATE.PATHS.NOTES, notes)
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.NOTES)), '', 'OnEditedNotes')
+			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.NOTES))), '', 'OnEditedNotes')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
