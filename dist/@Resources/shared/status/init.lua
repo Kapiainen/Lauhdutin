@@ -1,13 +1,17 @@
+local update
+update = function()
+  return SKIN:Bang('[!UpdateMeter "StatusMessage"]')
+end
 local Status
 do
   local _class_0
   local _base_0 = {
-    update = function(self)
-      return SKIN:Bang('[!UpdateMeter "StatusMessage"]')
-    end,
     show = function(self, message, exception)
       if exception == nil then
         exception = false
+      end
+      if self.exception then
+        return 
       end
       assert(type(message) == 'string', 'shared.status.init.Status')
       if not (self.visible) then
@@ -29,7 +33,7 @@ do
         log(message)
       end
       SKIN:Bang(('[!SetOption "StatusMessage" "Text" "%s"]'):format(message))
-      return self:update()
+      return update()
     end,
     hide = function(self)
       if not (self.visible) then
@@ -40,7 +44,7 @@ do
       end
       self.visible = false
       SKIN:Bang('[!HideMeter "StatusMessage"]')
-      return self:update()
+      return update()
     end
   }
   _base_0.__index = _base_0

@@ -1,11 +1,12 @@
+update = () -> SKIN\Bang('[!UpdateMeter "StatusMessage"]')
+
 class Status
 	new: () =>
 		@visible = true
 		@exception = false
 
-	update: () => SKIN\Bang('[!UpdateMeter "StatusMessage"]')
-
 	show: (message, exception = false) =>
+		return if @exception
 		assert(type(message) == 'string', 'shared.status.init.Status')
 		SKIN\Bang('[!ShowMeter "StatusMessage"]') unless @visible
 		@visible = true
@@ -20,13 +21,13 @@ class Status
 		else
 			log(message)
 		SKIN\Bang(('[!SetOption "StatusMessage" "Text" "%s"]')\format(message))
-		@update()
+		update()
 
 	hide: () =>
 		return unless @visible
 		return if @exception
 		@visible = false
 		SKIN\Bang('[!HideMeter "StatusMessage"]')
-		@update()
+		update()
 
 return Status
