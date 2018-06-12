@@ -25,6 +25,31 @@ lookupTable[63] = '4611686018427387904'
 lookupTable[64] = '9223372036854775808'
 lookupTable = [ [tonumber(char) for char in value\reverse()\gmatch('.')] for value in *lookupTable ]
 
+parseVDF = (lines, start = 1) ->
+	result = {}
+	i = start - 1
+	while i < #lines
+		i += 1
+		key = lines[i]\match('^%s*"([^"]+)"%s*$') -- Start of a dictionary
+		if key ~= nil
+			assert(lines[i + 1]\match('^%s*{%s*$') ~= nil, '"parseVDF" expected "{".')
+			tbl, i = parseVDF(lines, i + 2)
+			result[key\lower()] = tbl
+		else
+			key, value = lines[i]\match('^%s*"([^"]+)"%s*"(.-)"%s*$') -- Key-value pair
+			if key ~= nil and value ~= nil
+				result[key\lower()] = value
+			else
+				if lines[i]\match('^%s*}%s*$') -- End of a dictionary
+					return result, i
+				elseif lines[i]\match('^%s*//.*$') -- Comment
+					continue
+				elseif lines[i]\match('^%s*"#base"%s*"([^"]+)"%s*$')
+					continue
+				else
+					assert(nil, ('"parseVDF" encountered unexpected input on line %d: %s.')\format(i, lines[i]))		
+	return result, i
+
 class Steam extends Platform
 	new: (settings) =>
 		super(settings)
@@ -152,7 +177,7 @@ class Steam extends Platform
 		if io.fileExists(libraryFoldersPath, false)
 			file = io.readFile(libraryFoldersPath, false)
 			lines = file\splitIntoLines()
-			vdf = utility.parseVDF(lines)
+			vdf = parseVDF(lines)
 			if type(vdf.libraryfolders) == 'table'
 				for key, value in pairs(vdf.libraryfolders)
 					if tonumber(key) ~= nil
@@ -174,13 +199,13 @@ class Steam extends Platform
 		log('Parsing localconfig.vdf')
 		file = io.readFile(io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\localconfig.vdf'), false)
 		lines = file\splitIntoLines()
-		return utility.parseVDF(lines)
+		return parseVDF(lines)
 
 	parseSharedConfig: () =>
 		log('Parsing sharedconfig.vdf')
 		file = io.readFile(io.joinPaths(@steamPath, 'userdata\\', @accountID, '\\7\\remote\\sharedconfig.vdf'), false)
 		lines = file\splitIntoLines()
-		return utility.parseVDF(lines)
+		return parseVDF(lines)
 
 	getTags: (appID, sharedConfig) =>
 		tags = nil
@@ -339,7 +364,7 @@ class Steam extends Platform
 				continue
 			file = io.readFile(io.joinPaths(libraryPath, manifest), false)
 			lines = file\splitIntoLines()
-			success, vdf = pcall(utility.parseVDF, lines)
+			success, vdf = pcall(parseVDF, lines)
 			unless success
 				log(('Failed to parse "%s": %s')\format(manifest, vdf))
 				continue
