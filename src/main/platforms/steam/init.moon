@@ -166,12 +166,9 @@ class Steam extends Platform
 
 	hasLibrariesToParse: () => return #@libraries > 0
 
-	hasGottenACFs: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
-
 	getACFs: () =>
 		io.writeFile(io.joinPaths(@cachePath, 'output.txt'), '')
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]')\format(@libraries[1]))
-		return @getWaitCommand(), '', 'OnGotACFs'
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@libraries[1]))
 
 	parseLocalConfig: () =>
 		log('Parsing localconfig.vdf')

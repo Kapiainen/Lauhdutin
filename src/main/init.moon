@@ -96,7 +96,7 @@ startDetectingPlatformGames = () ->
 				log('Starting to detect Steam games')
 				STATE.PLATFORM_QUEUE[1]\getLibraries()
 				if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-					utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())
+					STATE.PLATFORM_QUEUE[1]\getACFs()
 				else
 					OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
@@ -801,7 +801,7 @@ export OnCommunityProfileDownloaded = () ->
 			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile(profile)
 			STATE.PLATFORM_QUEUE[1]\getLibraries()
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())
+				return STATE.PLATFORM_QUEUE[1]\getACFs()
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -813,7 +813,7 @@ export OnCommunityProfileDownloadFailed = () ->
 			stopDownloader()
 			STATE.PLATFORM_QUEUE[1]\getLibraries()
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())
+				return STATE.PLATFORM_QUEUE[1]\getACFs()
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -821,12 +821,10 @@ export OnCommunityProfileDownloadFailed = () ->
 export OnGotACFs = () ->
 	success, err = pcall(
 		() ->
-			unless STATE.PLATFORM_QUEUE[1]\hasGottenACFs()
-				return utility.runLastCommand()
 			log('Dumped list of Steam appmanifests')
 			STATE.PLATFORM_QUEUE[1]\generateGames()
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\getACFs())
+				return STATE.PLATFORM_QUEUE[1]\getACFs()
 			STATE.PLATFORM_QUEUE[1]\generateShortcuts()
 			OnFinishedDetectingPlatformGames()
 	)

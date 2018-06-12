@@ -97,7 +97,7 @@ startDetectingPlatformGames = function()
       log('Starting to detect Steam games')
       STATE.PLATFORM_QUEUE[1]:getLibraries()
       if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-        return utility.runCommand(STATE.PLATFORM_QUEUE[1]:getACFs())
+        return STATE.PLATFORM_QUEUE[1]:getACFs()
       else
         return OnFinishedDetectingPlatformGames()
       end
@@ -1082,7 +1082,7 @@ OnCommunityProfileDownloaded = function()
     STATE.PLATFORM_QUEUE[1]:parseCommunityProfile(profile)
     STATE.PLATFORM_QUEUE[1]:getLibraries()
     if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return utility.runCommand(STATE.PLATFORM_QUEUE[1]:getACFs())
+      return STATE.PLATFORM_QUEUE[1]:getACFs()
     end
     return OnFinishedDetectingPlatformGames()
   end)
@@ -1096,7 +1096,7 @@ OnCommunityProfileDownloadFailed = function()
     stopDownloader()
     STATE.PLATFORM_QUEUE[1]:getLibraries()
     if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return utility.runCommand(STATE.PLATFORM_QUEUE[1]:getACFs())
+      return STATE.PLATFORM_QUEUE[1]:getACFs()
     end
     return OnFinishedDetectingPlatformGames()
   end)
@@ -1106,13 +1106,10 @@ OnCommunityProfileDownloadFailed = function()
 end
 OnGotACFs = function()
   local success, err = pcall(function()
-    if not (STATE.PLATFORM_QUEUE[1]:hasGottenACFs()) then
-      return utility.runLastCommand()
-    end
     log('Dumped list of Steam appmanifests')
     STATE.PLATFORM_QUEUE[1]:generateGames()
     if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return utility.runCommand(STATE.PLATFORM_QUEUE[1]:getACFs())
+      return STATE.PLATFORM_QUEUE[1]:getACFs()
     end
     STATE.PLATFORM_QUEUE[1]:generateShortcuts()
     return OnFinishedDetectingPlatformGames()

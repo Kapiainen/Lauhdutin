@@ -203,13 +203,9 @@ do
     hasLibrariesToParse = function(self)
       return #self.libraries > 0
     end,
-    hasGottenACFs = function(self)
-      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
-    end,
     getACFs = function(self)
       io.writeFile(io.joinPaths(self.cachePath, 'output.txt'), '')
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s"]'):format(self.libraries[1]))
-      return self:getWaitCommand(), '', 'OnGotACFs'
+      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.libraries[1]))
     end,
     parseLocalConfig = function(self)
       log('Parsing localconfig.vdf')
