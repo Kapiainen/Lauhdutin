@@ -75,11 +75,12 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			require('shared.string')
+			json = require('lib.json')
+			require('shared.io')(json)
 			require('shared.rainmeter')
 			require('shared.enums')
 			additionalEnums()
 			utility = require('shared.utility')
-			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			COMPONENTS.OLD_SETTINGS = require('shared.settings')()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)

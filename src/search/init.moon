@@ -31,10 +31,11 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			require('shared.string')
+			json = require('lib.json')
+			require('shared.io')(json)
 			require('shared.rainmeter')
 			require('shared.enums')
 			utility = require('shared.utility')
-			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			SKIN\Bang(('[!SetOption "WindowTitle" "Text" "%s"]')\format(LOCALIZATION\get('search_window_all_title', 'Search')))
