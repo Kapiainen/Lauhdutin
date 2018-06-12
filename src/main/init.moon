@@ -111,11 +111,8 @@ startDetectingPlatformGames = () ->
 				OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
 			log('Starting to detect GOG Galaxy games')
-			parameter, output, callback = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
-			if parameter ~= nil
-				utility.runCommand(parameter, output, callback)
-			else
-				utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
+			unless STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
+				STATE.PLATFORM_QUEUE[1]\dumpDatabases()
 		when ENUMS.PLATFORM_IDS.CUSTOM
 			log('Starting to detect Custom games')
 			STATE.PLATFORM_QUEUE[1]\detectBanners(COMPONENTS.LIBRARY\getOldGames())
@@ -846,18 +843,14 @@ export OnIdentifiedBattlenetFolders = () ->
 export OnDownloadedGOGCommunityProfile = () ->
 	success, err = pcall(
 		() ->
-			unless STATE.PLATFORM_QUEUE[1]\hasdownloadedCommunityProfile()
-				return utility.runLastCommand()
 			log('Downloaded GOG community profile')
-			utility.runCommand(STATE.PLATFORM_QUEUE[1]\dumpDatabases())
+			STATE.PLATFORM_QUEUE[1]\dumpDatabases()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export OnDumpedDBs = () ->
 	success, err = pcall(
 		() ->
-			unless STATE.PLATFORM_QUEUE[1]\hasDumpedDatabases()
-				return utility.runLastCommand()
 			log('Dumped GOG Galaxy databases')
 			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
 			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))

@@ -56,22 +56,16 @@ class GOGGalaxy extends Platform
 			assert(io.fileExists(@communityProfileJavaScriptPath) == true, ('The JavaScript file for downloading and parsing the GOG community profile is missing. Expected the path to be "%s".')\format(@communityProfileJavaScriptPath))
 
 	downloadCommunityProfile: () =>
-		return nil unless @useCommunityProfile
-		parameter = ('""%s" "\\%s""')\format(@phantomjsPath, @communityProfileJavaScriptPath)
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s"]')\format(@communityProfileName))
-		return @getWaitCommand(), '', 'OnDownloadedGOGCommunityProfile'
-
-	hasdownloadedCommunityProfile: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
-
-	hasDumpedDatabases: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
+		return false unless @useCommunityProfile
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@communityProfileName))
+		return true
 
 	dumpDatabases: () =>
 		assert(@programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
 		indexDBPath = io.joinPaths(@programDataPath, 'storage\\index.db')
 		galaxyDBPath = io.joinPaths(@programDataPath, 'storage\\galaxy.db')
 		assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.')\format(galaxyDBPath))
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s"]')\format(indexDBPath, galaxyDBPath))
-		return @getWaitCommand(), '', 'OnDumpedDBs'
+		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(indexDBPath, galaxyDBPath))
 
 	parseIndexDB: (output) =>
 		assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseIndexDB')

@@ -5,8 +5,6 @@ cd "%~dp0"
 cd ..\..\..\cache
 if not exist "%cd%\gog_galaxy" mkdir "%cd%\gog_galaxy"
 cd gog_galaxy
-set "completed="%cd%\completed.txt""
-if exist %completed% del %completed%
 set "index="%cd%\index.txt""
 if exist %index% del %index%
 set "galaxy="%cd%\galaxy.txt""
@@ -17,10 +15,11 @@ set "sqlite="%cd%\sqlite3.exe""
 :: This is just to support the scenarios where the client has not been
 :: updated and where the client has been updated.
 if exist %1 (
-	start /B "" %sqlite% %1 "select productId, localpath from Products;" > %index%
+	start /B /W "" %sqlite% %1 "select productId, localpath from Products;" > %index%
 ) else (
-	start /B "" %sqlite% %2 "select productId, installationPath from InstalledBaseProducts;" > %index%
+	start /B /W "" %sqlite% %2 "select productId, installationPath from InstalledBaseProducts;" > %index%
 )
-start /B "" %sqlite% %2 "select productId, title, images, links from LimitedDetails;" > %galaxy%
-echo "" > %completed%
+start /B /W "" %sqlite% %2 "select productId, title, images, links from LimitedDetails;" > %galaxy%
+set "rainmeter="%~3\Rainmeter.exe""
+start /B "" %rainmeter% !CommandMeasure "Script" "OnDumpedDBs()" %4
 ::pause

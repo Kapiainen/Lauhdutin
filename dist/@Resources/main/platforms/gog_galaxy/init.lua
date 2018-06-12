@@ -26,25 +26,17 @@ do
     end,
     downloadCommunityProfile = function(self)
       if not (self.useCommunityProfile) then
-        return nil
+        return false
       end
-      local parameter = ('""%s" "\\%s""'):format(self.phantomjsPath, self.communityProfileJavaScriptPath)
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s"]'):format(self.communityProfileName))
-      return self:getWaitCommand(), '', 'OnDownloadedGOGCommunityProfile'
-    end,
-    hasdownloadedCommunityProfile = function(self)
-      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
-    end,
-    hasDumpedDatabases = function(self)
-      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
+      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.communityProfileName))
+      return true
     end,
     dumpDatabases = function(self)
       assert(self.programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
       local indexDBPath = io.joinPaths(self.programDataPath, 'storage\\index.db')
       local galaxyDBPath = io.joinPaths(self.programDataPath, 'storage\\galaxy.db')
       assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.'):format(galaxyDBPath))
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s"]'):format(indexDBPath, galaxyDBPath))
-      return self:getWaitCommand(), '', 'OnDumpedDBs'
+      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(indexDBPath, galaxyDBPath))
     end,
     parseIndexDB = function(self, output)
       assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseIndexDB')
