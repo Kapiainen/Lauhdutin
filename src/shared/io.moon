@@ -1,5 +1,5 @@
 return (json) ->
-	assert(type(json) == 'table', 'shared.utility.createJSONHelpers')
+	assert(type(json) == 'table', 'shared.io')
 	io.readJSON = (path, pathIsRelative = true) -> return json.decode(io.readFile(path, pathIsRelative))
 
 	io.writeJSON = (relativePath, tbl) ->

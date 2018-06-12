@@ -1,5 +1,5 @@
 return function(json)
-  assert(type(json) == 'table', 'shared.utility.createJSONHelpers')
+  assert(type(json) == 'table', 'shared.io')
   io.readJSON = function(path, pathIsRelative)
     if pathIsRelative == nil then
       pathIsRelative = true
