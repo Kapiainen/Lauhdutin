@@ -106,7 +106,7 @@ startDetectingPlatformGames = () ->
 		when ENUMS.PLATFORM_IDS.BATTLENET
 			log('Starting to detect Blizzard Battle.net games')
 			if STATE.PLATFORM_QUEUE[1]\hasUnprocessedPaths()
-				utility.runCommand(STATE.PLATFORM_QUEUE[1]\identifyFolders())
+				STATE.PLATFORM_QUEUE[1]\identifyFolders()
 			else
 				OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
@@ -834,12 +834,10 @@ export OnGotACFs = () ->
 export OnIdentifiedBattlenetFolders = () ->
 	success, err = pcall(
 		() ->
-			unless STATE.PLATFORM_QUEUE[1]\hasProcessedPath()
-				return utility.runLastCommand()
 			log('Dumped list of folders in a Blizzard Battle.net folder')
 			STATE.PLATFORM_QUEUE[1]\generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]\getCachePath(), 'output.txt')))
 			if STATE.PLATFORM_QUEUE[1]\hasUnprocessedPaths()
-				return utility.runCommand(STATE.PLATFORM_QUEUE[1]\identifyFolders())
+				return STATE.PLATFORM_QUEUE[1]\identifyFolders()
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

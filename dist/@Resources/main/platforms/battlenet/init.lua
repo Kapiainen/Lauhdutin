@@ -9,15 +9,11 @@ do
     hasUnprocessedPaths = function(self)
       return #self.battlenetPaths > 0
     end,
-    hasProcessedPath = function(self)
-      return io.fileExists(io.joinPaths(self.cachePath, 'completed.txt'))
-    end,
     getCachePath = function(self)
       return self.cachePath
     end,
     identifyFolders = function(self)
-      SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s"]'):format(self.battlenetPaths[1]))
-      return self:getWaitCommand(), '', 'OnIdentifiedBattlenetFolders'
+      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.battlenetPaths[1]))
     end,
     getBanner = function(self, title, bannerURL)
       local banner = self:getBannerPath(title)

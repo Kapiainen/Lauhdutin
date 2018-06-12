@@ -18,14 +18,10 @@ class Battlenet extends Platform
 	validate: () => return
 
 	hasUnprocessedPaths: () => return #@battlenetPaths > 0
-	
-	hasProcessedPath: () => return io.fileExists(io.joinPaths(@cachePath, 'completed.txt'))
 
 	getCachePath: () => return @cachePath
 
-	identifyFolders: () =>
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s"]')\format(@battlenetPaths[1]))
-		return @getWaitCommand(), '', 'OnIdentifiedBattlenetFolders'
+	identifyFolders: () => SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@battlenetPaths[1]))
 
 	getBanner: (title, bannerURL) =>
 		banner = @getBannerPath(title)

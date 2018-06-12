@@ -109,7 +109,7 @@ startDetectingPlatformGames = function()
   elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
     log('Starting to detect Blizzard Battle.net games')
     if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
-      return utility.runCommand(STATE.PLATFORM_QUEUE[1]:identifyFolders())
+      return STATE.PLATFORM_QUEUE[1]:identifyFolders()
     else
       return OnFinishedDetectingPlatformGames()
     end
@@ -1120,13 +1120,10 @@ OnGotACFs = function()
 end
 OnIdentifiedBattlenetFolders = function()
   local success, err = pcall(function()
-    if not (STATE.PLATFORM_QUEUE[1]:hasProcessedPath()) then
-      return utility.runLastCommand()
-    end
     log('Dumped list of folders in a Blizzard Battle.net folder')
     STATE.PLATFORM_QUEUE[1]:generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]:getCachePath(), 'output.txt')))
     if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
-      return utility.runCommand(STATE.PLATFORM_QUEUE[1]:identifyFolders())
+      return STATE.PLATFORM_QUEUE[1]:identifyFolders()
     end
     return OnFinishedDetectingPlatformGames()
   end)
