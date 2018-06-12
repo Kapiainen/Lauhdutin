@@ -121,11 +121,7 @@ class Steam extends Platform
 		SKIN\Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
 		assert(type(@communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
 		url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1')\format(@communityID)
-		return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
-
-	getDownloadedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
-
-	getCachedCommunityProfilePath: () => return io.joinPaths(STATE.PATHS.RESOURCES, @cachePath, 'communityProfile.txt')
+		return url, @cachePath, 'communityProfile.txt'
 
 	parseCommunityProfile: (profile) =>
 		games = {}

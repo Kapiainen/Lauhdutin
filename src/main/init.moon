@@ -38,43 +38,19 @@ export STATE = {
 }
 
 export COMPONENTS = {
-	STATUS: nil
-	SETTINGS: nil
+	ANIMATIONS: nil
+	DOWNLOADER: nil
 	LIBRARY: nil
+	PROCESS: nil
+	SETTINGS: nil
+	SLOTS: nil
+	STATUS: nil
+	TOOLBAR: nil
 }
 
 export log = (...) -> print(...) if STATE.LOGGING == true
 
 export HideStatus = () -> COMPONENTS.STATUS\hide()
-
-downloadFile = (url, path, finishCallback, errorCallback) ->
-	log('Attempting to download file:', url, path, finishCallback, errorCallback)
-	assert(type(url) == 'string', 'main.init.downloadFile')
-	assert(type(path) == 'string', 'main.init.downloadFile')
-	assert(type(finishCallback) == 'string', 'main.init.downloadFile')
-	assert(type(errorCallback) == 'string', 'main.init.downloadFile')
-	SKIN\Bang(('[!SetOption "Downloader" "URL" "%s"]')\format(url))
-	SKIN\Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]')\format(path))
-	SKIN\Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]')\format(finishCallback))
-	SKIN\Bang(('[!SetOption "Downloader" "OnConnectErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
-	SKIN\Bang(('[!SetOption "Downloader" "OnRegExpErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
-	SKIN\Bang(('[!SetOption "Downloader" "OnDownloadErrorAction" "[!CommandMeasure Script %s()]"]')\format(errorCallback))
-	SKIN\Bang('[!SetOption "Downloader" "UpdateDivider" "63"]')
-	SKIN\Bang('[!SetOption "Downloader" "Disabled" "0"]')
-	SKIN\Bang('[!UpdateMeasure "Downloader"]')
-
-stopDownloader = () ->
-	log('Stopping downloader')
-	SKIN\Bang('[!SetOption "Downloader" "UpdateDivider" "-1"]')
-	SKIN\Bang('[!SetOption "Downloader" "Disabled" "1"]')
-	SKIN\Bang('[!UpdateMeasure "Downloader"]')
-
-downloadBanner = (game) ->
-	log('Downloading a banner for', game\getTitle())
-	assert(game ~= nil, 'main.init.downloadBanner')
-	assert(game.__class == Game, 'main.init.downloadBanner')
-	bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
-	downloadFile(game\getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 
 export setUpdateDivider = (value) ->
 	assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
@@ -88,10 +64,37 @@ startDetectingPlatformGames = () ->
 			log('Starting to detect Windows shortcuts')
 			STATE.PLATFORM_QUEUE[1]\parseShortcuts()
 		when ENUMS.PLATFORM_IDS.STEAM
-			url, path, finishCallback, errorCallback = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
+			url, folder, file = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
 			if url ~= nil
 				log('Attempting to download and parse the Steam community profile')
-				downloadFile(url, path, finishCallback, errorCallback)
+				COMPONENTS.DOWNLOADER\push({
+					:url
+					outputFile: file
+					outputFolder: folder
+					finishCallback: (args) ->
+						log('Successfully downloaded Steam community profile')
+						cachedPath = io.joinPaths(args.folder, args.file)
+						profile = ''
+						if io.fileExists(cachedPath)
+							profile = io.readFile(cachedPath)
+						args.platform\parseCommunityProfile(profile)
+						args.platform\getLibraries()
+						if args.platform\hasLibrariesToParse()
+							return args.platform\getACFs()
+						OnFinishedDetectingPlatformGames()
+					errorCallback: (args) ->
+						log('Failed to download Steam community profile')
+						args.platform\getLibraries()
+						if args.platform\hasLibrariesToParse()
+							return args.platform\getACFs()
+						OnFinishedDetectingPlatformGames()
+					callbackArgs: {
+						:file
+						:folder
+						platform: STATE.PLATFORM_QUEUE[1]
+					}
+				})
+				COMPONENTS.DOWNLOADER\start()
 			else
 				log('Starting to detect Steam games')
 				STATE.PLATFORM_QUEUE[1]\getLibraries()
@@ -142,20 +145,6 @@ detectGames = () ->
 	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_games', 'Detecting games'))
 	STATE.BANNER_QUEUE = {}
 	startDetectingPlatformGames()
-
-startDownloadingBanner = () ->
-	while #STATE.BANNER_QUEUE > 0 -- Remove games, which have previously failed to have their banners downloaded
-		if io.fileExists((STATE.BANNER_QUEUE[1]\getBanner()\gsub('%..+', '%.failedToDownload')))
-			table.remove(STATE.BANNER_QUEUE, 1)
-			continue
-		break
-	if #STATE.BANNER_QUEUE > 0
-		log('Starting to download a banner')
-		COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_n_banners_to_download', '%d banners left to download')\format(#STATE.BANNER_QUEUE))
-		downloadBanner(STATE.BANNER_QUEUE[1])
-	else
-		STATE.BANNER_QUEUE = nil
-		OnFinishedDownloadingBanners()
 
 updateSlots = () ->
 	success, err = pcall(
@@ -216,6 +205,7 @@ export Initialize = () ->
 			additionalEnums()
 			Game = require('main.game')
 			utility = require('shared.utility')
+			COMPONENTS.DOWNLOADER = require('shared.downloader')()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
@@ -757,16 +747,42 @@ export OnFinishedDetectingPlatformGames = () ->
 			COMPONENTS.LIBRARY\extend(games)
 			for game in *games
 				if game\getBannerURL() ~= nil
-					if game\getBanner() == nil
+					path = game\getBanner()
+					if path == nil
 						game\setBannerURL(nil)
-					else
+					elseif not io.fileExists((path\gsub('%..+', '%.failedToDownload')))
 						table.insert(STATE.BANNER_QUEUE, game)
 			if #STATE.PLATFORM_QUEUE > 0
 				return startDetectingPlatformGames()
 			STATE.PLATFORM_QUEUE = nil
 			log(('%d banners to download')\format(#STATE.BANNER_QUEUE))
 			if #STATE.BANNER_QUEUE > 0
-				return startDownloadingBanner()
+				finishCallback = (args) ->
+					args.game\setBannerURL(nil)
+					args.game\setExpectedBanner(nil)
+				finalFinishCallback = (args) ->
+					finishCallback(args)
+					onInitialized()
+				errorCallback = (args) ->
+					file = args.file\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
+					io.writeFile(io.joinPaths(args.folder, file .. '.failedToDownload'), '')
+					args.game\setBanner(nil)
+					args.game\setBannerURL(nil)
+				for i, game in ipairs(STATE.BANNER_QUEUE)
+					folder, file = io.splitPath(game\getBanner())
+					COMPONENTS.DOWNLOADER\push({
+						url: game\getBannerURL()
+						outputFile: file
+						outputFolder: folder
+						finishCallback: if i > 1 then finishCallback else finalFinishCallback
+						:errorCallback
+						callbackArgs: {
+							:file
+							:folder
+							:game
+						}
+					})
+				return if COMPONENTS.DOWNLOADER\start()
 			onInitialized()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -786,37 +802,6 @@ export OnParsedShortcuts = () ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 -- Game detection -> Steam
-export OnCommunityProfileDownloaded = () ->
-	success, err = pcall(
-		() ->
-			log('Successfully downloaded Steam community profile')
-			stopDownloader()
-			downloadedPath = STATE.PLATFORM_QUEUE[1]\getDownloadedCommunityProfilePath()
-			cachedPath = STATE.PLATFORM_QUEUE[1]\getCachedCommunityProfilePath()
-			os.rename(downloadedPath, cachedPath)
-			profile = ''
-			if io.fileExists(cachedPath, false)
-				profile = io.readFile(cachedPath, false)
-			STATE.PLATFORM_QUEUE[1]\parseCommunityProfile(profile)
-			STATE.PLATFORM_QUEUE[1]\getLibraries()
-			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return STATE.PLATFORM_QUEUE[1]\getACFs()
-			OnFinishedDetectingPlatformGames()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnCommunityProfileDownloadFailed = () ->
-	success, err = pcall(
-		() ->
-			log('Failed to download Steam community profile')
-			stopDownloader()
-			STATE.PLATFORM_QUEUE[1]\getLibraries()
-			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return STATE.PLATFORM_QUEUE[1]\getACFs()
-			OnFinishedDetectingPlatformGames()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 export OnGotACFs = () ->
 	success, err = pcall(
 		() ->
@@ -877,42 +862,6 @@ export OnDumpedDBs = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
--- Banner downloading
-export OnBannerDownloadFinished = () ->
-	success, err = pcall(
-		() ->
-			log('Successfully downloaded a banner')
-			downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN\GetMeasure('Downloader')\GetOption('DownloadFile'))
-			game = table.remove(STATE.BANNER_QUEUE, 1)
-			bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game\getBanner())
-			os.rename(downloadedPath, bannerPath)
-			game\setBannerURL(nil)
-			game\setExpectedBanner(nil)
-			startDownloadingBanner()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnBannerDownloadError = () ->
-	success, err = pcall(
-		() ->
-			log('Failed to download a banner')
-			game = table.remove(STATE.BANNER_QUEUE, 1)
-			io.writeFile(game\getBanner()\gsub('%..+', '%.failedToDownload'), '')
-			game\setBanner(nil)
-			game\setBannerURL(nil)
-			startDownloadingBanner()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnFinishedDownloadingBanners = () ->
-	success, err = pcall(
-		() ->
-			log('Finished downloading banners')
-			stopDownloader()
-			onInitialized()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 getPlatformByGame = (game) ->
 	platforms = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
 	platformID = game\getPlatformID()
@@ -935,38 +884,24 @@ export ReacquireBanner = (gameID) ->
 			if url == nil
 				log("Failed to get URL for banner reacquisition", gameID)
 				return
-			STATE.BANNER_QUEUE = {game}
-			bannerPath = game\getBanner()\reverse()\match('^([^%.]+%.[^\\]+)')\reverse()
-			downloadFile(url, bannerPath, 'OnBannerReacquisitionFinished', 'OnBannerReacquisitionError')
+			path = game\getBanner()
+			if io.fileExists(path)
+				os.remove(io.absolutePath(path))
+			folder, file = io.splitPath(path)
+			COMPONENTS.DOWNLOADER\push({
+				:url
+				outputFile: file
+				outputFolder: folder
+				finishCallback: () ->
+					log('Successfully reacquired a banner')
+					STATE.SCROLL_INDEX_UPDATED = false
+					SKIN\Bang('[!UpdateMeasure "Script"]')
+					SKIN\Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
+				errorCallback: () -> log('Failed to reacquire a banner')
+			})
+			COMPONENTS.DOWNLOADER\start()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnBannerReacquisitionFinished = () ->
-	success, err = pcall(
-		() ->
-			log('Successfully reacquired a banner')
-			game = STATE.BANNER_QUEUE[1]
-			STATE.BANNER_QUEUE = nil
-			downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN\GetMeasure('Downloader')\GetOption('DownloadFile'))
-			bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game\getBanner())
-			os.remove(bannerPath)
-			os.rename(downloadedPath, bannerPath)
-			stopDownloader()
-			STATE.SCROLL_INDEX_UPDATED = false
-			SKIN\Bang('[!UpdateMeasure "Script"]')
-			SKIN\Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnBannerReacquisitionError = () ->
-	success, err = pcall(
-		() ->
-			log('Failed to reacquire a banner')
-			STATE.BANNER_QUEUE = nil
-			stopDownloader()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 
 -- Context title action
 export ToggleHideGames = () ->

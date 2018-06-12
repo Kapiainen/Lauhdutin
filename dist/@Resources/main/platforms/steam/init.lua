@@ -134,13 +134,7 @@ do
       SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\steam\\deleteCachedCommunityProfile.bat"]')
       assert(type(self.communityID) == 'string', 'main.platforms.steam.init.downloadCommunityProfile')
       local url = ('http://steamcommunity.com/profiles/%s/games/?tab=all&xml=1'):format(self.communityID)
-      return url, 'communityProfile.txt', 'OnCommunityProfileDownloaded', 'OnCommunityProfileDownloadFailed'
-    end,
-    getDownloadedCommunityProfilePath = function(self)
-      return io.joinPaths(STATE.PATHS.DOWNLOADFILE, 'communityProfile.txt')
-    end,
-    getCachedCommunityProfilePath = function(self)
-      return io.joinPaths(STATE.PATHS.RESOURCES, self.cachePath, 'communityProfile.txt')
+      return url, self.cachePath, 'communityProfile.txt'
     end,
     parseCommunityProfile = function(self, profile)
       local games = { }

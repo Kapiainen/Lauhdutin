@@ -32,9 +32,14 @@ STATE = {
   GAME_BEING_MODIFIED = nil
 }
 COMPONENTS = {
-  STATUS = nil,
+  ANIMATIONS = nil,
+  DOWNLOADER = nil,
+  LIBRARY = nil,
+  PROCESS = nil,
   SETTINGS = nil,
-  LIBRARY = nil
+  SLOTS = nil,
+  STATUS = nil,
+  TOOLBAR = nil
 }
 log = function(...)
   if STATE.LOGGING == true then
@@ -43,38 +48,6 @@ log = function(...)
 end
 HideStatus = function()
   return COMPONENTS.STATUS:hide()
-end
-local downloadFile
-downloadFile = function(url, path, finishCallback, errorCallback)
-  log('Attempting to download file:', url, path, finishCallback, errorCallback)
-  assert(type(url) == 'string', 'main.init.downloadFile')
-  assert(type(path) == 'string', 'main.init.downloadFile')
-  assert(type(finishCallback) == 'string', 'main.init.downloadFile')
-  assert(type(errorCallback) == 'string', 'main.init.downloadFile')
-  SKIN:Bang(('[!SetOption "Downloader" "URL" "%s"]'):format(url))
-  SKIN:Bang(('[!SetOption "Downloader" "DownloadFile" "%s"]'):format(path))
-  SKIN:Bang(('[!SetOption "Downloader" "FinishAction" "[!CommandMeasure Script %s()]"]'):format(finishCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnConnectErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnRegExpErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang(('[!SetOption "Downloader" "OnDownloadErrorAction" "[!CommandMeasure Script %s()]"]'):format(errorCallback))
-  SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "63"]')
-  SKIN:Bang('[!SetOption "Downloader" "Disabled" "0"]')
-  return SKIN:Bang('[!UpdateMeasure "Downloader"]')
-end
-local stopDownloader
-stopDownloader = function()
-  log('Stopping downloader')
-  SKIN:Bang('[!SetOption "Downloader" "UpdateDivider" "-1"]')
-  SKIN:Bang('[!SetOption "Downloader" "Disabled" "1"]')
-  return SKIN:Bang('[!UpdateMeasure "Downloader"]')
-end
-local downloadBanner
-downloadBanner = function(game)
-  log('Downloading a banner for', game:getTitle())
-  assert(game ~= nil, 'main.init.downloadBanner')
-  assert(game.__class == Game, 'main.init.downloadBanner')
-  local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
-  return downloadFile(game:getBannerURL(), bannerPath, 'OnBannerDownloadFinished', 'OnBannerDownloadError')
 end
 setUpdateDivider = function(value)
   assert(type(value) == 'number' and value % 1 == 0 and value ~= 0, 'main.init.setUpdateDivider')
@@ -89,10 +62,42 @@ startDetectingPlatformGames = function()
     log('Starting to detect Windows shortcuts')
     return STATE.PLATFORM_QUEUE[1]:parseShortcuts()
   elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
-    local url, path, finishCallback, errorCallback = STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()
+    local url, folder, file = STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()
     if url ~= nil then
       log('Attempting to download and parse the Steam community profile')
-      return downloadFile(url, path, finishCallback, errorCallback)
+      COMPONENTS.DOWNLOADER:push({
+        url = url,
+        outputFile = file,
+        outputFolder = folder,
+        finishCallback = function(args)
+          log('Successfully downloaded Steam community profile')
+          local cachedPath = io.joinPaths(args.folder, args.file)
+          local profile = ''
+          if io.fileExists(cachedPath) then
+            profile = io.readFile(cachedPath)
+          end
+          args.platform:parseCommunityProfile(profile)
+          args.platform:getLibraries()
+          if args.platform:hasLibrariesToParse() then
+            return args.platform:getACFs()
+          end
+          return OnFinishedDetectingPlatformGames()
+        end,
+        errorCallback = function(args)
+          log('Failed to download Steam community profile')
+          args.platform:getLibraries()
+          if args.platform:hasLibrariesToParse() then
+            return args.platform:getACFs()
+          end
+          return OnFinishedDetectingPlatformGames()
+        end,
+        callbackArgs = {
+          file = file,
+          folder = folder,
+          platform = STATE.PLATFORM_QUEUE[1]
+        }
+      })
+      return COMPONENTS.DOWNLOADER:start()
     else
       log('Starting to detect Steam games')
       STATE.PLATFORM_QUEUE[1]:getLibraries()
@@ -170,34 +175,6 @@ detectGames = function()
   STATE.BANNER_QUEUE = { }
   return startDetectingPlatformGames()
 end
-local startDownloadingBanner
-startDownloadingBanner = function()
-  while #STATE.BANNER_QUEUE > 0 do
-    local _continue_0 = false
-    repeat
-      do
-        if io.fileExists((STATE.BANNER_QUEUE[1]:getBanner():gsub('%..+', '%.failedToDownload'))) then
-          table.remove(STATE.BANNER_QUEUE, 1)
-          _continue_0 = true
-          break
-        end
-        break
-      end
-      _continue_0 = true
-    until true
-    if not _continue_0 then
-      break
-    end
-  end
-  if #STATE.BANNER_QUEUE > 0 then
-    log('Starting to download a banner')
-    COMPONENTS.STATUS:show(LOCALIZATION:get('main_status_n_banners_to_download', '%d banners left to download'):format(#STATE.BANNER_QUEUE))
-    return downloadBanner(STATE.BANNER_QUEUE[1])
-  else
-    STATE.BANNER_QUEUE = nil
-    return OnFinishedDownloadingBanners()
-  end
-end
 local updateSlots
 updateSlots = function()
   local success, err = pcall(function()
@@ -264,6 +241,7 @@ Initialize = function()
     additionalEnums()
     Game = require('main.game')
     utility = require('shared.utility')
+    COMPONENTS.DOWNLOADER = require('shared.downloader')()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
@@ -1031,9 +1009,10 @@ OnFinishedDetectingPlatformGames = function()
     for _index_0 = 1, #games do
       local game = games[_index_0]
       if game:getBannerURL() ~= nil then
-        if game:getBanner() == nil then
+        local path = game:getBanner()
+        if path == nil then
           game:setBannerURL(nil)
-        else
+        elseif not io.fileExists((path:gsub('%..+', '%.failedToDownload'))) then
           table.insert(STATE.BANNER_QUEUE, game)
         end
       end
@@ -1044,7 +1023,47 @@ OnFinishedDetectingPlatformGames = function()
     STATE.PLATFORM_QUEUE = nil
     log(('%d banners to download'):format(#STATE.BANNER_QUEUE))
     if #STATE.BANNER_QUEUE > 0 then
-      return startDownloadingBanner()
+      local finishCallback
+      finishCallback = function(args)
+        args.game:setBannerURL(nil)
+        return args.game:setExpectedBanner(nil)
+      end
+      local finalFinishCallback
+      finalFinishCallback = function(args)
+        finishCallback(args)
+        return onInitialized()
+      end
+      local errorCallback
+      errorCallback = function(args)
+        local file = args.file:reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        io.writeFile(io.joinPaths(args.folder, file .. '.failedToDownload'), '')
+        args.game:setBanner(nil)
+        return args.game:setBannerURL(nil)
+      end
+      for i, game in ipairs(STATE.BANNER_QUEUE) do
+        local folder, file = io.splitPath(game:getBanner())
+        COMPONENTS.DOWNLOADER:push({
+          url = game:getBannerURL(),
+          outputFile = file,
+          outputFolder = folder,
+          finishCallback = (function()
+            if i > 1 then
+              return finishCallback
+            else
+              return finalFinishCallback
+            end
+          end)(),
+          errorCallback = errorCallback,
+          callbackArgs = {
+            file = file,
+            folder = folder,
+            game = game
+          }
+        })
+      end
+      if COMPONENTS.DOWNLOADER:start() then
+        return 
+      end
     end
     return onInitialized()
   end)
@@ -1061,42 +1080,6 @@ OnParsedShortcuts = function()
       output = io.readFile(path)
     end
     STATE.PLATFORM_QUEUE[1]:generateGames(output)
-    return OnFinishedDetectingPlatformGames()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnCommunityProfileDownloaded = function()
-  local success, err = pcall(function()
-    log('Successfully downloaded Steam community profile')
-    stopDownloader()
-    local downloadedPath = STATE.PLATFORM_QUEUE[1]:getDownloadedCommunityProfilePath()
-    local cachedPath = STATE.PLATFORM_QUEUE[1]:getCachedCommunityProfilePath()
-    os.rename(downloadedPath, cachedPath)
-    local profile = ''
-    if io.fileExists(cachedPath, false) then
-      profile = io.readFile(cachedPath, false)
-    end
-    STATE.PLATFORM_QUEUE[1]:parseCommunityProfile(profile)
-    STATE.PLATFORM_QUEUE[1]:getLibraries()
-    if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return STATE.PLATFORM_QUEUE[1]:getACFs()
-    end
-    return OnFinishedDetectingPlatformGames()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnCommunityProfileDownloadFailed = function()
-  local success, err = pcall(function()
-    log('Failed to download Steam community profile')
-    stopDownloader()
-    STATE.PLATFORM_QUEUE[1]:getLibraries()
-    if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return STATE.PLATFORM_QUEUE[1]:getACFs()
-    end
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then
@@ -1176,44 +1159,6 @@ OnDumpedDBs = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
-OnBannerDownloadFinished = function()
-  local success, err = pcall(function()
-    log('Successfully downloaded a banner')
-    local downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN:GetMeasure('Downloader'):GetOption('DownloadFile'))
-    local game = table.remove(STATE.BANNER_QUEUE, 1)
-    local bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game:getBanner())
-    os.rename(downloadedPath, bannerPath)
-    game:setBannerURL(nil)
-    game:setExpectedBanner(nil)
-    return startDownloadingBanner()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnBannerDownloadError = function()
-  local success, err = pcall(function()
-    log('Failed to download a banner')
-    local game = table.remove(STATE.BANNER_QUEUE, 1)
-    io.writeFile(game:getBanner():gsub('%..+', '%.failedToDownload'), '')
-    game:setBanner(nil)
-    game:setBannerURL(nil)
-    return startDownloadingBanner()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnFinishedDownloadingBanners = function()
-  local success, err = pcall(function()
-    log('Finished downloading banners')
-    stopDownloader()
-    return onInitialized()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
 local getPlatformByGame
 getPlatformByGame = function(game)
   local platforms
@@ -1251,39 +1196,26 @@ ReacquireBanner = function(gameID)
       log("Failed to get URL for banner reacquisition", gameID)
       return 
     end
-    STATE.BANNER_QUEUE = {
-      game
-    }
-    local bannerPath = game:getBanner():reverse():match('^([^%.]+%.[^\\]+)'):reverse()
-    return downloadFile(url, bannerPath, 'OnBannerReacquisitionFinished', 'OnBannerReacquisitionError')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnBannerReacquisitionFinished = function()
-  local success, err = pcall(function()
-    log('Successfully reacquired a banner')
-    local game = STATE.BANNER_QUEUE[1]
-    STATE.BANNER_QUEUE = nil
-    local downloadedPath = io.joinPaths(STATE.PATHS.DOWNLOADFILE, SKIN:GetMeasure('Downloader'):GetOption('DownloadFile'))
-    local bannerPath = io.joinPaths(STATE.PATHS.RESOURCES, game:getBanner())
-    os.remove(bannerPath)
-    os.rename(downloadedPath, bannerPath)
-    stopDownloader()
-    STATE.SCROLL_INDEX_UPDATED = false
-    SKIN:Bang('[!UpdateMeasure "Script"]')
-    return SKIN:Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnBannerReacquisitionError = function()
-  local success, err = pcall(function()
-    log('Failed to reacquire a banner')
-    STATE.BANNER_QUEUE = nil
-    return stopDownloader()
+    local path = game:getBanner()
+    if io.fileExists(path) then
+      os.remove(io.absolutePath(path))
+    end
+    local folder, file = io.splitPath(path)
+    COMPONENTS.DOWNLOADER:push({
+      url = url,
+      outputFile = file,
+      outputFolder = folder,
+      finishCallback = function()
+        log('Successfully reacquired a banner')
+        STATE.SCROLL_INDEX_UPDATED = false
+        SKIN:Bang('[!UpdateMeasure "Script"]')
+        return SKIN:Bang('[!CommandMeasure "Script" "OnReacquiredBanner()" "#ROOTCONFIG#\\Game"]')
+      end,
+      errorCallback = function()
+        return log('Failed to reacquire a banner')
+      end
+    })
+    return COMPONENTS.DOWNLOADER:start()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
