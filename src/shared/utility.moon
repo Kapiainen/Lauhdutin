@@ -171,8 +171,6 @@ return {
 
 	runLastCommand: () -> SKIN\Bang('[!CommandMeasure "Command" "Run"]')
 
-	waitCommand: 'ping -n 2 127.0.0.1 > nul'
-
 	parseVDF: (file) ->
 		switch type(file)
 			when 'string'

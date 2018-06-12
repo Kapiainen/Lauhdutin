@@ -19,9 +19,6 @@ do
     getName = function(self)
       return self.name
     end,
-    getWaitCommand = function(self)
-      return utility.waitCommand
-    end,
     getGames = function(self)
       return self.games or { }
     end,

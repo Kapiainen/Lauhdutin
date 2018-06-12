@@ -19,8 +19,6 @@ class Platform
 
 	getName: () => return @name
 
-	getWaitCommand: () => return utility.waitCommand
-
 	getGames: () => return @games or {}
 
 	getBannerPath: (fileWithoutExtension, bannerPath = @cachePath) =>

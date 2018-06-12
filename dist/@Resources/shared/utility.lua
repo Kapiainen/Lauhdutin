@@ -524,7 +524,6 @@ return {
   runLastCommand = function()
     return SKIN:Bang('[!CommandMeasure "Command" "Run"]')
   end,
-  waitCommand = 'ping -n 2 127.0.0.1 > nul',
   parseVDF = function(file)
     local _exp_0 = type(file)
     if 'string' == _exp_0 then
