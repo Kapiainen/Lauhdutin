@@ -79,6 +79,7 @@ export Initialize = () ->
 		() ->
 			log('Initializing NewGame config')
 			require('shared.string')
+			require('shared.rainmeter')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
@@ -133,16 +134,15 @@ centerConfig = () ->
 	STATE.CENTERED = true
 	return if not COMPONENTS.SETTINGS\getCenterOnMonitor()
 	meter = SKIN\GetMeter('WindowShadow')
-	skinWidth = meter\GetW()
-	skinHeight = meter\GetH()
-	mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+	configWidth = meter\GetW()
+	configHeight = meter\GetH()
+	mainConfig = RAINMETER\GetConfig(SKIN\GetVariable('ROOTCONFIG'))
 	monitorIndex = nil
 	if mainConfig ~= nil
-		monitorIndex = utility.getConfigMonitor(mainConfig) or 1
+		monitorIndex = RAINMETER\GetConfigMonitor(mainConfig)
 	else
 		monitorIndex = 1
-	x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-	SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
+	RAINMETER\CenterOnMonitor(configWidth, configHeight, monitorIndex)
 
 export Handshake = (gameID) ->
 	success, err = pcall(

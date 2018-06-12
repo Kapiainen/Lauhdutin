@@ -82,6 +82,7 @@ Initialize = function()
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     require('shared.string')
+    require('shared.rainmeter')
     require('shared.enums')
     additionalEnums()
     utility = require('shared.utility')
@@ -201,7 +202,7 @@ Close = function()
           io.writeJSON(STATE.PATHS.GAMES, games)
         end
       end
-      local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
+      local mainConfig = RAINMETER:GetConfig(SKIN:GetVariable('ROOTCONFIG'))
       if mainConfig ~= nil and mainConfig:isActive() then
         SKIN:Bang('[!Refresh "#ROOTCONFIG#]')
       end

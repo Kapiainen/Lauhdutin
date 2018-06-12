@@ -257,6 +257,7 @@ Initialize = function()
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     require('shared.string')
+    require('shared.rainmeter')
     require('shared.enums')
     additionalEnums()
     Game = require('main.game')
@@ -445,7 +446,7 @@ end
 local otherWindowsActive
 otherWindowsActive = function()
   local rootConfigName = STATE.ROOT_CONFIG
-  local configs = utility.getConfigs((function()
+  local configs = RAINMETER:GetConfigs((function()
     local _accum_0 = { }
     local _len_0 = 1
     local _list_0 = {
@@ -613,7 +614,7 @@ OnToolbarSort = function(quick)
       return Sort(sortingType)
     end
     local configName = ('%s\\Sort'):format(STATE.ROOT_CONFIG)
-    local config = utility.getConfig(configName)
+    local config = RAINMETER:GetConfig(configName)
     if config ~= nil and config:isActive() then
       return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))
     end
@@ -668,7 +669,7 @@ OnToolbarFilter = function(stack)
   local success, err = pcall(function()
     STATE.STACK_NEXT_FILTER = stack
     local configName = ('%s\\Filter'):format(STATE.ROOT_CONFIG)
-    local config = utility.getConfig(configName)
+    local config = RAINMETER:GetConfig(configName)
     if config ~= nil and config:isActive() then
       return HandshakeFilter()
     end
@@ -897,7 +898,7 @@ OnMiddleClickSlot = function(index)
       return 
     end
     local configName = ('%s\\Game'):format(STATE.ROOT_CONFIG)
-    local config = utility.getConfig(configName)
+    local config = RAINMETER:GetConfig(configName)
     if STATE.GAME_BEING_MODIFIED == game and config:isActive() then
       STATE.GAME_BEING_MODIFIED = nil
       return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))

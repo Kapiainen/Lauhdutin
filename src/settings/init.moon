@@ -75,6 +75,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			require('shared.string')
+			require('shared.rainmeter')
 			require('shared.enums')
 			additionalEnums()
 			utility = require('shared.utility')
@@ -175,7 +176,7 @@ export Close = () ->
 						games = io.readJSON(STATE.PATHS.GAMES)
 						games.updated = nil
 						io.writeJSON(STATE.PATHS.GAMES, games)
-				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
+				mainConfig = RAINMETER\GetConfig(SKIN\GetVariable('ROOTCONFIG'))
 				if mainConfig ~= nil and mainConfig\isActive()
 					SKIN\Bang('[!Refresh "#ROOTCONFIG#]')
 			SKIN\Bang('[!DeactivateConfig "#CURRENTCONFIG#"]')

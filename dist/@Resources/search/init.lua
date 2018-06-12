@@ -8,7 +8,8 @@ local STATE = {
   PATHS = {
     RESOURCES = nil
   },
-  STACK = false
+  STACK = false,
+  CENTERED = false
 }
 local COMPONENTS = {
   STATUS = nil
@@ -28,6 +29,7 @@ Initialize = function()
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     require('shared.string')
+    require('shared.rainmeter')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
@@ -42,24 +44,34 @@ Initialize = function()
   end
 end
 Update = function() end
+local centerConfig
+centerConfig = function()
+  if STATE.CENTERED == true then
+    return 
+  end
+  STATE.CENTERED = true
+  if not COMPONENTS.SETTINGS:getCenterOnMonitor() then
+    return 
+  end
+  local meter = SKIN:GetMeter('WindowShadow')
+  local configWidth = meter:GetW()
+  local configHeight = meter:GetH()
+  local mainConfig = RAINMETER:GetConfig(SKIN:GetVariable('ROOTCONFIG'))
+  local monitorIndex = nil
+  if mainConfig ~= nil then
+    monitorIndex = RAINMETER:GetConfigMonitor(mainConfig)
+  else
+    monitorIndex = 1
+  end
+  return RAINMETER:CenterOnMonitor(configWidth, configHeight, monitorIndex)
+end
 Handshake = function(stack)
   local success, err = pcall(function()
     if stack then
       SKIN:Bang(('[!SetOption "WindowTitle" "Text" "%s"]'):format(LOCALIZATION:get('search_window_current_title', 'Search (current games)')))
     end
     STATE.STACK = stack
-    local meter = SKIN:GetMeter('WindowShadow')
-    local skinWidth = meter:GetW()
-    local skinHeight = meter:GetH()
-    local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
-    local monitorIndex = nil
-    if mainConfig ~= nil then
-      monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-    else
-      monitorIndex = 1
-    end
-    local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-    SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
+    centerConfig()
     SKIN:Bang('[!Show]')
     return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
   end)

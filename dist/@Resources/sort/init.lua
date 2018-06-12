@@ -14,7 +14,8 @@ STATE = {
     HEIGHT = nil,
     STEP = nil
   },
-  NUM_SLOTS = 5
+  NUM_SLOTS = 5,
+  CENTERED = false
 }
 local COMPONENTS = {
   STATUS = nil,
@@ -116,6 +117,7 @@ Initialize = function()
   local success, err = pcall(function()
     log('Initializing Sort config')
     require('shared.string')
+    require('shared.rainmeter')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
@@ -208,26 +210,34 @@ updateSlots = function()
     end
   end
 end
+local centerConfig
+centerConfig = function()
+  if STATE.CENTERED == true then
+    return 
+  end
+  STATE.CENTERED = true
+  if not COMPONENTS.SETTINGS:getCenterOnMonitor() then
+    return 
+  end
+  local meter = SKIN:GetMeter('WindowShadow')
+  local configWidth = meter:GetW()
+  local configHeight = meter:GetH()
+  local mainConfig = RAINMETER:GetConfig(SKIN:GetVariable('ROOTCONFIG'))
+  local monitorIndex = nil
+  if mainConfig ~= nil then
+    monitorIndex = RAINMETER:GetConfigMonitor(mainConfig)
+  else
+    monitorIndex = 1
+  end
+  return RAINMETER:CenterOnMonitor(configWidth, configHeight, monitorIndex)
+end
 Handshake = function(currentSortingType)
   local success, err = pcall(function()
     log('Accepting Sort handshake', currentSortingType)
     STATE.PROPERTIES = createProperties()
     updateScrollbar()
     updateSlots()
-    if COMPONENTS.SETTINGS:getCenterOnMonitor() then
-      local meter = SKIN:GetMeter('WindowShadow')
-      local skinWidth = meter:GetW()
-      local skinHeight = meter:GetH()
-      local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
-      local monitorIndex = nil
-      if mainConfig ~= nil then
-        monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-      else
-        monitorIndex = 1
-      end
-      local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-      SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
-    end
+    centerConfig()
     return SKIN:Bang('[!Show]')
   end)
   if not (success) then

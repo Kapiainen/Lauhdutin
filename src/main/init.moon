@@ -209,6 +209,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			require('shared.string')
+			require('shared.rainmeter')
 			require('shared.enums')
 			additionalEnums()
 			Game = require('main.game')
@@ -355,7 +356,7 @@ export OnMouseOver = () ->
 
 otherWindowsActive = () ->
 	rootConfigName = STATE.ROOT_CONFIG
-	configs = utility.getConfigs([('%s\\%s')\format(rootConfigName, name) for name in *{'Search', 'Sort', 'Filter', 'Game'}])
+	configs = RAINMETER\GetConfigs([('%s\\%s')\format(rootConfigName, name) for name in *{'Search', 'Sort', 'Filter', 'Game'}])
 	for config in *configs
 		if config\isActive()
 			return true
@@ -460,7 +461,7 @@ export OnToolbarSort = (quick) ->
 				sortingType = 1 if sortingType >= ENUMS.SORTING_TYPES.MAX
 				return Sort(sortingType)
 			configName = ('%s\\Sort')\format(STATE.ROOT_CONFIG)
-			config = utility.getConfig(configName)
+			config = RAINMETER\GetConfig(configName)
 			if config ~= nil and config\isActive()
 				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
 			SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
@@ -503,7 +504,7 @@ export OnToolbarFilter = (stack) ->
 		() ->
 			STATE.STACK_NEXT_FILTER = stack
 			configName = ('%s\\Filter')\format(STATE.ROOT_CONFIG)
-			config = utility.getConfig(configName)
+			config = RAINMETER\GetConfig(configName)
 			if config ~= nil and config\isActive()
 				return HandshakeFilter()
 			SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
@@ -658,7 +659,7 @@ export OnMiddleClickSlot = (index) ->
 			game = COMPONENTS.SLOTS\middleClick(index)
 			return if game == nil
 			configName = ('%s\\Game')\format(STATE.ROOT_CONFIG)
-			config = utility.getConfig(configName)
+			config = RAINMETER\GetConfig(configName)
 			if STATE.GAME_BEING_MODIFIED == game and config\isActive()
 				STATE.GAME_BEING_MODIFIED = nil
 				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))

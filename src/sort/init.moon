@@ -17,6 +17,7 @@ export STATE = {
 		STEP: nil
 	}
 	NUM_SLOTS: 5
+	CENTERED: false
 }
 
 COMPONENTS = {
@@ -75,6 +76,7 @@ export Initialize = () ->
 		() ->
 			log('Initializing Sort config')
 			require('shared.string')
+			require('shared.rainmeter')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
@@ -155,6 +157,21 @@ updateSlots = () ->
 		if i == STATE.HIGHLIGHTED_SLOT_INDEX
 			MouseOver(i)
 
+centerConfig = () ->
+	return if STATE.CENTERED == true
+	STATE.CENTERED = true
+	return if not COMPONENTS.SETTINGS\getCenterOnMonitor()
+	meter = SKIN\GetMeter('WindowShadow')
+	configWidth = meter\GetW()
+	configHeight = meter\GetH()
+	mainConfig = RAINMETER\GetConfig(SKIN\GetVariable('ROOTCONFIG'))
+	monitorIndex = nil
+	if mainConfig ~= nil
+		monitorIndex = RAINMETER\GetConfigMonitor(mainConfig)
+	else
+		monitorIndex = 1
+	RAINMETER\CenterOnMonitor(configWidth, configHeight, monitorIndex)
+
 export Handshake = (currentSortingType) ->
 	success, err = pcall(
 		() ->
@@ -162,18 +179,7 @@ export Handshake = (currentSortingType) ->
 			STATE.PROPERTIES = createProperties()
 			updateScrollbar()
 			updateSlots()
-			if COMPONENTS.SETTINGS\getCenterOnMonitor()
-				meter = SKIN\GetMeter('WindowShadow')
-				skinWidth = meter\GetW()
-				skinHeight = meter\GetH()
-				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
-				monitorIndex = nil
-				if mainConfig ~= nil
-					monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-				else
-					monitorIndex = 1
-				x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-				SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
+			centerConfig()
 			SKIN\Bang('[!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

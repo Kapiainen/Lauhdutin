@@ -11,6 +11,7 @@ STATE = {
 		RESOURCES: nil
 	}
 	STACK: false
+	CENTERED: false
 }
 
 COMPONENTS = {
@@ -30,6 +31,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			require('shared.string')
+			require('shared.rainmeter')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
@@ -44,23 +46,28 @@ export Initialize = () ->
 export Update = () ->
 	return
 
+centerConfig = () ->
+	return if STATE.CENTERED == true
+	STATE.CENTERED = true
+	return if not COMPONENTS.SETTINGS\getCenterOnMonitor()
+	meter = SKIN\GetMeter('WindowShadow')
+	configWidth = meter\GetW()
+	configHeight = meter\GetH()
+	mainConfig = RAINMETER\GetConfig(SKIN\GetVariable('ROOTCONFIG'))
+	monitorIndex = nil
+	if mainConfig ~= nil
+		monitorIndex = RAINMETER\GetConfigMonitor(mainConfig)
+	else
+		monitorIndex = 1
+	RAINMETER\CenterOnMonitor(configWidth, configHeight, monitorIndex)
+
 export Handshake = (stack) ->
 	success, err = pcall(
 		() ->
 			if stack
 				SKIN\Bang(('[!SetOption "WindowTitle" "Text" "%s"]')\format(LOCALIZATION\get('search_window_current_title', 'Search (current games)')))
 			STATE.STACK = stack
-			meter = SKIN\GetMeter('WindowShadow')
-			skinWidth = meter\GetW()
-			skinHeight = meter\GetH()
-			mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
-			monitorIndex = nil
-			if mainConfig ~= nil
-				monitorIndex = utility.getConfigMonitor(mainConfig) or 1
-			else
-				monitorIndex = 1
-			x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-			SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
+			centerConfig()
 			SKIN\Bang('[!Show]')
 			SKIN\Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
 	)

@@ -121,6 +121,7 @@ Initialize = function()
   local success, err = pcall(function()
     log('Initializing NewGame config')
     require('shared.string')
+    require('shared.rainmeter')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
@@ -202,17 +203,16 @@ centerConfig = function()
     return 
   end
   local meter = SKIN:GetMeter('WindowShadow')
-  local skinWidth = meter:GetW()
-  local skinHeight = meter:GetH()
-  local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
+  local configWidth = meter:GetW()
+  local configHeight = meter:GetH()
+  local mainConfig = RAINMETER:GetConfig(SKIN:GetVariable('ROOTCONFIG'))
   local monitorIndex = nil
   if mainConfig ~= nil then
-    monitorIndex = utility.getConfigMonitor(mainConfig) or 1
+    monitorIndex = RAINMETER:GetConfigMonitor(mainConfig)
   else
     monitorIndex = 1
   end
-  local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
-  return SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
+  return RAINMETER:CenterOnMonitor(configWidth, configHeight, monitorIndex)
 end
 Handshake = function(gameID)
   local success, err = pcall(function()
