@@ -29,6 +29,7 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
+			require('shared.string')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()

@@ -35,7 +35,7 @@ class Localization
 		for line in *lines
 			key, translation = line\match('^([^\t]+)\t(.+)$')
 			continue if key == nil or translation == nil
-			translations[key] = utility.replaceUnsupportedChars(translation)\gsub('\\n', '\n')
+			translations[key] = translation\replaceUnsupportedChars()\gsub('\\n', '\n')
 		if @migrate(translations, version)
 			@save(translations)
 		return translations

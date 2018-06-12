@@ -208,6 +208,7 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
+			require('shared.string')
 			require('shared.enums')
 			additionalEnums()
 			Game = require('main.game')

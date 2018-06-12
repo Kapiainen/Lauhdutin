@@ -62,8 +62,8 @@ do
         if self.property.update ~= nil then
           self.property.value = self.property:update()
         end
-        SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(self.property.title)))
-        SKIN:Bang(('[!SetOption "Slot%dValue" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(self.property.value)))
+        SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]'):format(self.index, self.property.title:replaceUnsupportedChars()))
+        SKIN:Bang(('[!SetOption "Slot%dValue" "Text" "%s"]'):format(self.index, self.property.value:replaceUnsupportedChars()))
         return 
       end
       SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" " "]'):format(self.index))
@@ -115,6 +115,7 @@ Initialize = function()
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     log('Initializing Sort config')
+    require('shared.string')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()

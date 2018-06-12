@@ -45,8 +45,8 @@ class Slot
 	update: () =>
 		if @property ~= nil
 			@property.value = @property\update() if @property.update ~= nil
-			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
-			value = utility.replaceUnsupportedChars(@property.value)
+			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, @property.title\replaceUnsupportedChars()))
+			value = @property.value\replaceUnsupportedChars()
 			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, value))
 			if value\len() > @maxValueStringLength
 				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipText" "%s"]')\format(@index, value))
@@ -78,6 +78,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			log('Initializing NewGame config')
+			require('shared.string')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()

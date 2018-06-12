@@ -33,7 +33,7 @@ do
             _continue_0 = true
             break
           end
-          translations[key] = utility.replaceUnsupportedChars(translation):gsub('\\n', '\n')
+          translations[key] = translation:replaceUnsupportedChars():gsub('\\n', '\n')
           _continue_0 = true
         until true
         if not _continue_0 then

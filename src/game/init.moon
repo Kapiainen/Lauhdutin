@@ -53,8 +53,8 @@ class Slot
 	update: () =>
 		if @property ~= nil
 			@property.value = @property\update() if @property.update ~= nil
-			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
-			value = utility.replaceUnsupportedChars(@property.value)
+			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, @property.title\replaceUnsupportedChars()))
+			value = @property.value\replaceUnsupportedChars()
 			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, value))
 			if value\len() > @maxValueStringLength
 				SKIN\Bang(('[!SetOption "Slot%dValue" "ToolTipText" "%s"]')\format(@index, value))
@@ -107,6 +107,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			log('Initializing Game config')
+			require('shared.string')
 			require('shared.enums')
 			additionalEnums()
 			utility = require('shared.utility')
@@ -137,7 +138,7 @@ export Update = () ->
 	return
 
 updateTitle = (game, maxStringLength) ->
-	title = utility.replaceUnsupportedChars(game\getTitle())
+	title = game\getTitle()\replaceUnsupportedChars()
 	SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(title))
 	if title\len() > maxStringLength
 		SKIN\Bang(('[!SetOption "PageTitle" "ToolTipText" "%s"]')\format(title))

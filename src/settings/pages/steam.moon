@@ -12,7 +12,7 @@ getUsers = () ->
 	vdf = utility.parseVDF(io.readFile(path, false))
 	return nil if vdf == nil or vdf.users == nil
 	for communityID, user in pairs(vdf.users)
-		user.personaname = utility.replaceUnsupportedChars(user.personaname)
+		user.personaname = user.personaname\replaceUnsupportedChars()
 	return vdf.users
 
 getPersonaName = (accountID) ->
@@ -23,7 +23,7 @@ getPersonaName = (accountID) ->
 	config = vdf.userlocalconfigstore if config == nil
 	return nil if config == nil
 	return nil if config.friends == nil
-	return utility.replaceUnsupportedChars(config.friends.personaname)
+	return config.friends.personaname\replaceUnsupportedChars()
 
 updateUsers = () -> 
 	state.accounts = {}

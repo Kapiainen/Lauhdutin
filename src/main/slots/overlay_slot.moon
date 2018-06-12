@@ -131,7 +131,7 @@ class OverlaySlot
 			SKIN\Bang(('[!SetOption "SlotOverlayImage" "ImageName" "#@#main\\gfx\\%s"]')\format(image))
 		else
 			SKIN\Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
-		text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(utility.replaceUnsupportedChars(upperText), utility.replaceUnsupportedChars(lowerText))
+		text = ('%s#CRLF##CRLF##CRLF##CRLF#%s')\format(upperText\replaceUnsupportedChars(), lowerText\replaceUnsupportedChars())
 		SKIN\Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]')\format(text))
 		slot = SKIN\GetMeter(('Slot%dImage')\format(index))
 		SKIN\Bang(('[!SetOption "SlotOverlayImage" "X" "%d"]')\format(slot\GetX()))

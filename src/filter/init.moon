@@ -57,8 +57,8 @@ class Slot
 	update: () =>
 		if @property
 			@property.value = @property\update() if @property.update ~= nil
-			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
-			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.value)))
+			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, @property.title\replaceUnsupportedChars()))
+			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, @property.value\replaceUnsupportedChars()))
 			return
 		SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" " "]')\format(@index))
 		SKIN\Bang(('[!SetOption "Slot%dValue" "Text" " "]')\format(@index))
@@ -96,6 +96,7 @@ export Initialize = () ->
 	success, err = pcall(
 		() ->
 			log('Initializing Filter config')
+			require('shared.string')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()

@@ -21,7 +21,7 @@ class Slot
 			SKIN\Bang(('[!SetOption "Slot%dText" "Text" ""]')\format(@index))
 			SKIN\Bang(('[!SetOption "Slot%dImage" "ImageName" "#@#%s"]')\format(@index, banner))
 		else
-			SKIN\Bang(('[!SetOption "Slot%dText" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(game\getTitle())))
+			SKIN\Bang(('[!SetOption "Slot%dText" "Text" "%s"]')\format(@index, game\getTitle()\replaceUnsupportedChars()))
 			SKIN\Bang(('[!SetOption "Slot%dImage" "ImageName" ""]')\format(@index))
 
 return Slot

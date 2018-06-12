@@ -68,8 +68,8 @@ do
         if self.property.update ~= nil then
           self.property.value = self.property:update()
         end
-        SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]'):format(self.index, utility.replaceUnsupportedChars(self.property.title)))
-        local value = utility.replaceUnsupportedChars(self.property.value)
+        SKIN:Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]'):format(self.index, self.property.title:replaceUnsupportedChars()))
+        local value = self.property.value:replaceUnsupportedChars()
         SKIN:Bang(('[!SetOption "Slot%dValue" "Text" "%s"]'):format(self.index, value))
         if value:len() > self.maxValueStringLength then
           SKIN:Bang(('[!SetOption "Slot%dValue" "ToolTipText" "%s"]'):format(self.index, value))
@@ -171,6 +171,7 @@ Initialize = function()
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
     log('Initializing Game config')
+    require('shared.string')
     require('shared.enums')
     additionalEnums()
     utility = require('shared.utility')
@@ -220,7 +221,7 @@ end
 Update = function() end
 local updateTitle
 updateTitle = function(game, maxStringLength)
-  local title = utility.replaceUnsupportedChars(game:getTitle())
+  local title = game:getTitle():replaceUnsupportedChars()
   SKIN:Bang(('[!SetOption "PageTitle" "Text" "%s"]'):format(title))
   if title:len() > maxStringLength then
     SKIN:Bang(('[!SetOption "PageTitle" "ToolTipText" "%s"]'):format(title))

@@ -15,7 +15,7 @@ getUsers = function()
     return nil
   end
   for communityID, user in pairs(vdf.users) do
-    user.personaname = utility.replaceUnsupportedChars(user.personaname)
+    user.personaname = user.personaname:replaceUnsupportedChars()
   end
   return vdf.users
 end
@@ -36,7 +36,7 @@ getPersonaName = function(accountID)
   if config.friends == nil then
     return nil
   end
-  return utility.replaceUnsupportedChars(config.friends.personaname)
+  return config.friends.personaname:replaceUnsupportedChars()
 end
 local updateUsers
 updateUsers = function()

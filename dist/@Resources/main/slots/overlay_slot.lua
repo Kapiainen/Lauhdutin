@@ -75,7 +75,7 @@ do
       else
         SKIN:Bang('[!SetOption "SlotOverlayImage" "ImageName" ""]')
       end
-      local text = ('%s#CRLF##CRLF##CRLF##CRLF#%s'):format(utility.replaceUnsupportedChars(upperText), utility.replaceUnsupportedChars(lowerText))
+      local text = ('%s#CRLF##CRLF##CRLF##CRLF#%s'):format(upperText:replaceUnsupportedChars(), lowerText:replaceUnsupportedChars())
       SKIN:Bang(('[!SetOption "SlotOverlayText" "Text" "%s"]'):format(text))
       local slot = SKIN:GetMeter(('Slot%dImage'):format(index))
       SKIN:Bang(('[!SetOption "SlotOverlayImage" "X" "%d"]'):format(slot:GetX()))
