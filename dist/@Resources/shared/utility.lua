@@ -22,15 +22,5 @@ return {
   end,
   runLastCommand = function()
     return SKIN:Bang('[!CommandMeasure "Command" "Run"]')
-  end,
-  parseVDF = function(file)
-    local _exp_0 = type(file)
-    if 'string' == _exp_0 then
-      return parseVDF(file:splitIntoLines())
-    elseif 'table' == _exp_0 then
-      return parseVDF(file)
-    else
-      return assert(nil, ('"parseVDF" does not support the "%s" type as its argument.'):format(type(file)))
-    end
   end
 }

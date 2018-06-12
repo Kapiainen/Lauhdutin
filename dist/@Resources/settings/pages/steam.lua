@@ -1,3 +1,4 @@
+local vdf = require('shared.vdf')
 local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
@@ -10,14 +11,14 @@ getUsers = function()
   if not (io.fileExists(path, false)) then
     return nil
   end
-  local vdf = utility.parseVDF(io.readFile(path, false))
-  if vdf == nil or vdf.users == nil then
+  local file = vdf.parse(io.readFile(path, false))
+  if file == nil or file.users == nil then
     return nil
   end
-  for communityID, user in pairs(vdf.users) do
+  for communityID, user in pairs(file.users) do
     user.personaname = user.personaname:replaceUnsupportedChars()
   end
-  return vdf.users
+  return file.users
 end
 local getPersonaName
 getPersonaName = function(accountID)
@@ -25,10 +26,10 @@ getPersonaName = function(accountID)
   if not (io.fileExists(path, false)) then
     return nil
   end
-  local vdf = utility.parseVDF(io.readFile(path, false))
-  local config = vdf.userroamingconfigstore
+  local file = vdf.parse(io.readFile(path, false))
+  local config = file.userroamingconfigstore
   if config == nil then
-    config = vdf.userlocalconfigstore
+    config = file.userlocalconfigstore
   end
   if config == nil then
     return nil

@@ -12,13 +12,4 @@ return {
 		SKIN\Bang('[!CommandMeasure "Command" "Run"]')
 
 	runLastCommand: () -> SKIN\Bang('[!CommandMeasure "Command" "Run"]')
-
-	parseVDF: (file) ->
-		switch type(file)
-			when 'string'
-				return parseVDF(file\splitIntoLines())
-			when 'table'
-				return parseVDF(file)
-			else
-				assert(nil, ('"parseVDF" does not support the "%s" type as its argument.')\format(type(file)))
 }

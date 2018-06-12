@@ -1,3 +1,4 @@
+vdf = require('shared.vdf')
 utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
@@ -9,18 +10,18 @@ state = {
 getUsers = () ->
 	path = io.joinPaths(COMPONENTS.SETTINGS\getSteamPath(), 'config\\loginusers.vdf')
 	return nil unless io.fileExists(path, false)
-	vdf = utility.parseVDF(io.readFile(path, false))
-	return nil if vdf == nil or vdf.users == nil
-	for communityID, user in pairs(vdf.users)
+	file = vdf.parse(io.readFile(path, false))
+	return nil if file == nil or file.users == nil
+	for communityID, user in pairs(file.users)
 		user.personaname = user.personaname\replaceUnsupportedChars()
-	return vdf.users
+	return file.users
 
 getPersonaName = (accountID) ->
 	path = io.joinPaths(COMPONENTS.SETTINGS\getSteamPath(), 'userdata', accountID, 'config\\localconfig.vdf')
 	return nil unless io.fileExists(path, false)
-	vdf = utility.parseVDF(io.readFile(path, false))
-	config = vdf.userroamingconfigstore
-	config = vdf.userlocalconfigstore if config == nil
+	file = vdf.parse(io.readFile(path, false))
+	config = file.userroamingconfigstore
+	config = file.userlocalconfigstore if config == nil
 	return nil if config == nil
 	return nil if config.friends == nil
 	return config.friends.personaname\replaceUnsupportedChars()

@@ -1,3 +1,4 @@
+local vdf = require('shared.vdf')
 local bit = require('lib.bit.numberlua')
 local digest = require('lib.digest.crc32')
 local Platform = require('main.platforms.platform')
@@ -36,50 +37,6 @@ do
     _len_0 = _len_0 + 1
   end
   lookupTable = _accum_0
-end
-local parseVDF
-parseVDF = function(lines, start)
-  if start == nil then
-    start = 1
-  end
-  local result = { }
-  local i = start - 1
-  while i < #lines do
-    local _continue_0 = false
-    repeat
-      i = i + 1
-      local key = lines[i]:match('^%s*"([^"]+)"%s*$')
-      if key ~= nil then
-        assert(lines[i + 1]:match('^%s*{%s*$') ~= nil, '"parseVDF" expected "{".')
-        local tbl
-        tbl, i = parseVDF(lines, i + 2)
-        result[key:lower()] = tbl
-      else
-        local value
-        key, value = lines[i]:match('^%s*"([^"]+)"%s*"(.-)"%s*$')
-        if key ~= nil and value ~= nil then
-          result[key:lower()] = value
-        else
-          if lines[i]:match('^%s*}%s*$') then
-            return result, i
-          elseif lines[i]:match('^%s*//.*$') then
-            _continue_0 = true
-            break
-          elseif lines[i]:match('^%s*"#base"%s*"([^"]+)"%s*$') then
-            _continue_0 = true
-            break
-          else
-            assert(nil, ('"parseVDF" encountered unexpected input on line %d: %s.'):format(i, lines[i]))
-          end
-        end
-      end
-      _continue_0 = true
-    until true
-    if not _continue_0 then
-      break
-    end
-  end
-  return result, i
 end
 local Steam
 do
@@ -224,10 +181,9 @@ do
       local libraryFoldersPath = io.joinPaths(self.steamPath, 'steamapps\\libraryfolders.vdf')
       if io.fileExists(libraryFoldersPath, false) then
         local file = io.readFile(libraryFoldersPath, false)
-        local lines = file:splitIntoLines()
-        local vdf = parseVDF(lines)
-        if type(vdf.libraryfolders) == 'table' then
-          for key, value in pairs(vdf.libraryfolders) do
+        file = vdf.parse(file)
+        if type(file.libraryfolders) == 'table' then
+          for key, value in pairs(file.libraryfolders) do
             if tonumber(key) ~= nil then
               if value:endsWith('\\') then
                 value = value .. '\\'
@@ -253,14 +209,12 @@ do
     parseLocalConfig = function(self)
       log('Parsing localconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\localconfig.vdf'), false)
-      local lines = file:splitIntoLines()
-      return parseVDF(lines)
+      return vdf.parse(file)
     end,
     parseSharedConfig = function(self)
       log('Parsing sharedconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, '\\7\\remote\\sharedconfig.vdf'), false)
-      local lines = file:splitIntoLines()
-      return parseVDF(lines)
+      return vdf.parse(file)
     end,
     getTags = function(self, appID, sharedConfig)
       local tags = nil
@@ -497,19 +451,19 @@ do
             break
           end
           file = io.readFile(io.joinPaths(libraryPath, manifest), false)
-          local lines = file:splitIntoLines()
-          local success, vdf = pcall(parseVDF, lines)
+          local success
+          success, file = pcall(vdf.parse, file)
           if not (success) then
-            log(('Failed to parse "%s": %s'):format(manifest, vdf))
+            log(('Failed to parse "%s": %s'):format(manifest, file))
             _continue_0 = true
             break
           end
           local title = nil
-          if vdf.appstate ~= nil then
-            title = vdf.appstate.name
+          if file.appstate ~= nil then
+            title = file.appstate.name
           end
-          if title == nil and vdf.userconfig ~= nil then
-            title = vdf.userconfig.name
+          if title == nil and file.userconfig ~= nil then
+            title = file.userconfig.name
           end
           if title == nil and self.communityProfileGames ~= nil and self.communityProfileGames[appID] ~= nil then
             title = self.communityProfileGames[appID].title
