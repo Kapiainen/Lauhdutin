@@ -1,4 +1,8 @@
 local Game = require('main.game')
+local bannerExtensions = {
+  '.jpg',
+  '.png'
+}
 local Platform
 do
   local _class_0
@@ -26,9 +30,8 @@ do
         bannerPath = self.cachePath
       end
       local pathWithoutExtension = io.joinPaths(bannerPath, fileWithoutExtension)
-      local _list_0 = self.bannerExtensions
-      for _index_0 = 1, #_list_0 do
-        local extension = _list_0[_index_0]
+      for _index_0 = 1, #bannerExtensions do
+        local extension = bannerExtensions[_index_0]
         local path = pathWithoutExtension .. extension
         if io.fileExists(path) then
           return path
@@ -37,7 +40,7 @@ do
       return nil
     end,
     getBannerExtensions = function(self)
-      return self.bannerExtensions
+      return bannerExtensions
     end,
     getCachePath = function(self)
       return self.cachePath
@@ -52,11 +55,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, settings)
-      assert(type(settings) == 'table', 'main.platforms.platform.Platform')
-      self.bannerExtensions = {
-        '.jpg',
-        '.png'
-      }
+      return assert(type(settings) == 'table', 'main.platforms.platform.Platform')
     end,
     __base = _base_0,
     __name = "Platform"

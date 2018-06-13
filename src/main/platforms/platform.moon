@@ -1,12 +1,14 @@
 Game = require('main.game')
 
+bannerExtensions = {
+	'.jpg'
+	'.png'
+}
+
 class Platform
 	new: (settings) =>
 		assert(type(settings) == 'table', 'main.platforms.platform.Platform')
-		@bannerExtensions = {
-			'.jpg'
-			'.png'
-		}
+		
 
 	validate: () => assert(nil, 'Platform has not implemented the validate method.')
 
@@ -22,12 +24,12 @@ class Platform
 
 	getBannerPath: (fileWithoutExtension, bannerPath = @cachePath) =>
 		pathWithoutExtension = io.joinPaths(bannerPath, fileWithoutExtension)
-		for extension in *@bannerExtensions
+		for extension in *bannerExtensions
 			path = pathWithoutExtension .. extension
 			return path if io.fileExists(path)
 		return nil
 
-	getBannerExtensions: () => return @bannerExtensions
+	getBannerExtensions: () => return bannerExtensions
 
 	getCachePath: () => return @cachePath
 
