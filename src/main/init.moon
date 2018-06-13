@@ -37,6 +37,7 @@ export COMPONENTS = {
 	ANIMATIONS: nil
 	DOWNLOADER: nil
 	COMMANDER: nil
+	CONTEXT_MENU: nil
 	LIBRARY: nil
 	PROCESS: nil
 	SETTINGS: nil
@@ -48,6 +49,7 @@ export COMPONENTS = {
 
 export SIGNALS = {
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
+	UPDATE_SLOTS: 'update_slots'
 }
 
 export log = (...) -> print(...) if STATE.LOGGING == true
@@ -151,24 +153,20 @@ detectGames = () ->
 	startDetectingPlatformGames()
 
 updateSlots = () ->
-	success, err = pcall(
-		() ->
-			if STATE.SCROLL_INDEX < 1
-				STATE.SCROLL_INDEX = 1
-			elseif STATE.SCROLL_INDEX > #STATE.GAMES - STATE.NUM_SLOTS + 1
-				if #STATE.GAMES > STATE.NUM_SLOTS
-					STATE.SCROLL_INDEX = #STATE.GAMES - STATE.NUM_SLOTS + 1
-				else
-					STATE.SCROLL_INDEX = 1
-			if COMPONENTS.SLOTS\populate(STATE.GAMES, STATE.SCROLL_INDEX)
-				COMPONENTS.ANIMATIONS\resetSlots()
-				COMPONENTS.SLOTS\update()
-			else
-				SKIN\Bang(('[!SetOption "Slot1Text" "Text" "%s"]')\format(LOCALIZATION\get('main_no_games', 'No games to show')))
-				COMPONENTS.ANIMATIONS\resetSlots()
-				COMPONENTS.SLOTS\update()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
+	if STATE.SCROLL_INDEX < 1
+		STATE.SCROLL_INDEX = 1
+	elseif STATE.SCROLL_INDEX > #STATE.GAMES - STATE.NUM_SLOTS + 1
+		if #STATE.GAMES > STATE.NUM_SLOTS
+			STATE.SCROLL_INDEX = #STATE.GAMES - STATE.NUM_SLOTS + 1
+		else
+			STATE.SCROLL_INDEX = 1
+	if COMPONENTS.SLOTS\populate(STATE.GAMES, STATE.SCROLL_INDEX)
+		COMPONENTS.ANIMATIONS\resetSlots()
+		COMPONENTS.SLOTS\update()
+	else
+		SKIN\Bang(('[!SetOption "Slot1Text" "Text" "%s"]')\format(LOCALIZATION\get('main_no_games', 'No games to show')))
+		COMPONENTS.ANIMATIONS\resetSlots()
+		COMPONENTS.SLOTS\update()
 
 onInitialized = () ->
 	COMPONENTS.STATUS\hide()
@@ -209,6 +207,8 @@ export Initialize = () ->
 			COMPONENTS.DOWNLOADER = require('shared.downloader')()
 			COMPONENTS.COMMANDER = require('shared.commander')()
 			COMPONENTS.SIGNAL = require('shared.signal')()
+			COMPONENTS.SIGNAL\register(SIGNALS.UPDATE_SLOTS, updateSlots)
+			COMPONENTS.CONTEXT_MENU = require('main.context_menu')
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()

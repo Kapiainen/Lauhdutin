@@ -31,6 +31,7 @@ COMPONENTS = {
   ANIMATIONS = nil,
   DOWNLOADER = nil,
   COMMANDER = nil,
+  CONTEXT_MENU = nil,
   LIBRARY = nil,
   PROCESS = nil,
   SETTINGS = nil,
@@ -40,7 +41,8 @@ COMPONENTS = {
   TOOLBAR = nil
 }
 SIGNALS = {
-  UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status'
+  UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
+  UPDATE_SLOTS = 'update_slots'
 }
 log = function(...)
   if STATE.LOGGING == true then
@@ -180,27 +182,22 @@ detectGames = function()
 end
 local updateSlots
 updateSlots = function()
-  local success, err = pcall(function()
-    if STATE.SCROLL_INDEX < 1 then
-      STATE.SCROLL_INDEX = 1
-    elseif STATE.SCROLL_INDEX > #STATE.GAMES - STATE.NUM_SLOTS + 1 then
-      if #STATE.GAMES > STATE.NUM_SLOTS then
-        STATE.SCROLL_INDEX = #STATE.GAMES - STATE.NUM_SLOTS + 1
-      else
-        STATE.SCROLL_INDEX = 1
-      end
-    end
-    if COMPONENTS.SLOTS:populate(STATE.GAMES, STATE.SCROLL_INDEX) then
-      COMPONENTS.ANIMATIONS:resetSlots()
-      return COMPONENTS.SLOTS:update()
+  if STATE.SCROLL_INDEX < 1 then
+    STATE.SCROLL_INDEX = 1
+  elseif STATE.SCROLL_INDEX > #STATE.GAMES - STATE.NUM_SLOTS + 1 then
+    if #STATE.GAMES > STATE.NUM_SLOTS then
+      STATE.SCROLL_INDEX = #STATE.GAMES - STATE.NUM_SLOTS + 1
     else
-      SKIN:Bang(('[!SetOption "Slot1Text" "Text" "%s"]'):format(LOCALIZATION:get('main_no_games', 'No games to show')))
-      COMPONENTS.ANIMATIONS:resetSlots()
-      return COMPONENTS.SLOTS:update()
+      STATE.SCROLL_INDEX = 1
     end
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
+  end
+  if COMPONENTS.SLOTS:populate(STATE.GAMES, STATE.SCROLL_INDEX) then
+    COMPONENTS.ANIMATIONS:resetSlots()
+    return COMPONENTS.SLOTS:update()
+  else
+    SKIN:Bang(('[!SetOption "Slot1Text" "Text" "%s"]'):format(LOCALIZATION:get('main_no_games', 'No games to show')))
+    COMPONENTS.ANIMATIONS:resetSlots()
+    return COMPONENTS.SLOTS:update()
   end
 end
 local onInitialized
@@ -244,6 +241,8 @@ Initialize = function()
     COMPONENTS.DOWNLOADER = require('shared.downloader')()
     COMPONENTS.COMMANDER = require('shared.commander')()
     COMPONENTS.SIGNAL = require('shared.signal')()
+    COMPONENTS.SIGNAL:register(SIGNALS.UPDATE_SLOTS, updateSlots)
+    COMPONENTS.CONTEXT_MENU = require('main.context_menu')
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
