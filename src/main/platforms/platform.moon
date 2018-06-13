@@ -8,7 +8,6 @@ bannerExtensions = {
 class Platform
 	new: (settings) =>
 		assert(type(settings) == 'table', 'main.platforms.platform.Platform')
-		
 
 	validate: () => assert(nil, 'Platform has not implemented the validate method.')
 
