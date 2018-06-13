@@ -70,16 +70,13 @@ class Process
 		@monitoring = false
 		@duration = os.time() - @startingTime
 		@startingTime = nil
-		GameProcessTerminated(@currentGame)
+		COMPONENTS.SIGNAL\emit(SIGNALS.GAME_PROCESS_TERMINATED, @currentGame, @duration / 3600)
 		@currentGame = nil
 		SKIN\Bang('[!SetOption "Process" "UpdateDivider" "630"]')
 
-	getDuration: () => return @duration
-
-	isRunning: () => return @gameStatus
-
-	isPlatformRunning: (platformID) =>
-		return false if @platformProcesses == nil
-		return @platformStatuses[platformID] == true
+export OnProcessUpdate = (running) ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(() -> COMPONENTS.PROCESS\update(running == 1))
+	COMPONENTS.STATUS\show(err, true) unless success
 
 return Process

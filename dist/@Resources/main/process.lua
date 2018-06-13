@@ -84,21 +84,9 @@ do
       self.monitoring = false
       self.duration = os.time() - self.startingTime
       self.startingTime = nil
-      GameProcessTerminated(self.currentGame)
+      COMPONENTS.SIGNAL:emit(SIGNALS.GAME_PROCESS_TERMINATED, self.currentGame, self.duration / 3600)
       self.currentGame = nil
       return SKIN:Bang('[!SetOption "Process" "UpdateDivider" "630"]')
-    end,
-    getDuration = function(self)
-      return self.duration
-    end,
-    isRunning = function(self)
-      return self.gameStatus
-    end,
-    isPlatformRunning = function(self, platformID)
-      if self.platformProcesses == nil then
-        return false
-      end
-      return self.platformStatuses[platformID] == true
     end
   }
   _base_0.__index = _base_0
@@ -121,5 +109,16 @@ do
   })
   _base_0.__class = _class_0
   Process = _class_0
+end
+OnProcessUpdate = function(running)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    return COMPONENTS.PROCESS:update(running == 1)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
 end
 return Process

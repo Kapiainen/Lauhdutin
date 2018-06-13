@@ -46,14 +46,15 @@ SIGNALS = {
   DETECTED_SHORTCUT_GAMES = 'detected_shortcut_games',
   DETECTED_STEAM_GAMES = 'detected_steam_games',
   DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE = 'downloaded_gog_galaxy_community_profile',
-  UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
-  UPDATE_SLOTS = 'update_slots',
+  GAME_PROCESS_TERMINATED = 'game_process_terminated',
   START_HIDING_GAMES = 'start_hiding_games',
-  STOP_HIDING_GAMES = 'stop_hiding_games',
-  START_UNHIDING_GAMES = 'start_unhiding_games',
-  STOP_UNHIDING_GAMES = 'stop_unhiding_games',
   START_REMOVING_GAMES = 'start_removing_games',
-  STOP_REMOVING_GAMES = 'stop_removing_games'
+  START_UNHIDING_GAMES = 'start_unhiding_games',
+  STOP_HIDING_GAMES = 'stop_hiding_games',
+  STOP_REMOVING_GAMES = 'stop_removing_games',
+  STOP_UNHIDING_GAMES = 'stop_unhiding_games',
+  UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
+  UPDATE_SLOTS = 'update_slots'
 }
 log = function(...)
   if STATE.LOGGING == true then
@@ -230,6 +231,58 @@ additionalEnums = function()
     REMOVE_GAME = 4
   }
 end
+local gameProcessTerminated
+gameProcessTerminated = function(game, duration)
+  log(game:getTitle(), 'was played for', duration, 'hours')
+  game:incrementHoursPlayed(duration)
+  COMPONENTS.LIBRARY:save()
+  local platformID = game:getPlatformID()
+  if COMPONENTS.SETTINGS:getBangsEnabled() then
+    if not (game:getIgnoresOtherBangs()) then
+      local _list_0 = COMPONENTS.SETTINGS:getGlobalStoppingBangs()
+      for _index_0 = 1, #_list_0 do
+        local bang = _list_0[_index_0]
+        SKIN:Bang(bang)
+      end
+      local platformBangs
+      local _exp_0 = platformID
+      if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
+      elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getSteamStoppingBangs()
+      elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getBattlenetStoppingBangs()
+      elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
+      elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
+        platformBangs = COMPONENTS.SETTINGS:getCustomStoppingBangs()
+      else
+        platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
+      end
+      for _index_0 = 1, #platformBangs do
+        local bang = platformBangs[_index_0]
+        SKIN:Bang(bang)
+      end
+    end
+    local _list_0 = game:getStoppingBangs()
+    for _index_0 = 1, #_list_0 do
+      local bang = _list_0[_index_0]
+      SKIN:Bang(bang)
+    end
+  end
+  local _exp_0 = platformID
+  if ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
+    if COMPONENTS.SETTINGS:getGOGGalaxyIndirectLaunch() then
+      SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\closeClient.bat"]')
+    end
+  end
+  if COMPONENTS.SETTINGS:getHideSkin() then
+    SKIN:Bang('[!ShowFade]')
+  end
+  if COMPONENTS.SETTINGS:getShowSession() then
+    return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(('%s\\Session'):format(STATE.ROOT_CONFIG)))
+  end
+end
 Initialize = function()
   STATE.ROOT_CONFIG = SKIN:GetVariable('ROOTCONFIG')
   dofile(('%s%s'):format(SKIN:GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
@@ -246,6 +299,7 @@ Initialize = function()
     COMPONENTS.COMMANDER = require('shared.commander')()
     COMPONENTS.SIGNAL = require('shared.signal')()
     COMPONENTS.SIGNAL:register(SIGNALS.UPDATE_SLOTS, updateSlots)
+    COMPONENTS.SIGNAL:register(SIGNALS.GAME_PROCESS_TERMINATED, gameProcessTerminated)
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
@@ -294,77 +348,6 @@ Update = function()
   if not (success) then
     COMPONENTS.STATUS:show(err, true)
     return setUpdateDivider(-1)
-  end
-end
-UpdateProcess = function(running)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    return COMPONENTS.PROCESS:update(running == 1)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-GameProcessTerminated = function(game)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    local duration = COMPONENTS.PROCESS:getDuration() / 3600
-    log(game:getTitle(), 'was played for', duration, 'hours')
-    game:incrementHoursPlayed(duration)
-    COMPONENTS.LIBRARY:save()
-    local platformID = game:getPlatformID()
-    if COMPONENTS.SETTINGS:getBangsEnabled() then
-      if not (game:getIgnoresOtherBangs()) then
-        local _list_0 = COMPONENTS.SETTINGS:getGlobalStoppingBangs()
-        for _index_0 = 1, #_list_0 do
-          local bang = _list_0[_index_0]
-          SKIN:Bang(bang)
-        end
-        local platformBangs
-        local _exp_0 = platformID
-        if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
-          platformBangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
-        elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 or ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
-          platformBangs = COMPONENTS.SETTINGS:getSteamStoppingBangs()
-        elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
-          platformBangs = COMPONENTS.SETTINGS:getBattlenetStoppingBangs()
-        elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-          platformBangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
-        elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
-          platformBangs = COMPONENTS.SETTINGS:getCustomStoppingBangs()
-        else
-          platformBangs = assert(nil, 'Encountered an unsupported platform ID when executing platform-specific stopping bangs.')
-        end
-        for _index_0 = 1, #platformBangs do
-          local bang = platformBangs[_index_0]
-          SKIN:Bang(bang)
-        end
-      end
-      local _list_0 = game:getStoppingBangs()
-      for _index_0 = 1, #_list_0 do
-        local bang = _list_0[_index_0]
-        SKIN:Bang(bang)
-      end
-    end
-    local _exp_0 = platformID
-    if ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
-      if COMPONENTS.SETTINGS:getGOGGalaxyIndirectLaunch() then
-        SKIN:Bang('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\closeClient.bat"]')
-      end
-    end
-    if COMPONENTS.SETTINGS:getHideSkin() then
-      SKIN:Bang('[!ShowFade]')
-    end
-    if COMPONENTS.SETTINGS:getShowSession() then
-      return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(('%s\\Session'):format(STATE.ROOT_CONFIG)))
-    end
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
   end
 end
 Unload = function()
