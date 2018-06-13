@@ -21,5 +21,5 @@ if exist %1 (
 )
 start /B /W "" %sqlite% %2 "select productId, title, images, links from LimitedDetails;" > %galaxy%
 set "rainmeter="%~3\Rainmeter.exe""
-start /B "" %rainmeter% !CommandMeasure "Script" "OnDumpedDBs()" %4
+start /B "" %rainmeter% !CommandMeasure "Script" "OnGOGGalaxyDumpedDBs()" %4
 ::pause

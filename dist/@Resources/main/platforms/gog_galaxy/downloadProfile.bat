@@ -10,5 +10,5 @@ cd ..\..\
 set "phantomjs="%cd%\phantomjs.exe""
 start /B /W "" %phantomjs% %profilejs% %1
 set "rainmeter="%~2\Rainmeter.exe""
-start /B "" %rainmeter% !CommandMeasure "Script" "OnDownloadedGOGCommunityProfile()" %3
+start /B "" %rainmeter% !CommandMeasure "Script" "OnGOGGalaxyDownloadedCommunityProfile()" %3
 ::pause

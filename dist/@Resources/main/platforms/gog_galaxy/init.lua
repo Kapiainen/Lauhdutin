@@ -31,12 +31,51 @@ do
       SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.communityProfileName))
       return true
     end,
+    onCommunityProfileDownloaded = function(self)
+      return function()
+        log('Downloaded GOG community profile')
+        return self:dumpDatabases()
+      end
+    end,
     dumpDatabases = function(self)
       assert(self.programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
       local indexDBPath = io.joinPaths(self.programDataPath, 'storage\\index.db')
       local galaxyDBPath = io.joinPaths(self.programDataPath, 'storage\\galaxy.db')
       assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.'):format(galaxyDBPath))
       return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(indexDBPath, galaxyDBPath))
+    end,
+    onDumpedDatabases = function(self)
+      return function()
+        log('Dumped GOG Galaxy databases')
+        local index = io.readFile(io.joinPaths(self.cachePath, 'index.txt'))
+        local galaxyPath = io.joinPaths(self.cachePath, 'galaxy.txt')
+        local galaxy = io.readFile(galaxyPath)
+        local newGalaxy = { }
+        local wholeLine = { }
+        local lines = galaxy:splitIntoLines()
+        for _index_0 = 1, #lines do
+          local line = lines[_index_0]
+          if line:match('^%d+|[^|]+|[^|]+|.+$') then
+            table.insert(newGalaxy, table.concat(wholeLine, ''))
+            wholeLine = { }
+          end
+          table.insert(wholeLine, line)
+        end
+        if #wholeLine > 0 then
+          table.insert(newGalaxy, table.concat(wholeLine, ''))
+        end
+        galaxy = table.concat(newGalaxy, '\n')
+        io.writeFile(galaxyPath, galaxy)
+        local profilePath = io.joinPaths(self.cachePath, 'profile.txt')
+        local profile
+        if io.fileExists(profilePath) then
+          profile = io.readFile(profilePath)
+        else
+          profile = nil
+        end
+        self:generateGames(index, galaxy, profile)
+        return OnFinishedDetectingPlatformGames()
+      end
     end,
     parseIndexDB = function(self, output)
       assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseIndexDB')
@@ -321,6 +360,26 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   GOGGalaxy = _class_0
+end
+OnGOGGalaxyDownloadedCommunityProfile = function()
+  OnGOGGalaxyDownloadedCommunityProfile = nil
+  local success, err = pcall(function()
+    COMPONENTS.SIGNAL:emit(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
+    return COMPONENTS.SIGNAL:clear(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnGOGGalaxyDumpedDBs = function()
+  OnGOGGalaxyDumpedDBs = nil
+  local success, err = pcall(function()
+    COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_GOG_GALAXY_GAMES)
+    return COMPONENTS.SIGNAL:clear(SIGNALS.DETECTED_GOG_GALAXY_GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
 end
 if RUN_TESTS then
   local assertionMessage = 'GOG Galaxy test failed!'

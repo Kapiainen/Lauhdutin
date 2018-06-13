@@ -60,12 +60,40 @@ class GOGGalaxy extends Platform
 		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\downloadProfile.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@communityProfileName))
 		return true
 
+	onCommunityProfileDownloaded: () =>
+		return () ->
+			log('Downloaded GOG community profile')
+			@dumpDatabases()
+
 	dumpDatabases: () =>
 		assert(@programDataPath ~= nil, 'The path to GOG Galaxy\'s ProgramData path has not been defined.')
 		indexDBPath = io.joinPaths(@programDataPath, 'storage\\index.db')
 		galaxyDBPath = io.joinPaths(@programDataPath, 'storage\\galaxy.db')
 		assert(io.fileExists(galaxyDBPath, false) == true, ('"%s" does not exist.')\format(galaxyDBPath))
 		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\gog_galaxy\\dumpDatabases.bat" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(indexDBPath, galaxyDBPath))
+
+	onDumpedDatabases: () =>
+		return () ->
+			log('Dumped GOG Galaxy databases')
+			index = io.readFile(io.joinPaths(@cachePath, 'index.txt'))
+			galaxyPath = io.joinPaths(@cachePath, 'galaxy.txt')
+			galaxy = io.readFile(galaxyPath)
+			newGalaxy = {}
+			wholeLine = {}
+			lines = galaxy\splitIntoLines()
+			for line in *lines
+				if line\match('^%d+|[^|]+|[^|]+|.+$')
+					table.insert(newGalaxy, table.concat(wholeLine, ''))
+					wholeLine = {}
+				table.insert(wholeLine, line)
+			if #wholeLine > 0
+				table.insert(newGalaxy, table.concat(wholeLine, ''))
+			galaxy = table.concat(newGalaxy, '\n')
+			io.writeFile(galaxyPath, galaxy)
+			profilePath = io.joinPaths(@cachePath, 'profile.txt')
+			profile = if io.fileExists(profilePath) then io.readFile(profilePath) else nil
+			@generateGames(index, galaxy, profile)
+			OnFinishedDetectingPlatformGames() -- TODO: Emit
 
 	parseIndexDB: (output) =>
 		assert(type(output) == 'string', 'main.platforms.gog_galaxy.init.GOGGalaxy.parseIndexDB')
@@ -229,6 +257,24 @@ class GOGGalaxy extends Platform
 		productIDs[productID] = true
 		titles, bannerURLs = @parseGalaxyDB(productIDs, galaxy)
 		return bannerURLs[productID]
+
+export OnGOGGalaxyDownloadedCommunityProfile = () ->
+	export OnGOGGalaxyDownloadedCommunityProfile = nil
+	success, err = pcall(
+		() ->
+			COMPONENTS.SIGNAL\emit(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
+			COMPONENTS.SIGNAL\clear(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnGOGGalaxyDumpedDBs = () ->
+	export OnGOGGalaxyDumpedDBs = nil
+	success, err = pcall(
+		() ->
+			COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_GOG_GALAXY_GAMES)
+			COMPONENTS.SIGNAL\clear(SIGNALS.DETECTED_GOG_GALAXY_GAMES)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
 
 if RUN_TESTS
 	assertionMessage = 'GOG Galaxy test failed!'

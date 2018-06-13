@@ -42,7 +42,9 @@ COMPONENTS = {
 }
 SIGNALS = {
   DETECTED_BATTLENET_GAMES = 'detected_battlenet_games',
+  DETECTED_GOG_GALAXY_GAMES = 'detected_gog_galaxy_games',
   DETECTED_SHORTCUT_GAMES = 'detected_shortcut_games',
+  DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE = 'downloaded_gog_galaxy_community_profile',
   UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
   UPDATE_SLOTS = 'update_slots'
 }
@@ -124,7 +126,10 @@ startDetectingPlatformGames = function()
     end
   elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
     log('Starting to detect GOG Galaxy games')
+    COMPONENTS.SIGNAL:register(SIGNALS.DETECTED_GOG_GALAXY_GAMES, platform:onDumpedDatabases())
+    COMPONENTS.SIGNAL:register(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE, platform:onCommunityProfileDownloaded())
     if not (platform:downloadCommunityProfile()) then
+      COMPONENTS.SIGNAL:clear(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
       return platform:dumpDatabases()
     end
   elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
@@ -1061,52 +1066,6 @@ OnGotACFs = function()
       return STATE.PLATFORM_QUEUE[1]:getACFs()
     end
     STATE.PLATFORM_QUEUE[1]:generateShortcuts()
-    return OnFinishedDetectingPlatformGames()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnDownloadedGOGCommunityProfile = function()
-  local success, err = pcall(function()
-    log('Downloaded GOG community profile')
-    return STATE.PLATFORM_QUEUE[1]:dumpDatabases()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnDumpedDBs = function()
-  local success, err = pcall(function()
-    log('Dumped GOG Galaxy databases')
-    local cachePath = STATE.PLATFORM_QUEUE[1]:getCachePath()
-    local index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
-    local galaxyPath = io.joinPaths(cachePath, 'galaxy.txt')
-    local galaxy = io.readFile(galaxyPath)
-    local newGalaxy = { }
-    local wholeLine = { }
-    local lines = galaxy:splitIntoLines()
-    for _index_0 = 1, #lines do
-      local line = lines[_index_0]
-      if line:match('^%d+|[^|]+|[^|]+|.+$') then
-        table.insert(newGalaxy, table.concat(wholeLine, ''))
-        wholeLine = { }
-      end
-      table.insert(wholeLine, line)
-    end
-    if #wholeLine > 0 then
-      table.insert(newGalaxy, table.concat(wholeLine, ''))
-    end
-    galaxy = table.concat(newGalaxy, '\n')
-    io.writeFile(galaxyPath, galaxy)
-    local profilePath = io.joinPaths(cachePath, 'profile.txt')
-    local profile
-    if io.fileExists(profilePath) then
-      profile = io.readFile(profilePath)
-    else
-      profile = nil
-    end
-    STATE.PLATFORM_QUEUE[1]:generateGames(index, galaxy, profile)
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then

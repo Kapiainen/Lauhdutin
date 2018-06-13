@@ -49,7 +49,9 @@ export COMPONENTS = {
 
 export SIGNALS = {
 	DETECTED_BATTLENET_GAMES: 'detected_battlenet_games'
+	DETECTED_GOG_GALAXY_GAMES: 'detected_gog_galaxy_games'
 	DETECTED_SHORTCUT_GAMES: 'detected_shortcut_games'
+	DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE: 'downloaded_gog_galaxy_community_profile'
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 	UPDATE_SLOTS: 'update_slots'
 }
@@ -119,7 +121,10 @@ startDetectingPlatformGames = () ->
 				OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
 			log('Starting to detect GOG Galaxy games')
+			COMPONENTS.SIGNAL\register(SIGNALS.DETECTED_GOG_GALAXY_GAMES, platform\onDumpedDatabases())
+			COMPONENTS.SIGNAL\register(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE, platform\onCommunityProfileDownloaded())
 			unless platform\downloadCommunityProfile()
+				COMPONENTS.SIGNAL\clear(SIGNALS.DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE)
 				platform\dumpDatabases()
 		when ENUMS.PLATFORM_IDS.CUSTOM
 			log('Starting to detect Custom games')
@@ -785,42 +790,6 @@ export OnGotACFs = () ->
 			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
 				return STATE.PLATFORM_QUEUE[1]\getACFs()
 			STATE.PLATFORM_QUEUE[1]\generateShortcuts()
-			OnFinishedDetectingPlatformGames()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Game detection -> GOG Galaxy
-export OnDownloadedGOGCommunityProfile = () ->
-	success, err = pcall(
-		() ->
-			log('Downloaded GOG community profile')
-			STATE.PLATFORM_QUEUE[1]\dumpDatabases()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnDumpedDBs = () ->
-	success, err = pcall(
-		() ->
-			log('Dumped GOG Galaxy databases')
-			cachePath = STATE.PLATFORM_QUEUE[1]\getCachePath()
-			index = io.readFile(io.joinPaths(cachePath, 'index.txt'))
-			galaxyPath = io.joinPaths(cachePath, 'galaxy.txt')
-			galaxy = io.readFile(galaxyPath)
-			newGalaxy = {}
-			wholeLine = {}
-			lines = galaxy\splitIntoLines()
-			for line in *lines
-				if line\match('^%d+|[^|]+|[^|]+|.+$')
-					table.insert(newGalaxy, table.concat(wholeLine, ''))
-					wholeLine = {}
-				table.insert(wholeLine, line)
-			if #wholeLine > 0
-				table.insert(newGalaxy, table.concat(wholeLine, ''))
-			galaxy = table.concat(newGalaxy, '\n')
-			io.writeFile(galaxyPath, galaxy)
-			profilePath = io.joinPaths(cachePath, 'profile.txt')
-			profile = if io.fileExists(profilePath) then io.readFile(profilePath) else nil
-			STATE.PLATFORM_QUEUE[1]\generateGames(index, galaxy, profile)
 			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
