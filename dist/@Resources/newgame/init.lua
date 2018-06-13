@@ -2,7 +2,6 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
 LOCALIZATION = nil
 STATE = {
   PATHS = {
@@ -124,7 +123,6 @@ Initialize = function()
     require('shared.io')(json)
     require('shared.rainmeter')
     require('shared.enums')
-    utility = require('shared.utility')
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)

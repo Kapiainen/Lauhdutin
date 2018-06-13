@@ -2,8 +2,6 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
-
 export LOCALIZATION = nil
 
 export STATE = {
@@ -82,7 +80,6 @@ export Initialize = () ->
 			require('shared.io')(json)
 			require('shared.rainmeter')
 			require('shared.enums')
-			utility = require('shared.utility')
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)

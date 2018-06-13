@@ -2,7 +2,6 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
 LOCALIZATION = nil
 local STATE = {
   STACK = false,
@@ -29,7 +28,6 @@ Initialize = function()
     require('shared.io')(json)
     require('shared.rainmeter')
     require('shared.enums')
-    utility = require('shared.utility')
     COMPONENTS.SETTINGS = require('shared.settings')()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     SKIN:Bang(('[!SetOption "WindowTitle" "Text" "%s"]'):format(LOCALIZATION:get('search_window_all_title', 'Search')))

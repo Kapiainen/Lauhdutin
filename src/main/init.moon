@@ -2,7 +2,6 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
 json = nil
 
 Game = nil
@@ -200,7 +199,6 @@ export Initialize = () ->
 			require('shared.enums')
 			additionalEnums()
 			Game = require('main.game')
-			utility = require('shared.utility')
 			COMPONENTS.DOWNLOADER = require('shared.downloader')()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()

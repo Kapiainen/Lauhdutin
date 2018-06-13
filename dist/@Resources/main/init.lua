@@ -2,7 +2,6 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
 local json = nil
 local Game = nil
 LOCALIZATION = nil
@@ -236,7 +235,6 @@ Initialize = function()
     require('shared.enums')
     additionalEnums()
     Game = require('main.game')
-    utility = require('shared.utility')
     COMPONENTS.DOWNLOADER = require('shared.downloader')()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
