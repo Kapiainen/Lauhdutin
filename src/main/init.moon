@@ -129,7 +129,7 @@ startDetectingPlatformGames = () ->
 		when ENUMS.PLATFORM_IDS.CUSTOM
 			log('Starting to detect Custom games')
 			platform\detectBanners(COMPONENTS.LIBRARY\getOldGames())
-			OnFinishedDetectingPlatformGames()
+			OnFinishedDetectingPlatformGames() -- TODO: Emit
 		else
 			assert(nil, 'main.init.startDetectingPlatformGames')
 
