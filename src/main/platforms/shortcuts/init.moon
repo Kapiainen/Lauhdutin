@@ -104,8 +104,13 @@ class Shortcuts extends Platform
 			})
 		@games = [Game(args) for args in *games]
 
-export OnParsedShortcuts = () ->
-	success, err = pcall(() -> COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_SHORTCUT_GAMES))
+export OnWindowsShortcutsFinishedParsing = () ->
+	export OnWindowsShortcutsFinishedParsing = nil
+	success, err = pcall(
+		() ->
+			COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_SHORTCUT_GAMES)
+			COMPONENTS.SIGNAL\clear(SIGNALS.DETECTED_SHORTCUT_GAMES)
+	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
 if RUN_TESTS

@@ -185,9 +185,11 @@ do
   end
   Shortcuts = _class_0
 end
-OnParsedShortcuts = function()
+OnWindowsShortcutsFinishedParsing = function()
+  OnWindowsShortcutsFinishedParsing = nil
   local success, err = pcall(function()
-    return COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_SHORTCUT_GAMES)
+    COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_SHORTCUT_GAMES)
+    return COMPONENTS.SIGNAL:clear(SIGNALS.DETECTED_SHORTCUT_GAMES)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

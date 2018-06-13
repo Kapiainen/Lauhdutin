@@ -19,5 +19,5 @@ for /R %%F in (*.url) do (
 	wscript %parser% "%%~fF" >> %output%
 )
 set "rainmeter="%~2\Rainmeter.exe""
-start /B "" %rainmeter% !CommandMeasure "Script" "OnParsedShortcuts()" %3
+start /B "" %rainmeter% !CommandMeasure "Script" "OnWindowsShortcutsFinishedParsing()" %3
 ::pause
