@@ -55,6 +55,12 @@ export SIGNALS = {
 	DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE: 'downloaded_gog_galaxy_community_profile'
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 	UPDATE_SLOTS: 'update_slots'
+	START_HIDING_GAMES: 'start_hiding_games'
+	STOP_HIDING_GAMES: 'stop_hiding_games'
+	START_UNHIDING_GAMES: 'start_unhiding_games'
+	STOP_UNHIDING_GAMES: 'stop_unhiding_games'
+	START_REMOVING_GAMES: 'start_removing_games'
+	STOP_REMOVING_GAMES: 'stop_removing_games'
 }
 
 export log = (...) -> print(...) if STATE.LOGGING == true
@@ -173,7 +179,7 @@ onInitialized = () ->
 	COMPONENTS.LIBRARY\save()
 	COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
 	STATE.GAMES = COMPONENTS.LIBRARY\get()
-	updateSlots()
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	STATE.INITIALIZED = true
 	animationType = COMPONENTS.SETTINGS\getSkinSlideAnimation()
 	if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE
@@ -206,21 +212,13 @@ export Initialize = () ->
 			COMPONENTS.COMMANDER = require('shared.commander')()
 			COMPONENTS.SIGNAL = require('shared.signal')()
 			COMPONENTS.SIGNAL\register(SIGNALS.UPDATE_SLOTS, updateSlots)
-			COMPONENTS.CONTEXT_MENU = require('main.context_menu')
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
 			log('Initializing skin')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
+			COMPONENTS.CONTEXT_MENU = require('main.context_menu')()
 			COMPONENTS.STATUS\show(LOCALIZATION\get('status_initializing', 'Initializing'))
-			SKIN\Bang(('[!SetVariable "ContextTitleSettings" "%s"]')\format(LOCALIZATION\get('main_context_title_settings', 'Settings')))
-			SKIN\Bang(('[!SetVariable "ContextTitleOpenShortcutsFolder" "%s"]')\format(LOCALIZATION\get('main_context_title_open_shortcuts_folder', 'Open shortcuts folder')))
-			SKIN\Bang(('[!SetVariable "ContextTitleExecuteStoppingBangs" "%s"]')\format(LOCALIZATION\get('main_context_title_execute_stopping_bangs', 'Execute stopping bangs')))
-			SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_hiding_games', 'Start hiding games')))
-			SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
-			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
-			SKIN\Bang(('[!SetVariable "ContextTitleDetectGames" "%s"]')\format(LOCALIZATION\get('main_context_title_detect_games', 'Detect games')))
-			SKIN\Bang(('[!SetVariable "ContextTitleAddGame" "%s"]')\format(LOCALIZATION\get('main_context_title_add_game', 'Add a game')))
 			COMPONENTS.TOOLBAR = require('main.toolbar')(COMPONENTS.SETTINGS)
 			COMPONENTS.TOOLBAR\hide()
 			COMPONENTS.ANIMATIONS = require('main.animations')()
@@ -249,7 +247,7 @@ export Update = () ->
 			else
 				COMPONENTS.ANIMATIONS\play()
 				if STATE.SCROLL_INDEX_UPDATED == false
-					updateSlots()
+					COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 					STATE.SCROLL_INDEX_UPDATED = true
 	)
 	unless success
@@ -300,13 +298,6 @@ export GameProcessTerminated = (game) ->
 				SKIN\Bang('[!ShowFade]')
 			if COMPONENTS.SETTINGS\getShowSession()
 				SKIN\Bang(('[!DeactivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export ManuallyTerminateGameProcess = () ->
-	success, err = pcall(
-		() ->
-			COMPONENTS.PROCESS\stopMonitoring()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -410,7 +401,7 @@ export Search = (str, stack) ->
 			COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.TITLE, {input: str, :games, :stack})
 			STATE.GAMES = COMPONENTS.LIBRARY\get()
 			STATE.SCROLL_INDEX = 1
-			updateSlots()
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -420,7 +411,7 @@ export OnToolbarResetGames = () ->
 		() ->
 			STATE.GAMES = COMPONENTS.LIBRARY\get()
 			STATE.SCROLL_INDEX = 1
-			updateSlots()
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -448,7 +439,7 @@ export OnToolbarReverseOrder = () ->
 		() ->
 			log('Reversing order of games')
 			table.reverse(STATE.GAMES)
-			updateSlots()
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -467,7 +458,7 @@ export Sort = (sortingType) ->
 			COMPONENTS.SETTINGS\setSorting(sortingType)
 			COMPONENTS.LIBRARY\sort(sortingType, STATE.GAMES)
 			STATE.SCROLL_INDEX = 1
-			updateSlots()
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -509,7 +500,7 @@ export Filter = (filterType, stack, arguments) ->
 			COMPONENTS.LIBRARY\filter(filterType, arguments)
 			STATE.GAMES = COMPONENTS.LIBRARY\get()
 			STATE.SCROLL_INDEX = 1
-			updateSlots()
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -520,7 +511,7 @@ launchGame = (game) ->
 	COMPONENTS.LIBRARY\save()
 	STATE.GAMES = COMPONENTS.LIBRARY\get()
 	STATE.SCROLL_INDEX = 1
-	updateSlots()
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	COMPONENTS.PROCESS\monitor(game)
 	if COMPONENTS.SETTINGS\getBangsEnabled()
 		unless game\getIgnoresOtherBangs()
@@ -553,7 +544,7 @@ installGame = (game) ->
 	COMPONENTS.LIBRARY\save()
 	STATE.GAMES = COMPONENTS.LIBRARY\get()
 	STATE.SCROLL_INDEX = 1
-	updateSlots()
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	SKIN\Bang(('[%s]')\format(game\getPath()))
 
 hideGame = (game) ->
@@ -566,8 +557,8 @@ hideGame = (game) ->
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
 		STATE.SCROLL_INDEX = 1
-		ToggleHideGames()
-	updateSlots()
+		OnContextToggleHideGames() -- TODO: Emit
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 
 unhideGame = (game) ->
 	return if game\isVisible() == true
@@ -579,8 +570,8 @@ unhideGame = (game) ->
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
 		STATE.SCROLL_INDEX = 1
-		ToggleUnhideGames()
-	updateSlots()
+		OnContextToggleUnhideGames() -- TODO: Emit
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 
 removeGame = (game) ->
 	COMPONENTS.LIBRARY\remove(game)
@@ -590,8 +581,8 @@ removeGame = (game) ->
 		COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
 		STATE.GAMES = COMPONENTS.LIBRARY\get()
 		STATE.SCROLL_INDEX = 1
-		ToggleRemoveGames()
-	updateSlots()
+		OnContextToggleRemoveGames() -- TODO: Emit
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 
 export OnLeftClickSlot = (index) ->
 	return unless STATE.INITIALIZED
@@ -814,99 +805,6 @@ export ReacquireBanner = (gameID) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
--- Context title action
-export ToggleHideGames = () ->
-	success, err = pcall(
-		() ->
-			if STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME
-				SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_hiding_games', 'Start hiding games')))
-				STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-				return
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME
-				ToggleUnhideGames()
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
-				ToggleRemoveGames()
-			COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.HIDDEN, {state: false, stack: true, games: STATE.GAMES})
-			games = COMPONENTS.LIBRARY\get()
-			if #games == 0
-				COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.HIDDEN, {state: false})
-				games = COMPONENTS.LIBRARY\get()
-				if #games == 0
-					return
-				else
-					STATE.GAMES = games
-					STATE.SCROLL_INDEX = 1
-					updateSlots()
-			else
-				STATE.GAMES = games
-				updateSlots()
-			SKIN\Bang(('[!SetVariable "ContextTitleHideGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_stop_hiding_games', 'Stop hiding games')))
-			STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export ToggleUnhideGames = () ->
-	success, err = pcall(
-		() ->
-			if STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME
-				SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_unhiding_games', 'Start unhiding games')))
-				STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-				return
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME
-				ToggleHideGames()
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
-				ToggleRemoveGames()
-			COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.HIDDEN, {state: true, stack: true, games: STATE.GAMES})
-			games = COMPONENTS.LIBRARY\get()
-			if #games == 0
-				COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.HIDDEN, {state: true})
-				games = COMPONENTS.LIBRARY\get()
-				if #games == 0
-					return
-				else
-					STATE.GAMES = games
-					STATE.SCROLL_INDEX = 1
-					updateSlots()
-			else
-				STATE.GAMES = games
-				updateSlots()
-			SKIN\Bang(('[!SetVariable "ContextTitleUnhideGameStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_stop_unhiding_games', 'Stop unhiding games')))
-			STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export ToggleRemoveGames = () ->
-	success, err = pcall(
-		() ->
-			if STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
-				SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_start_removing_games', 'Start removing games')))
-				STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-				return
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME
-				ToggleHideGames()
-			elseif STATE.LEFT_CLICK_ACTION == ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME
-				ToggleUnhideGames()
-			if #STATE.GAMES == 0
-				COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.NONE)
-				STATE.GAMES = COMPONENTS.LIBRARY\get()
-				STATE.SCROLL_INDEX = 1
-				updateSlots()
-			return if #STATE.GAMES == 0
-			SKIN\Bang(('[!SetVariable "ContextTitleRemoveGamesStatus" "%s"]')\format(LOCALIZATION\get('main_context_title_stop_removing_games', 'Stop removing games')))
-			STATE.LEFT_CLICK_ACTION = ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export TriggerGameDetection = () ->
-	success, err = pcall(
-		() ->
-			games = io.readJSON(STATE.PATHS.GAMES)
-			games.updated = nil
-			io.writeJSON(STATE.PATHS.GAMES, games)
-			SKIN\Bang("[!Refresh]")
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 export OpenStorePage = (gameID) ->
 	success, err = pcall(
 		() ->
@@ -919,13 +817,6 @@ export OpenStorePage = (gameID) ->
 				log("Failed to get URL for opening the store page", gameID)
 				return
 			SKIN\Bang(('[%s]')\format(url))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export StartAddingGame = () ->
-	success, err = pcall(
-		() ->
-			SKIN\Bang('[!ActivateConfig "#ROOTCONFIG#\\NewGame"]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
