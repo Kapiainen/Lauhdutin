@@ -92,8 +92,8 @@ build = function(settings)
     'Y=0',
     'W=#SkinWidth#',
     'H=#SkinHeight#',
-    'MouseScrollUpAction=[!CommandMeasure "Script" "OnScrollSlots(-1)"]',
-    'MouseScrollDownAction=[!CommandMeasure "Script" "OnScrollSlots(1)"]',
+    'MouseScrollUpAction=[!CommandMeasure "Script" "OnSlotsScroll(-1)"]',
+    'MouseScrollDownAction=[!CommandMeasure "Script" "OnSlotsScroll(1)"]',
     'MouseOverAction=[!CommandMeasure "Script" "OnMouseOver()"]',
     '\n'
   }, '\n')
@@ -148,10 +148,10 @@ build = function(settings)
       'AntiAlias=1',
       'ClipString=1',
       'DynamicVariables=1',
-      ('%s=[!CommandMeasure "Script" "OnLeftClickSlot(%d)"]'):format(leftMouseAction, index),
-      ('MiddleMouseUpAction=[!CommandMeasure "Script" "OnMiddleClickSlot(%d)"]'):format(index),
-      ('MouseOverAction=[!CommandMeasure "Script" "OnHoverSlot(%d)"]'):format(index),
-      ('MouseLeaveAction=[!CommandMeasure "Script" "OnLeaveSlot(%d)"]'):format(index),
+      ('%s=[!CommandMeasure "Script" "OnSlotLeftClick(%d)"]'):format(leftMouseAction, index),
+      ('MiddleMouseUpAction=[!CommandMeasure "Script" "OnSlotMiddleClick(%d)"]'):format(index),
+      ('MouseOverAction=[!CommandMeasure "Script" "OnSlotHover(%d)"]'):format(index),
+      ('MouseLeaveAction=[!CommandMeasure "Script" "OnSlotLeave(%d)"]'):format(index),
       ('Group=Slots|Slot%d'):format(index)
     })
     table.insert(slot, '')

@@ -58,4 +58,86 @@ class Slots
 
 	getGame: (index) => return @slots[index]\getGame()
 
+export OnSlotHover = (index) ->
+	return unless STATE.INITIALIZED
+	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
+	success, err = pcall(() -> COMPONENTS.SLOTS\hover(index))
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnSlotsScroll = (direction) ->
+	return unless STATE.INITIALIZED
+	return if STATE.SKIN_ANIMATION_PLAYING
+	success, err = pcall(
+		() ->
+			index = STATE.SCROLL_INDEX + direction * STATE.SCROLL_STEP
+			if index < 1
+				return
+			elseif index > #STATE.GAMES - STATE.NUM_SLOTS + 1
+				return
+			STATE.SCROLL_INDEX = index
+			log(('Scroll index is now %d')\format(STATE.SCROLL_INDEX))
+			STATE.SCROLL_INDEX_UPDATED = false
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnSlotLeftClick = (index) ->
+	return unless STATE.INITIALIZED
+	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
+	success, err = pcall(
+		() ->
+			game = COMPONENTS.SLOTS\leftClick(index)
+			return unless game
+			action = switch STATE.LEFT_CLICK_ACTION
+				when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
+					result = nil
+					if game\isInstalled() == true
+						result = launchGame
+					else
+						platformID = game\getPlatformID()
+						if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
+							result = installGame
+					result
+				when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame
+				when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
+				when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
+				else
+					assert(nil, 'main.init.OnLeftClickSlot')
+			return unless action
+			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
+			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
+				action(game)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnSlotMiddleClick = (index) ->
+	return unless STATE.INITIALIZED
+	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
+	success, err = pcall(
+		() ->
+			log('OnMiddleClickSlot', index)
+			game = COMPONENTS.SLOTS\middleClick(index)
+			return if game == nil
+			configName = ('%s\\Game')\format(STATE.ROOT_CONFIG)
+			config = RAINMETER\GetConfig(configName)
+			if STATE.GAME_BEING_MODIFIED == game and config\isActive()
+				STATE.GAME_BEING_MODIFIED = nil
+				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
+			STATE.GAME_BEING_MODIFIED = game
+			if config == nil or not config\isActive()
+				SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
+			else
+				HandshakeGame()
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export OnSlotLeave = (index) ->
+	return unless STATE.INITIALIZED
+	return if STATE.SKIN_ANIMATION_PLAYING
+	return if index < 1 or index > STATE.NUM_SLOTS
+	success, err = pcall(() -> COMPONENTS.SLOTS\leave(index))
+	COMPONENTS.STATUS\show(err, true) unless success
+
 return Slots

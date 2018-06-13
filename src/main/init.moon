@@ -535,58 +535,6 @@ removeGame = (game) ->
 		OnContextToggleRemoveGames() -- TODO: Emit
 	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 
-export OnLeftClickSlot = (index) -> -- TODO: Move to the slots source file
-	return unless STATE.INITIALIZED
-	return if STATE.SKIN_ANIMATION_PLAYING
-	return if index < 1 or index > STATE.NUM_SLOTS
-	success, err = pcall(
-		() ->
-			game = COMPONENTS.SLOTS\leftClick(index)
-			return unless game
-			action = switch STATE.LEFT_CLICK_ACTION
-				when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-					result = nil
-					if game\isInstalled() == true
-						result = launchGame
-					else
-						platformID = game\getPlatformID()
-						if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
-							result = installGame
-					result
-				when ENUMS.LEFT_CLICK_ACTIONS.HIDE_GAME then hideGame
-				when ENUMS.LEFT_CLICK_ACTIONS.UNHIDE_GAME then unhideGame
-				when ENUMS.LEFT_CLICK_ACTIONS.REMOVE_GAME then removeGame
-				else
-					assert(nil, 'main.init.OnLeftClickSlot')
-			return unless action
-			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
-			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
-				action(game)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnMiddleClickSlot = (index) -> -- TODO: Move to the slots source file
-	return unless STATE.INITIALIZED
-	return if STATE.SKIN_ANIMATION_PLAYING
-	return if index < 1 or index > STATE.NUM_SLOTS
-	success, err = pcall(
-		() ->
-			log('OnMiddleClickSlot', index)
-			game = COMPONENTS.SLOTS\middleClick(index)
-			return if game == nil
-			configName = ('%s\\Game')\format(STATE.ROOT_CONFIG)
-			config = RAINMETER\GetConfig(configName)
-			if STATE.GAME_BEING_MODIFIED == game and config\isActive()
-				STATE.GAME_BEING_MODIFIED = nil
-				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
-			STATE.GAME_BEING_MODIFIED = game
-			if config == nil or not config\isActive()
-				SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
-			else
-				HandshakeGame()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 export HandshakeGame = () ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(
@@ -622,42 +570,6 @@ export UpdateGame = (gameID) ->
 			game = getGameByID(gameID)
 			assert(game ~= nil, 'main.init.UpdateGame')
 			COMPONENTS.LIBRARY\update(game)
-			STATE.SCROLL_INDEX_UPDATED = false
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnHoverSlot = (index) -> -- TODO: Move to the slots source file
-	return unless STATE.INITIALIZED
-	return if STATE.SKIN_ANIMATION_PLAYING
-	return if index < 1 or index > STATE.NUM_SLOTS
-	success, err = pcall(
-		() ->
-			COMPONENTS.SLOTS\hover(index)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnLeaveSlot = (index) -> -- TODO: Move to the slots source file
-	return unless STATE.INITIALIZED
-	return if STATE.SKIN_ANIMATION_PLAYING
-	return if index < 1 or index > STATE.NUM_SLOTS
-	success, err = pcall(
-		() ->
-			COMPONENTS.SLOTS\leave(index)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnScrollSlots = (direction) -> -- TODO: Move to the slots source file
-	return unless STATE.INITIALIZED
-	return if STATE.SKIN_ANIMATION_PLAYING
-	success, err = pcall(
-		() ->
-			index = STATE.SCROLL_INDEX + direction * STATE.SCROLL_STEP
-			if index < 1
-				return
-			elseif index > #STATE.GAMES - STATE.NUM_SLOTS + 1
-				return
-			STATE.SCROLL_INDEX = index
-			log(('Scroll index is now %d')\format(STATE.SCROLL_INDEX))
 			STATE.SCROLL_INDEX_UPDATED = false
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -771,14 +683,14 @@ export OpenStorePage = (gameID) -> -- TODO: Move to game\init.moon?
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export HandshakeNewGame = () ->
+export HandshakeNewGame = () -> -- TODO: Move up
 	success, err = pcall(
 		() ->
 			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\NewGame"]')\format(COMPONENTS.LIBRARY\getNextAvailableGameID()))
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OnAddGame = (gameID) ->
+export OnAddGame = (gameID) -> -- TODO: Move up
 	success, err = pcall(
 		() ->
 			game = getGameByID(gameID)
