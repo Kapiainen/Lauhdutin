@@ -18,7 +18,6 @@ STATE = {
   SCROLL_INDEX_UPDATED = nil,
   LEFT_CLICK_ACTION = 1,
   PLATFORM_NAMES = { },
-  PLATFORM_RUNNING_STATUS = { },
   GAMES = { },
   REVEALING_DELAY = 0,
   SKIN_VISIBLE = true,
@@ -35,9 +34,13 @@ COMPONENTS = {
   LIBRARY = nil,
   PROCESS = nil,
   SETTINGS = nil,
+  SIGNAL = nil,
   SLOTS = nil,
   STATUS = nil,
   TOOLBAR = nil
+}
+SIGNALS = {
+  UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status'
 }
 log = function(...)
   if STATE.LOGGING == true then
@@ -148,6 +151,7 @@ detectPlatforms = function()
   COMPONENTS.PROCESS:registerPlatforms(platforms)
   STATE.PLATFORM_ENABLED_STATUS = { }
   STATE.PLATFORM_QUEUE = { }
+  local platformRunningStatus = { }
   for _index_0 = 1, #platforms do
     local platform = platforms[_index_0]
     local enabled = platform:isEnabled()
@@ -158,13 +162,14 @@ detectPlatforms = function()
     STATE.PLATFORM_NAMES[platformID] = platform:getName()
     STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled
     if platform:getPlatformProcess() ~= nil then
-      STATE.PLATFORM_RUNNING_STATUS[platformID] = false
+      platformRunningStatus[platformID] = false
     end
     if enabled then
       table.insert(STATE.PLATFORM_QUEUE, platform)
     end
     log(' ' .. STATE.PLATFORM_NAMES[platformID] .. ' = ' .. tostring(enabled))
   end
+  COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, platformRunningStatus)
   return assert(#STATE.PLATFORM_QUEUE > 0, 'There are no enabled platforms.')
 end
 local detectGames
@@ -238,6 +243,7 @@ Initialize = function()
     Game = require('main.game')
     COMPONENTS.DOWNLOADER = require('shared.downloader')()
     COMPONENTS.COMMANDER = require('shared.commander')()
+    COMPONENTS.SIGNAL = require('shared.signal')()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()

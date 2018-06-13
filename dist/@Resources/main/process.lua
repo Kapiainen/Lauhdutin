@@ -40,7 +40,7 @@ do
       end
       local callback
       callback = function()
-        STATE.PLATFORM_RUNNING_STATUS = self:updatePlatforms(COMPONENTS.COMMANDER:getOutput())
+        return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, self:updatePlatforms(COMPONENTS.COMMANDER:getOutput()))
       end
       COMPONENTS.COMMANDER:run('tasklist /fo csv /nh', nil, callback, nil, nil, 'UTF8')
       return true

@@ -22,7 +22,6 @@ export STATE = {
 	SCROLL_INDEX_UPDATED: nil
 	LEFT_CLICK_ACTION: 1
 	PLATFORM_NAMES: {}
-	PLATFORM_RUNNING_STATUS: {}
 	GAMES: {}
 	REVEALING_DELAY: 0
 	SKIN_VISIBLE: true
@@ -41,9 +40,14 @@ export COMPONENTS = {
 	LIBRARY: nil
 	PROCESS: nil
 	SETTINGS: nil
+	SIGNAL: nil
 	SLOTS: nil
 	STATUS: nil
 	TOOLBAR: nil
+}
+
+export SIGNALS = {
+	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 }
 
 export log = (...) -> print(...) if STATE.LOGGING == true
@@ -128,15 +132,17 @@ detectPlatforms = () ->
 	COMPONENTS.PROCESS\registerPlatforms(platforms)
 	STATE.PLATFORM_ENABLED_STATUS = {}
 	STATE.PLATFORM_QUEUE = {}
+	platformRunningStatus = {}
 	for platform in *platforms
 		enabled = platform\isEnabled()
 		platform\validate() if enabled
 		platformID = platform\getPlatformID()
 		STATE.PLATFORM_NAMES[platformID] = platform\getName()
 		STATE.PLATFORM_ENABLED_STATUS[platformID] = enabled
-		STATE.PLATFORM_RUNNING_STATUS[platformID] = false if platform\getPlatformProcess() ~= nil
+		platformRunningStatus[platformID] = false if platform\getPlatformProcess() ~= nil
 		table.insert(STATE.PLATFORM_QUEUE, platform) if enabled
 		log(' ' .. STATE.PLATFORM_NAMES[platformID] .. ' = ' .. tostring(enabled))
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, platformRunningStatus)
 	assert(#STATE.PLATFORM_QUEUE > 0, 'There are no enabled platforms.')
 
 detectGames = () ->
@@ -202,6 +208,7 @@ export Initialize = () ->
 			Game = require('main.game')
 			COMPONENTS.DOWNLOADER = require('shared.downloader')()
 			COMPONENTS.COMMANDER = require('shared.commander')()
+			COMPONENTS.SIGNAL = require('shared.signal')()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()

@@ -10,6 +10,8 @@ images = {
 class OverlaySlot
 	new: (settings) =>
 		assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
+		@platformRunningStatus = {}
+		COMPONENTS.SIGNAL\register(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, (status) -> @platformRunningStatus = status)
 		@contextSensitive = settings\getSlotsOverlayEnabled()
 		@platformNotRunning = LOCALIZATION\get('overlay_platform_not_running', '%s is not running')
 		@multipleHoursPlayed = LOCALIZATION\get('overlay_hours_played', '%.0f hours played')
@@ -63,10 +65,6 @@ class OverlaySlot
 			if lastPlayed > 315532800
 				date = os.date('*t', lastPlayed)
 				return ('%04.f-%02.f-%02.f')\format(date.year, date.month, date.day)
-				--return ('%04.f-%02.f-%02.f %02.f:%02.f:%02.f')\format(
-				--	date.year, date.month, date.day,
-				--	date.hour, date.min, date.sec
-				--)
 			return ''
 		textOptions[ENUMS.OVERLAY_SLOT_TEXT.NOTES] = (game) =>
 			notes = game\getNotes()
@@ -104,7 +102,7 @@ class OverlaySlot
 					lowerText = @unhideGame
 				image = images.unhide
 			when ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME
-				if STATE.PLATFORM_RUNNING_STATUS[platformID] == false
+				if @platformRunningStatus[platformID] == false
 					upperText = game\getTitle()
 					lowerText = @platformNotRunning\format(STATE.PLATFORM_NAMES[platformID])
 					image = images.error

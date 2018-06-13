@@ -38,7 +38,7 @@ class Process
 			else
 				log('Game is still running')
 				return false
-		callback = () -> STATE.PLATFORM_RUNNING_STATUS = @updatePlatforms(COMPONENTS.COMMANDER\getOutput()) -- TODO: Emit signal
+		callback = () -> COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, @updatePlatforms(COMPONENTS.COMMANDER\getOutput()))
 		COMPONENTS.COMMANDER\run('tasklist /fo csv /nh', nil, callback, nil, nil, 'UTF8')
 		return true
 

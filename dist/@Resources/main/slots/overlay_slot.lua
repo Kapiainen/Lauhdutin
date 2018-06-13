@@ -41,7 +41,7 @@ do
         end
         image = images.unhide
       elseif ENUMS.LEFT_CLICK_ACTIONS.LAUNCH_GAME == _exp_0 then
-        if STATE.PLATFORM_RUNNING_STATUS[platformID] == false then
+        if self.platformRunningStatus[platformID] == false then
           upperText = game:getTitle()
           lowerText = self.platformNotRunning:format(STATE.PLATFORM_NAMES[platformID])
           image = images.error
@@ -91,6 +91,10 @@ do
   _class_0 = setmetatable({
     __init = function(self, settings)
       assert(type(settings) == 'table', 'main.slots.overlay_slot.OverlaySlot')
+      self.platformRunningStatus = { }
+      COMPONENTS.SIGNAL:register(SIGNALS.UPDATE_PLATFORM_RUNNING_STATUS, function(status)
+        self.platformRunningStatus = status
+      end)
       self.contextSensitive = settings:getSlotsOverlayEnabled()
       self.platformNotRunning = LOCALIZATION:get('overlay_platform_not_running', '%s is not running')
       self.multipleHoursPlayed = LOCALIZATION:get('overlay_hours_played', '%.0f hours played')
