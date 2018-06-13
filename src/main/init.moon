@@ -48,6 +48,7 @@ export COMPONENTS = {
 }
 
 export SIGNALS = {
+	DETECTED_SHORTCUT_GAMES: 'detected_shortcut_games'
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 	UPDATE_SLOTS: 'update_slots'
 }
@@ -62,13 +63,15 @@ export setUpdateDivider = (value) ->
 	SKIN\Bang('[!UpdateMeasure "Script"]')
 
 startDetectingPlatformGames = () ->
-	COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_detecting_platform_games', 'Detecting %s games')\format(STATE.PLATFORM_QUEUE[1]\getName()))
-	switch STATE.PLATFORM_QUEUE[1]\getPlatformID()
+	platform = STATE.PLATFORM_QUEUE[1]
+	msg = LOCALIZATION\get('main_status_detecting_platform_games', 'Detecting %s games')
+	COMPONENTS.STATUS\show(msg\format(platform\getName()))
+	switch platform\getPlatformID()
 		when ENUMS.PLATFORM_IDS.SHORTCUTS
-			log('Starting to detect Windows shortcuts')
-			STATE.PLATFORM_QUEUE[1]\parseShortcuts()
+			COMPONENTS.SIGNAL\register(SIGNALS.DETECTED_SHORTCUT_GAMES, platform\onParsedShortcuts())
+			platform\parseShortcuts()
 		when ENUMS.PLATFORM_IDS.STEAM
-			url, folder, file = STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
+			url, folder, file = platform\downloadCommunityProfile()
 			if url ~= nil
 				log('Attempting to download and parse the Steam community profile')
 				COMPONENTS.DOWNLOADER\push({
@@ -95,34 +98,34 @@ startDetectingPlatformGames = () ->
 					callbackArgs: {
 						:file
 						:folder
-						platform: STATE.PLATFORM_QUEUE[1]
+						:platform
 					}
 				})
 				COMPONENTS.DOWNLOADER\start()
 			else
 				log('Starting to detect Steam games')
-				STATE.PLATFORM_QUEUE[1]\getLibraries()
-				if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-					STATE.PLATFORM_QUEUE[1]\getACFs()
+				platform\getLibraries()
+				if platform\hasLibrariesToParse()
+					platform\getACFs()
 				else
 					OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
 			log('Starting to detect non-Steam game shortcuts added to Steam')
-			games = STATE.PLATFORM_QUEUE[1]\generateGames()
+			games = platform\generateGames()
 			OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.BATTLENET
 			log('Starting to detect Blizzard Battle.net games')
-			if STATE.PLATFORM_QUEUE[1]\hasUnprocessedPaths()
-				STATE.PLATFORM_QUEUE[1]\identifyFolders()
+			if platform\hasUnprocessedPaths()
+				platform\identifyFolders()
 			else
 				OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.GOG_GALAXY
 			log('Starting to detect GOG Galaxy games')
-			unless STATE.PLATFORM_QUEUE[1]\downloadCommunityProfile()
-				STATE.PLATFORM_QUEUE[1]\dumpDatabases()
+			unless platform\downloadCommunityProfile()
+				platform\dumpDatabases()
 		when ENUMS.PLATFORM_IDS.CUSTOM
 			log('Starting to detect Custom games')
-			STATE.PLATFORM_QUEUE[1]\detectBanners(COMPONENTS.LIBRARY\getOldGames())
+			platform\detectBanners(COMPONENTS.LIBRARY\getOldGames())
 			OnFinishedDetectingPlatformGames()
 		else
 			assert(nil, 'main.init.startDetectingPlatformGames')
@@ -772,20 +775,6 @@ export OnFinishedDetectingPlatformGames = () ->
 					})
 				return if COMPONENTS.DOWNLOADER\start()
 			onInitialized()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Game detection -> Windows shortcuts
-export OnParsedShortcuts = () ->
-	success, err = pcall(
-		() ->
-			log('Parsed Windows shortcuts')
-			output = ''
-			path = STATE.PLATFORM_QUEUE[1]\getOutputPath()
-			if io.fileExists(path)
-				output = io.readFile(path)
-			STATE.PLATFORM_QUEUE[1]\generateGames(output)
-			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

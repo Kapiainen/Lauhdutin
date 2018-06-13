@@ -41,6 +41,7 @@ COMPONENTS = {
   TOOLBAR = nil
 }
 SIGNALS = {
+  DETECTED_SHORTCUT_GAMES = 'detected_shortcut_games',
   UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
   UPDATE_SLOTS = 'update_slots'
 }
@@ -59,13 +60,15 @@ setUpdateDivider = function(value)
 end
 local startDetectingPlatformGames
 startDetectingPlatformGames = function()
-  COMPONENTS.STATUS:show(LOCALIZATION:get('main_status_detecting_platform_games', 'Detecting %s games'):format(STATE.PLATFORM_QUEUE[1]:getName()))
-  local _exp_0 = STATE.PLATFORM_QUEUE[1]:getPlatformID()
+  local platform = STATE.PLATFORM_QUEUE[1]
+  local msg = LOCALIZATION:get('main_status_detecting_platform_games', 'Detecting %s games')
+  COMPONENTS.STATUS:show(msg:format(platform:getName()))
+  local _exp_0 = platform:getPlatformID()
   if ENUMS.PLATFORM_IDS.SHORTCUTS == _exp_0 then
-    log('Starting to detect Windows shortcuts')
-    return STATE.PLATFORM_QUEUE[1]:parseShortcuts()
+    COMPONENTS.SIGNAL:register(SIGNALS.DETECTED_SHORTCUT_GAMES, platform:onParsedShortcuts())
+    return platform:parseShortcuts()
   elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
-    local url, folder, file = STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()
+    local url, folder, file = platform:downloadCommunityProfile()
     if url ~= nil then
       log('Attempting to download and parse the Steam community profile')
       COMPONENTS.DOWNLOADER:push({
@@ -97,38 +100,38 @@ startDetectingPlatformGames = function()
         callbackArgs = {
           file = file,
           folder = folder,
-          platform = STATE.PLATFORM_QUEUE[1]
+          platform = platform
         }
       })
       return COMPONENTS.DOWNLOADER:start()
     else
       log('Starting to detect Steam games')
-      STATE.PLATFORM_QUEUE[1]:getLibraries()
-      if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-        return STATE.PLATFORM_QUEUE[1]:getACFs()
+      platform:getLibraries()
+      if platform:hasLibrariesToParse() then
+        return platform:getACFs()
       else
         return OnFinishedDetectingPlatformGames()
       end
     end
   elseif ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
     log('Starting to detect non-Steam game shortcuts added to Steam')
-    local games = STATE.PLATFORM_QUEUE[1]:generateGames()
+    local games = platform:generateGames()
     return OnFinishedDetectingPlatformGames()
   elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
     log('Starting to detect Blizzard Battle.net games')
-    if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
-      return STATE.PLATFORM_QUEUE[1]:identifyFolders()
+    if platform:hasUnprocessedPaths() then
+      return platform:identifyFolders()
     else
       return OnFinishedDetectingPlatformGames()
     end
   elseif ENUMS.PLATFORM_IDS.GOG_GALAXY == _exp_0 then
     log('Starting to detect GOG Galaxy games')
-    if not (STATE.PLATFORM_QUEUE[1]:downloadCommunityProfile()) then
-      return STATE.PLATFORM_QUEUE[1]:dumpDatabases()
+    if not (platform:downloadCommunityProfile()) then
+      return platform:dumpDatabases()
     end
   elseif ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
     log('Starting to detect Custom games')
-    STATE.PLATFORM_QUEUE[1]:detectBanners(COMPONENTS.LIBRARY:getOldGames())
+    platform:detectBanners(COMPONENTS.LIBRARY:getOldGames())
     return OnFinishedDetectingPlatformGames()
   else
     return assert(nil, 'main.init.startDetectingPlatformGames')
@@ -1047,21 +1050,6 @@ OnFinishedDetectingPlatformGames = function()
       end
     end
     return onInitialized()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnParsedShortcuts = function()
-  local success, err = pcall(function()
-    log('Parsed Windows shortcuts')
-    local output = ''
-    local path = STATE.PLATFORM_QUEUE[1]:getOutputPath()
-    if io.fileExists(path) then
-      output = io.readFile(path)
-    end
-    STATE.PLATFORM_QUEUE[1]:generateGames(output)
-    return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

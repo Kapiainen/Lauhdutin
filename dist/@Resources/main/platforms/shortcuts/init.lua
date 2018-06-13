@@ -7,10 +7,26 @@ do
   local _base_0 = {
     validate = function(self) end,
     parseShortcuts = function(self)
+      log('Starting to detect Windows shortcuts')
       if io.fileExists(self.outputPath) then
         io.writeFile(self.outputPath, '')
       end
-      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.shortcutsPath))
+      local cmd = '#@#windowless.vbs'
+      local bat = '#@#main\\platforms\\shortcuts\\parseShortcuts.bat'
+      return SKIN:Bang(('["%s" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(cmd, bat, self.shortcutsPath))
+    end,
+    onParsedShortcuts = function(self)
+      return function()
+        log('Parsed Windows shortcuts')
+        local output
+        if io.fileExists(self.outputPath) then
+          output = io.readFile(self.outputPath)
+        else
+          output = ''
+        end
+        self:generateGames(output)
+        return OnFinishedDetectingPlatformGames()
+      end
     end,
     getOutputPath = function(self)
       return self.outputPath
@@ -168,6 +184,14 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Shortcuts = _class_0
+end
+OnParsedShortcuts = function()
+  local success, err = pcall(function()
+    return COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_SHORTCUT_GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
 end
 if RUN_TESTS then
   local assertionMessage = 'Windows shortcuts test failed!'

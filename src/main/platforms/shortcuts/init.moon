@@ -16,9 +16,19 @@ class Shortcuts extends Platform
 	validate: () => return
 
 	parseShortcuts: () =>
+		log('Starting to detect Windows shortcuts')
 		if io.fileExists(@outputPath)
 			io.writeFile(@outputPath, '')
-		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\shortcuts\\parseShortcuts.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@shortcutsPath))
+		cmd = '#@#windowless.vbs'
+		bat = '#@#main\\platforms\\shortcuts\\parseShortcuts.bat'
+		SKIN\Bang(('["%s" "%s" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(cmd, bat, @shortcutsPath))
+
+	onParsedShortcuts: () =>
+		return () ->
+			log('Parsed Windows shortcuts')
+			output = if io.fileExists(@outputPath) then io.readFile(@outputPath) else ''
+			@generateGames(output)
+			OnFinishedDetectingPlatformGames() -- TODO: Emit
 
 	getOutputPath: () => return @outputPath
 
@@ -93,6 +103,10 @@ class Shortcuts extends Platform
 				platformID: @platformID
 			})
 		@games = [Game(args) for args in *games]
+
+export OnParsedShortcuts = () ->
+	success, err = pcall(() -> COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_SHORTCUT_GAMES))
+	COMPONENTS.STATUS\show(err, true) unless success
 
 if RUN_TESTS
 	assertionMessage = 'Windows shortcuts test failed!'
