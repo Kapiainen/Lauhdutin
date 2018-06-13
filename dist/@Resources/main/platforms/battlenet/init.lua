@@ -6,14 +6,23 @@ do
   local _parent_0 = Platform
   local _base_0 = {
     validate = function(self) end,
+    identifyFolders = function(self)
+      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.battlenetPaths[1]))
+    end,
     hasUnprocessedPaths = function(self)
       return #self.battlenetPaths > 0
     end,
-    getCachePath = function(self)
-      return self.cachePath
-    end,
-    identifyFolders = function(self)
-      return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.battlenetPaths[1]))
+    onProcessedPath = function(self)
+      return function()
+        log('Dumped list of folders in a Blizzard Battle.net folder')
+        self:generateGames(io.readFile(io.joinPaths(self.cachePath, 'output.txt')))
+        if self:hasUnprocessedPaths() then
+          return self:identifyFolders()
+        end
+        OnBattlenetIdentifiedFolders = nil
+        COMPONENTS.SIGNAL:clear(SIGNALS.DETECTED_BATTLENET_GAMES)
+        return OnFinishedDetectingPlatformGames()
+      end
     end,
     getBanner = function(self, title, bannerURL)
       local banner = self:getBannerPath(title)
@@ -194,6 +203,14 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Battlenet = _class_0
+end
+OnBattlenetIdentifiedFolders = function()
+  local success, err = pcall(function()
+    return COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_BATTLENET_GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
 end
 if RUN_TESTS then
   local assertionMessage = 'Blizzard Battle.net test failed!'

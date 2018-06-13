@@ -10,5 +10,5 @@ if exist %output% del %output%
 echo BITS:%PROCESSOR_ARCHITECTURE% > %output%
 dir %1 /b /o:n /a:d >> %output%
 set "rainmeter="%~2\Rainmeter.exe""
-start /B "" %rainmeter% !CommandMeasure "Script" "OnIdentifiedBattlenetFolders()" %3
+start /B "" %rainmeter% !CommandMeasure "Script" "OnBattlenetIdentifiedFolders()" %3
 ::pause

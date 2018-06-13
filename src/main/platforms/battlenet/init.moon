@@ -16,12 +16,20 @@ class Battlenet extends Platform
 		@games = {}
 
 	validate: () => return
+	
+	identifyFolders: () => SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@battlenetPaths[1]))
 
 	hasUnprocessedPaths: () => return #@battlenetPaths > 0
 
-	getCachePath: () => return @cachePath
-
-	identifyFolders: () => SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\battlenet\\identifyFolders.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@battlenetPaths[1]))
+	onProcessedPath: () =>
+		return () ->
+			log('Dumped list of folders in a Blizzard Battle.net folder')
+			@generateGames(io.readFile(io.joinPaths(@cachePath, 'output.txt')))
+			if @hasUnprocessedPaths()
+				return @identifyFolders()
+			export OnBattlenetIdentifiedFolders = nil
+			COMPONENTS.SIGNAL\clear(SIGNALS.DETECTED_BATTLENET_GAMES)
+			OnFinishedDetectingPlatformGames() -- TODO: Emit
 
 	getBanner: (title, bannerURL) =>
 		banner = @getBannerPath(title)
@@ -112,6 +120,10 @@ class Battlenet extends Platform
 			table.insert(games, args)
 		for args in *games
 			table.insert(@games, Game(args))
+
+export OnBattlenetIdentifiedFolders = () ->
+	success, err = pcall(() -> COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_BATTLENET_GAMES))
+	COMPONENTS.STATUS\show(err, true) unless success
 
 if RUN_TESTS
 	assertionMessage = 'Blizzard Battle.net test failed!'

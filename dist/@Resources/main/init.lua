@@ -41,6 +41,7 @@ COMPONENTS = {
   TOOLBAR = nil
 }
 SIGNALS = {
+  DETECTED_BATTLENET_GAMES = 'detected_battlenet_games',
   DETECTED_SHORTCUT_GAMES = 'detected_shortcut_games',
   UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
   UPDATE_SLOTS = 'update_slots'
@@ -120,6 +121,7 @@ startDetectingPlatformGames = function()
   elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
     log('Starting to detect Blizzard Battle.net games')
     if platform:hasUnprocessedPaths() then
+      COMPONENTS.SIGNAL:register(SIGNALS.DETECTED_BATTLENET_GAMES, platform:onProcessedPath())
       return platform:identifyFolders()
     else
       return OnFinishedDetectingPlatformGames()
@@ -1063,19 +1065,6 @@ OnGotACFs = function()
       return STATE.PLATFORM_QUEUE[1]:getACFs()
     end
     STATE.PLATFORM_QUEUE[1]:generateShortcuts()
-    return OnFinishedDetectingPlatformGames()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnIdentifiedBattlenetFolders = function()
-  local success, err = pcall(function()
-    log('Dumped list of folders in a Blizzard Battle.net folder')
-    STATE.PLATFORM_QUEUE[1]:generateGames(io.readFile(io.joinPaths(STATE.PLATFORM_QUEUE[1]:getCachePath(), 'output.txt')))
-    if STATE.PLATFORM_QUEUE[1]:hasUnprocessedPaths() then
-      return STATE.PLATFORM_QUEUE[1]:identifyFolders()
-    end
     return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then
