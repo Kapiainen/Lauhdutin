@@ -242,7 +242,7 @@ class Steam extends Platform
 	getBanner: (appID) =>
 		banner = @getBannerPath(appID)
 		return banner, nil if banner -- Found an existing copy in the skin's cache
-		for extension in *@bannerExtensions
+		for extension in *@getBannerExtensions()
 			gridBannerPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\grid\\', appID .. extension)
 			cacheBannerPath = io.joinPaths(@cachePath, appID .. extension)
 			if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath)
@@ -281,7 +281,7 @@ class Steam extends Platform
 			banner = @getBannerPath(appID, shortcutsBannerPath)
 			expectedBanner = nil
 			unless banner
-				for extension in *@bannerExtensions
+				for extension in *@getBannerExtensions()
 					gridBannerPath = io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\grid\\', appID .. extension)
 					cacheBannerPath = io.joinPaths(shortcutsBannerPath, appID .. extension)
 					if io.fileExists(gridBannerPath, false) and not io.fileExists(cacheBannerPath)

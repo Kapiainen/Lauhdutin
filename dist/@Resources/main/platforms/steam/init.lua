@@ -304,7 +304,7 @@ do
       if banner then
         return banner, nil
       end
-      local _list_0 = self.bannerExtensions
+      local _list_0 = self:getBannerExtensions()
       for _index_0 = 1, #_list_0 do
         local extension = _list_0[_index_0]
         local gridBannerPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\grid\\', appID .. extension)
@@ -359,7 +359,7 @@ do
           local banner = self:getBannerPath(appID, shortcutsBannerPath)
           local expectedBanner = nil
           if not (banner) then
-            local _list_0 = self.bannerExtensions
+            local _list_0 = self:getBannerExtensions()
             for _index_0 = 1, #_list_0 do
               local extension = _list_0[_index_0]
               local gridBannerPath = io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\grid\\', appID .. extension)
