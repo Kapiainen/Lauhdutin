@@ -744,11 +744,12 @@ export OnFinishedDetectingPlatformGames = () ->
 			log(('%d banners to download')\format(#STATE.BANNER_QUEUE))
 			if #STATE.BANNER_QUEUE > 0
 				finishCallback = (args) ->
+					COMPONENTS.STATUS\show(LOCALIZATION\get('main_status_n_banners_to_download', '%d banners left to download')\format(args.bannersLeft))
 					args.game\setBannerURL(nil)
 					args.game\setExpectedBanner(nil)
 				finalFinishCallback = (args) ->
 					finishCallback(args)
-					onInitialized()
+					onInitialized() -- TODO: Emit
 				errorCallback = (args) ->
 					file = args.file\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
 					io.writeFile(io.joinPaths(args.folder, file .. '.failedToDownload'), '')
@@ -766,6 +767,7 @@ export OnFinishedDetectingPlatformGames = () ->
 							:file
 							:folder
 							:game
+							bannersLeft: i
 						}
 					})
 				return if COMPONENTS.DOWNLOADER\start()

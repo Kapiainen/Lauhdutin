@@ -1004,6 +1004,7 @@ OnFinishedDetectingPlatformGames = function()
     if #STATE.BANNER_QUEUE > 0 then
       local finishCallback
       finishCallback = function(args)
+        COMPONENTS.STATUS:show(LOCALIZATION:get('main_status_n_banners_to_download', '%d banners left to download'):format(args.bannersLeft))
         args.game:setBannerURL(nil)
         return args.game:setExpectedBanner(nil)
       end
@@ -1036,7 +1037,8 @@ OnFinishedDetectingPlatformGames = function()
           callbackArgs = {
             file = file,
             folder = folder,
-            game = game
+            game = game,
+            bannersLeft = i
           }
         })
       end
