@@ -51,6 +51,7 @@ export SIGNALS = {
 	DETECTED_BATTLENET_GAMES: 'detected_battlenet_games'
 	DETECTED_GOG_GALAXY_GAMES: 'detected_gog_galaxy_games'
 	DETECTED_SHORTCUT_GAMES: 'detected_shortcut_games'
+	DETECTED_STEAM_GAMES: 'detected_steam_games'
 	DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE: 'downloaded_gog_galaxy_community_profile'
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 	UPDATE_SLOTS: 'update_slots'
@@ -74,6 +75,13 @@ startDetectingPlatformGames = () ->
 			COMPONENTS.SIGNAL\register(SIGNALS.DETECTED_SHORTCUT_GAMES, platform\onParsedShortcuts())
 			platform\parseShortcuts()
 		when ENUMS.PLATFORM_IDS.STEAM
+			log('Starting to detect Steam games')
+			COMPONENTS.SIGNAL\register(SIGNALS.DETECTED_STEAM_GAMES, platform\onGotACFs())
+			processLocalFiles = () ->
+				platform\getLibraries()
+				if platform\hasLibrariesToParse()
+					return platform\getACFs()
+				OnFinishedDetectingPlatformGames() -- TODO: Emit
 			url, folder, file = platform\downloadCommunityProfile()
 			if url ~= nil
 				log('Attempting to download and parse the Steam community profile')
@@ -81,37 +89,21 @@ startDetectingPlatformGames = () ->
 					:url
 					outputFile: file
 					outputFolder: folder
-					finishCallback: (args) ->
+					finishCallback: () ->
 						log('Successfully downloaded Steam community profile')
-						cachedPath = io.joinPaths(args.folder, args.file)
+						cachedPath = io.joinPaths(folder, file)
 						profile = ''
 						if io.fileExists(cachedPath)
 							profile = io.readFile(cachedPath)
-						args.platform\parseCommunityProfile(profile)
-						args.platform\getLibraries()
-						if args.platform\hasLibrariesToParse()
-							return args.platform\getACFs()
-						OnFinishedDetectingPlatformGames()
-					errorCallback: (args) ->
+						platform\parseCommunityProfile(profile)
+						processLocalFiles()
+					errorCallback: () ->
 						log('Failed to download Steam community profile')
-						args.platform\getLibraries()
-						if args.platform\hasLibrariesToParse()
-							return args.platform\getACFs()
-						OnFinishedDetectingPlatformGames()
-					callbackArgs: {
-						:file
-						:folder
-						:platform
-					}
+						processLocalFiles()
 				})
 				COMPONENTS.DOWNLOADER\start()
 			else
-				log('Starting to detect Steam games')
-				platform\getLibraries()
-				if platform\hasLibrariesToParse()
-					platform\getACFs()
-				else
-					OnFinishedDetectingPlatformGames()
+				processLocalFiles()
 		when ENUMS.PLATFORM_IDS.BATTLENET
 			log('Starting to detect Blizzard Battle.net games')
 			if platform\hasUnprocessedPaths()
@@ -778,19 +770,6 @@ export OnFinishedDetectingPlatformGames = () ->
 					})
 				return if COMPONENTS.DOWNLOADER\start()
 			onInitialized()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Game detection -> Steam
-export OnGotACFs = () ->
-	success, err = pcall(
-		() ->
-			log('Dumped list of Steam appmanifests')
-			STATE.PLATFORM_QUEUE[1]\generateGames()
-			if STATE.PLATFORM_QUEUE[1]\hasLibrariesToParse()
-				return STATE.PLATFORM_QUEUE[1]\getACFs()
-			STATE.PLATFORM_QUEUE[1]\generateShortcuts()
-			OnFinishedDetectingPlatformGames()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

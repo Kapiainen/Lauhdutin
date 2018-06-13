@@ -12,5 +12,5 @@ for %%F in (%acfs%) do (
 	echo %%~nF%%~xF >> %output%
 )
 set "rainmeter="%~2\Rainmeter.exe""
-start /B "" %rainmeter% !CommandMeasure "Script" "OnGotACFs()" %3
+start /B "" %rainmeter% !CommandMeasure "Script" "OnSteamDumpedACFs()" %3
 ::pause

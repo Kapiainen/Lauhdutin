@@ -200,6 +200,19 @@ do
       io.writeFile(io.joinPaths(self.cachePath, 'output.txt'), '')
       return SKIN:Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]'):format(self.libraries[1]))
     end,
+    onGotACFs = function(self)
+      return function()
+        log('Dumped list of Steam appmanifests')
+        self:generateGames()
+        if self:hasLibrariesToParse() then
+          return self:getACFs()
+        end
+        OnSteamDumpedACFs = nil
+        COMPONENTS.SIGNAL:clear(SIGNALS.DETECTED_STEAM_GAMES)
+        self:generateShortcuts()
+        return OnFinishedDetectingPlatformGames()
+      end
+    end,
     parseLocalConfig = function(self)
       log('Parsing localconfig.vdf')
       local file = io.readFile(io.joinPaths(self.steamPath, 'userdata\\', self.accountID, 'config\\localconfig.vdf'), false)
@@ -600,6 +613,14 @@ do
     _parent_0.__inherited(_parent_0, _class_0)
   end
   Steam = _class_0
+end
+OnSteamDumpedACFs = function()
+  local success, err = pcall(function()
+    return COMPONENTS.SIGNAL:emit(SIGNALS.DETECTED_STEAM_GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
 end
 if RUN_TESTS then
   local assertionMessage = 'Steam test failed!'

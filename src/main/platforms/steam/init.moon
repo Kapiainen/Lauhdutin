@@ -165,6 +165,17 @@ class Steam extends Platform
 		io.writeFile(io.joinPaths(@cachePath, 'output.txt'), '')
 		SKIN\Bang(('["#@#windowless.vbs" "#@#main\\platforms\\steam\\getACFs.bat" "%s" "#PROGRAMPATH#" "#ROOTCONFIG#"]')\format(@libraries[1]))
 
+	onGotACFs: () =>
+		return () ->
+			log('Dumped list of Steam appmanifests')
+			@generateGames()
+			if @hasLibrariesToParse()
+				return @getACFs()
+			export OnSteamDumpedACFs = nil
+			COMPONENTS.SIGNAL\clear(SIGNALS.DETECTED_STEAM_GAMES)
+			@generateShortcuts()
+			OnFinishedDetectingPlatformGames() -- TODO: Emit
+
 	parseLocalConfig: () =>
 		log('Parsing localconfig.vdf')
 		file = io.readFile(io.joinPaths(@steamPath, 'userdata\\', @accountID, 'config\\localconfig.vdf'), false)
@@ -401,6 +412,10 @@ class Steam extends Platform
 			appID = game\getBanner()\reverse()\match('^[^%.]+%.([^\\]+)')\reverse()
 			return @generateBannerURL(appID)
 		return nil
+
+export OnSteamDumpedACFs = () ->
+	success, err = pcall(() -> COMPONENTS.SIGNAL\emit(SIGNALS.DETECTED_STEAM_GAMES))
+	COMPONENTS.STATUS\show(err, true) unless success
 
 if RUN_TESTS
 	assertionMessage = 'Steam test failed!'

@@ -44,6 +44,7 @@ SIGNALS = {
   DETECTED_BATTLENET_GAMES = 'detected_battlenet_games',
   DETECTED_GOG_GALAXY_GAMES = 'detected_gog_galaxy_games',
   DETECTED_SHORTCUT_GAMES = 'detected_shortcut_games',
+  DETECTED_STEAM_GAMES = 'detected_steam_games',
   DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE = 'downloaded_gog_galaxy_community_profile',
   UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
   UPDATE_SLOTS = 'update_slots'
@@ -71,6 +72,16 @@ startDetectingPlatformGames = function()
     COMPONENTS.SIGNAL:register(SIGNALS.DETECTED_SHORTCUT_GAMES, platform:onParsedShortcuts())
     return platform:parseShortcuts()
   elseif ENUMS.PLATFORM_IDS.STEAM == _exp_0 then
+    log('Starting to detect Steam games')
+    COMPONENTS.SIGNAL:register(SIGNALS.DETECTED_STEAM_GAMES, platform:onGotACFs())
+    local processLocalFiles
+    processLocalFiles = function()
+      platform:getLibraries()
+      if platform:hasLibrariesToParse() then
+        return platform:getACFs()
+      end
+      return OnFinishedDetectingPlatformGames()
+    end
     local url, folder, file = platform:downloadCommunityProfile()
     if url ~= nil then
       log('Attempting to download and parse the Steam community profile')
@@ -78,43 +89,24 @@ startDetectingPlatformGames = function()
         url = url,
         outputFile = file,
         outputFolder = folder,
-        finishCallback = function(args)
+        finishCallback = function()
           log('Successfully downloaded Steam community profile')
-          local cachedPath = io.joinPaths(args.folder, args.file)
+          local cachedPath = io.joinPaths(folder, file)
           local profile = ''
           if io.fileExists(cachedPath) then
             profile = io.readFile(cachedPath)
           end
-          args.platform:parseCommunityProfile(profile)
-          args.platform:getLibraries()
-          if args.platform:hasLibrariesToParse() then
-            return args.platform:getACFs()
-          end
-          return OnFinishedDetectingPlatformGames()
+          platform:parseCommunityProfile(profile)
+          return processLocalFiles()
         end,
-        errorCallback = function(args)
+        errorCallback = function()
           log('Failed to download Steam community profile')
-          args.platform:getLibraries()
-          if args.platform:hasLibrariesToParse() then
-            return args.platform:getACFs()
-          end
-          return OnFinishedDetectingPlatformGames()
-        end,
-        callbackArgs = {
-          file = file,
-          folder = folder,
-          platform = platform
-        }
+          return processLocalFiles()
+        end
       })
       return COMPONENTS.DOWNLOADER:start()
     else
-      log('Starting to detect Steam games')
-      platform:getLibraries()
-      if platform:hasLibrariesToParse() then
-        return platform:getACFs()
-      else
-        return OnFinishedDetectingPlatformGames()
-      end
+      return processLocalFiles()
     end
   elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
     log('Starting to detect Blizzard Battle.net games')
@@ -1053,20 +1045,6 @@ OnFinishedDetectingPlatformGames = function()
       end
     end
     return onInitialized()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnGotACFs = function()
-  local success, err = pcall(function()
-    log('Dumped list of Steam appmanifests')
-    STATE.PLATFORM_QUEUE[1]:generateGames()
-    if STATE.PLATFORM_QUEUE[1]:hasLibrariesToParse() then
-      return STATE.PLATFORM_QUEUE[1]:getACFs()
-    end
-    STATE.PLATFORM_QUEUE[1]:generateShortcuts()
-    return OnFinishedDetectingPlatformGames()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
