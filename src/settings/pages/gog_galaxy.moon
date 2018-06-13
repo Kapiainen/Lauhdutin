@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
 
@@ -68,7 +67,10 @@ class GOGGalaxy extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getGOGGalaxyStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGOGGalaxyStartingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setGOGGalaxyStartingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
@@ -78,7 +80,10 @@ class GOGGalaxy extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getGOGGalaxyStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGOGGalaxyStoppingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setGOGGalaxyStoppingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 		}
 

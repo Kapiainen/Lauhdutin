@@ -600,7 +600,7 @@ class Settings
 	getGOGGalaxyClientPath: () => return @settings.platforms.gogGalaxy.clientPath or nil
 	
 	setGOGGalaxyClientPath: (path) =>
-		return false unless io.fileExists(io.joinPaths(path, 'GalaxyClient.exe'), false)
+		return false if io.fileExists(io.joinPaths(path, 'GalaxyClient.exe'), false) == false and path ~= ''
 		@settings.platforms.gogGalaxy.clientPath = path
 		return true
 	

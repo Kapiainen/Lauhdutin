@@ -1,5 +1,4 @@
 local vdf = require('shared.vdf')
-local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
 local state = {
@@ -173,7 +172,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getSteamStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedSteamStartingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setSteamStartingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         }),
         Settings.Action({
@@ -184,7 +188,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getSteamStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedSteamStoppingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setSteamStoppingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         })
       }

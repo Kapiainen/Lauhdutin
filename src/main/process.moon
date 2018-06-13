@@ -1,5 +1,3 @@
-utility = require('shared.utility')
-
 -- A process measure regularly sends update events.
 -- If a specific process is being monitored, then that process' state is updated.
 -- Else the statuses of the various supported platforms' client processes are updated.
@@ -7,7 +5,6 @@ utility = require('shared.utility')
 class Process
 	new: () =>
 		@monitoring = false
-		@commandMeasure = SKIN\GetMeasure('Command')
 		@currentGame = nil
 		@startingTime = nil
 		@duration = 0
@@ -41,13 +38,13 @@ class Process
 			else
 				log('Game is still running')
 				return false
-		utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', {}, 'Hide', 'UTF8')
+		callback = () -> STATE.PLATFORM_RUNNING_STATUS = @updatePlatforms(COMPONENTS.COMMANDER\getOutput()) -- TODO: Emit signal
+		COMPONENTS.COMMANDER\run('tasklist /fo csv /nh', nil, callback, nil, nil, 'UTF8')
 		return true
 
-	updatePlatforms: () =>
+	updatePlatforms: (output) =>
 		return {} if @platformProcesses == nil
 		log('Updating platform client process statuses')
-		output = @commandMeasure\GetStringValue()
 		for id, process in pairs(@platformProcesses)
 			@platformStatuses[id] = if output\match(process) ~= nil then true else false
 			log(('- %d = %s')\format(id, tostring(@platformStatuses[id])))

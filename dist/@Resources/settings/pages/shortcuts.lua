@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
 local Shortcuts
@@ -40,7 +39,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getShortcutsStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStartingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setShortcutsStartingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         }),
         Settings.Action({
@@ -51,7 +55,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getShortcutsStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStoppingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setShortcutsStoppingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         })
       }

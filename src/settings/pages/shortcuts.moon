@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
 
@@ -31,7 +30,10 @@ class Shortcuts extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getShortcutsStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStartingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setShortcutsStartingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
@@ -41,7 +43,10 @@ class Shortcuts extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getShortcutsStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedShortcutsStoppingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setShortcutsStoppingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 		}
 

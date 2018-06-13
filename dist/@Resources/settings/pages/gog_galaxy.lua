@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
 local GOGGalaxy
@@ -86,7 +85,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getGOGGalaxyStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGOGGalaxyStartingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setGOGGalaxyStartingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         }),
         Settings.Action({
@@ -97,7 +101,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getGOGGalaxyStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedGOGGalaxyStoppingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setGOGGalaxyStoppingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         })
       }

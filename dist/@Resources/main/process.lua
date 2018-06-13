@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Process
 do
   local _class_0
@@ -39,15 +38,18 @@ do
           return false
         end
       end
-      utility.runCommand('tasklist /fo csv /nh', '', 'UpdatePlatformProcesses', { }, 'Hide', 'UTF8')
+      local callback
+      callback = function()
+        STATE.PLATFORM_RUNNING_STATUS = self:updatePlatforms(COMPONENTS.COMMANDER:getOutput())
+      end
+      COMPONENTS.COMMANDER:run('tasklist /fo csv /nh', nil, callback, nil, nil, 'UTF8')
       return true
     end,
-    updatePlatforms = function(self)
+    updatePlatforms = function(self, output)
       if self.platformProcesses == nil then
         return { }
       end
       log('Updating platform client process statuses')
-      local output = self.commandMeasure:GetStringValue()
       for id, process in pairs(self.platformProcesses) do
         if output:match(process) ~= nil then
           self.platformStatuses[id] = true
@@ -103,7 +105,6 @@ do
   _class_0 = setmetatable({
     __init = function(self)
       self.monitoring = false
-      self.commandMeasure = SKIN:GetMeasure('Command')
       self.currentGame = nil
       self.startingTime = nil
       self.duration = 0

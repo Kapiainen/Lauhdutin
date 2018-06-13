@@ -2,7 +2,6 @@ RUN_TESTS = false
 if RUN_TESTS then
   print('Running tests')
 end
-local utility = nil
 LOCALIZATION = nil
 STATE = {
   PATHS = {
@@ -176,7 +175,7 @@ Initialize = function()
     require('shared.rainmeter')
     require('shared.enums')
     additionalEnums()
-    utility = require('shared.utility')
+    COMPONENTS.COMMANDER = require('shared.commander')()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -1123,17 +1122,13 @@ StartEditingStartingBangs = function()
   local success, err = pcall(function()
     local bangs = STATE.GAME:getStartingBangs()
     io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-    return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStartingBangs')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnEditedStartingBangs = function()
-  local success, err = pcall(function()
-    local bangs = io.readFile(STATE.PATHS.BANGS)
-    STATE.GAME:setStartingBangs(bangs:splitIntoLines())
-    return updateSlots()
+    local callback
+    callback = function()
+      bangs = io.readFile(STATE.PATHS.BANGS)
+      STATE.GAME:setStartingBangs(bangs:splitIntoLines())
+      return updateSlots()
+    end
+    return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), nil, callback)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -1143,17 +1138,13 @@ StartEditingStoppingBangs = function()
   local success, err = pcall(function()
     local bangs = STATE.GAME:getStoppingBangs()
     io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-    return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStoppingBangs')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnEditedStoppingBangs = function()
-  local success, err = pcall(function()
-    local bangs = io.readFile(STATE.PATHS.BANGS)
-    STATE.GAME:setStoppingBangs(bangs:splitIntoLines())
-    return updateSlots()
+    local callback
+    callback = function()
+      bangs = io.readFile(STATE.PATHS.BANGS)
+      STATE.GAME:setStoppingBangs(bangs:splitIntoLines())
+      return updateSlots()
+    end
+    return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), nil, callback)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -1175,17 +1166,13 @@ StartEditingNotes = function()
       notes = ''
     end
     io.writeFile(STATE.PATHS.NOTES, notes)
-    return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.NOTES))), '', 'OnEditedNotes')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnEditedNotes = function()
-  local success, err = pcall(function()
-    local notes = io.readFile(STATE.PATHS.NOTES)
-    STATE.GAME:setNotes(notes)
-    return updateSlots()
+    local callback
+    callback = function()
+      notes = io.readFile(STATE.PATHS.NOTES)
+      STATE.GAME:setNotes(notes)
+      return updateSlots()
+    end
+    return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(STATE.PATHS.NOTES))), nil, callback)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

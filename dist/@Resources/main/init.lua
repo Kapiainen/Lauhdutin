@@ -31,6 +31,7 @@ STATE = {
 COMPONENTS = {
   ANIMATIONS = nil,
   DOWNLOADER = nil,
+  COMMANDER = nil,
   LIBRARY = nil,
   PROCESS = nil,
   SETTINGS = nil,
@@ -236,6 +237,7 @@ Initialize = function()
     additionalEnums()
     Game = require('main.game')
     COMPONENTS.DOWNLOADER = require('shared.downloader')()
+    COMPONENTS.COMMANDER = require('shared.commander')()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()

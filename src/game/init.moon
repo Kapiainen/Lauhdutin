@@ -2,8 +2,6 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
-
 export LOCALIZATION = nil
 
 export STATE = {
@@ -112,7 +110,7 @@ export Initialize = () ->
 			require('shared.rainmeter')
 			require('shared.enums')
 			additionalEnums()
-			utility = require('shared.utility')
+			COMPONENTS.COMMANDER = require('shared.commander')()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -796,16 +794,11 @@ export StartEditingStartingBangs = () ->
 		() ->
 			bangs = STATE.GAME\getStartingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStartingBangs')
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnEditedStartingBangs = () ->
-	success, err = pcall(
-		() ->
-			bangs = io.readFile(STATE.PATHS.BANGS)
-			STATE.GAME\setStartingBangs(bangs\splitIntoLines())
-			updateSlots()
+			callback = () ->
+				bangs = io.readFile(STATE.PATHS.BANGS)
+				STATE.GAME\setStartingBangs(bangs\splitIntoLines())
+				updateSlots()
+			COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), nil, callback)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -815,16 +808,11 @@ export StartEditingStoppingBangs = () ->
 		() ->
 			bangs = STATE.GAME\getStoppingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), '', 'OnEditedStoppingBangs')
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnEditedStoppingBangs = () ->
-	success, err = pcall(
-		() ->
-			bangs = io.readFile(STATE.PATHS.BANGS)
-			STATE.GAME\setStoppingBangs(bangs\splitIntoLines())
-			updateSlots()
+			callback = () ->
+				bangs = io.readFile(STATE.PATHS.BANGS)
+				STATE.GAME\setStoppingBangs(bangs\splitIntoLines())
+				updateSlots()
+			COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.BANGS))), nil, callback)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -842,16 +830,11 @@ export StartEditingNotes = () ->
 			notes = STATE.GAME\getNotes()
 			notes = '' if notes == nil
 			io.writeFile(STATE.PATHS.NOTES, notes)
-			utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.NOTES))), '', 'OnEditedNotes')
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnEditedNotes = () ->
-	success, err = pcall(
-		() ->
-			notes = io.readFile(STATE.PATHS.NOTES)
-			STATE.GAME\setNotes(notes)
-			updateSlots()
+			callback = () ->
+				notes = io.readFile(STATE.PATHS.NOTES)
+				STATE.GAME\setNotes(notes)
+				updateSlots()
+			COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(STATE.PATHS.NOTES))), nil, callback)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

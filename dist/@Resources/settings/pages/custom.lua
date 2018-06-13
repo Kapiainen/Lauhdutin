@@ -1,4 +1,3 @@
-local utility = require('shared.utility')
 local Page = require('settings.pages.page')
 local Settings = require('settings.types')
 local Custom
@@ -21,7 +20,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getCustomStartingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedCustomStartingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setCustomStartingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         }),
         Settings.Action({
@@ -32,7 +36,12 @@ do
             local path = 'cache\\bangs.txt'
             local bangs = COMPONENTS.SETTINGS:getCustomStoppingBangs()
             io.writeFile(path, table.concat(bangs, '\n'))
-            return utility.runCommand(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedCustomStoppingBangs')
+            local callback
+            callback = function()
+              bangs = io.readFile(path)
+              return COMPONENTS.SETTINGS:setCustomStoppingBangs(bangs:splitIntoLines())
+            end
+            return COMPONENTS.COMMANDER:run(('""%s""'):format(io.absolutePath(io.joinPaths(path))), '', callback)
           end
         })
       }

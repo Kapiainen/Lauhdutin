@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
 
@@ -43,7 +42,10 @@ class Battlenet extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getBattlenetStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedBattlenetStartingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setBattlenetStartingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
@@ -53,7 +55,10 @@ class Battlenet extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getBattlenetStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedBattlenetStoppingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setBattlenetStoppingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 		}
 

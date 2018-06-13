@@ -2,8 +2,6 @@ export RUN_TESTS = false
 if RUN_TESTS
 	print('Running tests')
 
-utility = nil
-
 export LOCALIZATION = nil
 
 export STATE = {
@@ -20,9 +18,12 @@ export STATE = {
 }
 
 export COMPONENTS = {
+	COMMANDER: nil
+	OLD_SETTINGS: nil
+	PAGES: nil
 	SETTINGS: nil
 	SLOTS: nil
-	PAGES: nil
+	STATUS: nil
 }
 
 export log = (...) -> print(...) if STATE.LOGGING == true
@@ -77,7 +78,7 @@ export Initialize = () ->
 			require('shared.rainmeter')
 			require('shared.enums')
 			additionalEnums()
-			utility = require('shared.utility')
+			COMPONENTS.COMMANDER = require('shared.commander')()
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			COMPONENTS.OLD_SETTINGS = require('shared.settings')()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -228,12 +229,11 @@ export StartEditingFolderPath = (index) ->
 
 export StartBrowsingFolderPath = (index) ->
 	parameter = COMPONENTS.SLOTS\startBrowsingFolderPath(index)
-	utility.runCommand(parameter, '', 'BrowseFolderPath', {('%d')\format(index)}, 'Hide', 'ANSI')
-
-export BrowseFolderPath = (index) ->
-	output = SKIN\GetMeasure('Command')\GetStringValue()
-	path = output\match('Path="([^"]*)"')
-	EditFolderPath(index, path)
+	callback = () ->
+		output = COMPONENTS.COMMANDER\getOutput()
+		path = output\match('Path="([^"]*)"')
+		EditFolderPath(index, path)
+	COMPONENTS.COMMANDER\run(parameter, nil, callback, nil, nil, 'ANSI')
 
 export EditFolderPath = (index, path) ->
 	path = path\sub(1, -2) if path\endsWith(';')
@@ -288,54 +288,6 @@ export EditInteger = (index, value) ->
 
 readBangs = () -> return io.readFile('cache\\bangs.txt')
 
-export OnEditedGlobalStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setGlobalStartingBangs(bangs\splitIntoLines())
-
-export OnEditedGlobalStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setGlobalStoppingBangs(bangs\splitIntoLines())
-
-export OnEditedShortcutsStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setShortcutsStartingBangs(bangs\splitIntoLines())
-
-export OnEditedShortcutsStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setShortcutsStoppingBangs(bangs\splitIntoLines())
-
-export OnEditedSteamStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setSteamStartingBangs(bangs\splitIntoLines())
-
-export OnEditedSteamStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setSteamStoppingBangs(bangs\splitIntoLines())
-
-export OnEditedBattlenetStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setBattlenetStartingBangs(bangs\splitIntoLines())
-
-export OnEditedBattlenetStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setBattlenetStoppingBangs(bangs\splitIntoLines())
-
-export OnEditedGOGGalaxyStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setGOGGalaxyStartingBangs(bangs\splitIntoLines())
-
-export OnEditedGOGGalaxyStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setGOGGalaxyStoppingBangs(bangs\splitIntoLines())
-
-export OnEditedCustomStartingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setCustomStartingBangs(bangs\splitIntoLines())
-
-export OnEditedCustomStoppingBangs = () ->
-	bangs = readBangs()
-	COMPONENTS.SETTINGS\setCustomStoppingBangs(bangs\splitIntoLines())
-
 export CycleFolderPathSpinner = (index, direction) -> COMPONENTS.SLOTS\cycleFolderPathSpinner(index, direction)
 
 export StartEditingFolderPathSpinner = (index) ->
@@ -351,12 +303,11 @@ export StartEditingFolderPathSpinner = (index) ->
 
 export StartBrowsingFolderPathSpinner = (index) ->
 	parameter = COMPONENTS.SLOTS\startBrowsingFolderPathSpinner(index)
-	utility.runCommand(parameter, '', 'BrowseFolderPathSpinner', {('%d')\format(index)}, 'Hide', 'ANSI')
-
-export BrowseFolderPathSpinner = (index) ->
-	output = SKIN\GetMeasure('Command')\GetStringValue()
-	path = output\match('Path="([^"]*)"')
-	EditFolderPathSpinner(index, path)
+	callback = () ->
+		output = COMPONENTS.COMMANDER\getOutput()
+		path = output\match('Path="([^"]*)"')
+		EditFolderPathSpinner(index, path)
+	COMPONENTS.COMMANDER\run(parameter, nil, callback, nil, nil, 'ANSI')
 
 export EditFolderPathSpinner = (index, path) ->
 	path = path\sub(1, -2) if path\endsWith(';')

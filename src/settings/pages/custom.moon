@@ -1,4 +1,3 @@
-utility = require('shared.utility')
 Page = require('settings.pages.page')
 Settings = require('settings.types')
 
@@ -15,7 +14,10 @@ class Custom extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getCustomStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedCustomStartingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setCustomStartingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
@@ -25,7 +27,10 @@ class Custom extends Page
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getCustomStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', 'OnEditedCustomStoppingBangs')
+					callback = () ->
+						bangs = io.readFile(path)
+						COMPONENTS.SETTINGS\setCustomStoppingBangs(bangs\splitIntoLines())
+					COMPONENTS.COMMANDER\run(('""%s""')\format(io.absolutePath(io.joinPaths(path))), '', callback)
 			})
 		}
 

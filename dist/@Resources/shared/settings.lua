@@ -676,7 +676,7 @@ do
       return self.settings.platforms.gogGalaxy.clientPath or nil
     end,
     setGOGGalaxyClientPath = function(self, path)
-      if not (io.fileExists(io.joinPaths(path, 'GalaxyClient.exe'), false)) then
+      if io.fileExists(io.joinPaths(path, 'GalaxyClient.exe'), false) == false and path ~= '' then
         return false
       end
       self.settings.platforms.gogGalaxy.clientPath = path
