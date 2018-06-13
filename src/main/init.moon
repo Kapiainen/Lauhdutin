@@ -260,23 +260,6 @@ export UpdateProcess = (running) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export UpdatePlatformProcesses = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			STATE.PLATFORM_RUNNING_STATUS = COMPONENTS.PROCESS\updatePlatforms()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export GameProcessStarted = (game) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			log('Game started')
-			return
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 export GameProcessTerminated = (game) ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(

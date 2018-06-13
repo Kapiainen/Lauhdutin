@@ -306,28 +306,6 @@ UpdateProcess = function(running)
     return COMPONENTS.STATUS:show(err, true)
   end
 end
-UpdatePlatformProcesses = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    STATE.PLATFORM_RUNNING_STATUS = COMPONENTS.PROCESS:updatePlatforms()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-GameProcessStarted = function(game)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    log('Game started')
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
 GameProcessTerminated = function(game)
   if not (STATE.INITIALIZED) then
     return 

@@ -29,7 +29,7 @@ do
           self.gameStatus = true
           self.duration = 0
           self.startingTime = os.time()
-          GameProcessStarted(self.currentGame)
+          log('Game started')
           return true
         elseif not running and self.gameStatus then
           self:stopMonitoring()

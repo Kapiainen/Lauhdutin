@@ -31,7 +31,7 @@ class Process
 				@gameStatus = true
 				@duration = 0
 				@startingTime = os.time()
-				GameProcessStarted(@currentGame)
+				log('Game started')
 				return true
 			elseif not running and @gameStatus
 				@stopMonitoring()
