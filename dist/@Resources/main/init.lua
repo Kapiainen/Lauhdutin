@@ -47,12 +47,17 @@ SIGNALS = {
   DETECTED_STEAM_GAMES = 'detected_steam_games',
   DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE = 'downloaded_gog_galaxy_community_profile',
   GAME_PROCESS_TERMINATED = 'game_process_terminated',
+  OPEN_FILTERING_MENU = 'open_filtering_menu',
+  OPEN_SEARCH_MENU = 'open_search_menu',
+  OPEN_SORTING_MENU = 'open_sort_menu',
+  REVERSE_GAMES = 'reverse_games',
   START_HIDING_GAMES = 'start_hiding_games',
   START_REMOVING_GAMES = 'start_removing_games',
   START_UNHIDING_GAMES = 'start_unhiding_games',
   STOP_HIDING_GAMES = 'stop_hiding_games',
   STOP_REMOVING_GAMES = 'stop_removing_games',
   STOP_UNHIDING_GAMES = 'stop_unhiding_games',
+  UPDATE_GAMES = 'update_games',
   UPDATE_PLATFORM_RUNNING_STATUS = 'update_platform_running_status',
   UPDATE_SLOTS = 'update_slots'
 }
@@ -185,6 +190,12 @@ detectGames = function()
   STATE.BANNER_QUEUE = { }
   return startDetectingPlatformGames()
 end
+local updateGames
+updateGames = function(games)
+  STATE.GAMES = games
+  STATE.SCROLL_INDEX = 1
+  return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
+end
 local updateSlots
 updateSlots = function()
   if STATE.SCROLL_INDEX < 1 then
@@ -283,6 +294,150 @@ gameProcessTerminated = function(game, duration)
     return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(('%s\\Session'):format(STATE.ROOT_CONFIG)))
   end
 end
+local openSearchMenu
+openSearchMenu = function(stack)
+  STATE.STACK_NEXT_FILTER = stack
+  return SKIN:Bang('[!ActivateConfig "#ROOTCONFIG#\\Search"]')
+end
+HandshakeSearch = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    local args = tostring(STATE.STACK_NEXT_FILTER)
+    local bang = ('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]'):format(args)
+    return SKIN:Bang(bang)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+Search = function(str, stack)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('Searching for:', str)
+    local games
+    if stack then
+      games = STATE.GAMES
+    else
+      games = nil
+    end
+    COMPONENTS.LIBRARY:filter(ENUMS.FILTER_TYPES.TITLE, {
+      input = str,
+      games = games,
+      stack = stack
+    })
+    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_GAMES, COMPONENTS.LIBRARY:get())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+local openSortingMenu
+openSortingMenu = function(quick)
+  if quick then
+    local sortingType
+    local _exp_0 = COMPONENTS.SETTINGS:getSorting()
+    if ENUMS.SORTING_TYPES.ALPHABETICALLY == _exp_0 then
+      sortingType = ENUMS.SORTING_TYPES.LAST_PLAYED
+    elseif ENUMS.SORTING_TYPES.LAST_PLAYED == _exp_0 then
+      sortingType = ENUMS.SORTING_TYPES.HOURS_PLAYED
+    elseif ENUMS.SORTING_TYPES.HOURS_PLAYED == _exp_0 then
+      sortingType = ENUMS.SORTING_TYPES.ALPHABETICALLY
+    else
+      sortingType = ENUMS.SORTING_TYPES.ALPHABETICALLY
+    end
+    return Sort(sortingType)
+  end
+  local configName = ('%s\\Sort'):format(STATE.ROOT_CONFIG)
+  local config = RAINMETER:GetConfig(configName)
+  if config ~= nil and config:isActive() then
+    return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))
+  end
+  return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
+end
+HandshakeSort = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    local args = COMPONENTS.SETTINGS:getSorting()
+    local bang = ('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Sort"]'):format(args)
+    return SKIN:Bang(bang)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+Sort = function(sortingType)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    COMPONENTS.SETTINGS:setSorting(sortingType)
+    COMPONENTS.LIBRARY:sort(sortingType, STATE.GAMES)
+    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_GAMES, STATE.GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+local reverseGames
+reverseGames = function()
+  table.reverse(STATE.GAMES)
+  return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
+end
+local openFilteringMenu
+openFilteringMenu = function(stack)
+  STATE.STACK_NEXT_FILTER = stack
+  local configName = ('%s\\Filter'):format(STATE.ROOT_CONFIG)
+  local config = RAINMETER:GetConfig(configName)
+  if config ~= nil and config:isActive() then
+    return HandshakeFilter()
+  end
+  return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
+end
+HandshakeFilter = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    local stack = tostring(STATE.STACK_NEXT_FILTER)
+    local appliedFilters = '[]'
+    if STATE.STACK_NEXT_FILTER then
+      appliedFilters = json.encode(COMPONENTS.LIBRARY:getFilterStack()):gsub('"', '|')
+    end
+    local args = ('%s, \'%s\''):format(stack, appliedFilters)
+    local bang = ('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Filter"]'):format(args)
+    return SKIN:Bang(bang)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+Filter = function(filterType, stack, arguments)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('Filter', filterType, type(filterType), stack, type(stack), arguments)
+    arguments = arguments:gsub('|', '"')
+    arguments = json.decode(arguments)
+    if stack then
+      arguments.games = STATE.GAMES
+    else
+      arguments.games = nil
+    end
+    arguments.stack = stack
+    COMPONENTS.LIBRARY:filter(filterType, arguments)
+    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_GAMES, COMPONENTS.LIBRARY:get())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
 Initialize = function()
   STATE.ROOT_CONFIG = SKIN:GetVariable('ROOTCONFIG')
   dofile(('%s%s'):format(SKIN:GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
@@ -298,8 +453,13 @@ Initialize = function()
     COMPONENTS.DOWNLOADER = require('shared.downloader')()
     COMPONENTS.COMMANDER = require('shared.commander')()
     COMPONENTS.SIGNAL = require('shared.signal')()
+    COMPONENTS.SIGNAL:register(SIGNALS.UPDATE_GAMES, updateGames)
     COMPONENTS.SIGNAL:register(SIGNALS.UPDATE_SLOTS, updateSlots)
     COMPONENTS.SIGNAL:register(SIGNALS.GAME_PROCESS_TERMINATED, gameProcessTerminated)
+    COMPONENTS.SIGNAL:register(SIGNALS.OPEN_SEARCH_MENU, openSearchMenu)
+    COMPONENTS.SIGNAL:register(SIGNALS.OPEN_SORTING_MENU, openSortingMenu)
+    COMPONENTS.SIGNAL:register(SIGNALS.OPEN_FILTERING_MENU, openFilteringMenu)
+    COMPONENTS.SIGNAL:register(SIGNALS.REVERSE_GAMES, reverseGames)
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
@@ -426,221 +586,6 @@ OnMouseLeaveEnabler = function()
   local success, err = pcall(function()
     STATE.REVEALING_DELAY = COMPONENTS.SETTINGS:getSkinRevealingDelay()
     return setUpdateDivider(-1)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnMouseOverToolbar = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  if not (STATE.SKIN_VISIBLE) then
-    return 
-  end
-  if STATE.SKIN_ANIMATION_PLAYING then
-    return 
-  end
-  local success, err = pcall(function()
-    COMPONENTS.TOOLBAR:show()
-    COMPONENTS.SLOTS:unfocus()
-    COMPONENTS.SLOTS:leave()
-    COMPONENTS.ANIMATIONS:resetSlots()
-    return COMPONENTS.ANIMATIONS:cancelAnimations()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnMouseLeaveToolbar = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  if not (STATE.SKIN_VISIBLE) then
-    return 
-  end
-  if STATE.SKIN_ANIMATION_PLAYING then
-    return 
-  end
-  local success, err = pcall(function()
-    COMPONENTS.TOOLBAR:hide()
-    COMPONENTS.SLOTS:focus()
-    return COMPONENTS.SLOTS:hover()
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnToolbarSearch = function(stack)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  STATE.STACK_NEXT_FILTER = stack
-  log('OnToolbarSearch', stack)
-  return SKIN:Bang('[!ActivateConfig "#ROOTCONFIG#\\Search"]')
-end
-HandshakeSearch = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]'):format(tostring(STATE.STACK_NEXT_FILTER)))
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-Search = function(str, stack)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    log('Searching for:', str)
-    local games
-    if stack then
-      games = STATE.GAMES
-    else
-      games = nil
-    end
-    COMPONENTS.LIBRARY:filter(ENUMS.FILTER_TYPES.TITLE, {
-      input = str,
-      games = games,
-      stack = stack
-    })
-    STATE.GAMES = COMPONENTS.LIBRARY:get()
-    STATE.SCROLL_INDEX = 1
-    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnToolbarResetGames = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    STATE.GAMES = COMPONENTS.LIBRARY:get()
-    STATE.SCROLL_INDEX = 1
-    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnToolbarSort = function(quick)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    log('OnToolbarSort')
-    if quick then
-      local sortingType = COMPONENTS.SETTINGS:getSorting() + 1
-      if sortingType >= ENUMS.SORTING_TYPES.MAX then
-        sortingType = 1
-      end
-      return Sort(sortingType)
-    end
-    local configName = ('%s\\Sort'):format(STATE.ROOT_CONFIG)
-    local config = RAINMETER:GetConfig(configName)
-    if config ~= nil and config:isActive() then
-      return SKIN:Bang(('[!DeactivateConfig "%s"]'):format(configName))
-    end
-    return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnToolbarReverseOrder = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    log('Reversing order of games')
-    table.reverse(STATE.GAMES)
-    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-HandshakeSort = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Sort"]'):format(COMPONENTS.SETTINGS:getSorting()))
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-Sort = function(sortingType)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    COMPONENTS.SETTINGS:setSorting(sortingType)
-    COMPONENTS.LIBRARY:sort(sortingType, STATE.GAMES)
-    STATE.SCROLL_INDEX = 1
-    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-OnToolbarFilter = function(stack)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    STATE.STACK_NEXT_FILTER = stack
-    local configName = ('%s\\Filter'):format(STATE.ROOT_CONFIG)
-    local config = RAINMETER:GetConfig(configName)
-    if config ~= nil and config:isActive() then
-      return HandshakeFilter()
-    end
-    return SKIN:Bang(('[!ActivateConfig "%s"]'):format(configName))
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-HandshakeFilter = function()
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    local stack = tostring(STATE.STACK_NEXT_FILTER)
-    local appliedFilters = '[]'
-    if STATE.STACK_NEXT_FILTER then
-      appliedFilters = json.encode(COMPONENTS.LIBRARY:getFilterStack()):gsub('"', '|')
-    end
-    return SKIN:Bang(('[!CommandMeasure "Script" "Handshake(%s, \'%s\')" "#ROOTCONFIG#\\Filter"]'):format(stack, appliedFilters))
-  end)
-  if not (success) then
-    return COMPONENTS.STATUS:show(err, true)
-  end
-end
-Filter = function(filterType, stack, arguments)
-  if not (STATE.INITIALIZED) then
-    return 
-  end
-  local success, err = pcall(function()
-    log('Filter', filterType, type(filterType), stack, type(stack), arguments)
-    arguments = arguments:gsub('|', '"')
-    arguments = json.decode(arguments)
-    if stack then
-      arguments.games = STATE.GAMES
-    else
-      arguments.games = nil
-    end
-    arguments.stack = stack
-    COMPONENTS.LIBRARY:filter(filterType, arguments)
-    STATE.GAMES = COMPONENTS.LIBRARY:get()
-    STATE.SCROLL_INDEX = 1
-    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

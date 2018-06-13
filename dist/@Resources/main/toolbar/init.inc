@@ -9,7 +9,7 @@ Y=0
 W=#SkinWidth#
 H=1
 DynamicVariables=1
-MouseOverAction=[!CommandMeasure "Script" "OnMouseOverToolbar()"]
+MouseOverAction=[!CommandMeasure "Script" "OnToolbarMouseOver()"]
 
 [ToolbarBackground]
 Meter=Image
@@ -22,7 +22,7 @@ DynamicVariables=1
 Group=Toolbar
 LeftMouseUpAction=[]
 MiddleMouseUpAction=[]
-MouseLeaveAction=[!CommandMeasure "Script" "OnMouseLeaveToolbar()"]
+MouseLeaveAction=[!CommandMeasure "Script" "OnToolbarMouseLeave()"]
 
 [ToolbarSeparator1]
 Meter=Image

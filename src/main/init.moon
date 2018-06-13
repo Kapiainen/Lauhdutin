@@ -54,12 +54,17 @@ export SIGNALS = {
 	DETECTED_STEAM_GAMES: 'detected_steam_games'
 	DOWNLOADED_GOG_GALAXY_COMMUNITY_PROFILE: 'downloaded_gog_galaxy_community_profile'
 	GAME_PROCESS_TERMINATED: 'game_process_terminated'
+	OPEN_FILTERING_MENU: 'open_filtering_menu'
+	OPEN_SEARCH_MENU: 'open_search_menu'
+	OPEN_SORTING_MENU: 'open_sort_menu'
+	REVERSE_GAMES: 'reverse_games'
 	START_HIDING_GAMES: 'start_hiding_games'
 	START_REMOVING_GAMES: 'start_removing_games'
 	START_UNHIDING_GAMES: 'start_unhiding_games'
 	STOP_HIDING_GAMES: 'stop_hiding_games'
 	STOP_REMOVING_GAMES: 'stop_removing_games'
 	STOP_UNHIDING_GAMES: 'stop_unhiding_games'
+	UPDATE_GAMES: 'update_games'
 	UPDATE_PLATFORM_RUNNING_STATUS: 'update_platform_running_status'
 	UPDATE_SLOTS: 'update_slots'
 }
@@ -157,6 +162,11 @@ detectGames = () ->
 	STATE.BANNER_QUEUE = {}
 	startDetectingPlatformGames()
 
+updateGames = (games) ->
+	STATE.GAMES = games
+	STATE.SCROLL_INDEX = 1
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
+
 updateSlots = () ->
 	if STATE.SCROLL_INDEX < 1
 		STATE.SCROLL_INDEX = 1
@@ -228,6 +238,108 @@ gameProcessTerminated = (game, duration) ->
 	if COMPONENTS.SETTINGS\getShowSession()
 		SKIN\Bang(('[!DeactivateConfig "%s"]')\format(('%s\\Session')\format(STATE.ROOT_CONFIG)))
 
+-- Search menu
+openSearchMenu = (stack) ->
+	STATE.STACK_NEXT_FILTER = stack
+	SKIN\Bang('[!ActivateConfig "#ROOTCONFIG#\\Search"]')
+
+export HandshakeSearch = () ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			args = tostring(STATE.STACK_NEXT_FILTER)
+			bang = ('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]')\format(args)
+			SKIN\Bang(bang)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export Search = (str, stack) ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			log('Searching for:', str)
+			games = if stack then STATE.GAMES else nil
+			COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.TITLE, {input: str, :games, :stack})
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_GAMES, COMPONENTS.LIBRARY\get())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+-- Sorting menu
+openSortingMenu = (quick) ->
+	if quick
+		sortingType = switch COMPONENTS.SETTINGS\getSorting()
+			when ENUMS.SORTING_TYPES.ALPHABETICALLY then ENUMS.SORTING_TYPES.LAST_PLAYED
+			when ENUMS.SORTING_TYPES.LAST_PLAYED then ENUMS.SORTING_TYPES.HOURS_PLAYED
+			when ENUMS.SORTING_TYPES.HOURS_PLAYED then ENUMS.SORTING_TYPES.ALPHABETICALLY
+			else ENUMS.SORTING_TYPES.ALPHABETICALLY
+		return Sort(sortingType)
+	configName = ('%s\\Sort')\format(STATE.ROOT_CONFIG)
+	config = RAINMETER\GetConfig(configName)
+	if config ~= nil and config\isActive()
+		return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
+	SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
+
+export HandshakeSort = () ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			args = COMPONENTS.SETTINGS\getSorting()
+			bang = ('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Sort"]')\format(args)
+			SKIN\Bang(bang)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export Sort = (sortingType) ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			COMPONENTS.SETTINGS\setSorting(sortingType)
+			COMPONENTS.LIBRARY\sort(sortingType, STATE.GAMES)
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_GAMES, STATE.GAMES)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+reverseGames = () ->
+	table.reverse(STATE.GAMES)
+	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
+
+-- Filtering menu
+openFilteringMenu = (stack) ->
+	STATE.STACK_NEXT_FILTER = stack
+	configName = ('%s\\Filter')\format(STATE.ROOT_CONFIG)
+	config = RAINMETER\GetConfig(configName)
+	if config ~= nil and config\isActive()
+		return HandshakeFilter()
+	SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
+
+export HandshakeFilter = () ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			stack = tostring(STATE.STACK_NEXT_FILTER)
+			appliedFilters = '[]'
+			if STATE.STACK_NEXT_FILTER
+				appliedFilters = json.encode(COMPONENTS.LIBRARY\getFilterStack())\gsub('"', '|')
+			args = ('%s, \'%s\'')\format(stack, appliedFilters)
+			bang = ('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Filter"]')\format(args)
+			SKIN\Bang(bang)
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
+export Filter = (filterType, stack, arguments) ->
+	return unless STATE.INITIALIZED
+	success, err = pcall(
+		() ->
+			log('Filter', filterType, type(filterType), stack, type(stack), arguments)
+			arguments = arguments\gsub('|', '"')
+			arguments = json.decode(arguments)
+			arguments.games = if stack then STATE.GAMES else nil
+			arguments.stack = stack
+			COMPONENTS.LIBRARY\filter(filterType, arguments)
+			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_GAMES, COMPONENTS.LIBRARY\get())
+	)
+	COMPONENTS.STATUS\show(err, true) unless success
+
 export Initialize = () ->
 	STATE.ROOT_CONFIG = SKIN\GetVariable('ROOTCONFIG')
 	dofile(('%s%s')\format(SKIN\GetVariable('@'), 'lib\\rainmeter_helpers.lua'))
@@ -244,8 +356,13 @@ export Initialize = () ->
 			COMPONENTS.DOWNLOADER = require('shared.downloader')()
 			COMPONENTS.COMMANDER = require('shared.commander')()
 			COMPONENTS.SIGNAL = require('shared.signal')()
+			COMPONENTS.SIGNAL\register(SIGNALS.UPDATE_GAMES, updateGames)
 			COMPONENTS.SIGNAL\register(SIGNALS.UPDATE_SLOTS, updateSlots)
 			COMPONENTS.SIGNAL\register(SIGNALS.GAME_PROCESS_TERMINATED, gameProcessTerminated)
+			COMPONENTS.SIGNAL\register(SIGNALS.OPEN_SEARCH_MENU, openSearchMenu)
+			COMPONENTS.SIGNAL\register(SIGNALS.OPEN_SORTING_MENU, openSortingMenu)
+			COMPONENTS.SIGNAL\register(SIGNALS.OPEN_FILTERING_MENU, openFilteringMenu)
+			COMPONENTS.SIGNAL\register(SIGNALS.REVERSE_GAMES, reverseGames)
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
@@ -337,161 +454,8 @@ export OnMouseLeaveEnabler = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
--- Toolbar
-export OnMouseOverToolbar = () ->
-	return unless STATE.INITIALIZED
-	return unless STATE.SKIN_VISIBLE
-	return if STATE.SKIN_ANIMATION_PLAYING
-	success, err = pcall(
-		() ->
-			COMPONENTS.TOOLBAR\show()
-			COMPONENTS.SLOTS\unfocus()
-			COMPONENTS.SLOTS\leave()
-			COMPONENTS.ANIMATIONS\resetSlots()
-			COMPONENTS.ANIMATIONS\cancelAnimations()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnMouseLeaveToolbar = () ->
-	return unless STATE.INITIALIZED
-	return unless STATE.SKIN_VISIBLE
-	return if STATE.SKIN_ANIMATION_PLAYING
-	success, err = pcall(
-		() ->
-			COMPONENTS.TOOLBAR\hide()
-			COMPONENTS.SLOTS\focus()
-			COMPONENTS.SLOTS\hover()
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Toolbar -> Searching
-export OnToolbarSearch = (stack) ->
-	return unless STATE.INITIALIZED
-	STATE.STACK_NEXT_FILTER = stack
-	log('OnToolbarSearch', stack)
-	SKIN\Bang('[!ActivateConfig "#ROOTCONFIG#\\Search"]')
-
-export HandshakeSearch = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%s)" "#ROOTCONFIG#\\Search"]')\format(tostring(STATE.STACK_NEXT_FILTER)))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export Search = (str, stack) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			log('Searching for:', str)
-			games = if stack then STATE.GAMES else nil
-			COMPONENTS.LIBRARY\filter(ENUMS.FILTER_TYPES.TITLE, {input: str, :games, :stack})
-			STATE.GAMES = COMPONENTS.LIBRARY\get()
-			STATE.SCROLL_INDEX = 1
-			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnToolbarResetGames = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			STATE.GAMES = COMPONENTS.LIBRARY\get()
-			STATE.SCROLL_INDEX = 1
-			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Toolbar -> Sorting
-export OnToolbarSort = (quick) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			log('OnToolbarSort')
-			if quick
-				sortingType = COMPONENTS.SETTINGS\getSorting() + 1
-				sortingType = 1 if sortingType >= ENUMS.SORTING_TYPES.MAX
-				return Sort(sortingType)
-			configName = ('%s\\Sort')\format(STATE.ROOT_CONFIG)
-			config = RAINMETER\GetConfig(configName)
-			if config ~= nil and config\isActive()
-				return SKIN\Bang(('[!DeactivateConfig "%s"]')\format(configName))
-			SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export OnToolbarReverseOrder = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			log('Reversing order of games')
-			table.reverse(STATE.GAMES)
-			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export HandshakeSort = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%d)" "#ROOTCONFIG#\\Sort"]')\format(COMPONENTS.SETTINGS\getSorting()))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export Sort = (sortingType) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			COMPONENTS.SETTINGS\setSorting(sortingType)
-			COMPONENTS.LIBRARY\sort(sortingType, STATE.GAMES)
-			STATE.SCROLL_INDEX = 1
-			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
--- Toolbar -> Filtering
-export OnToolbarFilter = (stack) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			STATE.STACK_NEXT_FILTER = stack
-			configName = ('%s\\Filter')\format(STATE.ROOT_CONFIG)
-			config = RAINMETER\GetConfig(configName)
-			if config ~= nil and config\isActive()
-				return HandshakeFilter()
-			SKIN\Bang(('[!ActivateConfig "%s"]')\format(configName))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export HandshakeFilter = () ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			stack = tostring(STATE.STACK_NEXT_FILTER)
-			appliedFilters = '[]'
-			if STATE.STACK_NEXT_FILTER
-				appliedFilters = json.encode(COMPONENTS.LIBRARY\getFilterStack())\gsub('"', '|')
-			SKIN\Bang(('[!CommandMeasure "Script" "Handshake(%s, \'%s\')" "#ROOTCONFIG#\\Filter"]')\format(stack, appliedFilters))
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
-export Filter = (filterType, stack, arguments) ->
-	return unless STATE.INITIALIZED
-	success, err = pcall(
-		() ->
-			log('Filter', filterType, type(filterType), stack, type(stack), arguments)
-			arguments = arguments\gsub('|', '"')
-			arguments = json.decode(arguments)
-			arguments.games = if stack then STATE.GAMES else nil
-			arguments.stack = stack
-			COMPONENTS.LIBRARY\filter(filterType, arguments)
-			STATE.GAMES = COMPONENTS.LIBRARY\get()
-			STATE.SCROLL_INDEX = 1
-			COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
-	)
-	COMPONENTS.STATUS\show(err, true) unless success
-
 -- Slots
+-- TODO: Move up the next few functions below and pass them to the Slots class constructer as a table of enum:function pairs
 launchGame = (game) ->
 	game\setLastPlayed(os.time())
 	COMPONENTS.LIBRARY\sort(COMPONENTS.SETTINGS\getSorting())
@@ -571,7 +535,7 @@ removeGame = (game) ->
 		OnContextToggleRemoveGames() -- TODO: Emit
 	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 
-export OnLeftClickSlot = (index) ->
+export OnLeftClickSlot = (index) -> -- TODO: Move to the slots source file
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	return if index < 1 or index > STATE.NUM_SLOTS
@@ -601,7 +565,7 @@ export OnLeftClickSlot = (index) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OnMiddleClickSlot = (index) ->
+export OnMiddleClickSlot = (index) -> -- TODO: Move to the slots source file
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	return if index < 1 or index > STATE.NUM_SLOTS
@@ -662,7 +626,7 @@ export UpdateGame = (gameID) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OnHoverSlot = (index) ->
+export OnHoverSlot = (index) -> -- TODO: Move to the slots source file
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	return if index < 1 or index > STATE.NUM_SLOTS
@@ -672,7 +636,7 @@ export OnHoverSlot = (index) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OnLeaveSlot = (index) ->
+export OnLeaveSlot = (index) -> -- TODO: Move to the slots source file
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	return if index < 1 or index > STATE.NUM_SLOTS
@@ -682,7 +646,7 @@ export OnLeaveSlot = (index) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OnScrollSlots = (direction) ->
+export OnScrollSlots = (direction) -> -- TODO: Move to the slots source file
 	return unless STATE.INITIALIZED
 	return if STATE.SKIN_ANIMATION_PLAYING
 	success, err = pcall(
@@ -699,7 +663,7 @@ export OnScrollSlots = (direction) ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 -- Game detection
-export OnFinishedDetectingPlatformGames = () ->
+export OnFinishedDetectingPlatformGames = () -> -- TODO: Move up, register, and add parameters
 	success, err = pcall(
 		() ->
 			log('Finished detecting platform\'s games')
@@ -760,7 +724,7 @@ getPlatformByGame = (game) ->
 	log("Failed to get platform based on the game", platformID)
 	return nil
 
-export ReacquireBanner = (gameID) ->
+export ReacquireBanner = (gameID) -> -- TODO: Move to game\init.moon?
 	success, err = pcall(
 		() ->
 			log('ReacquireBanner', gameID)
@@ -792,7 +756,7 @@ export ReacquireBanner = (gameID) ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export OpenStorePage = (gameID) ->
+export OpenStorePage = (gameID) -> -- TODO: Move to game\init.moon?
 	success, err = pcall(
 		() ->
 			game = getGameByID(gameID)

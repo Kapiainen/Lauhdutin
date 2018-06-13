@@ -32,4 +32,104 @@ do
   _base_0.__class = _class_0
   Toolbar = _class_0
 end
+OnToolbarMouseOver = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  if not (STATE.SKIN_VISIBLE) then
+    return 
+  end
+  if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  local success, err = pcall(function()
+    COMPONENTS.TOOLBAR:show()
+    COMPONENTS.SLOTS:unfocus()
+    COMPONENTS.SLOTS:leave()
+    COMPONENTS.ANIMATIONS:resetSlots()
+    return COMPONENTS.ANIMATIONS:cancelAnimations()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarMouseLeave = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  if not (STATE.SKIN_VISIBLE) then
+    return 
+  end
+  if STATE.SKIN_ANIMATION_PLAYING then
+    return 
+  end
+  local success, err = pcall(function()
+    COMPONENTS.TOOLBAR:hide()
+    COMPONENTS.SLOTS:focus()
+    return COMPONENTS.SLOTS:hover()
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarSearch = function(stack)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('OnToolbarSearch', stack)
+    return COMPONENTS.SIGNAL:emit(SIGNALS.OPEN_SEARCH_MENU, stack)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarResetGames = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('Resetting list of games')
+    return COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_GAMES, COMPONENTS.LIBRARY:get())
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarSort = function(quick)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('OnToolbarSort', quick)
+    return COMPONENTS.SIGNAL:emit(SIGNALS.OPEN_SORTING_MENU, quick)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarReverseOrder = function()
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('Reversing order of games')
+    return COMPONENTS.SIGNAL:emit(SIGNALS.REVERSE_GAMES)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
+OnToolbarFilter = function(stack)
+  if not (STATE.INITIALIZED) then
+    return 
+  end
+  local success, err = pcall(function()
+    log('OnToolbarFilter', stack)
+    return COMPONENTS.SIGNAL:emit(SIGNALS.OPEN_FILTERING_MENU, stack)
+  end)
+  if not (success) then
+    return COMPONENTS.STATUS:show(err, true)
+  end
+end
 return Toolbar
