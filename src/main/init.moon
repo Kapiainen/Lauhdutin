@@ -110,10 +110,6 @@ startDetectingPlatformGames = () ->
 					platform\getACFs()
 				else
 					OnFinishedDetectingPlatformGames()
-		when ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS
-			log('Starting to detect non-Steam game shortcuts added to Steam')
-			games = platform\generateGames()
-			OnFinishedDetectingPlatformGames()
 		when ENUMS.PLATFORM_IDS.BATTLENET
 			log('Starting to detect Blizzard Battle.net games')
 			if platform\hasUnprocessedPaths()

@@ -114,10 +114,6 @@ startDetectingPlatformGames = function()
         return OnFinishedDetectingPlatformGames()
       end
     end
-  elseif ENUMS.PLATFORM_IDS.STEAM_SHORTCUTS == _exp_0 then
-    log('Starting to detect non-Steam game shortcuts added to Steam')
-    local games = platform:generateGames()
-    return OnFinishedDetectingPlatformGames()
   elseif ENUMS.PLATFORM_IDS.BATTLENET == _exp_0 then
     log('Starting to detect Blizzard Battle.net games')
     if platform:hasUnprocessedPaths() then
