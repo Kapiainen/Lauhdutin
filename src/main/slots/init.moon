@@ -185,8 +185,7 @@ export OnSlotLeftClick = (index) ->
 				else
 					assert(nil, 'main.init.OnLeftClickSlot')
 			return unless action
-			animationType = COMPONENTS.SETTINGS\getSlotsClickAnimation()
-			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, animationType, action, game)
+			unless COMPONENTS.ANIMATIONS\pushSlotClick(index, STATE.SLOT_CLICK_ANIMATION, action, game)
 				action(game)
 	)
 	COMPONENTS.STATUS\show(err, true) unless success

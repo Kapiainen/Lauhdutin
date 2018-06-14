@@ -298,8 +298,7 @@ OnSlotLeftClick = function(index)
     if not (action) then
       return 
     end
-    local animationType = COMPONENTS.SETTINGS:getSlotsClickAnimation()
-    if not (COMPONENTS.ANIMATIONS:pushSlotClick(index, animationType, action, game)) then
+    if not (COMPONENTS.ANIMATIONS:pushSlotClick(index, STATE.SLOT_CLICK_ANIMATION, action, game)) then
       return action(game)
     end
   end)
