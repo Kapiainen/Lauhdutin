@@ -22,6 +22,7 @@ STATE = {
   SETTINGS = { },
   SKIN_ANIMATION_PLAYING = false,
   SKIN_VISIBLE = true,
+  SLOT_CLICK_ANIMATION = nil,
   BANNER_QUEUE = nil,
   GAME_BEING_MODIFIED = nil,
   PLATFORM_ENABLED_STATUS = nil,
@@ -462,6 +463,7 @@ Initialize = function()
     COMPONENTS.SIGNAL:register(SIGNALS.REVERSE_GAMES, reverseGames)
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
+    STATE.SLOT_CLICK_ANIMATION = COMPONENTS.SETTINGS:getSlotsClickAnimation()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
     log('Initializing skin')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
