@@ -52,7 +52,7 @@ class AnimationQueue
 
 	updateSlot: (index) =>
 		return false if index < 1
-		return false if COMPONENTS.SETTINGS\getSlotsHoverAnimation() == ENUMS.SLOT_HOVER_ANIMATIONS.NONE
+		return false if STATE.SLOT_HOVER_ANIMATION == ENUMS.SLOT_HOVER_ANIMATIONS.NONE
 		game = COMPONENTS.SLOTS\getGame(index)
 		return false if game == nil
 		banner = game\getBanner()
@@ -63,15 +63,13 @@ class AnimationQueue
 
 	resetSlots: () =>
 		log('Animations.resetSlots')
-		animationType = COMPONENTS.SETTINGS\getSlotsHoverAnimation()
-		return false if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX
+		return false if STATE.SLOT_HOVER_ANIMATION <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or STATE.SLOT_HOVER_ANIMATION >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX
 		SKIN\Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
 		SKIN\Bang('[!UpdateMeter "SlotsBackgroundCutout"][!ShowMeterGroup "Slots"]')
 		return true
 
 	cancelAnimations: () =>
-		animationType = COMPONENTS.SETTINGS\getSlotsHoverAnimation()
-		return false if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX
+		return false if STATE.SLOT_HOVER_ANIMATION <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or STATE.SLOT_HOVER_ANIMATION >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX
 		i = 2
 		while i <= #@queue
 			unless @queue[i]\isMandatory()

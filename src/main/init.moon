@@ -27,6 +27,8 @@ export STATE = {
 	SKIN_ANIMATION_PLAYING: false
 	SKIN_VISIBLE: true
 	SLOT_CLICK_ANIMATION: nil
+	SLOT_HOVER_ANIMATION: nil
+	SKIN_SLIDE_ANIMATION: nil
 	-- Volatile
 	BANNER_QUEUE: nil
 	GAME_BEING_MODIFIED: nil
@@ -193,9 +195,8 @@ onInitialized = () ->
 	STATE.GAMES = COMPONENTS.LIBRARY\get()
 	COMPONENTS.SIGNAL\emit(SIGNALS.UPDATE_SLOTS)
 	STATE.INITIALIZED = true
-	animationType = COMPONENTS.SETTINGS\getSkinSlideAnimation()
-	if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE
-		COMPONENTS.ANIMATIONS\pushSkinSlide(animationType, false)
+	if STATE.SKIN_SLIDE_ANIMATION ~= ENUMS.SKIN_ANIMATIONS.NONE
+		COMPONENTS.ANIMATIONS\pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, false)
 		setUpdateDivider(1)
 	log('Skin initialized')
 
@@ -367,6 +368,8 @@ export Initialize = () ->
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
 			STATE.SLOT_CLICK_ANIMATION = COMPONENTS.SETTINGS\getSlotsClickAnimation()
+			STATE.SLOT_HOVER_ANIMATION = COMPONENTS.SETTINGS\getSlotsHoverAnimation()
+			STATE.SKIN_SLIDE_ANIMATION = COMPONENTS.SETTINGS\getSkinSlideAnimation()
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
 			log('Initializing skin')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -396,7 +399,7 @@ export Update = () ->
 			elseif STATE.REVEALING_DELAY >= 0 and not STATE.SKIN_VISIBLE
 					STATE.REVEALING_DELAY -= 17
 					if STATE.REVEALING_DELAY < 0
-						COMPONENTS.ANIMATIONS\pushSkinSlide(COMPONENTS.SETTINGS\getSkinSlideAnimation(), true)
+						COMPONENTS.ANIMATIONS\pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, true)
 			else
 				COMPONENTS.ANIMATIONS\play()
 				if STATE.SCROLL_INDEX_UPDATED == false
@@ -438,9 +441,8 @@ export OnMouseLeave = () ->
 	success, err = pcall(
 		() ->
 			COMPONENTS.ANIMATIONS\resetSlots()
-			animationType = COMPONENTS.SETTINGS\getSkinSlideAnimation()
-			if STATE.SKIN_VISIBLE and animationType ~= ENUMS.SKIN_ANIMATIONS.NONE and not otherWindowsActive()
-				if COMPONENTS.ANIMATIONS\pushSkinSlide(animationType, false)
+			if STATE.SKIN_VISIBLE and STATE.SKIN_SLIDE_ANIMATION ~= ENUMS.SKIN_ANIMATIONS.NONE and not otherWindowsActive()
+				if COMPONENTS.ANIMATIONS\pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, false)
 					return
 			setUpdateDivider(-1)
 	)

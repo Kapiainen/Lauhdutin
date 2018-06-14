@@ -26,14 +26,13 @@ class Slots
 		@hoveringSlot = index
 		return false unless @focused
 		@overlaySlot\show(index, @slots[index]\getGame())
-		animationType = COMPONENTS.SETTINGS\getSlotsHoverAnimation()
-		if animationType ~= ENUMS.SLOT_HOVER_ANIMATIONS.NONE
+		if STATE.SLOT_HOVER_ANIMATION ~= ENUMS.SLOT_HOVER_ANIMATIONS.NONE
 			COMPONENTS.ANIMATIONS\resetSlots()
 			game = @getGame(index)
 			if game ~= nil
 				banner = game\getBanner()
 				if banner ~= nil
-					COMPONENTS.ANIMATIONS\pushSlotHover(index, animationType, banner)
+					COMPONENTS.ANIMATIONS\pushSlotHover(index, STATE.SLOT_HOVER_ANIMATION, banner)
 					return true
 			COMPONENTS.ANIMATIONS\resetSlots()
 			COMPONENTS.ANIMATIONS\cancelAnimations()

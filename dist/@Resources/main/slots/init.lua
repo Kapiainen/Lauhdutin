@@ -31,14 +31,13 @@ do
         return false
       end
       self.overlaySlot:show(index, self.slots[index]:getGame())
-      local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
-      if animationType ~= ENUMS.SLOT_HOVER_ANIMATIONS.NONE then
+      if STATE.SLOT_HOVER_ANIMATION ~= ENUMS.SLOT_HOVER_ANIMATIONS.NONE then
         COMPONENTS.ANIMATIONS:resetSlots()
         local game = self:getGame(index)
         if game ~= nil then
           local banner = game:getBanner()
           if banner ~= nil then
-            COMPONENTS.ANIMATIONS:pushSlotHover(index, animationType, banner)
+            COMPONENTS.ANIMATIONS:pushSlotHover(index, STATE.SLOT_HOVER_ANIMATION, banner)
             return true
           end
         end

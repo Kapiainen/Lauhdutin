@@ -23,6 +23,8 @@ STATE = {
   SKIN_ANIMATION_PLAYING = false,
   SKIN_VISIBLE = true,
   SLOT_CLICK_ANIMATION = nil,
+  SLOT_HOVER_ANIMATION = nil,
+  SKIN_SLIDE_ANIMATION = nil,
   BANNER_QUEUE = nil,
   GAME_BEING_MODIFIED = nil,
   PLATFORM_ENABLED_STATUS = nil,
@@ -227,9 +229,8 @@ onInitialized = function()
   STATE.GAMES = COMPONENTS.LIBRARY:get()
   COMPONENTS.SIGNAL:emit(SIGNALS.UPDATE_SLOTS)
   STATE.INITIALIZED = true
-  local animationType = COMPONENTS.SETTINGS:getSkinSlideAnimation()
-  if animationType ~= ENUMS.SKIN_ANIMATIONS.NONE then
-    COMPONENTS.ANIMATIONS:pushSkinSlide(animationType, false)
+  if STATE.SKIN_SLIDE_ANIMATION ~= ENUMS.SKIN_ANIMATIONS.NONE then
+    COMPONENTS.ANIMATIONS:pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, false)
     setUpdateDivider(1)
   end
   return log('Skin initialized')
@@ -464,6 +465,8 @@ Initialize = function()
     COMPONENTS.SETTINGS = require('shared.settings')()
     STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
     STATE.SLOT_CLICK_ANIMATION = COMPONENTS.SETTINGS:getSlotsClickAnimation()
+    STATE.SLOT_HOVER_ANIMATION = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
+    STATE.SKIN_SLIDE_ANIMATION = COMPONENTS.SETTINGS:getSkinSlideAnimation()
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
     log('Initializing skin')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -497,7 +500,7 @@ Update = function()
     elseif STATE.REVEALING_DELAY >= 0 and not STATE.SKIN_VISIBLE then
       STATE.REVEALING_DELAY = STATE.REVEALING_DELAY - 17
       if STATE.REVEALING_DELAY < 0 then
-        return COMPONENTS.ANIMATIONS:pushSkinSlide(COMPONENTS.SETTINGS:getSkinSlideAnimation(), true)
+        return COMPONENTS.ANIMATIONS:pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, true)
       end
     else
       COMPONENTS.ANIMATIONS:play()
@@ -566,9 +569,8 @@ OnMouseLeave = function()
   end
   local success, err = pcall(function()
     COMPONENTS.ANIMATIONS:resetSlots()
-    local animationType = COMPONENTS.SETTINGS:getSkinSlideAnimation()
-    if STATE.SKIN_VISIBLE and animationType ~= ENUMS.SKIN_ANIMATIONS.NONE and not otherWindowsActive() then
-      if COMPONENTS.ANIMATIONS:pushSkinSlide(animationType, false) then
+    if STATE.SKIN_VISIBLE and STATE.SKIN_SLIDE_ANIMATION ~= ENUMS.SKIN_ANIMATIONS.NONE and not otherWindowsActive() then
+      if COMPONENTS.ANIMATIONS:pushSkinSlide(STATE.SKIN_SLIDE_ANIMATION, false) then
         return 
       end
     end

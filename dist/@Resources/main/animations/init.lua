@@ -82,7 +82,7 @@ do
       if index < 1 then
         return false
       end
-      if COMPONENTS.SETTINGS:getSlotsHoverAnimation() == ENUMS.SLOT_HOVER_ANIMATIONS.NONE then
+      if STATE.SLOT_HOVER_ANIMATION == ENUMS.SLOT_HOVER_ANIMATIONS.NONE then
         return false
       end
       local game = COMPONENTS.SLOTS:getGame(index)
@@ -99,8 +99,7 @@ do
     end,
     resetSlots = function(self)
       log('Animations.resetSlots')
-      local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
-      if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
+      if STATE.SLOT_HOVER_ANIMATION <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or STATE.SLOT_HOVER_ANIMATION >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
         return false
       end
       SKIN:Bang('[!SetOption "SlotsBackgroundCutout" "Shape2" "Rectangle 0,0,0,0 | StrokeWidth 0"]')
@@ -108,8 +107,7 @@ do
       return true
     end,
     cancelAnimations = function(self)
-      local animationType = COMPONENTS.SETTINGS:getSlotsHoverAnimation()
-      if animationType <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or animationType >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
+      if STATE.SLOT_HOVER_ANIMATION <= ENUMS.SLOT_HOVER_ANIMATIONS.NONE or STATE.SLOT_HOVER_ANIMATION >= ENUMS.SLOT_HOVER_ANIMATIONS.MAX then
         return false
       end
       local i = 2
