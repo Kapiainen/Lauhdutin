@@ -182,7 +182,7 @@ table.replace = function(tbl, old, new)
   return false
 end
 table.extend = function(tbl1, tbl2)
-  assert(type(tbl1) == 'table' and type(tbl2) == 'table', '"table.slice" expected a tables as its two arguments.')
+  assert(type(tbl1) == 'table' and type(tbl2) == 'table', '"table.extend" expected a tables as its two arguments.')
   local len = #tbl1
   for i, value in ipairs(tbl2) do
     tbl1[len + i] = value
