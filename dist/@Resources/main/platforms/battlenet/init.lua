@@ -50,7 +50,8 @@ do
             args = {
               title = 'Destiny 2',
               path = 'battlenet://DST2',
-              process = 'destiny2.exe'
+              process = 'destiny2.exe',
+              bannerURL = 'https://images.launchbox-app.com/34b4f780-34a2-42f0-a4ea-fa78933dd5e8.jpg'
             }
           elseif 'diablo iii' == _exp_0 then
             args = {
@@ -62,13 +63,15 @@ do
                 else
                   return 'Diablo III.exe'
                 end
-              end)()
+              end)(),
+              bannerURL = 'https://images.launchbox-app.com/9c1d2d30-8845-4b8a-89e6-632abab530c5.png'
             }
           elseif 'hearthstone' == _exp_0 then
             args = {
               title = 'Hearthstone',
               path = 'battlenet://WTCG',
-              process = 'Hearthstone.exe'
+              process = 'Hearthstone.exe',
+              bannerURL = 'https://images.launchbox-app.com/5aa3fd48-4edd-4d8a-a302-9eed46f3e471.png'
             }
           elseif 'heroes of the storm' == _exp_0 then
             args = {
@@ -80,13 +83,15 @@ do
                 else
                   return 'HeroesOfTheStorm.exe'
                 end
-              end)()
+              end)(),
+              bannerURL = 'https://images.launchbox-app.com/cb0aba61-915e-40e3-b2e1-187158819711.jpg'
             }
           elseif 'overwatch' == _exp_0 then
             args = {
               title = 'Overwatch',
               path = 'battlenet://Pro',
-              process = 'Overwatch.exe'
+              process = 'Overwatch.exe',
+              bannerURL = 'https://images.launchbox-app.com/09b1d6e3-316d-44d8-beca-90b87eb18c35.jpg'
             }
           elseif 'starcraft' == _exp_0 then
             args = {
@@ -116,7 +121,8 @@ do
                 else
                   return 'Wow.exe'
                 end
-              end)()
+              end)(),
+              bannerURL = 'https://images.launchbox-app.com/09a032b5-b86e-435a-b75a-264fcaa8a05d.png'
             }
           else
             _continue_0 = true

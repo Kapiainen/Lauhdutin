@@ -50,35 +50,35 @@ class Battlenet extends Platform
 						title: 'Destiny 2'
 						path: 'battlenet://DST2'
 						process: 'destiny2.exe' -- No 32-bit executable
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/34b4f780-34a2-42f0-a4ea-fa78933dd5e8.jpg'
 					}
 				when 'diablo iii'
 					args = {
 						title: 'Diablo III'
 						path: 'battlenet://D3'
 						process: if bits == 64 then 'Diablo III64.exe' else 'Diablo III.exe'
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/9c1d2d30-8845-4b8a-89e6-632abab530c5.png'
 					}
 				when 'hearthstone'
 					args = {
 						title: 'Hearthstone'
 						path: 'battlenet://WTCG'
 						process: 'Hearthstone.exe' -- No 64-bit executable
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/5aa3fd48-4edd-4d8a-a302-9eed46f3e471.png'
 					}
 				when 'heroes of the storm'
 					args = {
 						title: 'Heroes of the Storm'
 						path: 'battlenet://Hero'
 						process: if bits == 64 then 'HeroesOfTheStorm_x64.exe' else 'HeroesOfTheStorm.exe'
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/cb0aba61-915e-40e3-b2e1-187158819711.jpg'
 					}
 				when 'overwatch'
 					args = {
 						title: 'Overwatch'
 						path: 'battlenet://Pro'
 						process: 'Overwatch.exe' -- No 32-bit executable
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/09b1d6e3-316d-44d8-beca-90b87eb18c35.jpg'
 					}
 				when 'starcraft'
 					args = {
@@ -99,7 +99,7 @@ class Battlenet extends Platform
 						title: 'World of Warcraft'
 						path: 'battlenet://WoW'
 						process: if bits == 64 then 'Wow-64.exe' else 'Wow.exe'
-						--bannerURL: ''
+						bannerURL: 'https://images.launchbox-app.com/09a032b5-b86e-435a-b75a-264fcaa8a05d.png'
 					}
 				else
 					continue
