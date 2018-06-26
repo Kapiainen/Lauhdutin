@@ -1,3 +1,6 @@
+**Version 3.0.4 - 2018/06/26:**
+- Updated to support the new version of the Blizzard Battle.net launcher.
+
 **Version 3.0.3 - 2018/05/30:**
 - Updated GOG Galaxy support to include arguments in the paths of games.
 
