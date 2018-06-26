@@ -84,6 +84,7 @@ setting_bangs_enabled_title	Ejecutar bangs
 setting_bangs_starting_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego.
 setting_bangs_stopping_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego.
 setting_battlenet_add_path	Añadir ruta...
+setting_battlenet_client_path_description	La carpeta que contiene el ejecutable del cliente de Blizzard Battle.net.
 setting_battlenet_enabled_description	Si está activada, serán añadidos los juegos instalados con el cliente de Blizzard Battle.net.
 setting_battlenet_paths_description	""Definir la ruta de la carpeta que contiene los juegos de Blizzard Battle.net en sus respectivas subcarpetas:\nSi p. ej. Hearthstone está instalado en "D:\\Juegos\\Blizzard\\Hearthstone", la ruta que habría que poner sería "D:\\Juegos\\Blizzard".\nPara eliminar una ruta, editarla e introducir una cadena vacía.""
 setting_battlenet_paths_title	Rutas
