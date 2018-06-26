@@ -205,6 +205,9 @@ if RUN_TESTS then
     end,
     getBattlenetEnabled = function(self)
       return true
+    end,
+    getBattlenetClientPath = function(self)
+      return 'C:\\Program Files\\Battle.net'
     end
   }
   local battlenet = Battlenet(settings)
@@ -219,47 +222,47 @@ if RUN_TESTS then
   local expectedGames = {
     {
       title = 'Diablo III',
-      path = 'battlenet://D3',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch D3"',
       process = 'Diablo III64.exe'
     },
     {
       title = 'StarCraft',
-      path = 'battlenet://S1',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"',
       process = 'StarCraft.exe'
     },
     {
       title = 'Overwatch',
-      path = 'battlenet://Pro',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Pro"',
       process = 'Overwatch.exe'
     },
     {
       title = 'Hearthstone',
-      path = 'battlenet://WTCG',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WTCG"',
       process = 'Hearthstone.exe'
     },
     {
       title = 'Heroes of the Storm',
-      path = 'battlenet://Hero',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Hero"',
       process = 'HeroesOfTheStorm.exe'
     },
     {
       title = 'StarCraft II',
-      path = 'battlenet://S2',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S2"',
       process = 'SC2.exe'
     },
     {
       title = 'StarCraft',
-      path = 'battlenet://S1',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"',
       process = 'StarCraft.exe'
     },
     {
       title = 'World of Warcraft',
-      path = 'battlenet://WoW',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WoW"',
       process = 'Wow.exe'
     },
     {
       title = 'Destiny 2',
-      path = 'battlenet://DST2',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch DST2"',
       process = 'destiny2.exe'
     }
   }
