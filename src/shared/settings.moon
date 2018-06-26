@@ -201,6 +201,7 @@ class Settings
 						stopping: {} -- Bangs that are executed by all Blizzard Battle.net games when a game terminates.
 					}
 					paths: {} -- The absolute paths to folders, which in turn contain games in their own subfolders (e.g. "D:\Blizzard games" if Hearthstone is installed in "D:\Blizzard games\Hearthstone").
+					clientPath: '' -- The absolute path to the folder that contains 'Battle.net.exe'.
 				}
 				gogGalaxy: { -- GOG games installed via the GOG Galaxy client.
 					enabled: false
@@ -525,6 +526,13 @@ class Settings
 			bang = bang\trim()
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.platforms.battlenet.bangs.stopping = bangs
+
+	getBattlenetClientPath: () => return @settings.platforms.battlenet.clientPath or ''
+	
+	setBattlenetClientPath: (path) =>
+		return false unless io.fileExists(io.joinPaths(path, 'Battle.net.exe'), false)
+		@settings.platforms.battlenet.clientPath = path
+		return true
 
 	-- GOG Galaxy
 	getGOGGalaxyEnabled: () => return @settings.platforms.gogGalaxy.enabled or false

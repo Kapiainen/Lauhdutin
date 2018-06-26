@@ -594,6 +594,16 @@ do
       end
       self.settings.platforms.battlenet.bangs.stopping = bangs
     end,
+    getBattlenetClientPath = function(self)
+      return self.settings.platforms.battlenet.clientPath or ''
+    end,
+    setBattlenetClientPath = function(self, path)
+      if not (io.fileExists(io.joinPaths(path, 'Battle.net.exe'), false)) then
+        return false
+      end
+      self.settings.platforms.battlenet.clientPath = path
+      return true
+    end,
     getGOGGalaxyEnabled = function(self)
       return self.settings.platforms.gogGalaxy.enabled or false
     end,
@@ -717,7 +727,8 @@ do
               starting = { },
               stopping = { }
             },
-            paths = { }
+            paths = { },
+            clientPath = ''
           },
           gogGalaxy = {
             enabled = false,

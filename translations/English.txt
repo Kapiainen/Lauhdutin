@@ -84,6 +84,7 @@ setting_bangs_enabled_title	Execute bangs
 setting_bangs_starting_description	These Rainmeter bangs are executed just before any game launches.
 setting_bangs_stopping_description	These Rainmeter bangs are executed just after any game terminates.
 setting_battlenet_add_path	Add path...
+setting_battlenet_client_path_description	The folder that contains the Blizzard Battle.net client executable.
 setting_battlenet_enabled_description	If enabled, then games installed via the Blizzard Battle.net client will be included.
 setting_battlenet_paths_description	""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""
 setting_battlenet_paths_title	Paths
