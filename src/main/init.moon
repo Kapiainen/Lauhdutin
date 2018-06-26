@@ -43,8 +43,6 @@ export COMPONENTS = {
 	LIBRARY: nil
 }
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 downloadFile = (url, path, finishCallback, errorCallback) ->
@@ -218,9 +216,9 @@ export Initialize = () ->
 			utility.createJSONHelpers()
 			json = require('lib.json')
 			COMPONENTS.SETTINGS = require('shared.settings')()
-			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Main config')
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
-			log('Initializing skin')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			COMPONENTS.STATUS\show(LOCALIZATION\get('status_initializing', 'Initializing'))
 			SKIN\Bang(('[!SetVariable "ContextTitleSettings" "%s"]')\format(LOCALIZATION\get('main_context_title_settings', 'Settings')))

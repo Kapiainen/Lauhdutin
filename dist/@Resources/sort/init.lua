@@ -100,11 +100,6 @@ do
   _base_0.__class = _class_0
   Slot = _class_0
 end
-log = function(...)
-  if STATE.LOGGING == true then
-    return print(...)
-  end
-end
 HideStatus = function()
   return COMPONENTS.STATUS:hide()
 end
@@ -114,12 +109,18 @@ Initialize = function()
   dofile(('%s%s'):format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
-    log('Initializing Sort config')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
     COMPONENTS.SETTINGS = require('shared.settings')()
-    STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
+    if COMPONENTS.SETTINGS:getLogging() == true then
+      log = function(...)
+        return print(...)
+      end
+    else
+      log = function() end
+    end
+    log('Initializing Sort config')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     STATE.SCROLL_INDEX = 1
     do

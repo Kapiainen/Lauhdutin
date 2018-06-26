@@ -62,8 +62,6 @@ class Slot
 		SKIN\Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#"]')\format(@property.enum))
 		return false
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export Initialize = () ->
@@ -73,12 +71,12 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
-			log('Initializing Sort config')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
-			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Sort config')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			STATE.SCROLL_INDEX = 1
 			COMPONENTS.SLOTS = [Slot(i) for i = 1, STATE.NUM_SLOTS]

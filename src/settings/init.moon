@@ -26,8 +26,6 @@ export COMPONENTS = {
 	PAGES: nil
 }
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export RebuildSettingsSlots = () -> -- For development only
@@ -79,6 +77,7 @@ export Initialize = () ->
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
 			COMPONENTS.OLD_SETTINGS = require('shared.settings')()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			COMPONENTS.STATUS\show(LOCALIZATION\get('status_initializing', 'Initializing'))

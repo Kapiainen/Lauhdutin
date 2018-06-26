@@ -36,11 +36,6 @@ COMPONENTS = {
   SETTINGS = nil,
   LIBRARY = nil
 }
-log = function(...)
-  if STATE.LOGGING == true then
-    return print(...)
-  end
-end
 HideStatus = function()
   return COMPONENTS.STATUS:hide()
 end
@@ -266,9 +261,15 @@ Initialize = function()
     utility.createJSONHelpers()
     json = require('lib.json')
     COMPONENTS.SETTINGS = require('shared.settings')()
-    STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
+    if COMPONENTS.SETTINGS:getLogging() == true then
+      log = function(...)
+        return print(...)
+      end
+    else
+      log = function() end
+    end
+    log('Initializing Main config')
     STATE.SCROLL_STEP = COMPONENTS.SETTINGS:getScrollStep()
-    log('Initializing skin')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     COMPONENTS.STATUS:show(LOCALIZATION:get('status_initializing', 'Initializing'))
     SKIN:Bang(('[!SetVariable "ContextTitleSettings" "%s"]'):format(LOCALIZATION:get('main_context_title_settings', 'Settings')))

@@ -74,8 +74,6 @@ class Slot
 
 Game = nil
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 additionalEnums = () ->
@@ -106,13 +104,13 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
-			log('Initializing Game config')
 			require('shared.enums')
 			additionalEnums()
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
-			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Game config')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			Game = require('main.game')
 			STATE.ALL_PLATFORMS = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]

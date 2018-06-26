@@ -17,8 +17,6 @@ COMPONENTS = {
 	STATUS: nil
 }
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 -- TODO: Have a look at the possibility of being able to use Lua patterns (square brackets seem to cause issues, but dot works just fine)
@@ -33,6 +31,8 @@ export Initialize = () ->
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Search config')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			SKIN\Bang(('[!SetOption "WindowTitle" "Text" "%s"]')\format(LOCALIZATION\get('search_window_all_title', 'Search')))
 			COMPONENTS.STATUS\hide()

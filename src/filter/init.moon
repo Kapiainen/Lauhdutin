@@ -84,8 +84,6 @@ class Slot
 
 Game = nil
 
-export log = (...) -> print(...) if STATE.LOGGING == true
-
 export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export Initialize = () ->
@@ -95,13 +93,13 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
-			log('Initializing Filter config')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			json = require('lib.json')
 			COMPONENTS.SETTINGS = require('shared.settings')()
-			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Filter config')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			STATE.NUM_GAMES_PATTERN = LOCALIZATION\get('game_number_of_games', '%d games')
 			STATE.BACK_BUTTON_TITLE = LOCALIZATION\get('filter_back_button_title', 'Back')
