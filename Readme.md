@@ -122,7 +122,7 @@ Open the folder where Windows shortcuts and their banners should be placed.
 
 ### Execute stopping bangs
 
-Stop monitoring the game and execute bangs, if they are enabled and any bangs are defined. This can be used if the skin fails to detect that a game is no longer running or if the game was never started.
+Stop monitoring the game and execute bangs, if they are enabled and any bangs are defined. This can be used if the skin fails to detect that a game is no longer running or if the game was never started. If the Session skin is enabled, then that can also be double-clicked to execute stopping bangs.
 
 ### Start/stop hiding/unhiding/removing games
 
