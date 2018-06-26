@@ -27,6 +27,17 @@ do
             return COMPONENTS.SETTINGS:getBattlenetEnabled()
           end
         }),
+        Settings.FolderPath({
+          title = LOCALIZATION:get('button_label_client_path', 'Client path'),
+          tooltip = LOCALIZATION:get('setting_battlenet_client_path_description', 'The folder that contains the Blizzard Battle.net client executable.'),
+          getValue = function(self)
+            return COMPONENTS.SETTINGS:getBattlenetClientPath()
+          end,
+          setValue = function(self, path)
+            return COMPONENTS.SETTINGS:setBattlenetClientPath(path)
+          end,
+          dialogTitle = "Select the folder containing Battle.net.exe"
+        }),
         Settings.FolderPathSpinner({
           title = LOCALIZATION:get('setting_battlenet_paths_title', 'Paths'),
           tooltip = LOCALIZATION:get('setting_battlenet_paths_description', '""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""'),

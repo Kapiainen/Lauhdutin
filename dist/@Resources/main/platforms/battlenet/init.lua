@@ -5,7 +5,9 @@ do
   local _class_0
   local _parent_0 = Platform
   local _base_0 = {
-    validate = function(self) end,
+    validate = function(self)
+      return assert(io.fileExists(self.clientPath, false), 'The path to the Blizzard Battle.net client is undefined or invalid.')
+    end,
     hasUnprocessedPaths = function(self)
       return #self.battlenetPaths > 0
     end,
@@ -49,13 +51,13 @@ do
           if 'destiny 2' == _exp_0 then
             args = {
               title = 'Destiny 2',
-              path = 'battlenet://DST2',
+              path = 'DST2',
               process = 'destiny2.exe'
             }
           elseif 'diablo iii' == _exp_0 then
             args = {
               title = 'Diablo III',
-              path = 'battlenet://D3',
+              path = 'D3',
               process = (function()
                 if bits == 64 then
                   return 'Diablo III64.exe'
@@ -67,13 +69,13 @@ do
           elseif 'hearthstone' == _exp_0 then
             args = {
               title = 'Hearthstone',
-              path = 'battlenet://WTCG',
+              path = 'WTCG',
               process = 'Hearthstone.exe'
             }
           elseif 'heroes of the storm' == _exp_0 then
             args = {
               title = 'Heroes of the Storm',
-              path = 'battlenet://Hero',
+              path = 'Hero',
               process = (function()
                 if bits == 64 then
                   return 'HeroesOfTheStorm_x64.exe'
@@ -85,19 +87,19 @@ do
           elseif 'overwatch' == _exp_0 then
             args = {
               title = 'Overwatch',
-              path = 'battlenet://Pro',
+              path = 'Pro',
               process = 'Overwatch.exe'
             }
           elseif 'starcraft' == _exp_0 then
             args = {
               title = 'StarCraft',
-              path = 'battlenet://S1',
+              path = 'S1',
               process = 'StarCraft.exe'
             }
           elseif 'starcraft ii' == _exp_0 then
             args = {
               title = 'StarCraft II',
-              path = 'battlenet://S2',
+              path = 'S2',
               process = (function()
                 if bits == 64 then
                   return 'SC2_x64.exe'
@@ -109,7 +111,7 @@ do
           elseif 'world of warcraft' == _exp_0 then
             args = {
               title = 'World of Warcraft',
-              path = 'battlenet://WoW',
+              path = 'WoW',
               process = (function()
                 if bits == 64 then
                   return 'Wow-64.exe'
@@ -131,6 +133,7 @@ do
             _continue_0 = true
             break
           end
+          args.path = ('"%s" --exec="launch %s"'):format(self.clientPath, args.path)
           args.banner = self:getBanner(args.title, args.bannerURL)
           if not (args.banner) then
             args.expectedBanner = args.title
@@ -169,6 +172,7 @@ do
         end
         return _accum_0
       end)() or { }
+      self.clientPath = io.joinPaths(settings:getBattlenetClientPath(), 'Battle.net.exe')
       self.enabled = settings:getBattlenetEnabled()
       self.games = { }
     end,
@@ -210,6 +214,9 @@ if RUN_TESTS then
     end,
     getBattlenetEnabled = function(self)
       return true
+    end,
+    getBattlenetClientPath = function(self)
+      return 'C:\\Program Files\\Battle.net'
     end
   }
   local battlenet = Battlenet(settings)
@@ -224,47 +231,47 @@ if RUN_TESTS then
   local expectedGames = {
     {
       title = 'Diablo III',
-      path = 'battlenet://D3',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch D3"',
       process = 'Diablo III64.exe'
     },
     {
       title = 'StarCraft',
-      path = 'battlenet://S1',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"',
       process = 'StarCraft.exe'
     },
     {
       title = 'Overwatch',
-      path = 'battlenet://Pro',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Pro"',
       process = 'Overwatch.exe'
     },
     {
       title = 'Hearthstone',
-      path = 'battlenet://WTCG',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WTCG"',
       process = 'Hearthstone.exe'
     },
     {
       title = 'Heroes of the Storm',
-      path = 'battlenet://Hero',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Hero"',
       process = 'HeroesOfTheStorm.exe'
     },
     {
       title = 'StarCraft II',
-      path = 'battlenet://S2',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S2"',
       process = 'SC2.exe'
     },
     {
       title = 'StarCraft',
-      path = 'battlenet://S1',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"',
       process = 'StarCraft.exe'
     },
     {
       title = 'World of Warcraft',
-      path = 'battlenet://WoW',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WoW"',
       process = 'Wow.exe'
     },
     {
       title = 'Destiny 2',
-      path = 'battlenet://DST2',
+      path = '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch DST2"',
       process = 'destiny2.exe'
     }
   }

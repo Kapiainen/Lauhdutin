@@ -13,16 +13,28 @@ class Battlenet extends Page
 		@settings = {
 			Settings.Boolean({
 				title: LOCALIZATION\get('button_label_enabled', 'Enabled')
-				tooltip: LOCALIZATION\get('setting_battlenet_enabled_description', 'If enabled, then games installed via the Blizzard Battle.net client will be included.')
+				tooltip: LOCALIZATION\get('setting_battlenet_enabled_description',
+					'If enabled, then games installed via the Blizzard Battle.net client will be included.')
 				toggle: () ->
 					COMPONENTS.SETTINGS\toggleBattlenetEnabled()
 					return true
 				getState: () ->
 					return COMPONENTS.SETTINGS\getBattlenetEnabled()
 			})
+			Settings.FolderPath({
+				title: LOCALIZATION\get('button_label_client_path', 'Client path')
+				tooltip: LOCALIZATION\get('setting_battlenet_client_path_description',
+					'The folder that contains the Blizzard Battle.net client executable.')
+				getValue: () =>
+					return COMPONENTS.SETTINGS\getBattlenetClientPath()
+				setValue: (path) =>
+					return COMPONENTS.SETTINGS\setBattlenetClientPath(path)
+				dialogTitle: "Select the folder containing Battle.net.exe"
+			})
 			Settings.FolderPathSpinner({
 				title: LOCALIZATION\get('setting_battlenet_paths_title', 'Paths')
-				tooltip: LOCALIZATION\get('setting_battlenet_paths_description', '""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""')
+				tooltip: LOCALIZATION\get('setting_battlenet_paths_description',
+					'""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""')
 				index: 1
 				getValues: () =>
 					values = [path for path in *state.paths]
@@ -37,23 +49,27 @@ class Battlenet extends Page
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_starting_bangs', 'Starting bangs')
-				tooltip: LOCALIZATION\get('setting_battlenet_starting_bangs_description', 'These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.')
+				tooltip: LOCALIZATION\get('setting_battlenet_starting_bangs_description',
+					'These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getBattlenetStartingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedBattlenetStartingBangs')
+					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '',
+						'OnEditedBattlenetStartingBangs')
 			})
 			Settings.Action({
 				title: LOCALIZATION\get('button_label_stopping_bangs', 'Stopping bangs')
-				tooltip: LOCALIZATION\get('setting_battlenet_stopping_bangs_description', 'These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.')
+				tooltip: LOCALIZATION\get('setting_battlenet_stopping_bangs_description',
+					'These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.')
 				label: LOCALIZATION\get('button_label_edit', 'Edit')
 				perform:() =>
 					path = 'cache\\bangs.txt'
 					bangs = COMPONENTS.SETTINGS\getBattlenetStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
-					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedBattlenetStoppingBangs')
+					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '',
+						'OnEditedBattlenetStoppingBangs')
 			})
 		}
 
