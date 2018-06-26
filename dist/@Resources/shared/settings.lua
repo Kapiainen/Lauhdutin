@@ -720,7 +720,6 @@ do
       return self.settings.platforms.gogGalaxy.profileName or nil
     end,
     setGOGGalaxyProfileName = function(self, value)
-      print(value)
       if value == nil then
         return false
       end

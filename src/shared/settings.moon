@@ -633,7 +633,6 @@ class Settings
 	getGOGGalaxyProfileName: () => return @settings.platforms.gogGalaxy.profileName or nil
 
 	setGOGGalaxyProfileName: (value) =>
-		print(value)
 		return false if value == nil
 		value = value\trim()
 		if value == ''
