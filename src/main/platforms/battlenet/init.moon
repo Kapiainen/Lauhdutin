@@ -12,10 +12,13 @@ class Battlenet extends Platform
 		@name = 'Blizzard Battle.net'
 		@cachePath = 'cache\\battlenet\\'
 		@battlenetPaths = [path for path in *settings\getBattlenetPaths()] or {}
+		@clientPath = io.joinPaths(settings\getBattlenetClientPath(), 'Battle.net.exe')
 		@enabled = settings\getBattlenetEnabled()
 		@games = {}
 
-	validate: () => return
+	validate: () =>
+		assert(io.fileExists(@clientPath, false),
+			'The path to the Blizzard Battle.net client is undefined or invalid.')
 
 	hasUnprocessedPaths: () => return #@battlenetPaths > 0
 	
@@ -41,49 +44,49 @@ class Battlenet extends Platform
 				when 'destiny 2'
 					args = {
 						title: 'Destiny 2'
-						path: 'battlenet://DST2'
+						path: 'DST2'
 						process: 'destiny2.exe' -- No 32-bit executable
 					}
 				when 'diablo iii'
 					args = {
 						title: 'Diablo III'
-						path: 'battlenet://D3'
+						path: 'D3'
 						process: if bits == 64 then 'Diablo III64.exe' else 'Diablo III.exe'
 					}
 				when 'hearthstone'
 					args = {
 						title: 'Hearthstone'
-						path: 'battlenet://WTCG'
+						path: 'WTCG'
 						process: 'Hearthstone.exe' -- No 64-bit executable
 					}
 				when 'heroes of the storm'
 					args = {
 						title: 'Heroes of the Storm'
-						path: 'battlenet://Hero'
+						path: 'Hero'
 						process: if bits == 64 then 'HeroesOfTheStorm_x64.exe' else 'HeroesOfTheStorm.exe'
 					}
 				when 'overwatch'
 					args = {
 						title: 'Overwatch'
-						path: 'battlenet://Pro'
+						path: 'Pro'
 						process: 'Overwatch.exe' -- No 32-bit executable
 					}
 				when 'starcraft'
 					args = {
 						title: 'StarCraft'
-						path: 'battlenet://S1'
+						path: 'S1'
 						process: 'StarCraft.exe' -- No 64-bit executable
 					}
 				when 'starcraft ii'
 					args = {
 						title: 'StarCraft II'
-						path: 'battlenet://S2'
+						path: 'S2'
 						process: if bits == 64 then 'SC2_x64.exe' else 'SC2.exe'
 					}
 				when 'world of warcraft'
 					args = {
 						title: 'World of Warcraft'
-						path: 'battlenet://WoW'
+						path: 'WoW'
 						process: if bits == 64 then 'Wow-64.exe' else 'Wow.exe'
 					}
 				else
@@ -94,6 +97,7 @@ class Battlenet extends Platform
 			elseif args.path == nil
 				log('Skipping Blizzard Battle.net game because the path is missing')
 				continue
+			args.path = ('"%s" --exec="launch %s"')\format(@clientPath, args.path)
 			args.banner = @getBannerPath(args.title)
 			unless args.banner
 				args.expectedBanner = args.title
@@ -110,6 +114,7 @@ if RUN_TESTS
 			'Z:\\Games\\Battle.net'
 		}
 		getBattlenetEnabled: () => return true
+		getBattlenetClientPath: () => return 'C:\\Program Files\\Battle.net'
 	}
 	battlenet = Battlenet(settings)
 
@@ -139,48 +144,48 @@ Destiny 2
 		-- First library (64-bits)
 		{
 			title: 'Diablo III'
-			path: 'battlenet://D3'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch D3"'
 			process: 'Diablo III64.exe'
 		}
 		{
 			title: 'StarCraft'
-			path: 'battlenet://S1'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"'
 			process: 'StarCraft.exe'
 		}
 		{
 			title: 'Overwatch'
-			path: 'battlenet://Pro'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Pro"'
 			process: 'Overwatch.exe'
 		}
 		{
 			title: 'Hearthstone'
-			path: 'battlenet://WTCG'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WTCG"'
 			process: 'Hearthstone.exe'
 		}
 		-- Second library (32-bits)
 		{
 			title: 'Heroes of the Storm'
-			path: 'battlenet://Hero'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch Hero"'
 			process: 'HeroesOfTheStorm.exe'
 		}
 		{
 			title: 'StarCraft II'
-			path: 'battlenet://S2'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S2"'
 			process: 'SC2.exe'
 		}
 		{
 			title: 'StarCraft'
-			path: 'battlenet://S1'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch S1"'
 			process: 'StarCraft.exe'
 		}
 		{
 			title: 'World of Warcraft'
-			path: 'battlenet://WoW'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch WoW"'
 			process: 'Wow.exe'
 		}
 		{
 			title: 'Destiny 2'
-			path: 'battlenet://DST2'
+			path: '"C:\\Program Files\\Battle.net\\Battle.net.exe" --exec="launch DST2"'
 			process: 'destiny2.exe'
 		}
 	}
