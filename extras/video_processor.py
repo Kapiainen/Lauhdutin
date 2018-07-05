@@ -12,6 +12,10 @@ The structure of the config file, which should be in the working directory of th
 	"output": The absolute path to the @Resources folder of the skin.
 	"player_process": The name of your media player's process.
 	"subfolders_as_categories": Whether or not the first level of subfolders should be treated as categories.
+	"banner_width": The width of the banner in pixels.
+	"banner_height": The height of the banner in pixels.
+	"mosaic_tiles_wide": The number of frames widthwise in the mosaic thumbnail.
+	"mosaic_tiles_high": The number of frames heightwise in the mosaic thumbnail.
 	"tags": {
 		"<tag to assign to a video>": [
 			"<substring to look for in the name of a video>"
@@ -26,6 +30,7 @@ import os
 import subprocess
 import sys
 import ctypes
+import time
 
 CATEGORY_TITLE_SEPARATOR = " - "
 
@@ -48,6 +53,10 @@ def create_global_variables():
 	assert os.path.isdir(res["thumbnails_output"]), "Path to the thumbnails folder is not valid!"
 	res["player_process"] = res.get("player_process", None)
 	res["subfolders_as_categories"]  = res.get("subfolders_as_categories", False)
+	assert res.get("banner_width", 0) > 0, "Banner width is invalid."
+	assert res.get("banner_height", 0) > 0, "Banner height is invalid."
+	assert res.get("mosaic_tiles_wide", 2) > 0, "The number of tiles widthwise in the mosaic thumbnail is invalid."
+	assert res.get("mosaic_tiles_high", 2) > 0, "The number of tiles heightwise in the mosaic thumbnail is invalid."
 	res["tags"] = res.get("tags", {})
 	return res
 
@@ -239,10 +248,10 @@ def save_database(db):
 	with open(CONFIG["database_output"], "w") as file:
 		json.dump({"version": 1, "games": db}, file)
 
-# Option 4 - Resize existing thumbnails.
+# Option 5 - Resize existing thumbnails.
 def resize_thumbnail(path):
-	width = 460
-	height = 215
+	width = CONFIG["banner_width"]
+	height = CONFIG["banner_height"]
 	resize_pattern = "%d^^x%d" % (width, height) # W^^xH or WxH^^
 	convert = subprocess.Popen([CONFIG["convert"], path, "-resize", resize_pattern, "-gravity", "center", "-extent", "%dx%d" % (width, height), "-quality", "90", path])
 	convert.wait()
@@ -251,9 +260,20 @@ def resize_thumbnail(path):
 def generate_thumbnail(args):
 	video_path = args["path"]
 	timestamp = args["timestamp"]
-	title = args["title"]
-	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % title)
+	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["title"])
 	ffmpeg = subprocess.Popen([CONFIG["ffmpeg"], "-i", video_path, "-ss", "00:%s.000" % timestamp, "-vframes", "1", thumbnail])
+	ffmpeg.wait()
+	resize_thumbnail(thumbnail)
+
+# Option 4
+def generate_mosaic_thumbnail(args):
+	video_path = args["path"]
+	duration = get_duration(video_path)
+	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["title"])
+	tiles_wide = CONFIG["mosaic_tiles_wide"]
+	tiles_high = CONFIG["mosaic_tiles_high"]
+	num_frames = float(tiles_wide * tiles_high)
+	ffmpeg = subprocess.Popen([CONFIG["ffmpeg"], "-i", video_path, "-frames", "1", "-vf", "select=if(isnan(prev_selected_t)\\,gte(t\\,10)\\,gte(t-prev_selected_t\\,%d)),tile=%dx%d" % (int(duration / num_frames), tiles_wide, tiles_high), thumbnail])
 	ffmpeg.wait()
 	resize_thumbnail(thumbnail)
 
@@ -267,6 +287,7 @@ if __name__ == "__main__":
 			"Mux to MKV",
 			"Update database",
 			"Generate thumbnail",
+			"Generate mosaic thumbnail",
 			"Resize thumbnails",
 			"Exit"
 		]
@@ -323,16 +344,52 @@ if __name__ == "__main__":
 					videos = sorted(videos, key=lambda k: k["title"])
 					i = 0
 					num_videos = len(videos)
+					total_time = 0
 					for video in videos:
 						i += 1
-						set_title("%d/%d - Generating thumbnail" % (i, num_videos))
+						start_time = time.time()
+						estimation = 0
+						if i > 1:
+							estimation = total_time / (i - 1) * (num_videos - i)
+						set_title("%d/%d - Generating thumbnail (~%d seconds remaining)" % (i, num_videos, estimation))
 						generate_thumbnail(video)
+						total_time += time.time() - start_time
 					print("\nGenerated thumbnail for:")
 					for video in videos:
 						print("	%s" % video["title"])
 				else:
 					print("\nNo videos to generate thumbnails for...")
 			elif choice == 4:
+				db = load_database()
+				videos = []
+				for video in db:
+					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"])
+					if os.path.isfile(path):
+						continue
+					videos.append({
+						"path": video["path"][1:-1],
+						"title": video["title"]
+					})
+				if len(videos) > 0:
+					videos = sorted(videos, key=lambda k: k["title"])
+					i = 0
+					num_videos = len(videos)
+					total_time = 0
+					for video in videos:
+						i += 1
+						start_time = time.time()
+						estimation = 0
+						if i > 1:
+							estimation = total_time / (i - 1) * (num_videos - i)
+						set_title("%d/%d - Generating mosaic thumbnail (~%d seconds remaining)" % (i, num_videos, estimation))
+						generate_mosaic_thumbnail(video)
+						total_time += time.time() - start_time
+					print("\nGenerated mosaic thumbnail for:")
+					for video in videos:
+						print("	%s" % video["title"])
+				else:
+					print("\nNo videos to generate mosaic thumbnails for...")
+			elif choice == 5:
 				db = load_database()
 				thumbnails = [os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"]) for video in db]
 				if len(thumbnails) > 0:
@@ -350,6 +407,7 @@ if __name__ == "__main__":
 			else:
 				pass
 			set_title("Done!")
+			print("\a")
 	except:
 		import traceback
 		traceback.print_exc()
