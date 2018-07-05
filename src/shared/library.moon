@@ -1,4 +1,5 @@
 Game = require('main.game')
+json = require('lib.json')
 
 -- A migrator is a table with the following fields:
 -- - "version":
@@ -55,6 +56,59 @@ migrators = {
 				i = table.find(games, game)
 				table.remove(games, i)
 	}
+	{
+		version: 2 -- Version 3.0.0 -> 3.1.0
+		func: (games) ->
+			-- Reduce the number of characters stored in 'games.json'.
+			for i, game in ipairs(games)
+				-- Remove empty tables.
+				game.tags = nil if game.tags ~= nil and #game.tags == 0
+				game.platformTags = nil if game.platformTags ~= nil and #game.platformTags == 0
+				game.startingBangs = nil if game.startingBangs ~= nil and #game.startingBangs == 0
+				game.stoppingBangs = nil if game.stoppingBangs ~= nil and #game.stoppingBangs == 0
+				-- Switch over to using abbreviated properties.
+				game.ba = game.banner
+				game.baURL = game.bannerURL
+				game.exBa = game.expectedBanner
+				game.gaID = game.gameID
+				game.hi = game.hidden
+				game.hoPl = game.hoursPlayed
+				game.igOtBa = game.ignoresOtherBangs
+				game.laPl = game.lastPlayed
+				game.no = game.notes
+				game.pa = game.path
+				game.plID = game.platformID
+				game.plOv = game.platformOverride
+				game.plTa = game.platformTags
+				game.pr = game.process
+				game.prOv = game.processOverride
+				game.staBa = game.startingBangs
+				game.stoBa = game.stoppingBangs
+				game.ta = game.tags
+				game.ti = game.title
+				game.un = game.uninstalled
+				-- Clean up by removing the old properties.
+				game.banner = nil
+				game.bannerURL = nil
+				game.expectedBanner = nil
+				game.gameID = nil
+				game.hidden = nil
+				game.hoursPlayed = nil
+				game.ignoresOtherBangs = nil
+				game.lastPlayed = nil
+				game.notes = nil
+				game.path = nil
+				game.platformID = nil
+				game.platformOverride = nil
+				game.platformTags = nil
+				game.process = nil
+				game.processOverride = nil
+				game.startingBangs = nil
+				game.stoppingBangs = nil
+				game.tags = nil
+				game.title = nil
+				game.uninstalled = nil
+	}
 }
 
 class Library
@@ -63,7 +117,7 @@ class Library
 	-- regularMode should be false in all other cases (e.g. in the filter config)
 		assert(type(settings) == 'table', 'shared.library.Library')
 		assert(type(regularMode) == 'boolean', 'shared.library.Library')
-		@version = 1
+		@version = 2
 		@path = 'games.json'
 		games = if io.fileExists(@path) then io.readJSON(@path) else {}
 		@currentGameID = 1
@@ -148,11 +202,32 @@ class Library
 		return {}
 
 	save: (games = @gamesSortedByGameID) =>
-		io.writeJSON(@path, {
+		out = json.encode({
 			version: @version
 			games: games
 			updated: @updatedTimestamp
 		})
+		out = out\gsub('"banner":', '"ba":')
+		out = out\gsub('"bannerURL":', '"baURL":')
+		out = out\gsub('"expectedBanner":', '"exBa":')
+		out = out\gsub('"gameID":', '"gaID":')
+		out = out\gsub('"hidden":', '"hi":')
+		out = out\gsub('"hoursPlayed":', '"hoPl":')
+		out = out\gsub('"ignoresOtherBangs":', '"igOtBa":')
+		out = out\gsub('"lastPlayed":', '"laPl":')
+		out = out\gsub('"notes":', '"no":')
+		out = out\gsub('"path":', '"pa":')
+		out = out\gsub('"platformID":', '"plID":')
+		out = out\gsub('"platformOverride":', '"plOv":')
+		out = out\gsub('"platformTags":', '"plTa":')
+		out = out\gsub('"process":', '"pr":')
+		out = out\gsub('"processOverride":', '"prOv":')
+		out = out\gsub('"startingBangs":', '"stBa":')
+		out = out\gsub('"stoppingBangs":', '"stBa":')
+		out = out\gsub('"tags":', '"ta":')
+		out = out\gsub('"title":', '"ti":')
+		out = out\gsub('"uninstalled":', '"un":')
+		io.writeFile(@path, out)
 
 	migrate: (games, version) =>
 		assert(type(version) == 'number' and version % 1 == 0, 'Expected the games version number to be an integer.')
@@ -215,10 +290,19 @@ class Library
 
 	update: (updatedGame) =>
 		gameID = updatedGame\getGameID()
-		for game in *@games
-			if game\getGameID() == gameID
-				game\merge(updatedGame, true)
-				return true
+		game = @gamesSortedByGameID[gameID]
+		if game == nil or game\getGameID() ~= gameID
+			game = nil
+			for g in *@gamesSortedByGameID
+				if g\getGameID() == gameID
+					game = g
+					break
+		if game == nil
+			log('Failed to find and update the game!')
+			return false
+		log('Updating game')
+		game\merge(updatedGame, true)
+		@save()
 		return false
 
 	sort: (sorting, games = @games) =>

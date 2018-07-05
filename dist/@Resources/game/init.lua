@@ -141,21 +141,19 @@ getGamesAndTags = function()
     end
     STATE.ALL_GAMES = _accum_0
   end
-  if STATE.ALL_TAGS == nil then
-    STATE.ALL_TAGS = { }
-    local _list_0 = STATE.ALL_GAMES
-    for _index_0 = 1, #_list_0 do
-      local game = _list_0[_index_0]
-      local _list_1 = game:getTags()
-      for _index_1 = 1, #_list_1 do
-        local tag = _list_1[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
-      local _list_2 = game:getPlatformTags()
-      for _index_1 = 1, #_list_2 do
-        local tag = _list_2[_index_1]
-        STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-      end
+  STATE.ALL_TAGS = { }
+  local _list_0 = STATE.ALL_GAMES
+  for _index_0 = 1, #_list_0 do
+    local game = _list_0[_index_0]
+    local _list_1 = game:getTags()
+    for _index_1 = 1, #_list_1 do
+      local tag = _list_1[_index_1]
+      STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+    end
+    local _list_2 = game:getPlatformTags()
+    for _index_1 = 1, #_list_2 do
+      local tag = _list_2[_index_1]
+      STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
     end
   end
 end
@@ -831,7 +829,6 @@ end
 Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting Game handshake', gameID)
-    getGamesAndTags()
     local game = getGame(gameID)
     assert(game ~= nil, ('Could not find a game with the gameID: %d'):format(gameID))
     STATE.GAME = game

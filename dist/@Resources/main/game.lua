@@ -232,6 +232,9 @@ do
           table.insert(self.tags, tag)
         end
       end
+      if #self.tags == 0 then
+        self.tags = nil
+      end
     end,
     getPlatformTags = function(self)
       return self.platformTags or { }
@@ -269,6 +272,9 @@ do
           table.insert(self.startingBangs, bang)
         end
       end
+      if #self.startingBangs == 0 then
+        self.startingBangs = nil
+      end
     end,
     getStoppingBangs = function(self)
       return self.stoppingBangs or { }
@@ -281,6 +287,9 @@ do
         if bang ~= '' then
           table.insert(self.stoppingBangs, bang)
         end
+      end
+      if #self.stoppingBangs == 0 then
+        self.stoppingBangs = nil
       end
     end,
     getIgnoresOtherBangs = function(self)
@@ -311,33 +320,41 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self, args)
-      assert(type(args.title) == 'string' and args.title:trim() ~= '', 'main.game.Game')
-      self.title = self:_moveThe(args.title)
-      assert(type(args.path) == 'string', 'main.game.Game')
-      self.path = args.path
-      assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
-      self.platformID = args.platformID
+      local title = args.ti or args.title
+      assert(type(title) == 'string' and title:trim() ~= '', 'main.game.Game')
+      self.title = self:_moveThe(title)
+      local path = args.pa or args.path
+      assert(type(path) == 'string', 'main.game.Game')
+      self.path = path
+      local platformID = args.plID or args.platformID
+      assert(type(platformID) == 'number' and platformID % 1 == 0, 'main.game.Game')
+      self.platformID = platformID
       assert(self.platformID > 0 and self.platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
-      self.platformOverride = args.platformOverride
-      if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil) then
-        self.banner = args.banner
+      self.platformOverride = args.plOv or args.platformOverride
+      local banner = args.ba or args.banner
+      local bannerURL = args.baURL or args.bannerURL
+      if banner ~= nil and (io.fileExists(banner) or bannerURL ~= nil) then
+        self.banner = banner
       end
-      self.bannerURL = args.bannerURL
+      self.bannerURL = bannerURL
       assert(self.bannerURL == nil or (self.bannerURL ~= nil and self.banner ~= nil), 'main.game.Game')
-      self.expectedBanner = args.expectedBanner
-      self.process = args.process or self:_parseProcess(self.path)
-      self.uninstalled = args.uninstalled
-      self.gameID = args.gameID
-      self.platformTags = args.platformTags
-      self.processOverride = args.processOverride
-      self.hidden = args.hidden
-      self.lastPlayed = args.lastPlayed
-      self.hoursPlayed = args.hoursPlayed
-      self.tags = args.tags
-      self.startingBangs = args.startingBangs
-      self.stoppingBangs = args.stoppingBangs
-      self.ignoresOtherBangs = args.ignoresOtherBangs
-      self.notes = args.notes
+      self.expectedBanner = args.exBa or args.expectedBanner
+      self.process = args.pr or args.process or self:_parseProcess(self.path)
+      self.uninstalled = args.un or args.uninstalled
+      self.gameID = args.gaID or args.gameID
+      self.platformTags = args.plTa or args.platformTags
+      if self.platformTags ~= nil and #self.platformTags == 0 then
+        self.platformTags = nil
+      end
+      self.processOverride = args.prOv or args.processOverride
+      self.hidden = args.hi or args.hidden
+      self.lastPlayed = args.laPl or args.lastPlayed
+      self.hoursPlayed = args.hoPl or args.hoursPlayed
+      self.tags = args.ta or args.tags
+      self.startingBangs = args.staBa or args.startingBangs
+      self.stoppingBangs = args.stoBa or args.stoppingBangs
+      self.ignoresOtherBangs = args.igOtBa or args.ignoresOtherBangs
+      self.notes = args.no or args.notes
     end,
     __base = _base_0,
     __name = "Game"

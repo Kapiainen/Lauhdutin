@@ -89,13 +89,12 @@ getGamesAndTags = () ->
 	STATE.GAMES_VERSION = games.version
 	STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
 	STATE.ALL_GAMES = [Game(args) for args in *games.games]
-	if STATE.ALL_TAGS == nil
-		STATE.ALL_TAGS = {}
-		for game in *STATE.ALL_GAMES
-			for tag in *game\getTags()
-				STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-			for tag in *game\getPlatformTags()
-				STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+	STATE.ALL_TAGS = {}
+	for game in *STATE.ALL_GAMES
+		for tag in *game\getTags()
+			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+		for tag in *game\getPlatformTags()
+			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
 
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
@@ -555,7 +554,6 @@ export Handshake = (gameID) ->
 	success, err = pcall(
 		() ->
 			log('Accepting Game handshake', gameID)
-			getGamesAndTags()
 			game = getGame(gameID)
 			assert(game ~= nil, ('Could not find a game with the gameID: %d')\format(gameID))
 			STATE.GAME = game

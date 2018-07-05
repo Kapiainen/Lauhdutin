@@ -2,33 +2,39 @@ utility = require('shared.utility')
 
 class Game
 	new: (args) =>
-		assert(type(args.title) == 'string' and args.title\trim() ~= '', 'main.game.Game')
-		@title = @_moveThe(args.title)
-		assert(type(args.path) == 'string', 'main.game.Game')
-		@path = args.path
-		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
-		@platformID = args.platformID
+		title = args.ti or args.title
+		assert(type(title) == 'string' and title\trim() ~= '', 'main.game.Game')
+		@title = @_moveThe(title)
+		path = args.pa or args.path
+		assert(type(path) == 'string', 'main.game.Game')
+		@path = path
+		platformID = args.plID or args.platformID
+		assert(type(platformID) == 'number' and platformID % 1 == 0, 'main.game.Game')
+		@platformID = platformID
 		assert(@platformID > 0 and @platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
-		@platformOverride = args.platformOverride
-		if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil)
-			@banner = args.banner
-		@bannerURL = args.bannerURL
+		@platformOverride = args.plOv or args.platformOverride
+		banner = args.ba or args.banner
+		bannerURL = args.baURL or args.bannerURL
+		if banner ~= nil and (io.fileExists(banner) or bannerURL ~= nil)
+			@banner = banner
+		@bannerURL = bannerURL
 		assert(@bannerURL == nil or (@bannerURL ~= nil and @banner ~= nil), 'main.game.Game')
-		@expectedBanner = args.expectedBanner
-		@process = args.process or @_parseProcess(@path)
-		@uninstalled = args.uninstalled
-		@gameID = args.gameID
-		@platformTags = args.platformTags
+		@expectedBanner = args.exBa or args.expectedBanner
+		@process = args.pr or args.process or @_parseProcess(@path)
+		@uninstalled = args.un or args.uninstalled
+		@gameID = args.gaID or args.gameID
+		@platformTags = args.plTa or args.platformTags
+		@platformTags = nil if @platformTags ~= nil and #@platformTags == 0
 		-- User-generated information, which needs to be used in the 'merge' method.
-		@processOverride = args.processOverride
-		@hidden = args.hidden
-		@lastPlayed = args.lastPlayed
-		@hoursPlayed = args.hoursPlayed
-		@tags = args.tags
-		@startingBangs = args.startingBangs
-		@stoppingBangs = args.stoppingBangs
-		@ignoresOtherBangs = args.ignoresOtherBangs
-		@notes = args.notes
+		@processOverride = args.prOv or args.processOverride
+		@hidden = args.hi or args.hidden
+		@lastPlayed = args.laPl or args.lastPlayed
+		@hoursPlayed = args.hoPl or args.hoursPlayed
+		@tags = args.ta or args.tags
+		@startingBangs = args.staBa or args.startingBangs
+		@stoppingBangs = args.stoBa or args.stoppingBangs
+		@ignoresOtherBangs = args.igOtBa or args.ignoresOtherBangs
+		@notes = args.no or args.notes
 
 	merge: (other, newer = false) =>
 		assert(other.__class == Game, 'main.game.Game.merge')
@@ -179,6 +185,7 @@ class Game
 		for tag in *tags
 			tag = tag\trim()
 			table.insert(@tags, tag) if tag ~= ''
+		@tags = nil if #@tags == 0
 
 	getPlatformTags: () => return @platformTags or {}
 
@@ -198,6 +205,7 @@ class Game
 		for bang in *bangs
 			bang = bang\trim()
 			table.insert(@startingBangs, bang) if bang ~= ''
+		@startingBangs = nil if #@startingBangs == 0
 
 	getStoppingBangs: () => return @stoppingBangs or {}
 
@@ -206,6 +214,7 @@ class Game
 		for bang in *bangs
 			bang = bang\trim()
 			table.insert(@stoppingBangs, bang) if bang ~= ''
+		@stoppingBangs = nil if #@stoppingBangs == 0
 
 	getIgnoresOtherBangs: () => return @ignoresOtherBangs or false
 

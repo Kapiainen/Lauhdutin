@@ -1,4 +1,5 @@
 local Game = require('main.game')
+local json = require('lib.json')
 local migrators = {
   {
     version = 1,
@@ -62,6 +63,65 @@ local migrators = {
         local game = gamesToRemove[_index_0]
         local i = table.find(games, game)
         table.remove(games, i)
+      end
+    end
+  },
+  {
+    version = 2,
+    func = function(games)
+      for i, game in ipairs(games) do
+        if game.tags ~= nil and #game.tags == 0 then
+          game.tags = nil
+        end
+        if game.platformTags ~= nil and #game.platformTags == 0 then
+          game.platformTags = nil
+        end
+        if game.startingBangs ~= nil and #game.startingBangs == 0 then
+          game.startingBangs = nil
+        end
+        if game.stoppingBangs ~= nil and #game.stoppingBangs == 0 then
+          game.stoppingBangs = nil
+        end
+        game.ba = game.banner
+        game.baURL = game.bannerURL
+        game.exBa = game.expectedBanner
+        game.gaID = game.gameID
+        game.hi = game.hidden
+        game.hoPl = game.hoursPlayed
+        game.igOtBa = game.ignoresOtherBangs
+        game.laPl = game.lastPlayed
+        game.no = game.notes
+        game.pa = game.path
+        game.plID = game.platformID
+        game.plOv = game.platformOverride
+        game.plTa = game.platformTags
+        game.pr = game.process
+        game.prOv = game.processOverride
+        game.staBa = game.startingBangs
+        game.stoBa = game.stoppingBangs
+        game.ta = game.tags
+        game.ti = game.title
+        game.un = game.uninstalled
+        game.banner = nil
+        game.bannerURL = nil
+        game.expectedBanner = nil
+        game.gameID = nil
+        game.hidden = nil
+        game.hoursPlayed = nil
+        game.ignoresOtherBangs = nil
+        game.lastPlayed = nil
+        game.notes = nil
+        game.path = nil
+        game.platformID = nil
+        game.platformOverride = nil
+        game.platformTags = nil
+        game.process = nil
+        game.processOverride = nil
+        game.startingBangs = nil
+        game.stoppingBangs = nil
+        game.tags = nil
+        game.title = nil
+        game.uninstalled = nil
       end
     end
   }
@@ -155,11 +215,32 @@ do
       if games == nil then
         games = self.gamesSortedByGameID
       end
-      return io.writeJSON(self.path, {
+      local out = json.encode({
         version = self.version,
         games = games,
         updated = self.updatedTimestamp
       })
+      out = out:gsub('"banner":', '"ba":')
+      out = out:gsub('"bannerURL":', '"baURL":')
+      out = out:gsub('"expectedBanner":', '"exBa":')
+      out = out:gsub('"gameID":', '"gaID":')
+      out = out:gsub('"hidden":', '"hi":')
+      out = out:gsub('"hoursPlayed":', '"hoPl":')
+      out = out:gsub('"ignoresOtherBangs":', '"igOtBa":')
+      out = out:gsub('"lastPlayed":', '"laPl":')
+      out = out:gsub('"notes":', '"no":')
+      out = out:gsub('"path":', '"pa":')
+      out = out:gsub('"platformID":', '"plID":')
+      out = out:gsub('"platformOverride":', '"plOv":')
+      out = out:gsub('"platformTags":', '"plTa":')
+      out = out:gsub('"process":', '"pr":')
+      out = out:gsub('"processOverride":', '"prOv":')
+      out = out:gsub('"startingBangs":', '"stBa":')
+      out = out:gsub('"stoppingBangs":', '"stBa":')
+      out = out:gsub('"tags":', '"ta":')
+      out = out:gsub('"title":', '"ti":')
+      out = out:gsub('"uninstalled":', '"un":')
+      return io.writeFile(self.path, out)
     end,
     migrate = function(self, games, version)
       assert(type(version) == 'number' and version % 1 == 0, 'Expected the games version number to be an integer.')
@@ -249,14 +330,25 @@ do
     end,
     update = function(self, updatedGame)
       local gameID = updatedGame:getGameID()
-      local _list_0 = self.games
-      for _index_0 = 1, #_list_0 do
-        local game = _list_0[_index_0]
-        if game:getGameID() == gameID then
-          game:merge(updatedGame, true)
-          return true
+      local game = self.gamesSortedByGameID[gameID]
+      if game == nil or game:getGameID() ~= gameID then
+        game = nil
+        local _list_0 = self.gamesSortedByGameID
+        for _index_0 = 1, #_list_0 do
+          local g = _list_0[_index_0]
+          if g:getGameID() == gameID then
+            game = g
+            break
+          end
         end
       end
+      if game == nil then
+        log('Failed to find and update the game!')
+        return false
+      end
+      log('Updating game')
+      game:merge(updatedGame, true)
+      self:save()
       return false
     end,
     sort = function(self, sorting, games)
@@ -577,7 +669,7 @@ do
       end
       assert(type(settings) == 'table', 'shared.library.Library')
       assert(type(regularMode) == 'boolean', 'shared.library.Library')
-      self.version = 1
+      self.version = 2
       self.path = 'games.json'
       local games
       if io.fileExists(self.path) then
