@@ -170,6 +170,19 @@ table.find = function(tbl, obj)
   end
   return nil
 end
+table.isArray = function(tbl)
+  assert(type(tbl) == 'table', '"table.isArray" expected a table as its first argument.')
+  local sum = 0
+  for k, v in pairs(tbl) do
+    if type(k) == 'number' then
+      sum = sum + k
+    else
+      return false
+    end
+  end
+  local n = #tbl
+  return sum == n * (n + 1) / 2
+end
 table.replace = function(tbl, old, new)
   assert(type(tbl) == 'table', '"table.replace" expected a table as the first argument.')
   assert(old ~= nil, '"table.replace" expected a second argument')

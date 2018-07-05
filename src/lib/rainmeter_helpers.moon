@@ -138,6 +138,17 @@ table.find = (tbl, obj) ->
 		return key if value == obj
 	return nil
 
+table.isArray = (tbl) ->
+	assert(type(tbl) == 'table', '"table.isArray" expected a table as its first argument.')
+	sum = 0
+	for k, v in pairs(tbl)
+		if type(k) == 'number'
+			sum += k
+		else
+			return false
+	n = #tbl
+	return sum == n * (n + 1) / 2
+
 table.replace = (tbl, old, new) ->
 	assert(type(tbl) == 'table', '"table.replace" expected a table as the first argument.')
 	assert(old ~= nil, '"table.replace" expected a second argument')
@@ -222,5 +233,8 @@ export require = (modulePath) ->
 return module_info
 
 -- Changelog:
--- Version 1.0.0 - 2018/MM/DD:
--- - Initial release
+-- Version 1.0.0 - 2018/05/25:
+-- - Initial release.
+--
+-- Version 1.1.0 - 2018/07/05:
+-- - Added table.isArray.
