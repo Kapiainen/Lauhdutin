@@ -1,5 +1,4 @@
 utility = require('shared.utility')
-Game = require('main.game')
 
 class Platform
 	new: (settings) =>

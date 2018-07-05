@@ -1,5 +1,4 @@
 local utility = require('shared.utility')
-local Game = require('main.game')
 local Platform
 do
   local _class_0
