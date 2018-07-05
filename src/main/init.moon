@@ -211,12 +211,12 @@ export Initialize = () ->
 		() ->
 			require('shared.enums')
 			additionalEnums()
-			Game = require('main.game')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			json = require('lib.json')
 			COMPONENTS.SETTINGS = require('shared.settings')()
 			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			Game = require('main.game')
 			log('Initializing Main config')
 			STATE.SCROLL_STEP = COMPONENTS.SETTINGS\getScrollStep()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
@@ -684,18 +684,18 @@ export HandshakeGame = () ->
 getGameByID = (gameID) ->
 	assert(type(gameID) == 'number' and gameID % 1 == 0, 'main.init.getGameByID')
 	games = io.readJSON(STATE.PATHS.GAMES)
-	games = games.games
+	games = [Game(args) for args in *games.games]
 	game = games[gameID] -- gameID should also be the index of the game since the games table in games.json should be sorted according to the gameIDs.
-	if game == nil or game.gameID ~= gameID -- Backup approach in case we didn't find the right game.
+	if game == nil or game\getGameID() ~= gameID -- Backup approach in case we didn't find the right game.
 		game = nil
-		for args in *games
-			if args.gameID == gameID
-				game = args
+		for g in *games
+			if g\getGameID() == gameID
+				game = g
 				break
 	if game == nil
 		log('Failed to get game by gameID:', gameID)
 		return nil
-	return Game(game)
+	return game
 
 export UpdateGame = (gameID) ->
 	return unless STATE.INITIALIZED
