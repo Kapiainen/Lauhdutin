@@ -207,7 +207,7 @@ class Library
 			games: games
 			updated: @updatedTimestamp
 		})
-		out = out\gsub('".-":', {
+		out = out\gsub('"[^"]+":', {
 			['"banner":']: '"ba":'
 			['"bannerURL":']: '"baURL":'
 			['"expectedBanner":']: '"exBa":'

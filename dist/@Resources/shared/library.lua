@@ -220,7 +220,7 @@ do
         games = games,
         updated = self.updatedTimestamp
       })
-      out = out:gsub('".-":', {
+      out = out:gsub('"[^"]+":', {
         ['"banner":'] = '"ba":',
         ['"bannerURL":'] = '"baURL":',
         ['"expectedBanner":'] = '"exBa":',
