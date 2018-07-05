@@ -220,26 +220,28 @@ do
         games = games,
         updated = self.updatedTimestamp
       })
-      out = out:gsub('"banner":', '"ba":')
-      out = out:gsub('"bannerURL":', '"baURL":')
-      out = out:gsub('"expectedBanner":', '"exBa":')
-      out = out:gsub('"gameID":', '"gaID":')
-      out = out:gsub('"hidden":', '"hi":')
-      out = out:gsub('"hoursPlayed":', '"hoPl":')
-      out = out:gsub('"ignoresOtherBangs":', '"igOtBa":')
-      out = out:gsub('"lastPlayed":', '"laPl":')
-      out = out:gsub('"notes":', '"no":')
-      out = out:gsub('"path":', '"pa":')
-      out = out:gsub('"platformID":', '"plID":')
-      out = out:gsub('"platformOverride":', '"plOv":')
-      out = out:gsub('"platformTags":', '"plTa":')
-      out = out:gsub('"process":', '"pr":')
-      out = out:gsub('"processOverride":', '"prOv":')
-      out = out:gsub('"startingBangs":', '"stBa":')
-      out = out:gsub('"stoppingBangs":', '"stBa":')
-      out = out:gsub('"tags":', '"ta":')
-      out = out:gsub('"title":', '"ti":')
-      out = out:gsub('"uninstalled":', '"un":')
+      out = out:gsub('".-":', {
+        ['"banner":'] = '"ba":',
+        ['"bannerURL":'] = '"baURL":',
+        ['"expectedBanner":'] = '"exBa":',
+        ['"gameID":'] = '"gaID":',
+        ['"hidden":'] = '"hi":',
+        ['"hoursPlayed":'] = '"hoPl":',
+        ['"ignoresOtherBangs":'] = '"igOtBa":',
+        ['"lastPlayed":'] = '"laPl":',
+        ['"notes":'] = '"no":',
+        ['"path":'] = '"pa":',
+        ['"platformID":'] = '"plID":',
+        ['"platformOverride":'] = '"plOv":',
+        ['"platformTags":'] = '"plTa":',
+        ['"process":'] = '"pr":',
+        ['"processOverride":'] = '"prOv":',
+        ['"startingBangs":'] = '"stBa":',
+        ['"stoppingBangs":'] = '"stBa":',
+        ['"tags":'] = '"ta":',
+        ['"title":'] = '"ti":',
+        ['"uninstalled":'] = '"un":'
+      })
       return io.writeFile(self.path, out)
     end,
     migrate = function(self, games, version)
