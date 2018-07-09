@@ -186,6 +186,9 @@ do
           self:createBackup(path)
           local games = io.readJSON(path)
           local version = games.version or 0
+          for key, tag in pairs(games.tagsDictionary or { }) do
+            self.tagsDictionary[key] = tag
+          end
           if version > 0 then
             games = games.games
           end
@@ -198,7 +201,7 @@ do
             local _len_0 = 1
             for _index_1 = 1, #games do
               local args = games[_index_1]
-              _accum_0[_len_0] = Game(args)
+              _accum_0[_len_0] = Game(args, self.tagsDictionary)
               _len_0 = _len_0 + 1
             end
             games = _accum_0
@@ -211,12 +214,49 @@ do
       end
       return { }
     end,
+    cleanUp = function(self)
+      local tagReferenceCounts
+      do
+        local _tbl_0 = { }
+        for key, tag in pairs(self.tagsDictionary) do
+          _tbl_0[key] = 0
+        end
+        tagReferenceCounts = _tbl_0
+      end
+      local _list_0 = self.gamesSortedByGameID
+      for _index_0 = 1, #_list_0 do
+        local _continue_0 = false
+        repeat
+          local game = _list_0[_index_0]
+          if not (game:hasTags()) then
+            _continue_0 = true
+            break
+          end
+          for key, tag in pairs(self.tagsDictionary) do
+            if game:hasTag(key) ~= nil then
+              tagReferenceCounts[key] = tagReferenceCounts[key] + 1
+            end
+          end
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
+        end
+      end
+      for key, refCount in pairs(tagReferenceCounts) do
+        print(key, refCount)
+        if refCount == 0 then
+          self.tagsDictionary[key] = nil
+        end
+      end
+    end,
     save = function(self, games)
       if games == nil then
         games = self.gamesSortedByGameID
       end
       local out = json.encode({
         version = self.version,
+        tagsDictionary = self.tagsDictionary,
         games = games,
         updated = self.updatedTimestamp
       })
@@ -254,22 +294,31 @@ do
         local migrator = migrators[_index_0]
         if version < migrator.version then
           log("Migrating games.json from version " .. tostring(version) .. " to " .. tostring(migrator.version) .. ".")
-          migrator.func(games)
+          migrator.func(games, self.tagsDictionary)
         end
       end
       return true
     end,
     extend = function(self, games)
       if games == nil then
-        return false
+        return { }
       end
       assert(type(games) == 'table', 'shared.library.Library.extend')
       if #games == 0 then
-        return false
+        return { }
+      end
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        for _index_0 = 1, #games do
+          local args = games[_index_0]
+          _accum_0[_len_0] = Game(args, self.tagsDictionary)
+          _len_0 = _len_0 + 1
+        end
+        games = _accum_0
       end
       for _index_0 = 1, #games do
         local game = games[_index_0]
-        assert(game.__class == Game, 'shared.library.Library.extend')
         for i, oldGame in ipairs(self.oldGames) do
           if game:getPlatformID() == oldGame:getPlatformID() and game:getTitle() == oldGame:getTitle() then
             game:merge(oldGame)
@@ -282,7 +331,7 @@ do
         table.insert(self.games, game)
         table.insert(self.gamesSortedByGameID, game)
       end
-      return true
+      return games
     end,
     updateSortedList = function(self)
       return table.sort(self.gamesSortedByGameID, function(a, b)
@@ -295,8 +344,8 @@ do
       local platformID = game:getPlatformID()
       local _list_0 = self.games
       for _index_0 = 1, #_list_0 do
-        local g = _list_0[_index_0]
-        if g:getTitle() == title and g:getPlatformID() == platformID then
+        local oldGame = _list_0[_index_0]
+        if oldGame:getPlatformID() == platformID and oldGame:getTitle() == title then
           return 
         end
       end
@@ -330,28 +379,87 @@ do
         self.currentGameID = self.gamesSortedByGameID[#self.gamesSortedByGameID]:getGameID() + 1
       end
     end,
-    update = function(self, updatedGame)
-      local gameID = updatedGame:getGameID()
-      local game = self.gamesSortedByGameID[gameID]
-      if game == nil or game:getGameID() ~= gameID then
-        game = nil
-        local _list_0 = self.gamesSortedByGameID
+    add = function(self, gameID)
+      assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID >= self.currentGameID, 'shared.library.Library.add')
+      local games = io.readJSON(self.path)
+      local args = games.games[gameID]
+      local newGame
+      if args ~= nil then
+        newGame = Game(args, self.tagsDictionary)
+      else
+        newGame = nil
+      end
+      if newGame == nil or newGame:getGameID() ~= gameID then
+        newGame = nil
+        local _list_0 = games.games
         for _index_0 = 1, #_list_0 do
-          local g = _list_0[_index_0]
-          if g:getGameID() == gameID then
-            game = g
+          local args = _list_0[_index_0]
+          local game = Game(args, self.tagsDictionary)
+          if game:getGameID() == gameID then
+            newGame = game
             break
           end
         end
       end
-      if game == nil then
-        log('Failed to find and update the game!')
+      if newGame == nil then
+        log('Failed to add game!')
+        return false
+      end
+      self:insert(newGame)
+      return true
+    end,
+    update = function(self, gameID)
+      assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID < self.currentGameID, 'shared.library.Library.update')
+      local games = io.readJSON(self.path)
+      local tagsDictionary = games.tagsDictionary
+      for key, tag in pairs(tagsDictionary) do
+        if self.tagsDictionary[key] == nil then
+          self.tagsDictionary[key] = tag
+        end
+      end
+      local args = games.games[gameID]
+      local updatedGame
+      if args ~= nil then
+        updatedGame = Game(args, self.tagsDictionary)
+      else
+        updatedGame = nil
+      end
+      if updatedGame == nil or updatedGame:getGameID() ~= gameID then
+        updatedGame = nil
+        local _list_0 = games.games
+        for _index_0 = 1, #_list_0 do
+          local args = _list_0[_index_0]
+          local game = Game(args, self.tagsDictionary)
+          if game:getGameID() == gameID then
+            updatedGame = game
+            break
+          end
+        end
+      end
+      if updatedGame == nil then
+        log('Failed to find the updated game!')
+        return false
+      end
+      local gameToUpdate = self.gamesSortedByGameID[gameID]
+      if gameToUpdate == nil or gameToUpdate:getGameID() ~= gameID then
+        gameToUpdate = nil
+        local _list_0 = self.gamesSortedByGameID
+        for _index_0 = 1, #_list_0 do
+          local game = _list_0[_index_0]
+          if game:getGameID() == gameID then
+            gameToUpdate = game
+            break
+          end
+        end
+      end
+      if gameToUpdate == nil then
+        log('Failed to update the game!')
         return false
       end
       log('Updating game')
-      game:merge(updatedGame, true)
+      gameToUpdate:merge(updatedGame, true)
       self:save()
-      return false
+      return true
     end,
     sort = function(self, sorting, games)
       if games == nil then
@@ -583,8 +691,9 @@ do
         assert(type(args) == 'table', 'shared.library.Library.filter')
         assert(type(args.tag) == 'string', 'shared.library.Library.filter')
         local tag = args.tag
+        local key = table.find(self.tagsDictionary, tag)
         games = self:filterGames(gamesToProcess, function(game)
-          return game:hasTag(tag) == true
+          return game:hasTag(key) ~= nil
         end)
       elseif ENUMS.FILTER_TYPES.HIDDEN == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
@@ -605,11 +714,11 @@ do
         assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
         if args.state then
           games = self:filterGames(gamesToProcess, function(game)
-            return #game:getTags() == 0 and #game:getPlatformTags() == 0
+            return game:hasTags() == false
           end)
         else
           games = self:filterGames(gamesToProcess, function(game)
-            return #game:getTags() > 0 or #game:getPlatformTags() > 0
+            return game:hasTags() == true
           end)
         end
       elseif ENUMS.FILTER_TYPES.RANDOM_GAME == _exp_0 then
@@ -649,6 +758,22 @@ do
       local games = self.processedGames
       self.processedGames = nil
       return games
+    end,
+    getGameByID = function(self, gameID)
+      assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID < self.currentGameID, 'shared.library.Library.getGameByGameID')
+      local game = self.gamesSortedByGameID[gameID]
+      if game == nil or game:getGameID() ~= gameID then
+        local _list_0 = self.gamesSortedByGameID
+        for _index_0 = 1, #_list_0 do
+          local game = _list_0[_index_0]
+          if game:getGameID() == gameID then
+            return game
+          end
+        end
+        log('Failed to get game by gameID:', gameID)
+        return nil
+      end
+      return game
     end,
     replace = function(self, old, new)
       assert(old ~= nil and old.__class == Game, 'shared.library.Library.replace')
@@ -693,6 +818,7 @@ do
       else
         self.updatedTimestamp = games.updated
       end
+      self.tagsDictionary = { }
       if regularMode then
         local _exp_0 = settings:getGameDetectionFrequency()
         if ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS == _exp_0 then
@@ -718,13 +844,16 @@ do
           self.games = { }
           self.oldGames = self:load()
         else
+          for key, tag in pairs(games.tagsDictionary or { }) do
+            self.tagsDictionary[key] = tag
+          end
           do
             local _accum_0 = { }
             local _len_0 = 1
             local _list_0 = games.games
             for _index_0 = 1, #_list_0 do
               local args = _list_0[_index_0]
-              _accum_0[_len_0] = Game(args)
+              _accum_0[_len_0] = Game(args, self.tagsDictionary)
               _len_0 = _len_0 + 1
             end
             self.games = _accum_0
@@ -732,13 +861,16 @@ do
           self.oldGames = { }
         end
       else
+        for key, tag in pairs(games.tagsDictionary or { }) do
+          self.tagsDictionary[key] = tag
+        end
         do
           local _accum_0 = { }
           local _len_0 = 1
           local _list_0 = games.games
           for _index_0 = 1, #_list_0 do
             local args = _list_0[_index_0]
-            _accum_0[_len_0] = Game(args)
+            _accum_0[_len_0] = Game(args, self.tagsDictionary)
             _len_0 = _len_0 + 1
           end
           self.games = _accum_0

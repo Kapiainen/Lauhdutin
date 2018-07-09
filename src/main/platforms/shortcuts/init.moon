@@ -1,5 +1,4 @@
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 
 -- Dump a list of .lnk and .url files along with their target and argument properties.
 
@@ -95,7 +94,7 @@ class Shortcuts extends Platform
 				:uninstalled
 				platformID: @platformID
 			})
-		@games = [Game(args) for args in *games]
+		@games = games
 
 if RUN_TESTS
 	assertionMessage = 'Windows shortcuts test failed!'

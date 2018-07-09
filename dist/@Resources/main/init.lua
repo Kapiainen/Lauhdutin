@@ -427,6 +427,7 @@ end
 Unload = function()
   local success, err = pcall(function()
     log('Unloading skin')
+    COMPONENTS.LIBRARY:cleanUp()
     COMPONENTS.LIBRARY:save()
     return COMPONENTS.SETTINGS:save()
   end)
@@ -930,47 +931,13 @@ HandshakeGame = function()
     return COMPONENTS.STATUS:show(err, true)
   end
 end
-local getGameByID
-getGameByID = function(gameID)
-  assert(type(gameID) == 'number' and gameID % 1 == 0, 'main.init.getGameByID')
-  local games = io.readJSON(STATE.PATHS.GAMES)
-  do
-    local _accum_0 = { }
-    local _len_0 = 1
-    local _list_0 = games.games
-    for _index_0 = 1, #_list_0 do
-      local args = _list_0[_index_0]
-      _accum_0[_len_0] = Game(args)
-      _len_0 = _len_0 + 1
-    end
-    games = _accum_0
-  end
-  local game = games[gameID]
-  if game == nil or game:getGameID() ~= gameID then
-    game = nil
-    for _index_0 = 1, #games do
-      local g = games[_index_0]
-      if g:getGameID() == gameID then
-        game = g
-        break
-      end
-    end
-  end
-  if game == nil then
-    log('Failed to get game by gameID:', gameID)
-    return nil
-  end
-  return game
-end
 UpdateGame = function(gameID)
   if not (STATE.INITIALIZED) then
     return 
   end
   local success, err = pcall(function()
     log('UpdateGame', gameID)
-    local game = getGameByID(gameID)
-    assert(game ~= nil, 'main.init.UpdateGame')
-    COMPONENTS.LIBRARY:update(game)
+    COMPONENTS.LIBRARY:update(gameID)
     STATE.SCROLL_INDEX_UPDATED = false
   end)
   if not (success) then
@@ -1039,7 +1006,7 @@ OnFinishedDetectingPlatformGames = function()
     local platform = table.remove(STATE.PLATFORM_QUEUE, 1)
     local games = platform:getGames()
     log(('Found %d %s games'):format(#games, platform:getName()))
-    COMPONENTS.LIBRARY:extend(games)
+    games = COMPONENTS.LIBRARY:extend(games)
     for _index_0 = 1, #games do
       local game = games[_index_0]
       if game:getBannerURL() ~= nil then
@@ -1268,7 +1235,7 @@ end
 ReacquireBanner = function(gameID)
   local success, err = pcall(function()
     log('ReacquireBanner', gameID)
-    local game = getGameByID(gameID)
+    local game = COMPONENTS.LIBRARY:getGameByID(gameID)
     assert(game ~= nil, 'main.init.OnReacquireBanner')
     log('Reacquiring a banner for', game:getTitle())
     local platform = getPlatformByGame(game)
@@ -1436,7 +1403,7 @@ TriggerGameDetection = function()
 end
 OpenStorePage = function(gameID)
   local success, err = pcall(function()
-    local game = getGameByID(gameID)
+    local game = COMPONENTS.LIBRARY:getGameByID(gameID)
     assert(game ~= nil, 'main.init.OpenStorePage')
     local platform = getPlatformByGame(game)
     assert(platform ~= nil, 'main.init.OpenStorePage')
@@ -1469,9 +1436,7 @@ HandshakeNewGame = function()
 end
 OnAddGame = function(gameID)
   local success, err = pcall(function()
-    local game = getGameByID(gameID)
-    assert(game ~= nil, 'main.init.OnAddGame')
-    return COMPONENTS.LIBRARY:insert(game)
+    return COMPONENTS.LIBRARY:add(gameID)
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

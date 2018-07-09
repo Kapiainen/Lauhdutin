@@ -1,5 +1,4 @@
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 
 -- Dump a list of folders in one of the paths.
 -- Parse the list of folders and see if any of the names match with one of the pre-defined sets of arguments.
@@ -119,7 +118,7 @@ class Battlenet extends Platform
 			args.platformID = @platformID
 			table.insert(games, args)
 		for args in *games
-			table.insert(@games, Game(args))
+			table.insert(@games, args)
 
 if RUN_TESTS
 	assertionMessage = 'Blizzard Battle.net test failed!'

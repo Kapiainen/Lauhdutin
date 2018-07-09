@@ -2,7 +2,6 @@ local utility = require('shared.utility')
 local bit = require('lib.bit.numberlua')
 local digest = require('lib.digest.crc32')
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local lookupTable
 do
   local _accum_0 = { }
@@ -421,7 +420,7 @@ do
       end
       for _index_0 = 1, #games do
         local args = games[_index_0]
-        table.insert(self.games, Game(args))
+        table.insert(self.games, args)
       end
     end,
     generateGames = function(self)
@@ -548,7 +547,7 @@ do
         end
       end
       for appID, args in pairs(games) do
-        table.insert(self.games, Game(args))
+        table.insert(self.games, args)
       end
     end,
     getStorePageURL = function(self, game)

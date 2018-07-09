@@ -1,5 +1,4 @@
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local Shortcuts
 do
   local _class_0
@@ -122,16 +121,7 @@ do
           break
         end
       end
-      do
-        local _accum_0 = { }
-        local _len_0 = 1
-        for _index_0 = 1, #games do
-          local args = games[_index_0]
-          _accum_0[_len_0] = Game(args)
-          _len_0 = _len_0 + 1
-        end
-        self.games = _accum_0
-      end
+      self.games = games
     end
   }
   _base_0.__index = _base_0

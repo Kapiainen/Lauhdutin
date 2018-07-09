@@ -130,6 +130,7 @@ class Library
 		@gamesSortedByGameID = {}
 		@detectGames = false
 		@updatedTimestamp = if regularMode == true then os.date('*t') else games.updated
+		@tagsDictionary = {}
 		if regularMode
 			@detectGames = switch settings\getGameDetectionFrequency()
 				when ENUMS.GAME_DETECTION_FREQUENCY.ALWAYS
@@ -151,17 +152,19 @@ class Library
 				@games = {}
 				@oldGames = @load()
 			else
-				@games = [Game(args) for args in *games.games]
+				for key, tag in pairs(games.tagsDictionary or {})
+					@tagsDictionary[key] = tag
+				@games = [Game(args, @tagsDictionary) for args in *games.games]
 				@oldGames = {}
 		else
-			@games = [Game(args) for args in *games.games]
+			for key, tag in pairs(games.tagsDictionary or {})
+				@tagsDictionary[key] = tag
+			@games = [Game(args, @tagsDictionary) for args in *games.games]
 			@oldGames = {}
 
-	getDetectGames: () =>
-		return @detectGames
+	getDetectGames: () => return @detectGames
 
-	getNextAvailableGameID: () =>
-		return @currentGameID
+	getNextAvailableGameID: () => return @currentGameID
 
 	getOldGames: () => return @oldGames
 
@@ -192,18 +195,33 @@ class Library
 				@createBackup(path)
 				games = io.readJSON(path)
 				version = games.version or 0
+				for key, tag in pairs(games.tagsDictionary or {})
+					@tagsDictionary[key] = tag
 				games = games.games if version > 0
 				games = {} if type(games) ~= 'table'
 				migrated = @migrate(games, version)
-				games = [Game(args) for args in *games]
+				games = [Game(args, @tagsDictionary) for args in *games]
 				if migrated
 					@save(games)
 				return games
 		return {}
 
+	cleanUp: () =>
+		tagReferenceCounts = {key, 0 for key, tag in pairs(@tagsDictionary)}
+		for game in *@gamesSortedByGameID
+			continue unless game\hasTags()
+			for key, tag in pairs(@tagsDictionary)
+				if game\hasTag(key) ~= nil
+					tagReferenceCounts[key] += 1
+		for key, refCount in pairs(tagReferenceCounts)
+			print(key, refCount)
+			if refCount == 0
+				@tagsDictionary[key] = nil
+
 	save: (games = @gamesSortedByGameID) =>
 		out = json.encode({
 			version: @version
+			tagsDictionary: @tagsDictionary
 			games: games
 			updated: @updatedTimestamp
 		})
@@ -232,21 +250,23 @@ class Library
 		io.writeFile(@path, out)
 
 	migrate: (games, version) =>
-		assert(type(version) == 'number' and version % 1 == 0, 'Expected the games version number to be an integer.')
-		assert(version <= @version, ('Unsupported games version. Expected version %d or earlier.')\format(@version))
+		assert(type(version) == 'number' and version % 1 == 0,
+			'Expected the games version number to be an integer.')
+		assert(version <= @version,
+			('Unsupported games version. Expected version %d or earlier.')\format(@version))
 		return false if version == @version
 		for migrator in *migrators
 			if version < migrator.version
 				log("Migrating games.json from version #{version} to #{migrator.version}.")
-				migrator.func(games)
+				migrator.func(games, @tagsDictionary)
 		return true
 
 	extend: (games) =>
-		return false if games == nil
+		return {} if games == nil
 		assert(type(games) == 'table', 'shared.library.Library.extend')
-		return false if #games == 0
+		return {} if #games == 0
+		games = [Game(args, @tagsDictionary) for args in *games]
 		for game in *games
-			assert(game.__class == Game, 'shared.library.Library.extend')
 			for i, oldGame in ipairs(@oldGames)
 				if game\getPlatformID() == oldGame\getPlatformID() and game\getTitle() == oldGame\getTitle()
 					game\merge(oldGame)
@@ -256,7 +276,7 @@ class Library
 			@currentGameID += 1
 			table.insert(@games, game)
 			table.insert(@gamesSortedByGameID, game)
-		return true
+		return games
 
 	updateSortedList: () => table.sort(@gamesSortedByGameID, (a, b) -> return a.gameID < b.gameID)
 
@@ -264,8 +284,8 @@ class Library
 		assert(game.__class == Game, 'shared.library.Library.insert')
 		title = game\getTitle()
 		platformID = game\getPlatformID()
-		for g in *@games
-			if g\getTitle() == title and g\getPlatformID() == platformID
+		for oldGame in *@games
+			if oldGame\getPlatformID() == platformID and oldGame\getTitle() == title
 				return
 		game\setGameID(@currentGameID)
 		@currentGameID += 1
@@ -290,22 +310,59 @@ class Library
 		if #@gamesSortedByGameID > 0
 			@currentGameID = @gamesSortedByGameID[#@gamesSortedByGameID]\getGameID() + 1
 
-	update: (updatedGame) =>
-		gameID = updatedGame\getGameID()
-		game = @gamesSortedByGameID[gameID]
-		if game == nil or game\getGameID() ~= gameID
-			game = nil
-			for g in *@gamesSortedByGameID
-				if g\getGameID() == gameID
-					game = g
+	add: (gameID) =>
+		assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID >= @currentGameID,
+			'shared.library.Library.add')
+		games = io.readJSON(@path)
+		args = games.games[gameID]
+		newGame = if args ~= nil then Game(args, @tagsDictionary) else nil
+		if newGame == nil or newGame\getGameID() ~= gameID
+			newGame = nil
+			for args in *games.games
+				game = Game(args, @tagsDictionary)
+				if game\getGameID() == gameID
+					newGame = game
 					break
-		if game == nil
-			log('Failed to find and update the game!')
+		if newGame == nil
+			log('Failed to add game!')
+			return false
+		@insert(newGame)
+		return true
+
+	update: (gameID) =>
+		assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID < @currentGameID,
+			'shared.library.Library.update')
+		games = io.readJSON(@path)
+		tagsDictionary = games.tagsDictionary
+		for key, tag in pairs(tagsDictionary)
+			if @tagsDictionary[key] == nil
+				@tagsDictionary[key] = tag
+		args = games.games[gameID]
+		updatedGame = if args ~= nil then Game(args, @tagsDictionary) else nil
+		if updatedGame == nil or updatedGame\getGameID() ~= gameID
+			updatedGame = nil
+			for args in *games.games
+				game = Game(args, @tagsDictionary)
+				if game\getGameID() == gameID
+					updatedGame = game
+					break
+		if updatedGame == nil
+			log('Failed to find the updated game!')
+			return false
+		gameToUpdate = @gamesSortedByGameID[gameID]
+		if gameToUpdate == nil or gameToUpdate\getGameID() ~= gameID
+			gameToUpdate = nil
+			for game in *@gamesSortedByGameID
+				if game\getGameID() == gameID
+					gameToUpdate = game
+					break
+		if gameToUpdate == nil
+			log('Failed to update the game!')
 			return false
 		log('Updating game')
-		game\merge(updatedGame, true)
+		gameToUpdate\merge(updatedGame, true)
 		@save()
-		return false
+		return true
 
 	sort: (sorting, games = @games) =>
 		assert(type(sorting) == 'number' and sorting % 1 == 0, 'shared.library.Library.sort')
@@ -471,7 +528,8 @@ class Library
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.tag) == 'string', 'shared.library.Library.filter')
 				tag = args.tag
-				games = @filterGames(gamesToProcess, (game) -> return game\hasTag(tag) == true)
+				key = table.find(@tagsDictionary, tag)
+				games = @filterGames(gamesToProcess, (game) -> return game\hasTag(key) ~= nil)
 			when ENUMS.FILTER_TYPES.HIDDEN
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
@@ -486,9 +544,9 @@ class Library
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
 				if args.state
-					games = @filterGames(gamesToProcess, (game) -> return #game\getTags() == 0 and #game\getPlatformTags() == 0)
+					games = @filterGames(gamesToProcess, (game) -> return game\hasTags() == false)
 				else
-					games = @filterGames(gamesToProcess, (game) -> return #game\getTags() > 0 or #game\getPlatformTags() > 0)
+					games = @filterGames(gamesToProcess, (game) -> return game\hasTags() == true)
 			when ENUMS.FILTER_TYPES.RANDOM_GAME
 				assert(type(args) == 'table', 'shared.library.Library.filter')
 				assert(type(args.state) == 'boolean', 'shared.library.Library.filter')
@@ -514,6 +572,20 @@ class Library
 		games = @processedGames
 		@processedGames = nil
 		return games
+
+	getGameByID: (gameID) =>
+		assert(type(gameID) == 'number' and gameID % 1 == 0 and gameID < @currentGameID,
+			'shared.library.Library.getGameByGameID')
+		game = @gamesSortedByGameID[gameID]
+		if game == nil or game\getGameID() ~= gameID -- Backup approach in case we didn't find the right game.
+			for game in *@gamesSortedByGameID
+				if game\getGameID() == gameID
+					return game
+			log('Failed to get game by gameID:', gameID)
+			return nil
+		return game
+
+
 
 	replace: (old, new) =>
 		assert(old ~= nil and old.__class == Game, 'shared.library.Library.replace')

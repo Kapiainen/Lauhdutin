@@ -340,6 +340,7 @@ export Unload = () ->
 	success, err = pcall(
 		() ->
 			log('Unloading skin')
+			COMPONENTS.LIBRARY\cleanUp()
 			COMPONENTS.LIBRARY\save()
 			COMPONENTS.SETTINGS\save()
 	)
@@ -681,30 +682,12 @@ export HandshakeGame = () ->
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-getGameByID = (gameID) ->
-	assert(type(gameID) == 'number' and gameID % 1 == 0, 'main.init.getGameByID')
-	games = io.readJSON(STATE.PATHS.GAMES)
-	games = [Game(args) for args in *games.games]
-	game = games[gameID] -- gameID should also be the index of the game since the games table in games.json should be sorted according to the gameIDs.
-	if game == nil or game\getGameID() ~= gameID -- Backup approach in case we didn't find the right game.
-		game = nil
-		for g in *games
-			if g\getGameID() == gameID
-				game = g
-				break
-	if game == nil
-		log('Failed to get game by gameID:', gameID)
-		return nil
-	return game
-
 export UpdateGame = (gameID) ->
 	return unless STATE.INITIALIZED
 	success, err = pcall(
 		() ->
 			log('UpdateGame', gameID)
-			game = getGameByID(gameID)
-			assert(game ~= nil, 'main.init.UpdateGame')
-			COMPONENTS.LIBRARY\update(game)
+			COMPONENTS.LIBRARY\update(gameID)
 			STATE.SCROLL_INDEX_UPDATED = false
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -753,7 +736,7 @@ export OnFinishedDetectingPlatformGames = () ->
 			platform = table.remove(STATE.PLATFORM_QUEUE, 1)
 			games = platform\getGames()
 			log(('Found %d %s games')\format(#games, platform\getName()))
-			COMPONENTS.LIBRARY\extend(games)
+			games = COMPONENTS.LIBRARY\extend(games)
 			for game in *games
 				if game\getBannerURL() ~= nil
 					if game\getBanner() == nil
@@ -935,7 +918,7 @@ export ReacquireBanner = (gameID) ->
 	success, err = pcall(
 		() ->
 			log('ReacquireBanner', gameID)
-			game = getGameByID(gameID)
+			game = COMPONENTS.LIBRARY\getGameByID(gameID)
 			assert(game ~= nil, 'main.init.OnReacquireBanner')
 			log('Reacquiring a banner for', game\getTitle())
 			platform = getPlatformByGame(game)
@@ -1073,7 +1056,7 @@ export TriggerGameDetection = () ->
 export OpenStorePage = (gameID) ->
 	success, err = pcall(
 		() ->
-			game = getGameByID(gameID)
+			game = COMPONENTS.LIBRARY\getGameByID(gameID)
 			assert(game ~= nil, 'main.init.OpenStorePage')
 			platform = getPlatformByGame(game)
 			assert(platform ~= nil, 'main.init.OpenStorePage')
@@ -1100,10 +1083,5 @@ export HandshakeNewGame = () ->
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export OnAddGame = (gameID) ->
-	success, err = pcall(
-		() ->
-			game = getGameByID(gameID)
-			assert(game ~= nil, 'main.init.OnAddGame')
-			COMPONENTS.LIBRARY\insert(game)
-	)
+	success, err = pcall(() -> COMPONENTS.LIBRARY\add(gameID))
 	COMPONENTS.STATUS\show(err, true) unless success
