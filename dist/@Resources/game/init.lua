@@ -325,7 +325,6 @@ createTagProperty = function(tag, state)
         else
           STATE.GAME_TAGS[tag] = STATE.GAME_TAGS[tag]
         end
-        return print(old, '->', STATE.GAME_TAGS[tag])
       end,
       update = f
     })
@@ -922,7 +921,6 @@ Save = function()
       local enabledSkin = ENUMS.TAG_STATES.ENABLED
       local enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
       for tag, state in pairs(STATE.GAME_TAGS) do
-        print(tag, state)
         if state == enabledSkin then
           tags[tag] = sourceSkin
         elseif state == enabledPlatform then

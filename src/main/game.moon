@@ -72,11 +72,9 @@ class Game
 					n += 1
 			return t, n
 		@setTags = (t) =>
-			print('setTags')
 			@tags = {}
 			isEmpty = true
 			for tag, source in pairs(t)
-				print(tag, source)
 				isEmpty = false
 				key = table.find(tagsDictionary, tag)
 				if key == nil

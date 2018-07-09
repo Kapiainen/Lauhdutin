@@ -222,7 +222,6 @@ createTagProperty = (tag, state) ->
 							when ENUMS.TAG_STATES.DISABLED then ENUMS.TAG_STATES.ENABLED
 							when ENUMS.TAG_STATES.ENABLED then ENUMS.TAG_STATES.DISABLED
 							else STATE.GAME_TAGS[tag]
-						print(old, '->', STATE.GAME_TAGS[tag])
 					update: f
 				})
 
@@ -644,7 +643,6 @@ export Save = () ->
 				enabledSkin = ENUMS.TAG_STATES.ENABLED
 				enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
 				for tag, state in pairs(STATE.GAME_TAGS)
-					print(tag, state)
 					if state == enabledSkin
 						tags[tag] = sourceSkin
 					elseif state == enabledPlatform

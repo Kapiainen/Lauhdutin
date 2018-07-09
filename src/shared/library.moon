@@ -214,7 +214,6 @@ class Library
 				if game\hasTag(key) ~= nil
 					tagReferenceCounts[key] += 1
 		for key, refCount in pairs(tagReferenceCounts)
-			print(key, refCount)
 			if refCount == 0
 				@tagsDictionary[key] = nil
 

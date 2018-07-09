@@ -381,11 +381,9 @@ do
         return t, n
       end
       self.setTags = function(self, t)
-        print('setTags')
         self.tags = { }
         local isEmpty = true
         for tag, source in pairs(t) do
-          print(tag, source)
           isEmpty = false
           local key = table.find(tagsDictionary, tag)
           if key == nil then

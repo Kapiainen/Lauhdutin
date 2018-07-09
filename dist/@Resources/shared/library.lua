@@ -244,7 +244,6 @@ do
         end
       end
       for key, refCount in pairs(tagReferenceCounts) do
-        print(key, refCount)
         if refCount == 0 then
           self.tagsDictionary[key] = nil
         end
