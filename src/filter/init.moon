@@ -57,8 +57,10 @@ class Slot
 	update: () =>
 		if @property
 			@property.value = @property\update() if @property.update ~= nil
-			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
-			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.value)))
+			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index,
+				utility.replaceUnsupportedChars(@property.title)))
+			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index,
+				utility.replaceUnsupportedChars(@property.value)))
 			return
 		SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" " "]')\format(@index))
 		SKIN\Bang(('[!SetOption "Slot%dValue" "Text" " "]')\format(@index))
@@ -79,7 +81,8 @@ class Slot
 			return true
 		filter = STATE.FILTER_TYPE
 		arguments = json.encode(STATE.ARGUMENTS)\gsub('"', '|')
-		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter, tostring(STATE.STACK), arguments))
+		SKIN\Bang(('[!CommandMeasure "Script" "Filter(%d, %s, \'%s\')" "#ROOTCONFIG#"]')\format(filter,
+			tostring(STATE.STACK), arguments))
 		return false
 
 Game = nil
@@ -192,24 +195,19 @@ createTagProperties = (games, filterStack) ->
 	tags = {}
 	gamesWithTags = 0
 	for game in *games
-		skinTags = game\getTags()
-		platformTags = game\getPlatformTags()
-		gamesWithTags += 1 if (#skinTags > 0 or #platformTags > 0)
-		combinedTags = {}
-		for tag in *skinTags
-			combinedTags[tag] = true
-		for tag in *platformTags
-			combinedTags[tag] = true
-		for tag, _ in pairs(combinedTags)
-			skip = false
-			for f in *filterStack
-				if f.filter == ENUMS.FILTER_TYPES.TAG and f.args.tag == tag
-					skip = true
-					break
-			continue if skip
-			if tags[tag] == nil
-				tags[tag] = 0
-			tags[tag] += 1
+		gameTags, n = game\getTags()
+		if n > 0
+			gamesWithTags += 1
+			for tag, source in pairs(gameTags)
+				skip = false
+				for f in *filterStack
+					if f.filter == ENUMS.FILTER_TYPES.TAG and f.args.tag == tag
+						skip = true
+						break
+				continue if skip
+				if tags[tag] == nil
+					tags[tag] = 0
+				tags[tag] += 1
 	tagProperties = {}
 	tagInverseProperties = {}
 	for tag, numGames in pairs(tags)
@@ -374,6 +372,7 @@ createUninstalledProperty = (numUninstalledGames, numInstalledGames) ->
 	return default, inverse
 
 createProperties = (games, hiddenGames, uninstalledGames, platforms, stack, filterStack) ->
+	-- TODO: Inline stuff to reduce loops and increase performance
 	defaultProperties = {}
 	inverseProperties = {}
 	hiddenDefault, hiddenInverse = createHiddenProperty(#hiddenGames, #games)
@@ -511,7 +510,8 @@ export Handshake = (stack, appliedFilters) ->
 			appliedFilters = appliedFilters\gsub('|', '"')
 			filterStack = json.decode(appliedFilters)
 			if stack
-				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_current_title', 'Filter (current games)')))
+				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(
+					LOCALIZATION\get('filter_window_current_title', 'Filter (current games)')))
 				library = require('shared.library')(COMPONENTS.SETTINGS, false)
 				platformsEnabledStatus = {}
 				temp = {}
@@ -539,16 +539,18 @@ export Handshake = (stack, appliedFilters) ->
 					elseif not games[i]\isInstalled() and not (showUninstalledGames or showHiddenGames)
 						table.insert(uninstalledGames, table.remove(games, i))
 			else
-				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(LOCALIZATION\get('filter_window_all_title', 'Filter')))
+				SKIN\Bang(('[!SetOption "PageTitle" "Text" "%s"]')\format(
+					LOCALIZATION\get('filter_window_all_title', 'Filter')))
 				platforms = [platform for platform in *platforms when platform\isEnabled()]
 				games = io.readJSON('games.json')
-				games = [Game(args) for args in *games.games]
+				games = [Game(args, games.tagsDictionary) for args in *games.games]
 				for i = #games, 1, -1
 					if not games[i]\isVisible()
 						table.insert(hiddenGames, table.remove(games, i))
 					elseif not games[i]\isInstalled()
 						table.insert(uninstalledGames, table.remove(games, i))
-			STATE.DEFAULT_PROPERTIES, STATE.INVERSE_PROPERTIES = createProperties(games, hiddenGames, uninstalledGames, platforms, stack, filterStack)
+			STATE.DEFAULT_PROPERTIES, STATE.INVERSE_PROPERTIES = createProperties(games, hiddenGames,
+				uninstalledGames, platforms, stack, filterStack)
 			STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
 			updateScrollbar()
 			updateSlots()

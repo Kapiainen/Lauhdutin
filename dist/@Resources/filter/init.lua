@@ -278,43 +278,33 @@ createTagProperties = function(games, filterStack)
   local gamesWithTags = 0
   for _index_0 = 1, #games do
     local game = games[_index_0]
-    local skinTags = game:getTags()
-    local platformTags = game:getPlatformTags()
-    if (#skinTags > 0 or #platformTags > 0) then
+    local gameTags, n = game:getTags()
+    if n > 0 then
       gamesWithTags = gamesWithTags + 1
-    end
-    local combinedTags = { }
-    for _index_1 = 1, #skinTags do
-      local tag = skinTags[_index_1]
-      combinedTags[tag] = true
-    end
-    for _index_1 = 1, #platformTags do
-      local tag = platformTags[_index_1]
-      combinedTags[tag] = true
-    end
-    for tag, _ in pairs(combinedTags) do
-      local _continue_0 = false
-      repeat
-        local skip = false
-        for _index_1 = 1, #filterStack do
-          local f = filterStack[_index_1]
-          if f.filter == ENUMS.FILTER_TYPES.TAG and f.args.tag == tag then
-            skip = true
+      for tag, source in pairs(gameTags) do
+        local _continue_0 = false
+        repeat
+          local skip = false
+          for _index_1 = 1, #filterStack do
+            local f = filterStack[_index_1]
+            if f.filter == ENUMS.FILTER_TYPES.TAG and f.args.tag == tag then
+              skip = true
+              break
+            end
+          end
+          if skip then
+            _continue_0 = true
             break
           end
-        end
-        if skip then
+          if tags[tag] == nil then
+            tags[tag] = 0
+          end
+          tags[tag] = tags[tag] + 1
           _continue_0 = true
+        until true
+        if not _continue_0 then
           break
         end
-        if tags[tag] == nil then
-          tags[tag] = 0
-        end
-        tags[tag] = tags[tag] + 1
-        _continue_0 = true
-      until true
-      if not _continue_0 then
-        break
       end
     end
   end
@@ -804,7 +794,7 @@ Handshake = function(stack, appliedFilters)
         local _list_0 = games.games
         for _index_0 = 1, #_list_0 do
           local args = _list_0[_index_0]
-          _accum_0[_len_0] = Game(args)
+          _accum_0[_len_0] = Game(args, games.tagsDictionary)
           _len_0 = _len_0 + 1
         end
         games = _accum_0
