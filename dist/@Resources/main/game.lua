@@ -382,9 +382,7 @@ do
       end
       self.setTags = function(self, t)
         print('setTags')
-        if self.tags == nil then
-          self.tags = { }
-        end
+        self.tags = { }
         local isEmpty = true
         for tag, source in pairs(t) do
           print(tag, source)

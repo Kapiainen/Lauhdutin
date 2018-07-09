@@ -73,7 +73,7 @@ class Game
 			return t, n
 		@setTags = (t) =>
 			print('setTags')
-			@tags = {} if @tags == nil
+			@tags = {}
 			isEmpty = true
 			for tag, source in pairs(t)
 				print(tag, source)
