@@ -53,7 +53,8 @@ class Slot
 	update: () =>
 		if @property ~= nil
 			@property.value = @property\update() if @property.update ~= nil
-			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index, utility.replaceUnsupportedChars(@property.title)))
+			SKIN\Bang(('[!SetOption "Slot%dTitle" "Text" "%s"]')\format(@index,
+				utility.replaceUnsupportedChars(@property.title)))
 			value = utility.replaceUnsupportedChars(@property.value)
 			SKIN\Bang(('[!SetOption "Slot%dValue" "Text" "%s"]')\format(@index, value))
 			if value\len() > @maxValueStringLength
@@ -87,51 +88,49 @@ additionalEnums = () ->
 getGamesAndTags = () ->
 	games = io.readJSON(STATE.PATHS.GAMES)
 	STATE.GAMES_VERSION = games.version
+	STATE.TAGS_DICTIONARY = games.tagsDictionary
 	STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
-	STATE.ALL_GAMES = [Game(args) for args in *games.games]
+	STATE.ALL_GAMES = [Game(args, STATE.TAGS_DICTIONARY) for args in *games.games]
 	STATE.ALL_TAGS = {}
-	for game in *STATE.ALL_GAMES
-		for tag in *game\getTags()
-			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-		for tag in *game\getPlatformTags()
-			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
+	for key, tag in pairs(STATE.TAGS_DICTIONARY)
+		STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
 
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
 	STATE.PATHS.RESOURCES = SKIN\GetVariable('@')
 	dofile(('%s%s')\format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
 	COMPONENTS.STATUS = require('shared.status')()
-	success, err = pcall(
-		() ->
-			require('shared.enums')
-			additionalEnums()
-			utility = require('shared.utility')
-			utility.createJSONHelpers()
-			COMPONENTS.SETTINGS = require('shared.settings')()
-			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
-			log('Initializing Game config')
-			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
-			Game = require('main.game')
-			STATE.ALL_PLATFORMS = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
-			getGamesAndTags()
-			STATE.NUM_SLOTS = 4
-			STATE.SCROLL_INDEX = 1
-			valueMeter = SKIN\GetMeter('Slot1Value')
-			maxValueStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
-			COMPONENTS.SLOTS = [Slot(i, maxValueStringLength) for i = 1, STATE.NUM_SLOTS]
-			scrollbar = SKIN\GetMeter('Scrollbar')
-			STATE.SCROLLBAR.START = scrollbar\GetY()
-			STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
-			STATE.SUPPORTED_BANNER_EXTENSIONS = require('main.platforms.platform')(COMPONENTS.SETTINGS)\getBannerExtensions()
-			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
-			SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
-			SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
-			COMPONENTS.STATUS\hide()
+	success, err = pcall(() ->
+		require('shared.enums')
+		additionalEnums()
+		utility = require('shared.utility')
+		utility.createJSONHelpers()
+		COMPONENTS.SETTINGS = require('shared.settings')()
+		export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+		log('Initializing Game config')
+		export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
+		Game = require('main.game')
+		STATE.ALL_PLATFORMS = [Platform(COMPONENTS.SETTINGS) for Platform in *require('main.platforms')]
+		getGamesAndTags()
+		STATE.NUM_SLOTS = 4
+		STATE.SCROLL_INDEX = 1
+		valueMeter = SKIN\GetMeter('Slot1Value')
+		maxValueStringLength = math.round(valueMeter\GetW() / valueMeter\GetOption('FontSize'))
+		COMPONENTS.SLOTS = [Slot(i, maxValueStringLength) for i = 1, STATE.NUM_SLOTS]
+		scrollbar = SKIN\GetMeter('Scrollbar')
+		STATE.SCROLLBAR.START = scrollbar\GetY()
+		STATE.SCROLLBAR.MAX_HEIGHT = scrollbar\GetH()
+		STATE.SUPPORTED_BANNER_EXTENSIONS = STATE.ALL_PLATFORMS[1]\getBannerExtensions()
+		SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(
+			LOCALIZATION\get('button_label_save','Save')))
+		SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(
+			LOCALIZATION\get('button_label_cancel', 'Cancel')))
+		SKIN\Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
+		COMPONENTS.STATUS\hide()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
-export Update = () ->
-	return
+export Update = () -> return
 
 updateTitle = (game, maxStringLength) ->
 	title = utility.replaceUnsupportedChars(game\getTitle())
@@ -218,10 +217,12 @@ createTagProperty = (tag, state) ->
 					title: tag
 					value: f()
 					action: (index) =>
+						old = STATE.GAME_TAGS[tag]
 						STATE.GAME_TAGS[tag] = switch STATE.GAME_TAGS[tag]
 							when ENUMS.TAG_STATES.DISABLED then ENUMS.TAG_STATES.ENABLED
 							when ENUMS.TAG_STATES.ENABLED then ENUMS.TAG_STATES.DISABLED
 							else STATE.GAME_TAGS[tag]
+						print(old, '->', STATE.GAME_TAGS[tag])
 					update: f
 				})
 
@@ -234,8 +235,7 @@ createTagProperties = () ->
 		Property({
 			title: LOCALIZATION\get('game_tag_create', 'Create a new tag')
 			value: ''
-			action: (index) =>
-				StartCreatingTag(index)
+			action: (index) => StartCreatingTag(index)
 		})
 	)
 	return properties
@@ -244,7 +244,9 @@ createPlatformProperty = (game, platform) ->
 	get = () ->
 		platformOverride = game\getPlatformOverride()
 		return if platformOverride ~= nil then platformOverride .. '*' else platform\getName()
-	action = if platform\getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then nil else (index) => StartEditingPlatformOverride(index)
+	action = switch platform\getPlatformID()
+		when ENUMS.PLATFORM_IDS.CUSTOM then (index) => StartEditingPlatformOverride(index)
+		else nil
 	return Property({
 		title: LOCALIZATION\get('game_platform', 'Platform')
 		value: get()
@@ -357,35 +359,32 @@ createNotesProperty = (game) ->
 	})
 
 createTagsProperty = (game) ->
+	sourcePlatform = ENUMS.TAG_SOURCES.PLATFORM
 	f = () =>
-		tags = {}
-		for tag in *game\getTags()
-			tags[tag] = false
-		for tag in *game\getPlatformTags()
-			tags[tag] = true
-		if tags
-			tags = [{tag: tag, fromPlatform: fromPlatform} for tag, fromPlatform in pairs(tags)]
+		gameTags, n = game\getTags()
+		if n > 0
+			tags = [{tag: tag, fromPlatform: source == sourcePlatform} for tag, source in pairs(gameTags)]
 			table.sort(tags, (a, b) -> return a.tag < b.tag)
 			str = ''
 			for entry in *tags
-				if entry.fromPlatform
-					str ..= (' | %s*')\format(entry.tag)
-				else
-					str ..= (' | %s')\format(entry.tag)
-			str = str\sub(4)
-			if str ~= ''
-				return str
+				str ..= ' | ' .. entry.tag
+				str ..= '*' if entry.fromPlatform
+			return str\sub(4) if str ~= ''
 		return LOCALIZATION\get('game_tags_none', 'None')
+	sourceSkin = ENUMS.TAG_SOURCES.SKIN
+	enabledSkin = ENUMS.TAG_STATES.ENABLED
+	enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
 	return Property({
 		title: LOCALIZATION\get('game_tags', 'Tags')
 		value: f()
 		action: (index) =>
+			gameTags, n = game\getTags()
 			STATE.GAME_TAGS = {tag, state for tag, state in pairs(STATE.ALL_TAGS)}
-			for tag in *game\getTags()
-				STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
-			for tag in *game\getPlatformTags()
-				STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
-			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_accept', 'Accept')))
+			currentGameTags = STATE.GAME_TAGS
+			for tag, source in pairs(gameTags)
+				currentGameTags[tag] = if source == sourceSkin then enabledSkin else enabledPlatform
+			SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(
+				LOCALIZATION\get('button_label_accept', 'Accept')))
 			STATE.TAG_PROPERTIES = createTagProperties()
 			STATE.PROPERTIES = STATE.TAG_PROPERTIES
 			STATE.PREVIOUS_SCROLL_INDEX = STATE.SCROLL_INDEX
@@ -473,7 +472,8 @@ createBannerReacquisitionProperty = (game, platform) ->
 		switch game\getPlatformID()
 			when ENUMS.PLATFORM_IDS.STEAM, ENUMS.PLATFORM_IDS.GOG_GALAXY
 				if game\getPlatformOverride() == nil
-					SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+					SKIN\Bang(('[!CommandMeasure "Script" "ReacquireBanner(%d)" "#ROOTCONFIG#"]')\format(
+						game\getGameID()))
 					return
 		unless exists
 			game\setBanner(nil)
@@ -492,7 +492,8 @@ createOpenStorePageProperty = (game) ->
 			if game\getPlatformOverride() == nil
 				value = LOCALIZATION\get('button_label_platform_supported', 'Platform supported')
 				action = () ->
-					SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
+					SKIN\Bang(('[!CommandMeasure "Script" "OpenStorePage(%d)" "#ROOTCONFIG#"]')\format(
+						game\getGameID()))
 					SKIN\Bang('[!DeactivateConfig]')
 	return Property({
 		title: LOCALIZATION\get('button_label_open_store_page', 'Open store page')
@@ -599,18 +600,22 @@ export MouseLeave = (index) ->
 		SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonBaseColor#"]')\format(index))
 
 export MouseLeftPress = (index) ->
-	return unless COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]\hasAction()
+	slots = COMPONENTS.SLOTS
+	return unless slots ~= nil and slots[index] ~= nil and slots[index]\hasAction()
 	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]')\format(index))
 
 export ButtonAction = (index) ->
-	return unless COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]\hasAction()
+	slots = COMPONENTS.SLOTS
+	return unless slots ~= nil and slots[index] ~= nil and slots[index]\hasAction()
 	SKIN\Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]')\format(index))
-	COMPONENTS.SLOTS[index]\action()
+	slots[index]\action()
 	updateSlots()
 
 showDefaultProperties = () ->
-	SKIN\Bang(('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save')))
-	SKIN\Bang(('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel', 'Cancel')))
+	bangs = ('[!SetOption "SaveButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_save', 'Save'))
+	bangs ..= ('[!SetOption "CancelButton" "Text" "%s"]')\format(LOCALIZATION\get('button_label_cancel',
+		'Cancel'))
+	SKIN\Bang(bangs)
 	STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
 	STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
 	STATE.PREVIOUS_SCROLL_INDEX = 1
@@ -618,17 +623,34 @@ showDefaultProperties = () ->
 	updateSlots()
 
 export Save = () ->
-	success, err = pcall(
-		() ->
-			return if STATE.ACTIVE_INPUT == true
-			switch STATE.PROPERTIES
-				when STATE.DEFAULT_PROPERTIES
-					io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, updated: STATE.GAMES_UPDATED_TIMESTAMP})
-					gameID = STATE.GAME\getGameID()
-					SKIN\Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]')\format(gameID))
-				when STATE.TAG_PROPERTIES
-					STATE.GAME\setTags([tag for tag, state in pairs(STATE.GAME_TAGS) when state == ENUMS.TAG_STATES.ENABLED])
-					showDefaultProperties()
+	success, err = pcall(() ->
+		return if STATE.ACTIVE_INPUT == true
+		switch STATE.PROPERTIES
+			when STATE.DEFAULT_PROPERTIES
+				io.writeJSON(STATE.PATHS.GAMES, {
+					version: STATE.GAMES_VERSION
+					tagsDictionary: STATE.TAGS_DICTIONARY
+					games: STATE.ALL_GAMES
+					updated: STATE.GAMES_UPDATED_TIMESTAMP
+				})
+				gameID = STATE.GAME\getGameID()
+				bangs = ('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"]')\format(gameID)
+				bangs ..= '[!DeactivateConfig]'
+				SKIN\Bang(bangs)
+			when STATE.TAG_PROPERTIES
+				tags = {}
+				sourceSkin = ENUMS.TAG_SOURCES.SKIN
+				sourcePlatform = ENUMS.TAG_SOURCES.PLATFORM
+				enabledSkin = ENUMS.TAG_STATES.ENABLED
+				enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
+				for tag, state in pairs(STATE.GAME_TAGS)
+					print(tag, state)
+					if state == enabledSkin
+						tags[tag] = sourceSkin
+					elseif state == enabledPlatform
+						tags[tag] = sourcePlatform
+				STATE.GAME\setTags(tags)
+				showDefaultProperties()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -762,10 +784,7 @@ export OnEditedHoursPlayed = (hoursPlayed) ->
 
 -- Tags
 export StartCreatingTag = (index) ->
-	success, err = pcall(
-		() ->
-			startEditing(index, 2)
-	)
+	success, err = pcall(() -> startEditing(index, 2))
 	COMPONENTS.STATUS\show(err, true) unless success
 
 export OnCreatedTag = (tag) ->

@@ -129,6 +129,7 @@ local getGamesAndTags
 getGamesAndTags = function()
   local games = io.readJSON(STATE.PATHS.GAMES)
   STATE.GAMES_VERSION = games.version
+  STATE.TAGS_DICTIONARY = games.tagsDictionary
   STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
   do
     local _accum_0 = { }
@@ -136,25 +137,14 @@ getGamesAndTags = function()
     local _list_0 = games.games
     for _index_0 = 1, #_list_0 do
       local args = _list_0[_index_0]
-      _accum_0[_len_0] = Game(args)
+      _accum_0[_len_0] = Game(args, STATE.TAGS_DICTIONARY)
       _len_0 = _len_0 + 1
     end
     STATE.ALL_GAMES = _accum_0
   end
   STATE.ALL_TAGS = { }
-  local _list_0 = STATE.ALL_GAMES
-  for _index_0 = 1, #_list_0 do
-    local game = _list_0[_index_0]
-    local _list_1 = game:getTags()
-    for _index_1 = 1, #_list_1 do
-      local tag = _list_1[_index_1]
-      STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-    end
-    local _list_2 = game:getPlatformTags()
-    for _index_1 = 1, #_list_2 do
-      local tag = _list_2[_index_1]
-      STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
-    end
+  for key, tag in pairs(STATE.TAGS_DICTIONARY) do
+    STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
   end
 end
 Initialize = function()
@@ -206,7 +196,7 @@ Initialize = function()
     local scrollbar = SKIN:GetMeter('Scrollbar')
     STATE.SCROLLBAR.START = scrollbar:GetY()
     STATE.SCROLLBAR.MAX_HEIGHT = scrollbar:GetH()
-    STATE.SUPPORTED_BANNER_EXTENSIONS = require('main.platforms.platform')(COMPONENTS.SETTINGS):getBannerExtensions()
+    STATE.SUPPORTED_BANNER_EXTENSIONS = STATE.ALL_PLATFORMS[1]:getBannerExtensions()
     SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save')))
     SKIN:Bang(('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel')))
     SKIN:Bang('[!CommandMeasure "Script" "HandshakeGame()" "#ROOTCONFIG#"]')
@@ -326,6 +316,7 @@ createTagProperty = function(tag, state)
       title = tag,
       value = f(),
       action = function(self, index)
+        local old = STATE.GAME_TAGS[tag]
         local _exp_0 = STATE.GAME_TAGS[tag]
         if ENUMS.TAG_STATES.DISABLED == _exp_0 then
           STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
@@ -334,6 +325,7 @@ createTagProperty = function(tag, state)
         else
           STATE.GAME_TAGS[tag] = STATE.GAME_TAGS[tag]
         end
+        return print(old, '->', STATE.GAME_TAGS[tag])
       end,
       update = f
     })
@@ -367,12 +359,13 @@ createPlatformProperty = function(game, platform)
     end
   end
   local action
-  if platform:getPlatformID() ~= ENUMS.PLATFORM_IDS.CUSTOM then
-    action = nil
-  else
+  local _exp_0 = platform:getPlatformID()
+  if ENUMS.PLATFORM_IDS.CUSTOM == _exp_0 then
     action = function(self, index)
       return StartEditingPlatformOverride(index)
     end
+  else
+    action = nil
   end
   return Property({
     title = LOCALIZATION:get('game_platform', 'Platform'),
@@ -532,27 +525,19 @@ createNotesProperty = function(game)
 end
 local createTagsProperty
 createTagsProperty = function(game)
+  local sourcePlatform = ENUMS.TAG_SOURCES.PLATFORM
   local f
   f = function(self)
-    local tags = { }
-    local _list_0 = game:getTags()
-    for _index_0 = 1, #_list_0 do
-      local tag = _list_0[_index_0]
-      tags[tag] = false
-    end
-    local _list_1 = game:getPlatformTags()
-    for _index_0 = 1, #_list_1 do
-      local tag = _list_1[_index_0]
-      tags[tag] = true
-    end
-    if tags then
+    local gameTags, n = game:getTags()
+    if n > 0 then
+      local tags
       do
         local _accum_0 = { }
         local _len_0 = 1
-        for tag, fromPlatform in pairs(tags) do
+        for tag, source in pairs(gameTags) do
           _accum_0[_len_0] = {
             tag = tag,
-            fromPlatform = fromPlatform
+            fromPlatform = source == sourcePlatform
           }
           _len_0 = _len_0 + 1
         end
@@ -564,23 +549,25 @@ createTagsProperty = function(game)
       local str = ''
       for _index_0 = 1, #tags do
         local entry = tags[_index_0]
+        str = str .. (' | ' .. entry.tag)
         if entry.fromPlatform then
-          str = str .. (' | %s*'):format(entry.tag)
-        else
-          str = str .. (' | %s'):format(entry.tag)
+          str = str .. '*'
         end
       end
-      str = str:sub(4)
       if str ~= '' then
-        return str
+        return str:sub(4)
       end
     end
     return LOCALIZATION:get('game_tags_none', 'None')
   end
+  local sourceSkin = ENUMS.TAG_SOURCES.SKIN
+  local enabledSkin = ENUMS.TAG_STATES.ENABLED
+  local enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
   return Property({
     title = LOCALIZATION:get('game_tags', 'Tags'),
     value = f(),
     action = function(self, index)
+      local gameTags, n = game:getTags()
       do
         local _tbl_0 = { }
         for tag, state in pairs(STATE.ALL_TAGS) do
@@ -588,15 +575,13 @@ createTagsProperty = function(game)
         end
         STATE.GAME_TAGS = _tbl_0
       end
-      local _list_0 = game:getTags()
-      for _index_0 = 1, #_list_0 do
-        local tag = _list_0[_index_0]
-        STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED
-      end
-      local _list_1 = game:getPlatformTags()
-      for _index_0 = 1, #_list_1 do
-        local tag = _list_1[_index_0]
-        STATE.GAME_TAGS[tag] = ENUMS.TAG_STATES.ENABLED_PLATFORM
+      local currentGameTags = STATE.GAME_TAGS
+      for tag, source in pairs(gameTags) do
+        if source == sourceSkin then
+          currentGameTags[tag] = enabledSkin
+        else
+          currentGameTags[tag] = enabledPlatform
+        end
       end
       SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_accept', 'Accept')))
       STATE.TAG_PROPERTIES = createTagProperties()
@@ -887,23 +872,26 @@ MouseLeave = function(index)
   end
 end
 MouseLeftPress = function(index)
-  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
+  local slots = COMPONENTS.SLOTS
+  if not (slots ~= nil and slots[index] ~= nil and slots[index]:hasAction()) then
     return 
   end
   return SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonPressedColor#"]'):format(index))
 end
 ButtonAction = function(index)
-  if not (COMPONENTS.SLOTS ~= nil and COMPONENTS.SLOTS[index] ~= nil and COMPONENTS.SLOTS[index]:hasAction()) then
+  local slots = COMPONENTS.SLOTS
+  if not (slots ~= nil and slots[index] ~= nil and slots[index]:hasAction()) then
     return 
   end
   SKIN:Bang(('[!SetOption "Slot%dButton" "SolidColor" "#ButtonHighlightedColor#"]'):format(index))
-  COMPONENTS.SLOTS[index]:action()
+  slots[index]:action()
   return updateSlots()
 end
 local showDefaultProperties
 showDefaultProperties = function()
-  SKIN:Bang(('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save')))
-  SKIN:Bang(('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel')))
+  local bangs = ('[!SetOption "SaveButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_save', 'Save'))
+  bangs = bangs .. ('[!SetOption "CancelButton" "Text" "%s"]'):format(LOCALIZATION:get('button_label_cancel', 'Cancel'))
+  SKIN:Bang(bangs)
   STATE.PROPERTIES = STATE.DEFAULT_PROPERTIES
   STATE.SCROLL_INDEX = STATE.PREVIOUS_SCROLL_INDEX
   STATE.PREVIOUS_SCROLL_INDEX = 1
@@ -919,23 +907,29 @@ Save = function()
     if STATE.DEFAULT_PROPERTIES == _exp_0 then
       io.writeJSON(STATE.PATHS.GAMES, {
         version = STATE.GAMES_VERSION,
+        tagsDictionary = STATE.TAGS_DICTIONARY,
         games = STATE.ALL_GAMES,
         updated = STATE.GAMES_UPDATED_TIMESTAMP
       })
       local gameID = STATE.GAME:getGameID()
-      return SKIN:Bang(('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"][!DeactivateConfig]'):format(gameID))
+      local bangs = ('[!CommandMeasure "Script" "UpdateGame(%d)" "#ROOTCONFIG#"]'):format(gameID)
+      bangs = bangs .. '[!DeactivateConfig]'
+      return SKIN:Bang(bangs)
     elseif STATE.TAG_PROPERTIES == _exp_0 then
-      STATE.GAME:setTags((function()
-        local _accum_0 = { }
-        local _len_0 = 1
-        for tag, state in pairs(STATE.GAME_TAGS) do
-          if state == ENUMS.TAG_STATES.ENABLED then
-            _accum_0[_len_0] = tag
-            _len_0 = _len_0 + 1
-          end
+      local tags = { }
+      local sourceSkin = ENUMS.TAG_SOURCES.SKIN
+      local sourcePlatform = ENUMS.TAG_SOURCES.PLATFORM
+      local enabledSkin = ENUMS.TAG_STATES.ENABLED
+      local enabledPlatform = ENUMS.TAG_STATES.ENABLED_PLATFORM
+      for tag, state in pairs(STATE.GAME_TAGS) do
+        print(tag, state)
+        if state == enabledSkin then
+          tags[tag] = sourceSkin
+        elseif state == enabledPlatform then
+          tags[tag] = sourcePlatform
         end
-        return _accum_0
-      end)())
+      end
+      STATE.GAME:setTags(tags)
       return showDefaultProperties()
     end
   end)
