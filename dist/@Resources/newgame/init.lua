@@ -11,8 +11,6 @@ STATE = {
   GAME = nil,
   ALL_GAMES = nil,
   GAMES_VERSION = nil,
-  ALL_TAGS = nil,
-  ALL_PLATFORMS = nil,
   CENTERED = false,
   ACTIVE_INPUT = false,
   PROGRESS = 1
@@ -218,6 +216,7 @@ Handshake = function(gameID)
   local success, err = pcall(function()
     log('Accepting NewGame handshake', gameID)
     local games = io.readJSON(STATE.PATHS.GAMES)
+    STATE.TAGS_DICTIONARY = games.tagsDictionary
     STATE.GAMES_VERSION = games.version
     STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
     do
@@ -226,7 +225,7 @@ Handshake = function(gameID)
       local _list_0 = games.games
       for _index_0 = 1, #_list_0 do
         local args = _list_0[_index_0]
-        _accum_0[_len_0] = Game(args)
+        _accum_0[_len_0] = Game(args, STATE.TAGS_DICTIONARY)
         _len_0 = _len_0 + 1
       end
       STATE.ALL_GAMES = _accum_0
@@ -302,6 +301,7 @@ Save = function()
       table.insert(STATE.ALL_GAMES, game)
       io.writeJSON(STATE.PATHS.GAMES, {
         version = STATE.GAMES_VERSION,
+        tagsDictionary = STATE.TAGS_DICTIONARY,
         games = STATE.ALL_GAMES,
         updated = STATE.GAMES_UPDATED_TIMESTAMP
       })
