@@ -1,5 +1,4 @@
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local Battlenet
 do
   local _class_0
@@ -148,7 +147,7 @@ do
       end
       for _index_0 = 1, #games do
         local args = games[_index_0]
-        table.insert(self.games, Game(args))
+        table.insert(self.games, args)
       end
     end
   }

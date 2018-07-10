@@ -57,7 +57,7 @@ def create_global_variables():
 	assert res.get("banner_height", 0) > 0, "Banner height is invalid."
 	assert res.get("mosaic_tiles_wide", 2) > 0, "The number of tiles widthwise in the mosaic thumbnail is invalid."
 	assert res.get("mosaic_tiles_high", 2) > 0, "The number of tiles heightwise in the mosaic thumbnail is invalid."
-	res["tags"] = res.get("tags", {})
+	res["ta"] = res.get("ta", {})
 	return res
 
 def set_title(title):
@@ -125,43 +125,43 @@ def update_database(db = []):
 	# Update old entries here
 	i = 0
 	num_videos = len(db)
-	tagLookup = CONFIG["tags"]
+	tagLookup = CONFIG["ta"]
 	for video in db:
 		i += 1
 		set_title("%d/%d - Updating existing entries" % (i, num_videos))
-		if video["platformID"] != platform_id:
+		if video["plID"] != platform_id:
 			continue
 		updating = False
 		removing = False
-		path = video["path"][1:-1]
+		path = video["pa"][1:-1]
 		if not os.path.isfile(path):
 			removing = True
-			os.remove(os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"]))
+			os.remove(os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"]))
 			db.remove(video)
 		if removing:
-			print("Removing video: %s" % video.get("title", ""))
+			print("Removing video: %s" % video.get("ti", ""))
 			updated_videos += 1
 		else:
-			if video.get("platformOverride", None) == None:
+			if video.get("plOv", None) == None:
 				updating = True
 				relpath = None
 				for library in CONFIG["video_inputs"]:
-					temp = os.path.relpath(video["path"][1:-1], library)
+					temp = os.path.relpath(video["pa"][1:-1], library)
 					if relpath == None or len(temp) < len(relpath):
 						relpath = temp
 				assert relpath != None
 				category, file = os.path.split(relpath)
-				video["platformOverride"] = category
-			new_tags = generate_tags(video["title"], tagLookup, video["tags"][:])
-			old_tags = video["tags"]
+				video["plOv"] = category
+			new_tags = generate_tags(video["ti"], tagLookup, video["ta"][:])
+			old_tags = video["ta"]
 			if len(new_tags) != len(old_tags) or len(set(new_tags) & set(old_tags)) != len(new_tags):
 				updating = True
-				video["tags"] = new_tags
+				video["ta"] = new_tags
 			if updating:
-				print("Updating video: %s" % video.get("title", ""))
+				print("Updating video: %s" % video.get("ti", ""))
 				updated_videos += 1
 	# Add new entries
-	old_videos = [video["path"] for video in db if video.get("path", None) != None]
+	old_videos = [video["pa"] for video in db if video.get("pa", None) != None]
 	new_videos = []
 	categories = []
 	for library in CONFIG["video_inputs"]:
@@ -182,7 +182,7 @@ def update_database(db = []):
 							"category": category,
 							"root": root,
 							"file": file,
-							"path": path
+							"pa": path
 						})
 		else:
 			for root, dirs, files in os.walk(library):
@@ -196,7 +196,7 @@ def update_database(db = []):
 					new_videos.append({
 						"root": root,
 						"file": file,
-						"path": path
+						"pa": path
 					})
 	new_entries = []
 	i = 0
@@ -207,39 +207,39 @@ def update_database(db = []):
 		category = video.get("category", None)
 		root = video["root"]
 		file = video["file"]
-		path = video["path"]
+		path = video["pa"]
 		if category != None:
 			print("Adding file: %s - %s" % (category, file))
 			title = "%s%s%s" % (category, CATEGORY_TITLE_SEPARATOR, file[:file.rfind(".")])
 			duration = get_duration(os.path.join(root, file))
 			new_entries.append({
-				"path": path,
-				"processOverride": CONFIG["player_process"],
-				"title": title,
-				"expectedBanner": title,
-				"platformID": platform_id,
-				"lastPlayed": 0,
-				"hoursPlayed": (duration / 3600.0),
-				"uninstalled": False,
-				"notes": "%d minutes" % round(duration / 60.0),
-				"tags": generate_tags(title, tagLookup, [classify_duration(duration), category]),
-				"platformOverride": category
+				"pa": path,
+				"prOv": CONFIG["player_process"],
+				"ti": title,
+				"exBa": title,
+				"plID": platform_id,
+				"laPl": 0,
+				"hoPl": (duration / 3600.0),
+				"un": False,
+				"no": "%d minutes" % round(duration / 60.0),
+				"ta": generate_tags(title, tagLookup, [classify_duration(duration), category]),
+				"plOv": category
 			})
 		else:
 			print("Adding file: %s" % file)
 			title = file[:file.rfind(".")]
 			duration = get_duration(os.path.join(root, file))
 			new_entries.append({
-				"path": path,
-				"processOverride": CONFIG["player_process"],
-				"title": title,
-				"expectedBanner": title,
-				"platformID": platform_id,
-				"lastPlayed": 0,
-				"hoursPlayed": (duration / 3600.0),
-				"uninstalled": False,
-				"notes": "%d minutes" % round(duration / 60.0),
-				"tags": generate_tags(title, tagLookup, [classify_duration(duration)]),
+				"pa": path,
+				"prOv": CONFIG["player_process"],
+				"ti": title,
+				"exBa": title,
+				"plID": platform_id,
+				"laPl": 0,
+				"hoPl": (duration / 3600.0),
+				"un": False,
+				"no": "%d minutes" % round(duration / 60.0),
+				"ta": generate_tags(title, tagLookup, [classify_duration(duration)]),
 			})
 	db.extend(new_entries)
 	return updated_videos, len(new_entries)
@@ -258,18 +258,18 @@ def resize_thumbnail(path):
 
 # Option 3 - Generate thumbnails for the videos in your database.
 def generate_thumbnail(args):
-	video_path = args["path"]
+	video_path = args["pa"]
 	timestamp = args["timestamp"]
-	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["title"])
+	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["ti"])
 	ffmpeg = subprocess.Popen([CONFIG["ffmpeg"], "-i", video_path, "-ss", "00:%s.000" % timestamp, "-vframes", "1", thumbnail])
 	ffmpeg.wait()
 	resize_thumbnail(thumbnail)
 
 # Option 4
 def generate_mosaic_thumbnail(args):
-	video_path = args["path"]
+	video_path = args["pa"]
 	duration = get_duration(video_path)
-	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["title"])
+	thumbnail = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % args["ti"])
 	tiles_wide = CONFIG["mosaic_tiles_wide"]
 	tiles_high = CONFIG["mosaic_tiles_high"]
 	num_frames = float(tiles_wide * tiles_high)
@@ -332,16 +332,16 @@ if __name__ == "__main__":
 				db = load_database()
 				videos = []
 				for video in db:
-					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"])
+					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"])
 					if os.path.isfile(path):
 						continue
 					videos.append({
-						"path": video["path"][1:-1],
+						"pa": video["pa"][1:-1],
 						"timestamp": timestamp,
-						"title": video["title"]
+						"ti": video["ti"]
 					})
 				if len(videos) > 0:
-					videos = sorted(videos, key=lambda k: k["title"])
+					videos = sorted(videos, key=lambda k: k["ti"])
 					i = 0
 					num_videos = len(videos)
 					total_time = 0
@@ -356,22 +356,22 @@ if __name__ == "__main__":
 						total_time += time.time() - start_time
 					print("\nGenerated thumbnail for:")
 					for video in videos:
-						print("	%s" % video["title"])
+						print("	%s" % video["ti"])
 				else:
 					print("\nNo videos to generate thumbnails for...")
 			elif choice == 4:
 				db = load_database()
 				videos = []
 				for video in db:
-					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"])
+					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"])
 					if os.path.isfile(path):
 						continue
 					videos.append({
-						"path": video["path"][1:-1],
-						"title": video["title"]
+						"pa": video["pa"][1:-1],
+						"ti": video["ti"]
 					})
 				if len(videos) > 0:
-					videos = sorted(videos, key=lambda k: k["title"])
+					videos = sorted(videos, key=lambda k: k["ti"])
 					i = 0
 					num_videos = len(videos)
 					total_time = 0
@@ -386,12 +386,12 @@ if __name__ == "__main__":
 						total_time += time.time() - start_time
 					print("\nGenerated mosaic thumbnail for:")
 					for video in videos:
-						print("	%s" % video["title"])
+						print("	%s" % video["ti"])
 				else:
 					print("\nNo videos to generate mosaic thumbnails for...")
 			elif choice == 5:
 				db = load_database()
-				thumbnails = [os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["title"]) for video in db]
+				thumbnails = [os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"]) for video in db]
 				if len(thumbnails) > 0:
 					i = 0
 					num_thumbnails = len(thumbnails)

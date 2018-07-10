@@ -13,8 +13,6 @@ export STATE = {
 	GAME: nil
 	ALL_GAMES: nil
 	GAMES_VERSION: nil
-	ALL_TAGS: nil
-	ALL_PLATFORMS: nil
 	CENTERED: false
 	ACTIVE_INPUT: false
 	PROGRESS: 1
@@ -146,9 +144,10 @@ export Handshake = (gameID) ->
 		() ->
 			log('Accepting NewGame handshake', gameID)
 			games = io.readJSON(STATE.PATHS.GAMES)
+			STATE.TAGS_DICTIONARY = games.tagsDictionary
 			STATE.GAMES_VERSION = games.version
 			STATE.GAMES_UPDATED_TIMESTAMP = games.updated or os.date('*t')
-			STATE.ALL_GAMES = [Game(args) for args in *games.games]
+			STATE.ALL_GAMES = [Game(args, STATE.TAGS_DICTIONARY) for args in *games.games]
 			STATE.ARGS = {
 				title: ''
 				path: ''
@@ -203,7 +202,12 @@ export Save = () ->
 					STATE.ARGS.path = ('"%s"')\format(STATE.ARGS.path)
 				game = Game(STATE.ARGS)
 				table.insert(STATE.ALL_GAMES, game)
-				io.writeJSON(STATE.PATHS.GAMES, {version: STATE.GAMES_VERSION, games: STATE.ALL_GAMES, updated: STATE.GAMES_UPDATED_TIMESTAMP})
+				io.writeJSON(STATE.PATHS.GAMES, {
+					version: STATE.GAMES_VERSION
+					tagsDictionary: STATE.TAGS_DICTIONARY
+					games: STATE.ALL_GAMES
+					updated: STATE.GAMES_UPDATED_TIMESTAMP
+				})
 				SKIN\Bang(('[!CommandMeasure "Script" "OnAddGame(%d)" "#ROOTCONFIG#"]')\format(game\getGameID()))
 				SKIN\Bang('[!DeactivateConfig]')
 	)

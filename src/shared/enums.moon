@@ -67,4 +67,8 @@ export ENUMS = {
 		NOTES: 8
 		MAX: 9
 	}
+	TAG_SOURCES: {
+		SKIN: 1
+		PLATFORM: 2
+	}
 }

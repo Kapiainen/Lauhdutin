@@ -1,7 +1,7 @@
 utility = require('shared.utility')
 
 class Game
-	new: (args) =>
+	new: (args, tagsDictionary) =>
 		title = args.ti or args.title
 		assert(type(title) == 'string' and title\trim() ~= '', 'main.game.Game')
 		@title = @_moveThe(title)
@@ -23,18 +23,75 @@ class Game
 		@process = args.pr or args.process or @_parseProcess(@path)
 		@uninstalled = args.un or args.uninstalled
 		@gameID = args.gaID or args.gameID
-		@platformTags = args.plTa or args.platformTags
-		@platformTags = nil if @platformTags ~= nil and #@platformTags == 0
 		-- User-generated information, which needs to be used in the 'merge' method.
 		@processOverride = args.prOv or args.processOverride
 		@hidden = args.hi or args.hidden
 		@lastPlayed = args.laPl or args.lastPlayed
 		@hoursPlayed = args.hoPl or args.hoursPlayed
-		@tags = args.ta or args.tags
 		@startingBangs = args.staBa or args.startingBangs
 		@stoppingBangs = args.stoBa or args.stoppingBangs
 		@ignoresOtherBangs = args.igOtBa or args.ignoresOtherBangs
 		@notes = args.no or args.notes
+		tags = args.ta or args.tags or {}
+		platformTags = args.plTa or args.platformTags or {}
+		if table.isArray(tags) -- Old structure of two arrays of strings that must be transformed.
+			if #tags == 0 and #platformTags == 0
+				@tags = nil
+			else
+				@tags = {}
+				for i, tag in ipairs(tags)
+					key = table.find(tagsDictionary, tag)
+					if key == nil
+						j = 1
+						while true
+							key = tostring(j)
+							if tagsDictionary[key] == nil
+								tagsDictionary[key] = tag
+								break
+							j += 1
+					@tags[key] = ENUMS.TAG_SOURCES.SKIN
+				for i, tag in ipairs(platformTags)
+					key = table.find(tagsDictionary, tag)
+					if key == nil
+						j = 1
+						while true
+							key = tostring(j)
+							if tagsDictionary[key] == nil
+								tagsDictionary[key] = tag
+								break
+							j += 1
+					@tags[key] = ENUMS.TAG_SOURCES.PLATFORM
+		else -- New structure of a single dictionary of integers.
+			@tags = tags
+		@getTags = () =>
+			n = 0
+			t = {}
+			if @tags ~= nil
+				for key, source in pairs(@tags)
+					t[tagsDictionary[key]] = source
+					n += 1
+			return t, n
+		@setTags = (t) =>
+			@tags = {}
+			isEmpty = true
+			for tag, source in pairs(t)
+				isEmpty = false
+				key = table.find(tagsDictionary, tag)
+				if key == nil
+					i = 1
+					while true
+						key = tostring(i)
+						if tagsDictionary[key] == nil
+							tagsDictionary[key] = tag
+							break
+						i += 1
+				@tags[key] = source
+			@tags = nil if isEmpty
+		@hasTag = (key) =>
+			return nil if @tags == nil
+			if tonumber(key) == nil
+				key = table.find(tagsDictionary, key)
+			return @tags[key]
 
 	merge: (other, newer = false) =>
 		assert(other.__class == Game, 'main.game.Game.merge')
@@ -51,7 +108,6 @@ class Game
 				@hoursPlayed = other.hoursPlayed
 		else
 			@hoursPlayed = other.hoursPlayed
-		@tags = other.tags
 		@startingBangs = other.startingBangs
 		@stoppingBangs = other.stoppingBangs
 		@ignoresOtherBangs = other.ignoresOtherBangs
@@ -63,6 +119,14 @@ class Game
 			@banner = other.banner
 			@bannerURL = other.bannerURL
 			@expectedBanner = other.expectedBanner
+			@tags = other.tags
+		else
+			if other.tags ~= nil
+				@tags = {} if @tags == nil
+				for key, oldSource in pairs(other.tags)
+					newSource = @tags[key]
+					if newSource == nil or newSource < oldSource
+						@tags[key] = oldSource
 
 	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
 	-- the substring 'the' does not lead to a bunch of unrelated games beginning with 'the ' to show up.
@@ -178,24 +242,10 @@ class Game
 			@hoursPlayed = 0 if @hoursPlayed == nil
 			@hoursPlayed += hours
 
-	getTags: () => return @tags or {}
-
-	setTags: (tags) =>
-		@tags = {}
-		for tag in *tags
-			tag = tag\trim()
-			table.insert(@tags, tag) if tag ~= ''
-		@tags = nil if #@tags == 0
-
-	getPlatformTags: () => return @platformTags or {}
-
-	hasTag: (tag) =>
-		if @tags ~= nil
-			for t in *@tags
-				return true if t == tag
-		if @platformTags ~= nil
-			for t in *@platformTags
-				return true if t == tag
+	hasTags: () =>
+		return false if @tags == nil
+		for key, source in pairs(@tags)
+			return true
 		return false
 
 	getStartingBangs: () => return @startingBangs or {}

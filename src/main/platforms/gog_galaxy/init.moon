@@ -1,5 +1,4 @@
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 json = require('lib.json')
 
 -- New version
@@ -197,7 +196,7 @@ class GOGGalaxy extends Platform
 				:process
 				hoursPlayed: hoursPlayed[productID]
 			})
-		@games = [Game(args) for args in *games]
+		@games = games
 
 	getStorePageURL: (game) =>
 		assert(game ~= nil and game\getPlatformID() == @platformID, 'main.platforms.gog_galaxy.init.getStorePageURL')
