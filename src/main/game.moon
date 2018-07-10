@@ -122,6 +122,7 @@ class Game
 			@tags = other.tags
 		else
 			if other.tags ~= nil
+				@tags = {} if @tags == nil
 				for key, oldSource in pairs(other.tags)
 					newSource = @tags[key]
 					if newSource == nil or newSource < oldSource

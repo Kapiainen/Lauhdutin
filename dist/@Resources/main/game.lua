@@ -39,6 +39,9 @@ do
         self.tags = other.tags
       else
         if other.tags ~= nil then
+          if self.tags == nil then
+            self.tags = { }
+          end
           for key, oldSource in pairs(other.tags) do
             local newSource = self.tags[key]
             if newSource == nil or newSource < oldSource then
