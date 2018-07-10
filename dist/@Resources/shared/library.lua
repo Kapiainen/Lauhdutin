@@ -677,7 +677,7 @@ do
         end
       elseif ENUMS.FILTER_TYPES.PLATFORM == _exp_0 then
         assert(type(args) == 'table', 'shared.library.Library.filter')
-        assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
+        assert((type(args.platformID) == 'number' and args.platformID % 1 == 0) or type(args.platformOverride) == 'string', 'shared.library.Library.filter')
         local platformID = args.platformID
         local platformOverride = args.platformOverride
         games = self:filterGames(gamesToProcess, function(game)

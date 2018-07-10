@@ -515,7 +515,8 @@ class Library
 					games = [entry.game for entry in *temp]
 			when ENUMS.FILTER_TYPES.PLATFORM
 				assert(type(args) == 'table', 'shared.library.Library.filter')
-				assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'shared.library.Library.filter')
+				assert((type(args.platformID) == 'number' and args.platformID % 1 == 0) or
+					type(args.platformOverride) == 'string', 'shared.library.Library.filter')
 				platformID = args.platformID
 				platformOverride = args.platformOverride
 				games = @filterGames(gamesToProcess, (game) -> 
