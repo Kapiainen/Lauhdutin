@@ -327,7 +327,7 @@ See [**Changelog.md**](Changelog.md) for more information.
 See [**License.md**](License.md) for more information.
 
 This software makes use of:
-- [json4lua](https://github.com/craigmj/json4lua) by Craig Mason-Jones (MIT license)
+- [json.lua](https://github.com/rxi/json.lua) by rxi (MIT license)
 - [digest.crc32](https://github.com/davidm/lua-digest-crc32lua) by David Manura (MIT license)
 - [bit.numberlua](https://github.com/davidm/lua-bit-numberlua) by David Manura (MIT license)
 - Rainmeter helpers by Kapiainen (MIT license)

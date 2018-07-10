@@ -23,6 +23,7 @@
 - Fixed a bug where the title of the Filter window would not update correctly under certain circumstances.
 - Fixed bugs that could cause division by zero when updating scrollbars.
 - Optimized the file structure of `games.json` to reduce its file size and to improve the performance of tasks that require parsing said file.
+- Switched to a new JSON library for improved performance.
 
 **Version 3.0.4 - 2018/06/26:**
 - Updated to support the new version of the Blizzard Battle.net launcher.
