@@ -11,7 +11,7 @@
 - Added an optional Session skin that shows the current system time and the current gaming session's duration in HH:MM format while playing a game. Can be enabled/disabled via a setting.
 - Added a new `Custom` platform and settings for it.
 - Added a new `Add a game` custom skin action, which can be used to add a game (`Custom` platform) by inputting information into a new menu.
-- Added the ability to download and parse GOG profiles to get all of the games associated with that profile and any tracked amounts of time played.
+- Added the ability to download and parse GOG profiles to get all of the games associated with that profile and any tracked amounts of time played. Requires PhantomJS.
 - Added settings for toggling the use of a GOG profile and for defining the profile name.
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.

@@ -64,6 +64,8 @@ Copy any additional dependencies (e.g. `sqlite3.exe`) over as well.
 
 ## Supported platforms
 
+The skin detects games once per day by default, but can be configured to do this every time the skin is loaded or only when manually told to do so.
+
 ### Steam
 
 Support includes:
