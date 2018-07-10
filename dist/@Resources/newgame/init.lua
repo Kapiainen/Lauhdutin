@@ -240,7 +240,7 @@ Handshake = function(gameID)
     STATE.PROPERTIES = createProperties()
     updateSlot()
     centerConfig()
-    return SKIN:Bang('[!Show]')
+    return SKIN:Bang('[!ZPos 1][!Show]')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

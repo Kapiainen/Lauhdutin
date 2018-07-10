@@ -568,7 +568,7 @@ export Handshake = (gameID) ->
 			updateScrollbar()
 			updateSlots()
 			centerConfig()
-			SKIN\Bang('[!Show]')
+			SKIN\Bang('[!ZPos 1][!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

@@ -158,7 +158,7 @@ export Handshake = (gameID) ->
 			STATE.PROPERTIES = createProperties()
 			updateSlot()
 			centerConfig()
-			SKIN\Bang('[!Show]')
+			SKIN\Bang('[!ZPos 1][!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

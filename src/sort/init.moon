@@ -171,7 +171,7 @@ export Handshake = (currentSortingType) ->
 					monitorIndex = 1
 				x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
 				SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
-			SKIN\Bang('[!Show]')
+			SKIN\Bang('[!ZPos "1"][!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

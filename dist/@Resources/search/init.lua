@@ -62,7 +62,7 @@ Handshake = function(stack)
     end
     local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
     SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
-    SKIN:Bang('[!Show]')
+    SKIN:Bang('[!ZPos 1][!Show]')
     return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
   end)
   if not (success) then

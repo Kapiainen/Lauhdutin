@@ -228,7 +228,7 @@ Handshake = function(currentSortingType)
       local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
       SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
     end
-    return SKIN:Bang('[!Show]')
+    return SKIN:Bang('[!ZPos "1"][!Show]')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
