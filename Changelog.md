@@ -15,6 +15,7 @@
 - Added settings for toggling the use of a GOG profile and for defining the profile name.
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.
+- Updated Rainmeter helpers library.
 - Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
 - Fixed a bug in the Filter menu that could cause scrolling to no longer function when switching between filtering all games and the current list of games (i.e. when stacking filters) without closing the menu first.
 - Fixed a bug that allowed uninstalled games from platforms other than Steam to play the slot click animations when clicked.
