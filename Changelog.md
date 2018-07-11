@@ -1,4 +1,4 @@
-**Version 3.1.0 beta 1 - YYYY/MM/DD:**
+**Version 3.1.0 beta 1 - 2018/07/11:**
 - Added a setting for how often games should be detected when the skin is loaded.
 - Added a custom skin action to force the skin to refresh and detect games.
 - Added a setting for toggling context-sensitive images in slot overlays.
