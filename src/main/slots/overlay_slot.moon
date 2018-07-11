@@ -65,10 +65,6 @@ class OverlaySlot
 			if lastPlayed > 315532800
 				date = os.date('*t', lastPlayed)
 				return ('%04.f-%02.f-%02.f')\format(date.year, date.month, date.day)
-				--return ('%04.f-%02.f-%02.f %02.f:%02.f:%02.f')\format(
-				--	date.year, date.month, date.day,
-				--	date.hour, date.min, date.sec
-				--)
 			return ''
 		textOptions[ENUMS.OVERLAY_SLOT_TEXT.NOTES] = (game) =>
 			notes = game\getNotes()
