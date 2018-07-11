@@ -161,9 +161,10 @@ The window for game details (see above) can be used to view various details abou
 
 Some details can also be modified:
 
-- Toggle the visibility of the game.
-- Modify the process to monitor to determine whether or not a game is running. A blank string reverts to the default process. A `*` next to the process indicates that the value has been modified.
-- Keep notes.
+- Total amount of hours played.
+- The visibility of the game.
+- The process to monitor to determine whether or not a game is running. A blank string reverts to the default process. A `*` next to the process indicates that the value has been modified.
+- Keep notes e.g. about what to do next in the current playthrough or plans for another playthrough.
 - Assign tags for filtering purposes. Some tags may have been assigned via the game's platform, which is indicated by a `*`, and cannot be altered via Lauhdutin.
 - Set the game to ignore global and platform-specific bangs.
 - Assign starting and/or stopping bangs.
