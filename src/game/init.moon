@@ -145,7 +145,8 @@ updateBanner = (game) ->
 	path = game\getBanner()
 	unless path
 		SKIN\Bang('[!SetOption "Banner" "ImageName" "#@#game\\gfx\\blank.png"]')
-		SKIN\Bang(('[!SetOption "BannerMissing" "Text" "%s"]')\format(LOCALIZATION\get('game_no_banner', 'No banner')))
+		SKIN\Bang(('[!SetOption "BannerMissing" "Text" "%s"]')\format(LOCALIZATION\get('game_no_banner',
+			'No banner')))
 		expectedBanner = game\getExpectedBanner()
 		if expectedBanner
 			extensions = table.concat(STATE.SUPPORTED_BANNER_EXTENSIONS, '|')\gsub('%.', '')
@@ -153,7 +154,8 @@ updateBanner = (game) ->
 				when ENUMS.PLATFORM_IDS.SHORTCUTS
 					platformOverride = game\getPlatformOverride()
 					if platformOverride ~= nil
-						('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner, extensions)
+						('\\@Resources\\Shortcuts\\%s\\%s.%s')\format(platformOverride, expectedBanner,
+							extensions)
 					else
 						('\\@Resources\\Shortcuts\\%s.%s')\format(expectedBanner, extensions)
 				when ENUMS.PLATFORM_IDS.STEAM
@@ -806,9 +808,11 @@ export OnCreatedTag = (tag) ->
 export StartEditingStartingBangs = () ->
 	success, err = pcall(
 		() ->
+			SKIN\Bang('[!ZPos 0]')
 			bangs = STATE.GAME\getStartingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStartingBangs')
+			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '',
+				'OnEditedStartingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -818,6 +822,7 @@ export OnEditedStartingBangs = () ->
 			bangs = io.readFile(STATE.PATHS.BANGS)
 			STATE.GAME\setStartingBangs(bangs\splitIntoLines())
 			updateSlots()
+			SKIN\Bang('[!ZPos 1]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -825,9 +830,11 @@ export OnEditedStartingBangs = () ->
 export StartEditingStoppingBangs = () ->
 	success, err = pcall(
 		() ->
+			SKIN\Bang('[!ZPos 0]')
 			bangs = STATE.GAME\getStoppingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStoppingBangs')
+			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '',
+				'OnEditedStoppingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -837,6 +844,7 @@ export OnEditedStoppingBangs = () ->
 			bangs = io.readFile(STATE.PATHS.BANGS)
 			STATE.GAME\setStoppingBangs(bangs\splitIntoLines())
 			updateSlots()
+			SKIN\Bang('[!ZPos 1]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -851,10 +859,12 @@ export ToggleIgnoresOtherBangs = () ->
 export StartEditingNotes = () ->
 	success, err = pcall(
 		() ->
+			SKIN\Bang('[!ZPos 0]')
 			notes = STATE.GAME\getNotes()
 			notes = '' if notes == nil
 			io.writeFile(STATE.PATHS.NOTES, notes)
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.NOTES)), '', 'OnEditedNotes')
+			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.NOTES)), '',
+				'OnEditedNotes')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
@@ -864,6 +874,7 @@ export OnEditedNotes = () ->
 			notes = io.readFile(STATE.PATHS.NOTES)
 			STATE.GAME\setNotes(notes)
 			updateSlots()
+			SKIN\Bang('[!ZPos 1]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
