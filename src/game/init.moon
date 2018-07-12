@@ -811,7 +811,7 @@ export StartEditingStartingBangs = () ->
 			SKIN\Bang('[!ZPos 0]')
 			bangs = STATE.GAME\getStartingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '',
+			utility.runCommand(('""..\\@Resources\\%s""')\format(STATE.PATHS.BANGS), '',
 				'OnEditedStartingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -833,7 +833,7 @@ export StartEditingStoppingBangs = () ->
 			SKIN\Bang('[!ZPos 0]')
 			bangs = STATE.GAME\getStoppingBangs()
 			io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '',
+			utility.runCommand(('""..\\@Resources\\%s""')\format(STATE.PATHS.BANGS), '',
 				'OnEditedStoppingBangs')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
@@ -863,8 +863,7 @@ export StartEditingNotes = () ->
 			notes = STATE.GAME\getNotes()
 			notes = '' if notes == nil
 			io.writeFile(STATE.PATHS.NOTES, notes)
-			utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.NOTES)), '',
-				'OnEditedNotes')
+			utility.runCommand(('""..\\@Resources\\%s""')\format(STATE.PATHS.NOTES), '', 'OnEditedNotes')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

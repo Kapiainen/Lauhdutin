@@ -1113,7 +1113,7 @@ StartEditingStartingBangs = function()
     SKIN:Bang('[!ZPos 0]')
     local bangs = STATE.GAME:getStartingBangs()
     io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-    return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStartingBangs')
+    return utility.runCommand(('""..\\@Resources\\%s""'):format(STATE.PATHS.BANGS), '', 'OnEditedStartingBangs')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -1135,7 +1135,7 @@ StartEditingStoppingBangs = function()
     SKIN:Bang('[!ZPos 0]')
     local bangs = STATE.GAME:getStoppingBangs()
     io.writeFile(STATE.PATHS.BANGS, table.concat(bangs, '\n'))
-    return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.BANGS)), '', 'OnEditedStoppingBangs')
+    return utility.runCommand(('""..\\@Resources\\%s""'):format(STATE.PATHS.BANGS), '', 'OnEditedStoppingBangs')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)
@@ -1169,7 +1169,7 @@ StartEditingNotes = function()
       notes = ''
     end
     io.writeFile(STATE.PATHS.NOTES, notes)
-    return utility.runCommand(('""%s""'):format(io.joinPaths(STATE.PATHS.RESOURCES, STATE.PATHS.NOTES)), '', 'OnEditedNotes')
+    return utility.runCommand(('""..\\@Resources\\%s""'):format(STATE.PATHS.NOTES), '', 'OnEditedNotes')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

@@ -1,5 +1,6 @@
 **Version 3.1.0 beta 2 - 2018/MM/DD:**
 - Updated Game window to adjust its z-position when editing notes and bangs.
+- Fixed a bug that prevented editing a game's notes and bangs via the Game window when the skin's path contains whitespace.
 
 **Version 3.1.0 beta 1 - 2018/07/11:**
 - Added a setting for how often games should be detected when the skin is loaded.
