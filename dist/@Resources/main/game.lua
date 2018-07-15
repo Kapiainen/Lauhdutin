@@ -44,7 +44,7 @@ do
           end
           for key, oldSource in pairs(other.tags) do
             local newSource = self.tags[key]
-            if newSource == nil or newSource < oldSource then
+            if newSource == nil and oldSource == ENUMS.TAG_SOURCES.SKIN then
               self.tags[key] = oldSource
             end
           end

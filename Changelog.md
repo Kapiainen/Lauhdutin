@@ -1,3 +1,6 @@
+**Version 3.1.0 beta 3 - 2018/MM/DD:**
+- Fixed a bug that caused tags, which were once assigned via a platform, to remain when later unassigned via the platform.
+
 **Version 3.1.0 beta 2 - 2018/07/12:**
 - Updated Game window to adjust its z-position when editing notes and bangs.
 - Fixed a bug that prevented editing a game's notes and bangs via the Game window when the skin's path contains whitespace.

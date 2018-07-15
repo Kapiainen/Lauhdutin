@@ -125,7 +125,7 @@ class Game
 				@tags = {} if @tags == nil
 				for key, oldSource in pairs(other.tags)
 					newSource = @tags[key]
-					if newSource == nil or newSource < oldSource
+					if newSource == nil and oldSource == ENUMS.TAG_SOURCES.SKIN
 						@tags[key] = oldSource
 
 	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
