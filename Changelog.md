@@ -1,4 +1,4 @@
-**Version 3.1.0 beta 3 - 2018/MM/DD:**
+**Version 3.1.0 beta 3 - 2018/07/15:**
 - Fixed a bug that caused tags, which were once assigned via a platform, to remain when later unassigned via the platform.
 
 **Version 3.1.0 beta 2 - 2018/07/12:**
