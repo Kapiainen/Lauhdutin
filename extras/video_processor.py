@@ -33,6 +33,7 @@ import ctypes
 import time
 
 CATEGORY_TITLE_SEPARATOR = " - "
+TAG_SOURCES_SKIN = 1
 
 def create_global_variables():
 	res = {}
@@ -57,7 +58,7 @@ def create_global_variables():
 	assert res.get("banner_height", 0) > 0, "Banner height is invalid."
 	assert res.get("mosaic_tiles_wide", 2) > 0, "The number of tiles widthwise in the mosaic thumbnail is invalid."
 	assert res.get("mosaic_tiles_high", 2) > 0, "The number of tiles heightwise in the mosaic thumbnail is invalid."
-	res["ta"] = res.get("ta", {})
+	res["tags"] = res.get("tags", {})
 	return res
 
 def set_title(title):
@@ -77,7 +78,7 @@ def load_database():
 	if os.path.isfile(CONFIG["database_output"]):
 		with open(CONFIG["database_output"], "r") as file:
 			db = json.load(file)
-	return db.get("games", [])
+	return db.get("games", []), db.get("tagsDictionary", {})
 
 def get_duration(video):
 	args = [CONFIG["ffprobe"], "-i", "%s" % video, "-show_entries", "format=duration", "-loglevel", "quiet"]
@@ -93,16 +94,37 @@ def classify_duration(duration):
 	upper = math.ceil(result) * interval
 	return "%d-%d min" % (lower, upper)
 
-def generate_tags(title, lookup, tags):
+def getTagKey(allTags, tag):
+	# Look for existing entry.
+	for key, value in allTags.items():
+		if value == tag:
+			return key
+	# Get next available key and add a new entry.
+	i = 1
+	key = "\"%s\"" % i
+	while allTags.get(key) != None:
+		i += 1
+	allTags[key] = tag
+	return key
+
+def generate_tags(title, lookup, currentTags, allTags, newTags = []):
 	sep_index = title.find(CATEGORY_TITLE_SEPARATOR)
 	if sep_index >= 0:
 		title = title[sep_index + len(CATEGORY_TITLE_SEPARATOR):]
 	for tag, substrings in lookup.items():
+		key = getTagKey(allTags, tag)
+		if currentTags.get(key) != None:
+			continue
 		for substring in substrings:
-			if substring in title and tag not in tags:
-				tags.append(tag)
+			if substring in title:
+				currentTags[key] = TAG_SOURCES_SKIN
 				break
-	return tags
+	for tag in newTags:
+		key = getTagKey(allTags, tag)
+		if currentTags.get(key) != None:
+			continue
+		currentTags[key] = TAG_SOURCES_SKIN
+	return currentTags
 
 valid_extensions = [
 	".mkv",
@@ -118,14 +140,14 @@ def valid_extension(file):
 			return True
 	return False
 
-def update_database(db = []):
+def update_database(db = [], allTags = {}):
 	platform_id = 5
 	banner_path = "cache\\custom"
 	updated_videos = 0
 	# Update old entries here
 	i = 0
 	num_videos = len(db)
-	tagLookup = CONFIG["ta"]
+	tagLookup = CONFIG["tags"]
 	for video in db:
 		i += 1
 		set_title("%d/%d - Updating existing entries" % (i, num_videos))
@@ -152,8 +174,8 @@ def update_database(db = []):
 				assert relpath != None
 				category, file = os.path.split(relpath)
 				video["plOv"] = category
-			new_tags = generate_tags(video["ti"], tagLookup, video["ta"][:])
-			old_tags = video["ta"]
+			old_tags = video.get("ta", {}).copy()
+			new_tags = generate_tags(video["ti"], tagLookup, video.get("ta", {}), allTags)
 			if len(new_tags) != len(old_tags) or len(set(new_tags) & set(old_tags)) != len(new_tags):
 				updating = True
 				video["ta"] = new_tags
@@ -222,7 +244,7 @@ def update_database(db = []):
 				"hoPl": (duration / 3600.0),
 				"un": False,
 				"no": "%d minutes" % round(duration / 60.0),
-				"ta": generate_tags(title, tagLookup, [classify_duration(duration), category]),
+				"ta": generate_tags(title, tagLookup, {}, allTags, [classify_duration(duration), category]),
 				"plOv": category
 			})
 		else:
@@ -239,14 +261,14 @@ def update_database(db = []):
 				"hoPl": (duration / 3600.0),
 				"un": False,
 				"no": "%d minutes" % round(duration / 60.0),
-				"ta": generate_tags(title, tagLookup, [classify_duration(duration)]),
+				"ta": generate_tags(title, tagLookup, {}, allTags, [classify_duration(duration)]),
 			})
 	db.extend(new_entries)
 	return updated_videos, len(new_entries)
 
-def save_database(db):
+def save_database(db, allTags):
 	with open(CONFIG["database_output"], "w") as file:
-		json.dump({"version": 1, "games": db}, file)
+		json.dump({"version": 2, "games": db, "tagsDictionary": allTags}, file)
 
 # Option 5 - Resize existing thumbnails.
 def resize_thumbnail(path):
@@ -318,18 +340,18 @@ if __name__ == "__main__":
 					print("\nNo videos to mux to MKV...")
 			elif choice == 2:
 				print("")
-				db = load_database()
-				updated, added = update_database(db)
+				db, allTags = load_database()
+				updated, added = update_database(db, allTags)
 				print("\nUpdated %d videos..." % updated)
 				print("Added %d videos..." % added)
 				print("%d videos in total..." % len(db))
 				if updated > 0 or added > 0:
-					save_database(db)
+					save_database(db, allTags)
 			elif choice == 3:
 				timestamp = input("\nTimestamp (mm:ss): ")
 				if timestamp.strip() == "":
 					timestamp = "00:20"
-				db = load_database()
+				db, allTags = load_database()
 				videos = []
 				for video in db:
 					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"])
@@ -360,7 +382,7 @@ if __name__ == "__main__":
 				else:
 					print("\nNo videos to generate thumbnails for...")
 			elif choice == 4:
-				db = load_database()
+				db, allTags = load_database()
 				videos = []
 				for video in db:
 					path = os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"])
@@ -390,7 +412,7 @@ if __name__ == "__main__":
 				else:
 					print("\nNo videos to generate mosaic thumbnails for...")
 			elif choice == 5:
-				db = load_database()
+				db, allTags = load_database()
 				thumbnails = [os.path.join(CONFIG["thumbnails_output"], "%s.jpg" % video["ti"]) for video in db]
 				if len(thumbnails) > 0:
 					i = 0
