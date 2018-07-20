@@ -1,4 +1,4 @@
-**Version 3.1.0 beta 4 - 2018/MM/DD:**
+**Version 3.1.0 beta 4 - 2018/07/20:**
 - Fixed a bug that caused buttons on the Game window to become unresponsive after trying to create a tag that already existed.
 
 **Version 3.1.0 beta 3 - 2018/07/15:**
