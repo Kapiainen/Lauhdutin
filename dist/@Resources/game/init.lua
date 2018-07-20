@@ -1090,6 +1090,7 @@ StartCreatingTag = function(index)
 end
 OnCreatedTag = function(tag)
   local success, err = pcall(function()
+    OnDismissedInput()
     tag = tag:sub(1, -2)
     if STATE.ALL_TAGS[tag] ~= nil then
       return 
@@ -1101,8 +1102,7 @@ OnCreatedTag = function(tag)
     table.sort(STATE.TAG_PROPERTIES, sortPropertiesByTitle)
     table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
     updateScrollbar()
-    updateSlots()
-    return OnDismissedInput()
+    return updateSlots()
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

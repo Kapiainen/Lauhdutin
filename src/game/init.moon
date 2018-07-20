@@ -790,6 +790,7 @@ export StartCreatingTag = (index) ->
 export OnCreatedTag = (tag) ->
 	success, err = pcall(
 		() ->
+			OnDismissedInput()
 			tag = tag\sub(1, -2)
 			return if STATE.ALL_TAGS[tag] ~= nil
 			STATE.ALL_TAGS[tag] = ENUMS.TAG_STATES.DISABLED
@@ -800,7 +801,6 @@ export OnCreatedTag = (tag) ->
 			table.insert(STATE.TAG_PROPERTIES, 1, createProperty)
 			updateScrollbar()
 			updateSlots()
-			OnDismissedInput()
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 
