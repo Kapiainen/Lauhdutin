@@ -29,7 +29,7 @@ do
           tooltip = LOCALIZATION:get('setting_shortcuts_open_folder_description', 'Shortcuts and their banners should be placed in this folder. The banners should be named after their corresponding shortcut.'),
           label = LOCALIZATION:get('button_label_open', 'Open'),
           perform = function(self)
-            return SKIN:Bang(('[%s]'):format(io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')))
+            return SKIN:Bang(('["%s"]'):format(io.joinPaths(STATE.PATHS.RESOURCES, 'Shortcuts\\')))
           end
         }),
         Settings.Action({
