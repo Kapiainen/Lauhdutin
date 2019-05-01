@@ -513,7 +513,7 @@ return {
     assert(type(parameter) == 'string', 'shared.utility.runCommand')
     assert(type(output) == 'string', 'shared.utility.runCommand')
     assert(type(callback) == 'string', 'shared.utility.runCommand')
-    SKIN:Bang(('[!SetOption "Command" "Parameter" "%s"]'):format(parameter))
+    SKIN:Bang('[!SetOption "Command" "Parameter" """' .. parameter .. '"""]')
     SKIN:Bang(('[!SetOption "Command" "OutputFile" "%s"]'):format(output))
     SKIN:Bang(('[!SetOption "Command" "OutputType" "%s"]'):format(outputType))
     SKIN:Bang(('[!SetOption "Command" "State" "%s"]'):format(state))
