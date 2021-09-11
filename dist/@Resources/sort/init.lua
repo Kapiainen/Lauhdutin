@@ -100,10 +100,8 @@ do
   _base_0.__class = _class_0
   Slot = _class_0
 end
-log = function(...)
-  if STATE.LOGGING == true then
-    return print(...)
-  end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
 end
 Initialize = function()
   SKIN:Bang('[!Hide]')
@@ -111,12 +109,18 @@ Initialize = function()
   dofile(('%s%s'):format(STATE.PATHS.RESOURCES, 'lib\\rainmeter_helpers.lua'))
   COMPONENTS.STATUS = require('shared.status')()
   local success, err = pcall(function()
-    log('Initializing Sort config')
     require('shared.enums')
     utility = require('shared.utility')
     utility.createJSONHelpers()
     COMPONENTS.SETTINGS = require('shared.settings')()
-    STATE.LOGGING = COMPONENTS.SETTINGS:getLogging()
+    if COMPONENTS.SETTINGS:getLogging() == true then
+      log = function(...)
+        return print(...)
+      end
+    else
+      log = function() end
+    end
+    log('Initializing Sort config')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     STATE.SCROLL_INDEX = 1
     do
@@ -177,8 +181,16 @@ local updateScrollbar
 updateScrollbar = function()
   STATE.MAX_SCROLL_INDEX = #STATE.PROPERTIES - STATE.NUM_SLOTS + 1
   if #STATE.PROPERTIES > STATE.NUM_SLOTS then
-    STATE.SCROLLBAR.HEIGHT = math.round(STATE.SCROLLBAR.MAX_HEIGHT / (#STATE.PROPERTIES - STATE.NUM_SLOTS + 1))
-    STATE.SCROLLBAR.STEP = (STATE.SCROLLBAR.MAX_HEIGHT - STATE.SCROLLBAR.HEIGHT) / (#STATE.PROPERTIES - STATE.NUM_SLOTS)
+    local div = (#STATE.PROPERTIES - STATE.NUM_SLOTS + 1)
+    if div < 1 then
+      div = 1
+    end
+    STATE.SCROLLBAR.HEIGHT = math.round(STATE.SCROLLBAR.MAX_HEIGHT / div)
+    div = (#STATE.PROPERTIES - STATE.NUM_SLOTS)
+    if div < 1 then
+      div = 1
+    end
+    STATE.SCROLLBAR.STEP = (STATE.SCROLLBAR.MAX_HEIGHT - STATE.SCROLLBAR.HEIGHT) / div
   else
     STATE.SCROLLBAR.HEIGHT = STATE.SCROLLBAR.MAX_HEIGHT
     STATE.SCROLLBAR.STEP = 0
@@ -216,7 +228,7 @@ Handshake = function(currentSortingType)
       local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
       SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
     end
-    return SKIN:Bang('[!Show]')
+    return SKIN:Bang('[!ZPos "1"][!Show]')
   end)
   if not (success) then
     return COMPONENTS.STATUS:show(err, true)

@@ -1,5 +1,4 @@
 utility = require('shared.utility')
-Game = require('main.game')
 
 class Platform
 	new: (settings) =>
@@ -31,5 +30,11 @@ class Platform
 		return nil
 
 	getBannerExtensions: () => return @bannerExtensions
+
+	getCachePath: () => return @cachePath
+
+	getStorePageURL: (game) => return nil
+
+	getBannerURL: (game) => return nil
 
 return Platform

@@ -1,5 +1,4 @@
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local Shortcuts
 do
   local _class_0
@@ -70,8 +69,30 @@ do
           if arguments then
             arguments = arguments:match('^	Arguments=(.-)$')
           end
+          if arguments then
+            arguments = arguments:trim()
+          end
           if arguments ~= nil and arguments ~= '' then
-            arguments = arguments:split('"%s"')
+            local args = { }
+            local attempts = 20
+            while #arguments > 0 and attempts > 0 do
+              local arg = nil
+              if arguments:match('^"') then
+                local starts, ends = arguments:find('"(.-)"')
+                arg = arguments:sub(starts + 1, ends - 1)
+                arguments = arguments:sub(ends + 1):trim()
+              else
+                local starts, ends = arguments:find('([^%s]+)')
+                arg = arguments:sub(starts, ends)
+                arguments = arguments:sub(ends + 1):trim()
+              end
+              if arg == nil then
+                attempts = attempts - 1
+              else
+                table.insert(args, arg)
+              end
+            end
+            arguments = args
             if #arguments > 0 then
               path = ('%s "%s"'):format(path, table.concat(arguments, '" "'))
             end
@@ -100,16 +121,7 @@ do
           break
         end
       end
-      do
-        local _accum_0 = { }
-        local _len_0 = 1
-        for _index_0 = 1, #games do
-          local args = games[_index_0]
-          _accum_0[_len_0] = Game(args)
-          _len_0 = _len_0 + 1
-        end
-        self.games = _accum_0
-      end
+      self.games = games
     end
   }
   _base_0.__index = _base_0
@@ -163,18 +175,18 @@ if RUN_TESTS then
   shortcuts:generateGames(output)
   local games = shortcuts.games
   assert(#games == 2)
-  assert(games[1].title == 'Some game', assertionMessage)
-  assert(games[1].path == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
-  assert(games[1].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
-  assert(games[1].process == 'game.exe', assertionMessage)
-  assert(games[1].uninstalled == true, assertionMessage)
-  assert(games[1].expectedBanner == 'Some game', assertionMessage)
-  assert(games[2].title == 'Some other game', assertionMessage)
-  assert(games[2].path == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
-  assert(games[2].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
-  assert(games[2].platformOverride == 'Some platform', assertionMessage)
-  assert(games[2].process == 'othergame.exe', assertionMessage)
-  assert(games[2].uninstalled == true, assertionMessage)
-  assert(games[2].expectedBanner == 'Some other game', assertionMessage)
+  assert(games[1]:getTitle() == 'Some game', assertionMessage)
+  assert(games[1]:getPath() == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
+  assert(games[1]:getPlatformID() == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+  assert(games[1]:getProcess() == 'game.exe', assertionMessage)
+  assert(games[1]:isInstalled() == false, assertionMessage)
+  assert(games[1]:getExpectedBanner() == 'Some game', assertionMessage)
+  assert(games[2]:getTitle() == 'Some other game', assertionMessage)
+  assert(games[2]:getPath() == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
+  assert(games[2]:getPlatformID() == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+  assert(games[2]:getPlatformOverride() == 'Some platform', assertionMessage)
+  assert(games[2]:getProcess() == 'othergame.exe', assertionMessage)
+  assert(games[2]:isInstalled() == false, assertionMessage)
+  assert(games[2]:getExpectedBanner() == 'Some other game', assertionMessage)
 end
 return Shortcuts

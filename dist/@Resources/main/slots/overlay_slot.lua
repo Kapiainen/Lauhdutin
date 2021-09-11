@@ -48,7 +48,7 @@ do
           image = images.error
         elseif game:isInstalled() == false then
           upperText = game:getTitle()
-          if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET) then
+          if platformID == ENUMS.PLATFORM_IDS.STEAM and game:getPlatformOverride() == nil then
             lowerText = self.installGame
             image = images.install
           else
@@ -140,13 +140,12 @@ do
       end
       textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES] = function(self, game)
         local hoursPlayed = game:getHoursPlayed()
-        local numHoursPlayed = math.floor(hoursPlayed)
-        if numHoursPlayed == 1 then
-          return self.singleHourPlayed:format(numHoursPlayed)
-        elseif numHoursPlayed > 0 then
-          return self.multipleHoursPlayed:format(numHoursPlayed)
+        if hoursPlayed >= 1.0 and hoursPlayed < 1.5 then
+          return self.singleHourPlayed:format(math.floor(hoursPlayed))
+        elseif hoursPlayed >= 1.5 then
+          return self.multipleHoursPlayed:format(math.round(hoursPlayed))
         end
-        local numMinutesPlayed = math.round((hoursPlayed - numHoursPlayed) * 60.0)
+        local numMinutesPlayed = math.round((hoursPlayed - math.floor(hoursPlayed)) * 60.0)
         if numMinutesPlayed == 1 then
           return self.singleMinutePlayed:format(numMinutesPlayed)
         end

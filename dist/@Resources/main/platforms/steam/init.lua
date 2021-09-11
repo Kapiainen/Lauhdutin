@@ -2,7 +2,6 @@ local utility = require('shared.utility')
 local bit = require('lib.bit.numberlua')
 local digest = require('lib.digest.crc32')
 local Platform = require('main.platforms.platform')
-local Game = require('main.game')
 local lookupTable
 do
   local _accum_0 = { }
@@ -421,7 +420,7 @@ do
       end
       for _index_0 = 1, #games do
         local args = games[_index_0]
-        table.insert(self.games, Game(args))
+        table.insert(self.games, args)
       end
     end,
     generateGames = function(self)
@@ -548,8 +547,24 @@ do
         end
       end
       for appID, args in pairs(games) do
-        table.insert(self.games, Game(args))
+        table.insert(self.games, args)
       end
+    end,
+    getStorePageURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.steam.init.getStorePageURL')
+      if game:getPlatformOverride() == nil then
+        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        return ('https://store.steampowered.com/app/%s'):format(appID)
+      end
+      return nil
+    end,
+    getBannerURL = function(self, game)
+      assert(game ~= nil and game:getPlatformID() == self.platformID, 'main.platforms.steam.init.getBannerURL')
+      if game:getPlatformOverride() == nil then
+        local appID = game:getBanner():reverse():match('^[^%.]+%.([^\\]+)'):reverse()
+        return self:generateBannerURL(appID)
+      end
+      return nil
     end
   }
   _base_0.__index = _base_0

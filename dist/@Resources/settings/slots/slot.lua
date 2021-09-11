@@ -35,6 +35,9 @@ do
         SKIN:Bang(('[!SetOption "Slot%dFolderPathSpinnerValue" "Text" "%s"]'):format(self.index, setting:getValues()[setting:getIndex()]))
         SKIN:Bang(('[!SetOption "Slot%dFolderPathSpinnerBrowse" "Text" "%s"]'):format(self.index, LOCALIZATION:get('button_label_browse', 'Browse')))
         return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingFolderPathSpinner"]'):format(self.index))
+      elseif ENUMS.SETTING_TYPES.STRING == _exp_0 then
+        SKIN:Bang(('[!SetOption "Slot%dStringValue" "Text" "%s"]'):format(self.index, setting:getValue()))
+        return SKIN:Bang(('[!ShowMeterGroup "Slot%dSettingString"]'):format(self.index))
       else
         return assert(nil, 'settings.slots.slot.Slot.update')
       end

@@ -22,10 +22,8 @@ COMPONENTS = {
   SLOTS = nil,
   PAGES = nil
 }
-log = function(...)
-  if STATE.LOGGING == true then
-    return print(...)
-  end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
 end
 RebuildSettingsSlots = function()
   if not (STATE.INITIALIZED) then
@@ -67,7 +65,8 @@ additionalEnums = function()
     SPINNER = 4,
     INTEGER = 5,
     FOLDER_PATH_SPINNER = 6,
-    MAX = 7
+    STRING = 7,
+    MAX = 8
   }
 end
 Initialize = function()
@@ -82,6 +81,13 @@ Initialize = function()
     utility = require('shared.utility')
     utility.createJSONHelpers()
     COMPONENTS.SETTINGS = require('shared.settings')()
+    if COMPONENTS.SETTINGS:getLogging() == true then
+      log = function(...)
+        return print(...)
+      end
+    else
+      log = function() end
+    end
     COMPONENTS.OLD_SETTINGS = require('shared.settings')()
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     COMPONENTS.STATUS:show(LOCALIZATION:get('status_initializing', 'Initializing'))
@@ -191,9 +197,11 @@ Close = function()
         RebuildMainSlots()
       end
       if requiresGameDetection() then
-        local games = io.readJSON(STATE.PATHS.GAMES)
-        games.updated = nil
-        io.writeJSON(STATE.PATHS.GAMES, games)
+        if io.fileExists(STATE.PATHS.GAMES) then
+          local games = io.readJSON(STATE.PATHS.GAMES)
+          games.updated = nil
+          io.writeJSON(STATE.PATHS.GAMES, games)
+        end
       end
       local mainConfig = utility.getConfig(SKIN:GetVariable('ROOTCONFIG'))
       if mainConfig ~= nil and mainConfig:isActive() then
@@ -278,6 +286,23 @@ EditFolderPath = function(index, path)
   end
   return COMPONENTS.SLOTS:editFolderPath(index, path)
 end
+StartEditingString = function(index)
+  local valueMeter = SKIN:GetMeter(('Slot%dStringValue'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "DefaultValue" "%s"]'):format(valueMeter:GetOption('Text')))
+  SKIN:Bang(('[!SetOption "StringInput" "X" "([Slot%dStringValue:X])"]'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "Y" "([Slot%dStringValue:Y] + 18)"]'):format(index))
+  SKIN:Bang(('[!SetOption "StringInput" "W" "([Slot%dStringValue:W])"]'):format(index))
+  SKIN:Bang('[!SetOption "StringInput" "H" "32"]')
+  SKIN:Bang(('[!SetOption "StringInput" "SolidColor" "%s"]'):format(valueMeter:GetOption('SolidColor')))
+  SKIN:Bang(('[!CommandMeasure "StringInput" "ExecuteBatch %d"]'):format(index))
+  return log('StartEditingString ' .. index)
+end
+EditString = function(index, value)
+  if value:endsWith(';') then
+    value = value:sub(1, -2)
+  end
+  return COMPONENTS.SLOTS:editString(index, value)
+end
 OnLanguagesListed = function()
   if not (io.fileExists('cache\\languages.txt')) then
     return utility.runLastCommand()
@@ -321,45 +346,57 @@ EditInteger = function(index, value)
   end
   return COMPONENTS.SLOTS:setInteger(index, value)
 end
+local readBangs
+readBangs = function()
+  return io.readFile('cache\\bangs.txt')
+end
 OnEditedGlobalStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGlobalStartingBangs(bangs:splitIntoLines())
 end
 OnEditedGlobalStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGlobalStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedShortcutsStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setShortcutsStartingBangs(bangs:splitIntoLines())
 end
 OnEditedShortcutsStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setShortcutsStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedSteamStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setSteamStartingBangs(bangs:splitIntoLines())
 end
 OnEditedSteamStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setSteamStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedBattlenetStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setBattlenetStartingBangs(bangs:splitIntoLines())
 end
 OnEditedBattlenetStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setBattlenetStoppingBangs(bangs:splitIntoLines())
 end
 OnEditedGOGGalaxyStartingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGOGGalaxyStartingBangs(bangs:splitIntoLines())
 end
 OnEditedGOGGalaxyStoppingBangs = function()
-  local bangs = io.readFile('cache\\bangs.txt')
+  local bangs = readBangs()
   return COMPONENTS.SETTINGS:setGOGGalaxyStoppingBangs(bangs:splitIntoLines())
+end
+OnEditedCustomStartingBangs = function()
+  local bangs = readBangs()
+  return COMPONENTS.SETTINGS:setCustomStartingBangs(bangs:splitIntoLines())
+end
+OnEditedCustomStoppingBangs = function()
+  local bangs = readBangs()
+  return COMPONENTS.SETTINGS:setCustomStoppingBangs(bangs:splitIntoLines())
 end
 CycleFolderPathSpinner = function(index, direction)
   return COMPONENTS.SLOTS:cycleFolderPathSpinner(index, direction)

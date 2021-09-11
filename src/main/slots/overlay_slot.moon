@@ -52,12 +52,11 @@ class OverlaySlot
 			return @multipleHoursMultipleMinutesPlayed\format(numHoursPlayed, numMinutesPlayed)
 		textOptions[ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES] = (game) =>
 			hoursPlayed = game\getHoursPlayed()
-			numHoursPlayed = math.floor(hoursPlayed)
-			if numHoursPlayed == 1
-				return @singleHourPlayed\format(numHoursPlayed)
-			elseif numHoursPlayed > 0
-				return @multipleHoursPlayed\format(numHoursPlayed)
-			numMinutesPlayed = math.round((hoursPlayed - numHoursPlayed) * 60.0)
+			if hoursPlayed >= 1.0 and hoursPlayed < 1.5
+				return @singleHourPlayed\format(math.floor(hoursPlayed))
+			elseif hoursPlayed >= 1.5
+				return @multipleHoursPlayed\format(math.round(hoursPlayed))
+			numMinutesPlayed = math.round((hoursPlayed - math.floor(hoursPlayed)) * 60.0)
 			if numMinutesPlayed == 1
 				return @singleMinutePlayed\format(numMinutesPlayed)
 			return @multipleMinutesPlayed\format(numMinutesPlayed)
@@ -66,10 +65,6 @@ class OverlaySlot
 			if lastPlayed > 315532800
 				date = os.date('*t', lastPlayed)
 				return ('%04.f-%02.f-%02.f')\format(date.year, date.month, date.day)
-				--return ('%04.f-%02.f-%02.f %02.f:%02.f:%02.f')\format(
-				--	date.year, date.month, date.day,
-				--	date.hour, date.min, date.sec
-				--)
 			return ''
 		textOptions[ENUMS.OVERLAY_SLOT_TEXT.NOTES] = (game) =>
 			notes = game\getNotes()
@@ -113,7 +108,7 @@ class OverlaySlot
 					image = images.error
 				elseif game\isInstalled() == false
 					upperText = game\getTitle()
-					if (platformID == ENUMS.PLATFORM_IDS.STEAM or platformID == ENUMS.PLATFORM_IDS.BATTLENET)
+					if platformID == ENUMS.PLATFORM_IDS.STEAM and game\getPlatformOverride() == nil
 						lowerText = @installGame
 						image = images.install
 					else

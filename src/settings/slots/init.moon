@@ -82,4 +82,8 @@ class Slots
 		setting\setPath(setting.index, path)
 		@updateSlot(index)
 
+	editString: (index, value) =>
+		@getSetting(index)\setValue(value)
+		@updateSlot(index)
+
 return Slots

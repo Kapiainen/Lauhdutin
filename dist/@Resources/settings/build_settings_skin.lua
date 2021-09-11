@@ -17,6 +17,11 @@ build = function()
     contents = contents .. ('Command%d=[!CommandMeasure "Script" "EditInteger(%d, \'$UserInput$\')"]\n'):format(i, i)
   end
   contents = contents .. '\n'
+  contents = contents .. '\n[StringInput]\nMeasure=Plugin\nPlugin=InputText\nSolidColor=#WindowBackgroundColor#\nX=0\nY=0\nW=0\nH=0\nDefaultValue=\nStringAlign=Left\nStringStyle=Bold\nFontSize=16\nDynamicVariables=1'
+  for i = 1, STATE.NUM_SLOTS do
+    contents = contents .. ('Command%d=[!CommandMeasure "Script" "EditString(%d, \'$UserInput$;\')"]\n'):format(i, i)
+  end
+  contents = contents .. '\n'
   local Settings = require('settings.types')
   local args = {
     title = '',

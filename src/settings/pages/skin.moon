@@ -292,6 +292,15 @@ class Skin extends Page
 					return COMPONENTS.SETTINGS\getHideSkin()
 			})
 			Settings.Boolean({
+				title: LOCALIZATION\get('setting_skin_show_session_title', 'Show session skin')
+				tooltip: LOCALIZATION\get('setting_skin_show_session_description', 'If enabled, then a small skin that shows the current system time and session duration in HH:MM format is loaded for the duration of the game.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleShowSession()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getShowSession()
+			})
+			Settings.Boolean({
 				title: LOCALIZATION\get('setting_bangs_enabled_title', 'Execute bangs')
 				tooltip: LOCALIZATION\get('setting_bangs_enabled_description', 'If enabled, then the specified Rainmeter bangs are executed when a game starts or terminates.')
 				toggle: () =>
@@ -319,6 +328,24 @@ class Skin extends Page
 					bangs = COMPONENTS.SETTINGS\getGlobalStoppingBangs()
 					io.writeFile(path, table.concat(bangs, '\n'))
 					utility.runCommand(('""%s""')\format(io.joinPaths(STATE.PATHS.RESOURCES, path)), '', 'OnEditedGlobalStoppingBangs')
+			})
+			Settings.Boolean({
+				title: LOCALIZATION\get('setting_search_uninstalled_games_enabled_title', 'Include uninstalled games in search results')
+				tooltip: LOCALIZATION\get('setting_search_uninstalled_games_enabled_description', 'If enabled, then uninstalled games are included in the results when searching by name among all games.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleSearchUninstalledGamesEnabled()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getSearchUninstalledGamesEnabled()
+			})
+			Settings.Boolean({
+				title: LOCALIZATION\get('setting_search_hidden_games_enabled_title', 'Include hidden games in search results')
+				tooltip: LOCALIZATION\get('setting_search_hidden_games_enabled_description', 'If enabled, then hidden games are included in the results when searching by name among all games.')
+				toggle: () ->
+					COMPONENTS.SETTINGS\toggleSearchHiddenGamesEnabled()
+					return true
+				getState: () ->
+					return COMPONENTS.SETTINGS\getSearchHiddenGamesEnabled()
 			})
 			Settings.Spinner({
 				title: LOCALIZATION\get('setting_localization_language_title', 'Language')

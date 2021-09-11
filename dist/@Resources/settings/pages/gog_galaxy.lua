@@ -56,6 +56,28 @@ do
             return COMPONENTS.SETTINGS:getGOGGalaxyIndirectLaunch()
           end
         }),
+        Settings.Boolean({
+          title = LOCALIZATION:get('setting_gog_galaxy_community_profile_title', 'Parse community profile'),
+          tooltip = LOCALIZATION:get('setting_gog_galaxy_community_profile_description', "If enabled, then the GOG community profile will be downloaded and parsed to get all games associated with the chosen account even if not installed at the moment.\n\nRequires that the profile is set as public."),
+          toggle = function(self)
+            COMPONENTS.SETTINGS:toggleGOGGalaxyParseCommunityProfile()
+            return true
+          end,
+          getState = function(self)
+            return COMPONENTS.SETTINGS:getGOGGalaxyParseCommunityProfile()
+          end
+        }),
+        Settings.String({
+          title = LOCALIZATION:get('setting_gog_galaxy_community_profile_name_title', 'Community profile name'),
+          tooltip = LOCALIZATION:get('setting_gog_galaxy_community_profile_name_description', "The name of the GOG profile to download and parse."),
+          setValue = function(self, value)
+            COMPONENTS.SETTINGS:setGOGGalaxyProfileName(value)
+            return true
+          end,
+          getValue = function(self)
+            return COMPONENTS.SETTINGS:getGOGGalaxyProfileName() or ''
+          end
+        }),
         Settings.Action({
           title = LOCALIZATION:get('button_label_starting_bangs', 'Starting bangs'),
           tooltip = LOCALIZATION:get('setting_gog_galaxy_starting_bangs_description', 'These Rainmeter bangs are executed just before any GOG Galaxy game launches.'),

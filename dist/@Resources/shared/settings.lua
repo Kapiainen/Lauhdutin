@@ -161,6 +161,17 @@ local migrators = {
       settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
       settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
       settings.slots.overlayImagesEnabled = true
+      settings.showSession = false
+      settings.search = { }
+      settings.search.uninstalledGamesEnabled = false
+      settings.search.hiddenGamesEnabled = false
+      settings.platforms.custom = { }
+      settings.platforms.custom.bangs = {
+        starting = { },
+        stopping = { }
+      }
+      settings.platforms.gogGalaxy.useCommunityProfile = false
+      settings.platforms.gogGalaxy.profileName = nil
     end
   }
 }
@@ -283,6 +294,12 @@ do
       end
       self.settings.gameDetectionFrequency = value
     end,
+    getShowSession = function(self)
+      return self.settings.showSession
+    end,
+    toggleShowSession = function(self)
+      self.settings.showSession = not self.settings.showSession
+    end,
     getLocalization = function(self)
       return self.settings.localization or 'English'
     end,
@@ -325,6 +342,18 @@ do
         end
       end
       self.settings.bangs.global.stopping = bangs
+    end,
+    getSearchUninstalledGamesEnabled = function(self)
+      return self.settings.search.uninstalledGamesEnabled or false
+    end,
+    toggleSearchUninstalledGamesEnabled = function(self)
+      self.settings.search.uninstalledGamesEnabled = not self.settings.search.uninstalledGamesEnabled
+    end,
+    getSearchHiddenGamesEnabled = function(self)
+      return self.settings.search.hiddenGamesEnabled or false
+    end,
+    toggleSearchHiddenGamesEnabled = function(self)
+      self.settings.search.hiddenGamesEnabled = not self.settings.search.hiddenGamesEnabled
     end,
     getLayoutRows = function(self)
       return self.settings.layout.rows or 1
@@ -639,6 +668,16 @@ do
       end
       self.settings.platforms.battlenet.bangs.stopping = bangs
     end,
+    getBattlenetClientPath = function(self)
+      return self.settings.platforms.battlenet.clientPath or ''
+    end,
+    setBattlenetClientPath = function(self, path)
+      if not (io.fileExists(io.joinPaths(path, 'Battle.net.exe'), false)) then
+        return false
+      end
+      self.settings.platforms.battlenet.clientPath = path
+      return true
+    end,
     getGOGGalaxyEnabled = function(self)
       return self.settings.platforms.gogGalaxy.enabled or false
     end,
@@ -671,6 +710,27 @@ do
     toggleGOGGalaxyIndirectLaunch = function(self)
       self.settings.platforms.gogGalaxy.indirectLaunch = not self.settings.platforms.gogGalaxy.indirectLaunch
     end,
+    getGOGGalaxyParseCommunityProfile = function(self)
+      return self.settings.platforms.gogGalaxy.useCommunityProfile or false
+    end,
+    toggleGOGGalaxyParseCommunityProfile = function(self)
+      self.settings.platforms.gogGalaxy.useCommunityProfile = not self.settings.platforms.gogGalaxy.useCommunityProfile
+    end,
+    getGOGGalaxyProfileName = function(self)
+      return self.settings.platforms.gogGalaxy.profileName or nil
+    end,
+    setGOGGalaxyProfileName = function(self, value)
+      if value == nil then
+        return false
+      end
+      value = value:trim()
+      if value == '' then
+        self.settings.platforms.gogGalaxy.profileName = nil
+      else
+        self.settings.platforms.gogGalaxy.profileName = value
+      end
+      return true
+    end,
     getGOGGalaxyStartingBangs = function(self)
       return self.settings.platforms.gogGalaxy.bangs.starting or { }
     end,
@@ -698,6 +758,34 @@ do
         end
       end
       self.settings.platforms.gogGalaxy.bangs.stopping = bangs
+    end,
+    getCustomStartingBangs = function(self)
+      return self.settings.platforms.custom.bangs.starting or { }
+    end,
+    setCustomStartingBangs = function(self, tbl)
+      local bangs = { }
+      for _index_0 = 1, #tbl do
+        local bang = tbl[_index_0]
+        bang = bang:trim()
+        if bang ~= '' then
+          table.insert(bangs, bang)
+        end
+      end
+      self.settings.platforms.custom.bangs.starting = bangs
+    end,
+    getCustomStoppingBangs = function(self)
+      return self.settings.platforms.custom.bangs.stopping or { }
+    end,
+    setCustomStoppingBangs = function(self, tbl)
+      local bangs = { }
+      for _index_0 = 1, #tbl do
+        local bang = tbl[_index_0]
+        bang = bang:trim()
+        if bang ~= '' then
+          table.insert(bangs, bang)
+        end
+      end
+      self.settings.platforms.custom.bangs.stopping = bangs
     end
   }
   _base_0.__index = _base_0
@@ -710,12 +798,17 @@ do
         logging = false,
         sorting = ENUMS.SORTING_TYPES.ALPHABETICALLY,
         gameDetectionFrequency = ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY,
+        showSession = false,
         bangs = {
           enabled = true,
           global = {
             starting = { },
             stopping = { }
           }
+        },
+        search = {
+          uninstalledGamesEnabled = false,
+          hiddenGamesEnabled = false
         },
         layout = {
           rows = 1,
@@ -766,7 +859,8 @@ do
               starting = { },
               stopping = { }
             },
-            paths = { }
+            paths = { },
+            clientPath = ''
           },
           gogGalaxy = {
             enabled = false,
@@ -776,7 +870,9 @@ do
             },
             clientPath = '',
             programDataPath = 'C:\\ProgramData\\GOG.com\\Galaxy',
-            indirectLaunch = false
+            indirectLaunch = false,
+            useCommunityProfile = false,
+            profileName = nil
           }
         }
       }

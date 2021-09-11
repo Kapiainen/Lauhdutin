@@ -3,30 +3,53 @@ local Game
 do
   local _class_0
   local _base_0 = {
-    merge = function(self, old)
-      assert(old.__class == Game, 'main.game.Game.merge')
-      log('Merging: ' .. old.title)
-      self.processOverride = old.processOverride
-      self.hidden = old.hidden
+    merge = function(self, other, newer)
+      if newer == nil then
+        newer = false
+      end
+      assert(other.__class == Game, 'main.game.Game.merge')
+      log('Merging: ' .. other.title)
+      self.processOverride = other.processOverride
+      self.hidden = other.hidden
       if self.lastPlayed ~= nil then
-        if old.lastPlayed ~= nil and old.lastPlayed > self.lastPlayed then
-          self.lastPlayed = old.lastPlayed
+        if other.lastPlayed ~= nil and other.lastPlayed > self.lastPlayed then
+          self.lastPlayed = other.lastPlayed
         end
       else
-        self.lastPlayed = old.lastPlayed
+        self.lastPlayed = other.lastPlayed
       end
       if self.hoursPlayed ~= nil then
-        if old.hoursPlayed ~= nil and old.hoursPlayed > self.hoursPlayed then
-          self.hoursPlayed = old.hoursPlayed
+        if other.hoursPlayed ~= nil and other.hoursPlayed > self.hoursPlayed then
+          self.hoursPlayed = other.hoursPlayed
         end
       else
-        self.hoursPlayed = old.hoursPlayed
+        self.hoursPlayed = other.hoursPlayed
       end
-      self.tags = old.tags
-      self.startingBangs = old.startingBangs
-      self.stoppingBangs = old.stoppingBangs
-      self.ignoresOtherBangs = old.ignoresOtherBangs
-      self.notes = old.notes
+      self.startingBangs = other.startingBangs
+      self.stoppingBangs = other.stoppingBangs
+      self.ignoresOtherBangs = other.ignoresOtherBangs
+      self.notes = other.notes
+      if newer == true then
+        self.uninstalled = other.uninstalled
+        self.path = other.path
+        self.platformOverride = other.platformOverride
+        self.banner = other.banner
+        self.bannerURL = other.bannerURL
+        self.expectedBanner = other.expectedBanner
+        self.tags = other.tags
+      else
+        if other.tags ~= nil then
+          if self.tags == nil then
+            self.tags = { }
+          end
+          for key, oldSource in pairs(other.tags) do
+            local newSource = self.tags[key]
+            if newSource == nil and oldSource == ENUMS.TAG_SOURCES.SKIN then
+              self.tags[key] = oldSource
+            end
+          end
+        end
+      end
     end,
     _moveThe = function(self, title)
       if title:lower():startsWith('the ') then
@@ -58,8 +81,36 @@ do
     getPlatformOverride = function(self)
       return self.platformOverride
     end,
+    setPlatformOverride = function(self, platform)
+      if not (self:getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM) then
+        return 
+      end
+      if platform == nil then
+        self.platformOverride = nil
+      elseif type(platform) == 'string' then
+        platform = platform:trim()
+        if platform == '' then
+          self.platformOverride = nil
+        else
+          self.platformOverride = platform
+        end
+      end
+    end,
     getPath = function(self)
       return self.path
+    end,
+    setPath = function(self, path)
+      if not (self:getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM) then
+        return 
+      end
+      path = path:trim()
+      if path == '' then
+        return 
+      end
+      if (path:find('%s') == nil) then
+        path = ('"%s"'):format(path)
+      end
+      self.path = path
     end,
     getProcess = function(self, skipOverride)
       if skipOverride == nil then
@@ -181,40 +232,12 @@ do
         self.hoursPlayed = self.hoursPlayed + hours
       end
     end,
-    getTags = function(self)
-      return self.tags or { }
-    end,
-    setTags = function(self, tags)
-      self.tags = { }
-      for _index_0 = 1, #tags do
-        local tag = tags[_index_0]
-        tag = tag:trim()
-        if tag ~= '' then
-          table.insert(self.tags, tag)
-        end
+    hasTags = function(self)
+      if self.tags == nil then
+        return false
       end
-    end,
-    getPlatformTags = function(self)
-      return self.platformTags or { }
-    end,
-    hasTag = function(self, tag)
-      if self.tags ~= nil then
-        local _list_0 = self.tags
-        for _index_0 = 1, #_list_0 do
-          local t = _list_0[_index_0]
-          if t == tag then
-            return true
-          end
-        end
-      end
-      if self.platformTags ~= nil then
-        local _list_0 = self.platformTags
-        for _index_0 = 1, #_list_0 do
-          local t = _list_0[_index_0]
-          if t == tag then
-            return true
-          end
-        end
+      for key, source in pairs(self.tags) do
+        return true
       end
       return false
     end,
@@ -230,6 +253,9 @@ do
           table.insert(self.startingBangs, bang)
         end
       end
+      if #self.startingBangs == 0 then
+        self.startingBangs = nil
+      end
     end,
     getStoppingBangs = function(self)
       return self.stoppingBangs or { }
@@ -242,6 +268,9 @@ do
         if bang ~= '' then
           table.insert(self.stoppingBangs, bang)
         end
+      end
+      if #self.stoppingBangs == 0 then
+        self.stoppingBangs = nil
       end
     end,
     getIgnoresOtherBangs = function(self)
@@ -271,34 +300,121 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, args)
-      assert(type(args.title) == 'string' and args.title:trim() ~= '', 'main.game.Game')
-      self.title = self:_moveThe(args.title)
-      assert(type(args.path) == 'string', 'main.game.Game')
-      self.path = args.path
-      assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
-      self.platformID = args.platformID
+    __init = function(self, args, tagsDictionary)
+      local title = args.ti or args.title
+      assert(type(title) == 'string' and title:trim() ~= '', 'main.game.Game')
+      self.title = self:_moveThe(title)
+      local path = args.pa or args.path
+      assert(type(path) == 'string', 'main.game.Game')
+      self.path = path
+      local platformID = args.plID or args.platformID
+      assert(type(platformID) == 'number' and platformID % 1 == 0, 'main.game.Game')
+      self.platformID = platformID
       assert(self.platformID > 0 and self.platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
-      self.platformOverride = args.platformOverride
-      if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil) then
-        self.banner = args.banner
+      self.platformOverride = args.plOv or args.platformOverride
+      local banner = args.ba or args.banner
+      local bannerURL = args.baURL or args.bannerURL
+      if banner ~= nil and (io.fileExists(banner) or bannerURL ~= nil) then
+        self.banner = banner
       end
-      self.bannerURL = args.bannerURL
+      self.bannerURL = bannerURL
       assert(self.bannerURL == nil or (self.bannerURL ~= nil and self.banner ~= nil), 'main.game.Game')
-      self.expectedBanner = args.expectedBanner
-      self.process = args.process or self:_parseProcess(self.path)
-      self.uninstalled = args.uninstalled
-      self.gameID = args.gameID
-      self.platformTags = args.platformTags
-      self.processOverride = args.processOverride
-      self.hidden = args.hidden
-      self.lastPlayed = args.lastPlayed
-      self.hoursPlayed = args.hoursPlayed
-      self.tags = args.tags
-      self.startingBangs = args.startingBangs
-      self.stoppingBangs = args.stoppingBangs
-      self.ignoresOtherBangs = args.ignoresOtherBangs
-      self.notes = args.notes
+      self.expectedBanner = args.exBa or args.expectedBanner
+      self.process = args.pr or args.process or self:_parseProcess(self.path)
+      self.uninstalled = args.un or args.uninstalled
+      self.gameID = args.gaID or args.gameID
+      self.processOverride = args.prOv or args.processOverride
+      self.hidden = args.hi or args.hidden
+      self.lastPlayed = args.laPl or args.lastPlayed
+      self.hoursPlayed = args.hoPl or args.hoursPlayed
+      self.startingBangs = args.staBa or args.startingBangs
+      self.stoppingBangs = args.stoBa or args.stoppingBangs
+      self.ignoresOtherBangs = args.igOtBa or args.ignoresOtherBangs
+      self.notes = args.no or args.notes
+      local tags = args.ta or args.tags or { }
+      local platformTags = args.plTa or args.platformTags or { }
+      if table.isArray(tags) then
+        if #tags == 0 and #platformTags == 0 then
+          self.tags = nil
+        else
+          self.tags = { }
+          for i, tag in ipairs(tags) do
+            local key = table.find(tagsDictionary, tag)
+            if key == nil then
+              local j = 1
+              while true do
+                key = tostring(j)
+                if tagsDictionary[key] == nil then
+                  tagsDictionary[key] = tag
+                  break
+                end
+                j = j + 1
+              end
+            end
+            self.tags[key] = ENUMS.TAG_SOURCES.SKIN
+          end
+          for i, tag in ipairs(platformTags) do
+            local key = table.find(tagsDictionary, tag)
+            if key == nil then
+              local j = 1
+              while true do
+                key = tostring(j)
+                if tagsDictionary[key] == nil then
+                  tagsDictionary[key] = tag
+                  break
+                end
+                j = j + 1
+              end
+            end
+            self.tags[key] = ENUMS.TAG_SOURCES.PLATFORM
+          end
+        end
+      else
+        self.tags = tags
+      end
+      self.getTags = function(self)
+        local n = 0
+        local t = { }
+        if self.tags ~= nil then
+          for key, source in pairs(self.tags) do
+            t[tagsDictionary[key]] = source
+            n = n + 1
+          end
+        end
+        return t, n
+      end
+      self.setTags = function(self, t)
+        self.tags = { }
+        local isEmpty = true
+        for tag, source in pairs(t) do
+          isEmpty = false
+          local key = table.find(tagsDictionary, tag)
+          if key == nil then
+            local i = 1
+            while true do
+              key = tostring(i)
+              if tagsDictionary[key] == nil then
+                tagsDictionary[key] = tag
+                break
+              end
+              i = i + 1
+            end
+          end
+          self.tags[key] = source
+        end
+        if isEmpty then
+          self.tags = nil
+        end
+      end
+      self.hasTag = function(self, key)
+        if self.tags == nil then
+          return nil
+        end
+        if tonumber(key) == nil then
+          key = table.find(tagsDictionary, key)
+        end
+        return self.tags[key]
+      end
     end,
     __base = _base_0,
     __name = "Game"

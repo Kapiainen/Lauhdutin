@@ -13,10 +13,8 @@ local STATE = {
 local COMPONENTS = {
   STATUS = nil
 }
-log = function(...)
-  if STATE.LOGGING == true then
-    return print(...)
-  end
+HideStatus = function()
+  return COMPONENTS.STATUS:hide()
 end
 Initialize = function()
   SKIN:Bang('[!Hide]')
@@ -28,6 +26,14 @@ Initialize = function()
     utility = require('shared.utility')
     utility.createJSONHelpers()
     COMPONENTS.SETTINGS = require('shared.settings')()
+    if COMPONENTS.SETTINGS:getLogging() == true then
+      log = function(...)
+        return print(...)
+      end
+    else
+      log = function() end
+    end
+    log('Initializing Search config')
     LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
     SKIN:Bang(('[!SetOption "WindowTitle" "Text" "%s"]'):format(LOCALIZATION:get('search_window_all_title', 'Search')))
     COMPONENTS.STATUS:hide()
@@ -56,7 +62,7 @@ Handshake = function(stack)
     end
     local x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
     SKIN:Bang(('[!Move "%d" "%d"]'):format(x, y))
-    SKIN:Bang('[!Show]')
+    SKIN:Bang('[!ZPos 1][!Show]')
     return SKIN:Bang('[!CommandMeasure "Input" "ExecuteBatch 1"]')
   end)
   if not (success) then

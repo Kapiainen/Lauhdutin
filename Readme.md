@@ -28,7 +28,9 @@ A Rainmeter skin for aggregating games from different platforms and launching th
  - Windows Script Host 5.8 or later
    - Should be included by default in all versions of Windows that are supported by Rainmeter 4.0 and later.
  - [SQLite3 command-line tool](http://www.sqlite.org/download.html) (optional)
-   - Required for GOG Galaxy support.
+   - Required for basic GOG Galaxy support.
+ - [PhantomJS](http://phantomjs.org/download.html) (optional)
+   - Required for extended GOG Galaxy support.
 
 # Installing
 - Install Rainmeter, if you do not already have it.
@@ -43,51 +45,72 @@ A Rainmeter skin for aggregating games from different platforms and launching th
 
 If you are using the previous major version (2.x.x) of Lauhdutin, then you may be able to migrate your settings and/or games to the new major version (3.x.x). Settings and games from version 2.7.1 should be possible to migrate with a minimal amount of issues though some may arise from e.g. changes in the folder structure.
 
-Copy `games.json` and `settings.json` from the `@Resources` folder of the old version of Lauhdutin and paste them in the `@Resources` folder of the new version of Lauhdutin. Load **Main.ini**.
+Copy `games.json` and `settings.json` from the `@Resources` folder of the old version of Lauhdutin and paste them into the `@Resources` folder of the new version of Lauhdutin. Load **Main.ini**.
 
 ## 3.x.x to 3.y.y
 
 The various files that store e.g. settings or games now include a version number that is used to implement the migration of files between versions, which should allow for major changes in the structures of such files without loss of data.
 
+Copy the following folders and files from the `@Resources` folder of the old version and paste them into the corresponding folder of the new version:
+- `Shortcuts/`
+- `cache/`
+- `games.json`
+- `games_backup_*.json`
+- `settings.json`
+
+Copy any additional dependencies (e.g. `sqlite3.exe`) over as well.
+
 # Features
 
 ## Supported platforms
 
+The skin detects games once per day by default, but can be configured to do this every time the skin is loaded or only when manually told to do so.
+
 ### Steam
 
 Support includes:
-- Acquire a list of installed games and games that are not currently installed, but for which a license has been purchased.
-- Acquire a list of games that have been added to Steam as a 'non-Steam game'.
+- Get installed games.
+- Get games that are not currently installed.\*
+- Get games that have been added to Steam as 'non-Steam games'.
+- Get the last played timestamp for each game.
+- Get the amount of hours played for each game.\*
+- Automatically copy custom grid images assigned in Steam to be used as banners.
+- Automatically download banners for Steam games that were detected.
 - Launch games via the Steam client.
 - Install Steam games that are not currently installed.
-- Automatically copy custom grid images assigned in Steam as banners.
-- Automatically download banners for Steam games that were found.
-- Integrate the total amount of hours played and last played timestamp, which are tracked for each game by Steam into Lauhdutin's corresponding system.
 
-Parsing the Steam community profile for information (e.g. hours played) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
+#### \*Parsing the Steam community profile for information (e.g. hours played and games that are not currently installed) requires that the `Game details` setting in your Steam profile's privacy settings is set to `Public`.
 
 ### GOG Galaxy
 
 Support includes:
-- Acquire a list of games installed via GOG Galaxy.
+- Get games installed via the client.\*
+- Get games that are not currently installed via the client.\*\*
+- Get the amount of hours played for each game.\*\*
+- Automatically download banners for games that were detected.
 - Launch games directly via the game's executable or via the GOG Galaxy client.
-- Automatically download banners for games that were found.
 
-**NOTE:** GOG Galaxy support requires the command-line tool `sqlite3.exe`, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable must be placed in Lauhdutin's `@Resources` folder.
+#### \*Requires the SQLite3 command-line tool, which can be downloaded [here](http://www.sqlite.org/download.html) as part of the `sqlite-tools-win*.zip` archive. The executable (`sqlite3.exe`) must be placed in Lauhdutin's `@Resources` folder.
+
+#### \*\*Requires PhantomJS, which can be downloaded [here](http://phantomjs.org/download.html), and that the GOG profile is public. The executable (`phantomjs.exe`) must be placed in Lauhdutin's `@Resources` folder.
 
 ### Blizzard Battle.net
 
 Support includes:
-- Acquire a list of games installed via Blizzard Battle.net.
+- Get installed games.\*
 - Launch games via the Blizzard Battle.net client.
 
-Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
+#### \*Blizzard Battle.net support does not currently include support for classic games (e.g. Diablo II, Warcraft III).
 
-### Windows shortcuts and other platforms
+### Windows shortcuts
 
 Windows shortcuts (.lnk and .url files) can be added to the `\@Resources\Shortcuts` folder. This folder can also be opened via the context menu in the main config or via the settings page for Windows shortcuts.
 
+### Other platforms
+
 Additional platforms might be supported in the future, if possible. In the mean time it is possible to add games, which were not installed via the supported platforms described above, by placing shortcuts for them in `\@Resources\Shortcuts`. If the shortcuts are placed in a subfolder, then the name of the subfolder will then be used as an override for the name of the games' platform, which can be used e.g. for filtering purposes. For example if shortcuts are placed in `\@Resources\Shortcuts\Origin`, then `Origin` will be used as the name of those games' platform and a platform-based filter will be created for that group of games.
+
+Alternatively, you can add games via the context menu action `Add a game`. These games are considered to be a part of a platform called `Custom`, but you can modify the platform later.
 
 ## Context menu actions
 
@@ -101,7 +124,7 @@ Open the folder where Windows shortcuts and their banners should be placed.
 
 ### Execute stopping bangs
 
-Stop monitoring the game and execute bangs, if they are enabled and any bangs are defined. This can be used if the skin fails to detect that a game is no longer running or if the game was never started.
+Stop monitoring the game and execute bangs, if they are enabled and any bangs are defined. This can be used if the skin fails to detect that a game is no longer running or if the game was never started. If the Session skin is enabled, then that can also be double-clicked to execute stopping bangs.
 
 ### Start/stop hiding/unhiding/removing games
 
@@ -110,6 +133,10 @@ These context actions change what left-clicking on a game does. This can be used
 ### Detect games
 
 Force the skin to refresh and detect games.
+
+### Add a game
+
+Brings up a menu where you can input information about a game that you want to add. The game is considered to belong to the *Custom* platform, which has a few more modifiable properties in the Game window (see [Games](#games)) compared to the other platforms.
 
 ## Banners
 
@@ -134,9 +161,10 @@ The window for game details (see above) can be used to view various details abou
 
 Some details can also be modified:
 
-- Toggle the visibility of the game.
-- Modify the process to monitor to determine whether or not a game is running. A blank string reverts to the default process. A `*` next to the process indicates that the value has been modified.
-- Keep notes.
+- Total amount of hours played.
+- The visibility of the game.
+- The process to monitor to determine whether or not a game is running. A blank string reverts to the default process. A `*` next to the process indicates that the value has been modified.
+- Keep notes e.g. about what to do next in the current playthrough or plans for another playthrough.
 - Assign tags for filtering purposes. Some tags may have been assigned via the game's platform, which is indicated by a `*`, and cannot be altered via Lauhdutin.
 - Set the game to ignore global and platform-specific bangs.
 - Assign starting and/or stopping bangs.
@@ -156,7 +184,7 @@ The toolbar, which can be made visible by hovering the mouse over the top or bot
 
 The button on the left-hand side of the toolbar is for searching for games based on the title. Searching uses fuzzy matching, which means that you do not need to input the exact same title as the game you are looking for. Titles are instead compared to the input and given a score. Using just the initials of a game's title should be enough to place it at the top of the list of results in many cases (e.g. `wtno` for `Wolfenstein: The New Order`).
 
-- Left-clicking the button searches through all installed games.
+- Left-clicking the button searches through all installed games. Uninstalled and/or hidden games are included in the results if the pertinent settings are enabled.
 - Middle-clicking the button searches through the current list of games, which might be the result of applying various filters.
 - Right-clicking the button clears all filters and resets the list of games. It can also be used to instantly go to the beginning of the list of games.
 
@@ -302,7 +330,7 @@ See [**Changelog.md**](Changelog.md) for more information.
 See [**License.md**](License.md) for more information.
 
 This software makes use of:
-- [json4lua](https://github.com/craigmj/json4lua) by Craig Mason-Jones (MIT license)
+- [json.lua](https://github.com/rxi/json.lua) by rxi (MIT license)
 - [digest.crc32](https://github.com/davidm/lua-digest-crc32lua) by David Manura (MIT license)
 - [bit.numberlua](https://github.com/davidm/lua-bit-numberlua) by David Manura (MIT license)
 - Rainmeter helpers by Kapiainen (MIT license)

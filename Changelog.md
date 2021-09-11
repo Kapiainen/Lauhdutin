@@ -1,14 +1,54 @@
-**Version 3.1.0 beta 1 - YYYY/MM/DD:**
+**Version 3.1.0 beta 4 - 2018/07/20:**
+- Fixed a bug that caused buttons on the Game window to become unresponsive after trying to create a tag that already existed.
+
+**Version 3.1.0 beta 3 - 2018/07/15:**
+- Fixed a bug that caused tags, which were once assigned via a platform, to remain when later unassigned via the platform.
+
+**Version 3.1.0 beta 2 - 2018/07/12:**
+- Updated Game window to adjust its z-position when editing notes and bangs.
+- Fixed a bug that prevented editing a game's notes and bangs via the Game window when the skin's path contains whitespace.
+
+**Version 3.1.0 beta 1 - 2018/07/11:**
 - Added a setting for how often games should be detected when the skin is loaded.
 - Added a custom skin action to force the skin to refresh and detect games.
 - Added a setting for toggling context-sensitive images in slot overlays.
 - Added settings for the information to show in the upper and lower halves of the slot overlay.
+- Added the ability to update a game's banner via the Game menu in case the banner has been removed or replaced with a banner with a different file extension.
 - Added the ability to redownload a game's banner via the Game menu. Only available for Steam and GOG Galaxy games.
 - Added the ability to open a game's store page in the system's default browser. Only available for Steam and GOG Galaxy games.
-- Added a `Lacks tag` filter to find games that do **not** have a specific tag.
+- Added the ability to invert filters (i.e. `Has notes` becomes `Does not have notes`).
+- Added the ability to include uninstalled and/or hidden games in the results when searching by name among all games.
+- Added an optional Session skin that shows the current system time and the current gaming session's duration in HH:MM format while playing a game. Can be enabled/disabled via a setting.
+- Added a new `Custom` platform and settings for it.
+- Added a new `Add a game` custom skin action, which can be used to add a game (`Custom` platform) by inputting information into a new menu.
+- Added the ability to download and parse GOG profiles to get all of the games associated with that profile and any tracked amounts of time played. Requires PhantomJS.
+- Added settings for toggling the use of a GOG profile and for defining the profile name.
 - Updated the Game menu so that the hours played property can be modified.
 - Updated the Game menu so that editable properties use the current value as the default value in the text input box.
+- Updated Rainmeter helpers library.
+- Updated windows to be brought to the foreground when activated.
 - Fixed a bug in the Game menu where closing the menu while there was an active text input box could cause Rainmeter to freeze.
+- Fixed a bug in the Filter menu that could cause scrolling to no longer function when switching between filtering all games and the current list of games (i.e. when stacking filters) without closing the menu first.
+- Fixed a bug that allowed uninstalled games from platforms other than Steam to play the slot click animations when clicked.
+- Fixed a bug that caused the overlay slot to show that unsupported games could be installed via the skin.
+- Fixed a bug where game slots would not correctly replace unsupported characters when displaying a game's title because there is no banner to display.
+- Fixed a bug where the title of the Filter window would not update correctly under certain circumstances.
+- Fixed bugs that could cause division by zero when updating scrollbars.
+- Optimized the file structure of `games.json` to reduce its file size and to improve the performance of tasks that require parsing said file.
+- Switched to a new JSON library for improved performance.
+
+**Version 3.0.4 - 2018/06/26:**
+- Updated to support the new version of the Blizzard Battle.net launcher.
+- Fixed a bug in the context menu option for opening the shortcuts folder.
+
+**Version 3.0.3 - 2018/05/30:**
+- Updated GOG Galaxy support to include arguments in the paths of games.
+
+**Version 3.0.2 - 2018/05/30:**
+- Updated to support the latest version of GOG Galaxy.
+
+**Version 3.0.1 - 2018/05/26:**
+- Fixed the manner in which arguments of Windows shortcuts are parsed.
 
 **Version 3.0.0 - 2018/05/25:**
 - Updated error messages related to version numbers of games, settings, and translations.

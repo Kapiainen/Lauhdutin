@@ -50,7 +50,7 @@ DynamicVariables=1'
 		contents ..= ('Command%d=[!CommandMeasure "Script" "EditFolderPath(%d, \'$UserInput$;\')"]\n')\format(i, i)
 	contents ..= '\n'
 
--- FolderPath
+	-- FolderPathSpinner
 	contents ..= '
 [FolderPathSpinnerInput]
 Measure=Plugin
@@ -70,6 +70,7 @@ DynamicVariables=1'
 		contents ..= ('Command%d=[!CommandMeasure "Script" "EditFolderPathSpinner(%d, \'$UserInput$;\')"]\n')\format(i, i)
 	contents ..= '\n'
 
+	-- Integer
 	contents ..= '
 [IntegerInput]
 Measure=Plugin
@@ -88,6 +89,26 @@ DynamicVariables=1
 '
 	for i = 1, STATE.NUM_SLOTS
 		contents ..= ('Command%d=[!CommandMeasure "Script" "EditInteger(%d, \'$UserInput$\')"]\n')\format(i, i)
+	contents ..= '\n'
+
+	-- String
+	contents ..= '
+[StringInput]
+Measure=Plugin
+Plugin=InputText
+SolidColor=#WindowBackgroundColor#
+X=0
+Y=0
+W=0
+H=0
+DefaultValue=
+StringAlign=Left
+StringStyle=Bold
+FontSize=16
+DynamicVariables=1'
+
+	for i = 1, STATE.NUM_SLOTS
+		contents ..= ('Command%d=[!CommandMeasure "Script" "EditString(%d, \'$UserInput$;\')"]\n')\format(i, i)
 	contents ..= '\n'
 
 	Settings = require('settings.types')

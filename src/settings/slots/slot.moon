@@ -33,6 +33,9 @@ class Slot
 				SKIN\Bang(('[!SetOption "Slot%dFolderPathSpinnerValue" "Text" "%s"]')\format(@index, setting\getValues()[setting\getIndex()]))
 				SKIN\Bang(('[!SetOption "Slot%dFolderPathSpinnerBrowse" "Text" "%s"]')\format(@index, LOCALIZATION\get('button_label_browse', 'Browse')))
 				SKIN\Bang(('[!ShowMeterGroup "Slot%dSettingFolderPathSpinner"]')\format(@index))
+			when ENUMS.SETTING_TYPES.STRING
+				SKIN\Bang(('[!SetOption "Slot%dStringValue" "Text" "%s"]')\format(@index, setting\getValue()))
+				SKIN\Bang(('[!ShowMeterGroup "Slot%dSettingString"]')\format(@index))
 			else
 				assert(nil, 'settings.slots.slot.Slot.update')
 

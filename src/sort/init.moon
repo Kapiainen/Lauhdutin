@@ -62,7 +62,7 @@ class Slot
 		SKIN\Bang(('[!CommandMeasure "Script" "Sort(%d)" "#ROOTCONFIG#"]')\format(@property.enum))
 		return false
 
-export log = (...) -> print(...) if STATE.LOGGING == true
+export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export Initialize = () ->
 	SKIN\Bang('[!Hide]')
@@ -71,12 +71,12 @@ export Initialize = () ->
 	COMPONENTS.STATUS = require('shared.status')()
 	success, err = pcall(
 		() ->
-			log('Initializing Sort config')
 			require('shared.enums')
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
-			STATE.LOGGING = COMPONENTS.SETTINGS\getLogging()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
+			log('Initializing Sort config')
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			STATE.SCROLL_INDEX = 1
 			COMPONENTS.SLOTS = [Slot(i) for i = 1, STATE.NUM_SLOTS]
@@ -133,8 +133,12 @@ createProperties = (game, platform) ->
 updateScrollbar = () ->
 	STATE.MAX_SCROLL_INDEX = #STATE.PROPERTIES - STATE.NUM_SLOTS + 1
 	if #STATE.PROPERTIES > STATE.NUM_SLOTS
-		STATE.SCROLLBAR.HEIGHT = math.round(STATE.SCROLLBAR.MAX_HEIGHT / (#STATE.PROPERTIES - STATE.NUM_SLOTS + 1))
-		STATE.SCROLLBAR.STEP = (STATE.SCROLLBAR.MAX_HEIGHT - STATE.SCROLLBAR.HEIGHT) / (#STATE.PROPERTIES - STATE.NUM_SLOTS)
+		div = (#STATE.PROPERTIES - STATE.NUM_SLOTS + 1)
+		div = 1 if div < 1
+		STATE.SCROLLBAR.HEIGHT = math.round(STATE.SCROLLBAR.MAX_HEIGHT / div)
+		div = (#STATE.PROPERTIES - STATE.NUM_SLOTS)
+		div = 1 if div < 1
+		STATE.SCROLLBAR.STEP = (STATE.SCROLLBAR.MAX_HEIGHT - STATE.SCROLLBAR.HEIGHT) / div
 	else
 		STATE.SCROLLBAR.HEIGHT = STATE.SCROLLBAR.MAX_HEIGHT
 		STATE.SCROLLBAR.STEP = 0
@@ -167,7 +171,7 @@ export Handshake = (currentSortingType) ->
 					monitorIndex = 1
 				x, y = utility.centerOnMonitor(skinWidth, skinHeight, monitorIndex)
 				SKIN\Bang(('[!Move "%d" "%d"]')\format(x, y))
-			SKIN\Bang('[!Show]')
+			SKIN\Bang('[!ZPos "1"][!Show]')
 	)
 	COMPONENTS.STATUS\show(err, true) unless success
 

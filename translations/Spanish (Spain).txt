@@ -1,0 +1,155 @@
+version 1
+button_label_accept	Aceptar
+button_label_bangs_none	Ninguno
+button_label_browse	Examinar
+button_label_cancel	Cancelar
+button_label_client_path	Ruta del cliente
+button_label_close	Cerrar
+button_label_disabled	Desactivado
+button_label_edit	Editar
+button_label_enabled	Activado
+button_label_hours_played	Horas de juego
+button_label_no	No
+button_label_open	Abrir
+button_label_save	Guardar
+button_label_starting_bangs	Bangs de inicio
+button_label_stopping_bangs	Bangs de finalización
+button_label_yes	Sí
+filter_back_button_title	Atrás
+filter_clear_filters	Borrar filtros
+filter_from_platform	Plataforma
+filter_has_no_tags	Sin etiquetas
+filter_has_notes	Con notas
+filter_has_tag	Etiqueta
+filter_is_hidden	Oculto
+filter_is_uninstalled	Desinstalado
+filter_never_played	Nunca jugado
+filter_random	Juego aleatorio
+filter_window_all_title	Filtrar
+filter_window_current_title	Filtrar (juegos actuales)
+game_ignores_other_bangs	Ignorar otros bangs
+game_installed	Instalado
+game_last_played	Jugado por última vez
+game_last_played_never	Nunca
+game_no_banner	Sin imagen
+game_notes	Notas
+game_notes_none	Ninguna
+game_number_of_games	%d juegos
+game_path	Ruta
+game_platform	Plataforma
+game_process	Proceso
+game_process_none	Ninguno
+game_tag_create	Crear nueva etiqueta
+game_tags	Etiquetas
+game_tags_none	Ninguna
+game_visible	Visible
+main_context_title_execute_stopping_bangs	Ejecutar bangs de finalización
+main_context_title_open_shortcuts_folder	Carpeta de accesos directos
+main_context_title_settings	Ajustes
+main_context_title_start_hiding_games	Iniciar ocultador de juegos
+main_context_title_start_removing_games	Iniciar eliminador de juegos
+main_context_title_start_unhiding_games	Iniciar mostrador de juegos
+main_context_title_stop_hiding_games	Finalizar ocultador de juegos
+main_context_title_stop_removing_games	Finalizar eliminador de juegos
+main_context_title_stop_unhiding_games	Finalizar mostrador de juegos
+main_no_games	No hay juegos que mostrar
+main_status_detecting_games	Detectando juegos
+main_status_detecting_platform_games	Detectando juegos de %s 
+main_status_n_banners_to_download	%d imágenes pendientes de descargar
+overlay_already_hidden	Ya está oculto
+overlay_already_visible	Ya está visible
+overlay_hide	Ocultar
+overlay_hours_played	%.0f horas de juego
+overlay_install	Instalar
+overlay_platform_not_running	%s no se está ejecutando
+overlay_remove	Eliminar
+overlay_single_hour_played	%.0f hora de juego
+overlay_unhide	Mostrar
+overlay_uninstalled	Desinstalado
+platform_name_windows_shortcut	Acceso directo de Windows
+search_window_all_title	Buscar
+search_window_current_title	Buscar (juegos actuales)
+setting_animation_label_jiggle	Sacudir
+setting_animation_label_none	Ninguna
+setting_animation_label_shake_left_right	Agitar a izquierda y derecha
+setting_animation_label_shake_up_down	Agitar arriba y abajo
+setting_animation_label_shrink	Contraer
+setting_animation_label_slide_down	Deslizar hacia abajo
+setting_animation_label_slide_left	Deslizar a la izquierda
+setting_animation_label_slide_right	Deslizar a la derecha
+setting_animation_label_slide_up	Deslizar hacia arriba
+setting_animation_label_zoom_in	Acercar
+setting_bangs_enabled_description	Si está activada, los bangs de Rainmeter especificados son ejecutados cuando empieza o finaliza la ejecución de un juego.
+setting_bangs_enabled_title	Ejecutar bangs
+setting_bangs_starting_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego.
+setting_bangs_stopping_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego.
+setting_battlenet_add_path	Añadir ruta...
+setting_battlenet_client_path_description	La carpeta que contiene el ejecutable del cliente de Blizzard Battle.net.
+setting_battlenet_enabled_description	Si está activada, serán añadidos los juegos instalados con el cliente de Blizzard Battle.net.
+setting_battlenet_paths_description	""Definir la ruta de la carpeta que contiene los juegos de Blizzard Battle.net en sus respectivas subcarpetas:\nSi p. ej. Hearthstone está instalado en "D:\\Juegos\\Blizzard\\Hearthstone", la ruta que habría que poner sería "D:\\Juegos\\Blizzard".\nPara eliminar una ruta, editarla e introducir una cadena vacía.""
+setting_battlenet_paths_title	Rutas
+setting_battlenet_starting_bangs_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego de Blizzard Battle.net.
+setting_battlenet_stopping_bangs_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego de Blizzard Battle.net.
+setting_gog_galaxy_client_path_description	La carpeta que contiene el ejecutable del cliente de GOG Galaxy.
+setting_gog_galaxy_enabled_description	Si está activada, serán añadidos los juegos instalados con el cliente de GOG Galaxy.
+setting_gog_galaxy_indirect_launch_description	Si está activada, los juegos serán ejecutados mediante el cliente de GOG Galaxy.\nEjecutándolos mediante el cliente permite usar su superposición y que el cliente registre las horas de juego.
+setting_gog_galaxy_indirect_launch_title	Iniciar a través del cliente
+setting_gog_galaxy_program_data_path_description	La ruta en la que el cliente de GOG Galaxy guarda algunos de sus datos.
+setting_gog_galaxy_program_data_path_title	Ruta de ProgramData
+setting_gog_galaxy_starting_bangs_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego de GOG Galaxy.
+setting_gog_galaxy_stopping_bangs_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego de GOG Galaxy.
+setting_localization_language_description	Selecciona un idioma.
+setting_localization_language_title	Idioma
+setting_logging_description	Si está activada, se grabarán un montón de mensajes en el registro de Rainmeter. Útil para solucionar problemas.
+setting_logging_title	Registro
+setting_number_of_backups_description	El número de copias de seguridad diarias de la lista de juegos que serán guardadas.
+setting_number_of_backups_title	Cantidad de copias de seguridad
+setting_shortcuts_enabled_description	Si está activada, serán añadidos los accesos directos de Windows situados en la carpeta designada.
+setting_shortcuts_open_folder_description	Accesos directos y sus imágenes deben ser situados en esta carpeta. Las imágenes deben llevar el nombre de su respectivo acceso directo.
+setting_shortcuts_open_folder_title	Carpeta
+setting_shortcuts_starting_bangs_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego de acceso directo de Windows.
+setting_shortcuts_stopping_bangs_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego de acceso directo de Windows.
+setting_shortcuts_title	Accesos directos de Windows
+setting_skin_animation_description	La animación que es reproducida cuando el ratón abandona la piel. La animación se reproduce al revés cuando el ratón entra en el borde facilitador de la piel.
+setting_skin_animation_title	Animación de la piel
+setting_skin_hide_skin_description	Si está activada, la piel será ocultada mientras se ejecuta un juego.
+setting_skin_hide_skin_title	Ocultar piel mientras se juega
+setting_skin_revealing_delay_description	La duración del retardo (en milisegundos) antes de que se reproduzca la animación de la piel para revelarla.
+setting_skin_revealing_delay_title	Retardo de revelado
+setting_skin_scroll_step_description	El número de juegos que se desplazan en cada evento de desplazamiento.
+setting_skin_scroll_step_title	Cantidad de desplazamiento
+setting_skin_title	Piel
+setting_slots_center_on_monitor_description	Si está activada, algunas ventanas (p. ej. ordenar, filtrar) serán centradas en el monitor en el que la ventana de la piel principal esté activada.
+setting_slots_center_on_monitor_title	Centrar ventanas en el monitor actual
+setting_slots_click_animation_description	La animación que es reproducida cuando una ranura es clicada.
+setting_slots_click_animation_title	Animación de clic de ranura
+setting_slots_columns_description	La cantidad de columnas de ranuras.
+setting_slots_columns_title	Cantidad de columnas
+setting_slots_double_click_to_launch_description	Si está activada, hay que hacer doble clic para ejecutar un juego.
+setting_slots_double_click_to_launch_title	Doble clic para ejecutar.
+setting_slots_height_description	La altura de cada ranura en píxeles.
+setting_slots_height_title	Altura de la ranura
+setting_slots_horizontal_orientation_description	Si está activada, las ranuras se colocan de izquierda a derecha. Si está desactivada, de arriba a abajo.
+setting_slots_horizontal_orientation_title	Orientación horizontal
+setting_slots_hover_animation_description	La animación que es reproducida al pasar el puntero sobre una ranura.
+setting_slots_hover_animation_title	Animación de ranura al pasar puntero
+setting_slots_overlay_enabled_description	Si está activada, se muestra una superposición con información contextual cuando el ratón está en una ranura.
+setting_slots_overlay_enabled_title	Superposición en ranuras
+setting_slots_rows_description	La cantidad de filas de ranuras.
+setting_slots_rows_title	Cantidad de filas
+setting_slots_toolbar_at_top_description	Si está activada, la barra de herramientas está en la parte superior de la piel.
+setting_slots_toolbar_at_top_title	Barra de herramientas en la parte superior
+setting_slots_width_description	La anchura de cada ranura en píxeles.
+setting_slots_width_title	Anchura de la ranura
+setting_steam_account_description	Elija la cuenta de Steam de la que obtener juegos.
+setting_steam_account_title	Cuenta
+setting_steam_client_path_description	La carpeta que contiene el ejecutable del cliente de Steam.
+setting_steam_community_profile_description	Si está activada, el perfil de la comunidad será descargado y analizado para obtener:\n- Todos los juegos de la cuenta elegida aunque no estén instalados en este momento.\n- El total de horas jugadas de cada juego de la cuenta elegida.\n\nRequiere que la opción Game details del perfil de la comunidad de Steam tenga seleccionada la opción público.
+setting_steam_community_profile_title	Análisis del perfil de la comunidad
+setting_steam_enabled_description	Si está activada, serán añadidos los juegos instalados con el cliente de Steam, incluyendo los juegos que no son de Steam que hayan sido añadidos manualmente a la biblioteca.
+setting_steam_starting_bangs_description	Estos bangs de Rainmeter son ejecutados al empezar la ejecución de un juego de Steam.
+setting_steam_stopping_bangs_description	Estos bangs de Rainmeter son ejecutados al finalizar la ejecución de un juego de Steam.
+sort_alphabetically	Alfabéticamente
+sort_last_played	Jugado más recientemente
+sort_window_title	Ordenar
+status_initializing	Inicializando

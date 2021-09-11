@@ -1,55 +1,132 @@
 utility = require('shared.utility')
 
 class Game
-	new: (args) =>
-		assert(type(args.title) == 'string' and args.title\trim() ~= '', 'main.game.Game')
-		@title = @_moveThe(args.title)
-		assert(type(args.path) == 'string', 'main.game.Game')
-		@path = args.path
-		assert(type(args.platformID) == 'number' and args.platformID % 1 == 0, 'main.game.Game')
-		@platformID = args.platformID
+	new: (args, tagsDictionary) =>
+		title = args.ti or args.title
+		assert(type(title) == 'string' and title\trim() ~= '', 'main.game.Game')
+		@title = @_moveThe(title)
+		path = args.pa or args.path
+		assert(type(path) == 'string', 'main.game.Game')
+		@path = path
+		platformID = args.plID or args.platformID
+		assert(type(platformID) == 'number' and platformID % 1 == 0, 'main.game.Game')
+		@platformID = platformID
 		assert(@platformID > 0 and @platformID < ENUMS.PLATFORM_IDS.MAX, 'main.game.Game')
-		@platformOverride = args.platformOverride
-		if args.banner ~= nil and (io.fileExists(args.banner) or args.bannerURL ~= nil)
-			@banner = args.banner
-		@bannerURL = args.bannerURL
+		@platformOverride = args.plOv or args.platformOverride
+		banner = args.ba or args.banner
+		bannerURL = args.baURL or args.bannerURL
+		if banner ~= nil and (io.fileExists(banner) or bannerURL ~= nil)
+			@banner = banner
+		@bannerURL = bannerURL
 		assert(@bannerURL == nil or (@bannerURL ~= nil and @banner ~= nil), 'main.game.Game')
-		@expectedBanner = args.expectedBanner
-		@process = args.process or @_parseProcess(@path)
-		@uninstalled = args.uninstalled
-		@gameID = args.gameID
-		@platformTags = args.platformTags
+		@expectedBanner = args.exBa or args.expectedBanner
+		@process = args.pr or args.process or @_parseProcess(@path)
+		@uninstalled = args.un or args.uninstalled
+		@gameID = args.gaID or args.gameID
 		-- User-generated information, which needs to be used in the 'merge' method.
-		@processOverride = args.processOverride
-		@hidden = args.hidden
-		@lastPlayed = args.lastPlayed
-		@hoursPlayed = args.hoursPlayed
-		@tags = args.tags
-		@startingBangs = args.startingBangs
-		@stoppingBangs = args.stoppingBangs
-		@ignoresOtherBangs = args.ignoresOtherBangs
-		@notes = args.notes
+		@processOverride = args.prOv or args.processOverride
+		@hidden = args.hi or args.hidden
+		@lastPlayed = args.laPl or args.lastPlayed
+		@hoursPlayed = args.hoPl or args.hoursPlayed
+		@startingBangs = args.staBa or args.startingBangs
+		@stoppingBangs = args.stoBa or args.stoppingBangs
+		@ignoresOtherBangs = args.igOtBa or args.ignoresOtherBangs
+		@notes = args.no or args.notes
+		tags = args.ta or args.tags or {}
+		platformTags = args.plTa or args.platformTags or {}
+		if table.isArray(tags) -- Old structure of two arrays of strings that must be transformed.
+			if #tags == 0 and #platformTags == 0
+				@tags = nil
+			else
+				@tags = {}
+				for i, tag in ipairs(tags)
+					key = table.find(tagsDictionary, tag)
+					if key == nil
+						j = 1
+						while true
+							key = tostring(j)
+							if tagsDictionary[key] == nil
+								tagsDictionary[key] = tag
+								break
+							j += 1
+					@tags[key] = ENUMS.TAG_SOURCES.SKIN
+				for i, tag in ipairs(platformTags)
+					key = table.find(tagsDictionary, tag)
+					if key == nil
+						j = 1
+						while true
+							key = tostring(j)
+							if tagsDictionary[key] == nil
+								tagsDictionary[key] = tag
+								break
+							j += 1
+					@tags[key] = ENUMS.TAG_SOURCES.PLATFORM
+		else -- New structure of a single dictionary of integers.
+			@tags = tags
+		@getTags = () =>
+			n = 0
+			t = {}
+			if @tags ~= nil
+				for key, source in pairs(@tags)
+					t[tagsDictionary[key]] = source
+					n += 1
+			return t, n
+		@setTags = (t) =>
+			@tags = {}
+			isEmpty = true
+			for tag, source in pairs(t)
+				isEmpty = false
+				key = table.find(tagsDictionary, tag)
+				if key == nil
+					i = 1
+					while true
+						key = tostring(i)
+						if tagsDictionary[key] == nil
+							tagsDictionary[key] = tag
+							break
+						i += 1
+				@tags[key] = source
+			@tags = nil if isEmpty
+		@hasTag = (key) =>
+			return nil if @tags == nil
+			if tonumber(key) == nil
+				key = table.find(tagsDictionary, key)
+			return @tags[key]
 
-	merge: (old) =>
-		assert(old.__class == Game, 'main.game.Game.merge')
-		log('Merging: ' .. old.title)
-		@processOverride = old.processOverride
-		@hidden = old.hidden
+	merge: (other, newer = false) =>
+		assert(other.__class == Game, 'main.game.Game.merge')
+		log('Merging: ' .. other.title)
+		@processOverride = other.processOverride
+		@hidden = other.hidden
 		if @lastPlayed ~= nil
-			if old.lastPlayed ~= nil and old.lastPlayed > @lastPlayed
-				@lastPlayed = old.lastPlayed
+			if other.lastPlayed ~= nil and other.lastPlayed > @lastPlayed
+				@lastPlayed = other.lastPlayed
 		else
-			@lastPlayed = old.lastPlayed
+			@lastPlayed = other.lastPlayed
 		if @hoursPlayed ~= nil
-			if old.hoursPlayed ~= nil and old.hoursPlayed > @hoursPlayed
-				@hoursPlayed = old.hoursPlayed
+			if other.hoursPlayed ~= nil and other.hoursPlayed > @hoursPlayed
+				@hoursPlayed = other.hoursPlayed
 		else
-			@hoursPlayed = old.hoursPlayed
-		@tags = old.tags
-		@startingBangs = old.startingBangs
-		@stoppingBangs = old.stoppingBangs
-		@ignoresOtherBangs = old.ignoresOtherBangs
-		@notes = old.notes
+			@hoursPlayed = other.hoursPlayed
+		@startingBangs = other.startingBangs
+		@stoppingBangs = other.stoppingBangs
+		@ignoresOtherBangs = other.ignoresOtherBangs
+		@notes = other.notes
+		if newer == true
+			@uninstalled = other.uninstalled
+			@path = other.path
+			@platformOverride = other.platformOverride
+			@banner = other.banner
+			@bannerURL = other.bannerURL
+			@expectedBanner = other.expectedBanner
+			@tags = other.tags
+		else
+			if other.tags ~= nil
+				@tags = {} if @tags == nil
+				for key, oldSource in pairs(other.tags)
+					newSource = @tags[key]
+					if newSource == nil and oldSource == ENUMS.TAG_SOURCES.SKIN
+						@tags[key] = oldSource
 
 	-- Move the substring 'the ' to the end of the title to ensure that searching for anything containing
 	-- the substring 'the' does not lead to a bunch of unrelated games beginning with 'the ' to show up.
@@ -82,7 +159,23 @@ class Game
 
 	getPlatformOverride: () => return @platformOverride
 
+	setPlatformOverride: (platform) =>
+		return unless @getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM
+		if platform == nil
+			@platformOverride = nil
+		elseif type(platform) == 'string'
+			platform = platform\trim()
+			@platformOverride = if platform == '' then nil else platform
+
 	getPath: () => return @path
+
+	setPath: (path) =>
+		return unless @getPlatformID() == ENUMS.PLATFORM_IDS.CUSTOM
+		path = path\trim()
+		return if path == ''
+		if (path\find('%s') == nil)
+			path = ('"%s"')\format(path)
+		@path = path
 
 	getProcess: (skipOverride = false) => return if @processOverride and skipOverride == false then @processOverride else @process
 
@@ -149,23 +242,10 @@ class Game
 			@hoursPlayed = 0 if @hoursPlayed == nil
 			@hoursPlayed += hours
 
-	getTags: () => return @tags or {}
-
-	setTags: (tags) =>
-		@tags = {}
-		for tag in *tags
-			tag = tag\trim()
-			table.insert(@tags, tag) if tag ~= ''
-
-	getPlatformTags: () => return @platformTags or {}
-
-	hasTag: (tag) =>
-		if @tags ~= nil
-			for t in *@tags
-				return true if t == tag
-		if @platformTags ~= nil
-			for t in *@platformTags
-				return true if t == tag
+	hasTags: () =>
+		return false if @tags == nil
+		for key, source in pairs(@tags)
+			return true
 		return false
 
 	getStartingBangs: () => return @startingBangs or {}
@@ -175,6 +255,7 @@ class Game
 		for bang in *bangs
 			bang = bang\trim()
 			table.insert(@startingBangs, bang) if bang ~= ''
+		@startingBangs = nil if #@startingBangs == 0
 
 	getStoppingBangs: () => return @stoppingBangs or {}
 
@@ -183,6 +264,7 @@ class Game
 		for bang in *bangs
 			bang = bang\trim()
 			table.insert(@stoppingBangs, bang) if bang ~= ''
+		@stoppingBangs = nil if #@stoppingBangs == 0
 
 	getIgnoresOtherBangs: () => return @ignoresOtherBangs or false
 

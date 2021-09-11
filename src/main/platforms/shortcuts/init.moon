@@ -1,5 +1,4 @@
 Platform = require('main.platforms.platform')
-Game = require('main.game')
 
 -- Dump a list of .lnk and .url files along with their target and argument properties.
 
@@ -59,8 +58,25 @@ class Shortcuts extends Platform
 			path = ('"%s"')\format(path)
 			arguments = table.remove(lines, 1)
 			arguments = arguments\match('^	Arguments=(.-)$') if arguments
+			arguments = arguments\trim() if arguments
 			if arguments ~= nil and arguments ~= ''
-				arguments = arguments\split('"%s"')
+				args = {}
+				attempts = 20
+				while #arguments > 0 and attempts > 0
+					arg = nil
+					if arguments\match('^"') -- Arguments inside quotation marks
+						starts, ends = arguments\find('"(.-)"')
+						arg = arguments\sub(starts + 1, ends - 1)
+						arguments = arguments\sub(ends + 1)\trim()
+					else -- Single word arguments
+						starts, ends = arguments\find('([^%s]+)')
+						arg = arguments\sub(starts, ends)
+						arguments = arguments\sub(ends + 1)\trim()
+					if arg == nil
+						attempts -= 1
+					else
+						table.insert(args, arg)
+				arguments = args
 				if #arguments > 0
 					path = ('%s "%s"')\format(path, table.concat(arguments, '" "'))
 			if title == nil
@@ -78,7 +94,7 @@ class Shortcuts extends Platform
 				:uninstalled
 				platformID: @platformID
 			})
-		@games = [Game(args) for args in *games]
+		@games = games
 
 if RUN_TESTS
 	assertionMessage = 'Windows shortcuts test failed!'
@@ -95,18 +111,18 @@ D:\\Programs\\Rainmeter\\Skins\\Lauhdutin\\@Resources\\Shortcuts\\Some platform\
 	shortcuts\generateGames(output)
 	games = shortcuts.games
 	assert(#games == 2)
-	assert(games[1].title == 'Some game', assertionMessage)
-	assert(games[1].path == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
-	assert(games[1].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
-	assert(games[1].process == 'game.exe', assertionMessage)
-	assert(games[1].uninstalled == true, assertionMessage)
-	assert(games[1].expectedBanner == 'Some game', assertionMessage)
-	assert(games[2].title == 'Some other game', assertionMessage)
-	assert(games[2].path == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
-	assert(games[2].platformID == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
-	assert(games[2].platformOverride == 'Some platform', assertionMessage)
-	assert(games[2].process == 'othergame.exe', assertionMessage)
-	assert(games[2].uninstalled == true, assertionMessage)
-	assert(games[2].expectedBanner == 'Some other game', assertionMessage)
+	assert(games[1]\getTitle() == 'Some game', assertionMessage)
+	assert(games[1]\getPath() == '"Y:\\Games\\Some game\\game.exe"', assertionMessage)
+	assert(games[1]\getPlatformID() == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[1]\getProcess() == 'game.exe', assertionMessage)
+	assert(games[1]\isInstalled() == false, assertionMessage)
+	assert(games[1]\getExpectedBanner() == 'Some game', assertionMessage)
+	assert(games[2]\getTitle() == 'Some other game', assertionMessage)
+	assert(games[2]\getPath() == '"Y:\\Games\\Some other game\\othergame.exe" "--console"', assertionMessage)
+	assert(games[2]\getPlatformID() == ENUMS.PLATFORM_IDS.SHORTCUTS, assertionMessage)
+	assert(games[2]\getPlatformOverride() == 'Some platform', assertionMessage)
+	assert(games[2]\getProcess() == 'othergame.exe', assertionMessage)
+	assert(games[2]\isInstalled() == false, assertionMessage)
+	assert(games[2]\getExpectedBanner() == 'Some other game', assertionMessage)
 
 return Shortcuts

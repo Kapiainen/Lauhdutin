@@ -144,6 +144,17 @@ migrators = {
 			settings.slots.overlayUpperText = ENUMS.OVERLAY_SLOT_TEXT.GAME_TITLE
 			settings.slots.overlayLowerText = ENUMS.OVERLAY_SLOT_TEXT.TIME_PLAYED_HOURS_OR_MINUTES
 			settings.slots.overlayImagesEnabled = true
+			settings.showSession = false
+			settings.search = {}
+			settings.search.uninstalledGamesEnabled = false
+			settings.search.hiddenGamesEnabled = false
+			settings.platforms.custom = {}
+			settings.platforms.custom.bangs = {
+				starting: {}
+				stopping: {}
+			}
+			settings.platforms.gogGalaxy.useCommunityProfile = false
+			settings.platforms.gogGalaxy.profileName = nil
 	}
 }
 
@@ -156,12 +167,17 @@ class Settings
 			logging: false -- If true, then extra information is printed to Rainmeter's log. Useful when troubleshooting issues.
 			sorting: ENUMS.SORTING_TYPES.ALPHABETICALLY -- How games are sorted.
 			gameDetectionFrequency: ENUMS.GAME_DETECTION_FREQUENCY.ONCE_PER_DAY -- How often the skin attempts to detect games when the skin is loaded.
+			showSession: false -- Load a tiny skin that shows the current system time and the current session's duration. Both times are shown in HH:MM format.
 			bangs: {
 				enabled: true -- Whether or not bangs are executed (applies to global, platform-specific, and game-specific bangs).
 				global: {
 					starting: {} -- Bangs that are executed by ALL games when a game is launched.
 					stopping: {} -- Bangs that are executed by ALL games when a game terminates.
 				}
+			}
+			search: {
+				uninstalledGamesEnabled: false
+				hiddenGamesEnabled: false
 			}
 			layout: {
 				rows: 1 -- The number of rows of slots.
@@ -213,6 +229,7 @@ class Settings
 						stopping: {} -- Bangs that are executed by all Blizzard Battle.net games when a game terminates.
 					}
 					paths: {} -- The absolute paths to folders, which in turn contain games in their own subfolders (e.g. "D:\Blizzard games" if Hearthstone is installed in "D:\Blizzard games\Hearthstone").
+					clientPath: '' -- The absolute path to the folder that contains 'Battle.net.exe'.
 				}
 				gogGalaxy: { -- GOG games installed via the GOG Galaxy client.
 					enabled: false
@@ -223,6 +240,8 @@ class Settings
 					clientPath: '' -- The absolute path to the folder containing the GOG Galaxy executable. Needed only if games are launched via the GOG Galaxy client rather than directly via a game's executable.
 					programDataPath: 'C:\\ProgramData\\GOG.com\\Galaxy' -- The absolute path to the ProgramData folder (usually "C:\ProgramData\GOG.com\Galaxy"), which contains some of the local files that are used to figure out which games are installed.
 					indirectLaunch: false -- If true, then games are launched via the GOG Galaxy client, which enables the use of the GOG Galaxy overlay and tracking time played in the GOG Galaxy client. If false, then games are launched directly via their executables.
+					useCommunityProfile: false -- If true, then PhantomJS is used to download and parse the GOG profile's games page provided that the profile is public.
+					profileName: nil -- The name of the GOG profile.
 				}
 			}
 		}
@@ -305,6 +324,10 @@ class Settings
 		return if value < ENUMS.GAME_DETECTION_FREQUENCY.NEVER or value >= ENUMS.GAME_DETECTION_FREQUENCY.MAX
 		@settings.gameDetectionFrequency = value
 
+	getShowSession: () => return @settings.showSession
+
+	toggleShowSession: () => @settings.showSession = not @settings.showSession
+
 	getLocalization: () => return @settings.localization or 'English'
 
 	setLocalization: (str) => @settings.localization = str
@@ -334,6 +357,15 @@ class Settings
 			bang = bang\trim()
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.bangs.global.stopping = bangs
+
+	-- Search
+	getSearchUninstalledGamesEnabled: () => return @settings.search.uninstalledGamesEnabled or false
+
+	toggleSearchUninstalledGamesEnabled: () => @settings.search.uninstalledGamesEnabled = not @settings.search.uninstalledGamesEnabled
+
+	getSearchHiddenGamesEnabled: () => return @settings.search.hiddenGamesEnabled or false
+
+	toggleSearchHiddenGamesEnabled: () => @settings.search.hiddenGamesEnabled = not @settings.search.hiddenGamesEnabled
 
 	-- Layout
 	getLayoutRows: () => return @settings.layout.rows or 1
@@ -563,6 +595,13 @@ class Settings
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.platforms.battlenet.bangs.stopping = bangs
 
+	getBattlenetClientPath: () => return @settings.platforms.battlenet.clientPath or ''
+	
+	setBattlenetClientPath: (path) =>
+		return false unless io.fileExists(io.joinPaths(path, 'Battle.net.exe'), false)
+		@settings.platforms.battlenet.clientPath = path
+		return true
+
 	-- GOG Galaxy
 	getGOGGalaxyEnabled: () => return @settings.platforms.gogGalaxy.enabled or false
 	
@@ -587,6 +626,21 @@ class Settings
 
 	toggleGOGGalaxyIndirectLaunch: () => @settings.platforms.gogGalaxy.indirectLaunch = not @settings.platforms.gogGalaxy.indirectLaunch
 
+	getGOGGalaxyParseCommunityProfile: () => return @settings.platforms.gogGalaxy.useCommunityProfile or false
+
+	toggleGOGGalaxyParseCommunityProfile: () => @settings.platforms.gogGalaxy.useCommunityProfile = not @settings.platforms.gogGalaxy.useCommunityProfile
+
+	getGOGGalaxyProfileName: () => return @settings.platforms.gogGalaxy.profileName or nil
+
+	setGOGGalaxyProfileName: (value) =>
+		return false if value == nil
+		value = value\trim()
+		if value == ''
+			@settings.platforms.gogGalaxy.profileName = nil
+		else
+			@settings.platforms.gogGalaxy.profileName = value
+		return true
+
 	getGOGGalaxyStartingBangs: () => return @settings.platforms.gogGalaxy.bangs.starting or {}
 
 	setGOGGalaxyStartingBangs: (tbl) =>
@@ -604,5 +658,24 @@ class Settings
 			bang = bang\trim()
 			table.insert(bangs, bang) if bang ~= ''
 		@settings.platforms.gogGalaxy.bangs.stopping = bangs
+
+	-- Custom games
+	getCustomStartingBangs: () => return @settings.platforms.custom.bangs.starting or {}
+
+	setCustomStartingBangs: (tbl) =>
+		bangs = {}
+		for bang in *tbl
+			bang = bang\trim()
+			table.insert(bangs, bang) if bang ~= ''
+		@settings.platforms.custom.bangs.starting = bangs
+
+	getCustomStoppingBangs: () => return @settings.platforms.custom.bangs.stopping or {}
+
+	setCustomStoppingBangs: (tbl) =>
+		bangs = {}
+		for bang in *tbl
+			bang = bang\trim()
+			table.insert(bangs, bang) if bang ~= ''
+		@settings.platforms.custom.bangs.stopping = bangs
 
 return Settings

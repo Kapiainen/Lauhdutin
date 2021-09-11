@@ -4,7 +4,8 @@ ENUMS = {
     STEAM = 2,
     BATTLENET = 3,
     GOG_GALAXY = 4,
-    MAX = 5
+    CUSTOM = 5,
+    MAX = 6
   },
   FILTER_TYPES = {
     NONE = 1,
@@ -16,8 +17,7 @@ ENUMS = {
     NO_TAGS = 7,
     RANDOM_GAME = 8,
     NEVER_PLAYED = 9,
-    HAS_NOTES = 10,
-    LACKS_TAG = 11
+    HAS_NOTES = 10
   },
   SORTING_TYPES = {
     ALPHABETICALLY = 1,
@@ -66,5 +66,9 @@ ENUMS = {
     LAST_PLAYED_YYYYMMDD = 7,
     NOTES = 8,
     MAX = 9
+  },
+  TAG_SOURCES = {
+    SKIN = 1,
+    PLATFORM = 2
   }
 }

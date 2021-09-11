@@ -48,7 +48,6 @@ def parse_gitignore(root_path):
 
 def main(root_path, releases_path, version):
 	release_name = "Lauhdutin"
-	author_name = "Kapiainen"
 	print("\nGenerating release: '%s - %s'" % (release_name, version))
 	folders_to_ignore, files_to_ignore, file_patterns_to_ignore = parse_gitignore(root_path)
 	print("\n  Gathering stuff to include in the release...")
@@ -105,14 +104,25 @@ def main(root_path, releases_path, version):
 	changelog_path = os.path.join(current_working_directory, "Changelog.md")
 	contributors_path = os.path.join(current_working_directory, "Contributors.md")
 	english_translation_path = os.path.join(current_working_directory, "translations", "English.txt")
-	with zipfile.ZipFile(os.path.join(releases_path, "%s - %s" % (release_name, version)) + ".zip", mode="w", compression=compression_type) as release_archive:
+	cache_folder_paths = [
+		"battlenet",
+		"custom",
+		"gog_galaxy",
+		"shortcuts",
+		"steam",
+		"steam_shortcuts"
+	]
+	with zipfile.ZipFile(os.path.join(releases_path, "%s - %s.zip" % (release_name, version)), mode="w", compression=compression_type) as release_archive:
 		release_archive.write(readme_path, "Readme.md")
 		release_archive.write(license_path, "License.md")
 		release_archive.write(changelog_path, "Changelog.md")
 		release_archive.write(contributors_path, "Contributors.md")
 		release_archive.write(english_translation_path, os.path.join("@Resources", "Languages", "English.txt"))
+		release_archive.writestr(zipfile.ZipInfo(os.path.join("@Resources", "Shortcuts\\")), "")
 		for file in files_to_pack:
 			release_archive.write(file, os.path.relpath(file, root_path))
+		for folder in cache_folder_paths:
+			release_archive.writestr(zipfile.ZipInfo(os.path.join("@Resources", "cache", folder + "\\")), "")
 	print("\nSuccessfully generated the release!")
 
 try:
@@ -136,5 +146,4 @@ try:
 except:
 	import traceback
 	traceback.print_exc()
-
 input("\nPress enter to exit...")

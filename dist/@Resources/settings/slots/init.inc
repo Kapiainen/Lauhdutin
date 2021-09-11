@@ -82,6 +82,24 @@ Command2=[!CommandMeasure "Script" "EditInteger(2, '$UserInput$')"]
 Command3=[!CommandMeasure "Script" "EditInteger(3, '$UserInput$')"]
 Command4=[!CommandMeasure "Script" "EditInteger(4, '$UserInput$')"]
 
+
+[StringInput]
+Measure=Plugin
+Plugin=InputText
+SolidColor=#WindowBackgroundColor#
+X=0
+Y=0
+W=0
+H=0
+DefaultValue=
+StringAlign=Left
+StringStyle=Bold
+FontSize=16
+DynamicVariables=1Command1=[!CommandMeasure "Script" "EditString(1, '$UserInput$;')"]
+Command2=[!CommandMeasure "Script" "EditString(2, '$UserInput$;')"]
+Command3=[!CommandMeasure "Script" "EditString(3, '$UserInput$;')"]
+Command4=[!CommandMeasure "Script" "EditString(4, '$UserInput$;')"]
+
 [Slot1BoundingBox]
 Meter=Image
 SolidColor=0,0,0,1
@@ -118,6 +136,22 @@ H=32
 ClipString=1
 DynamicVariables=1
 Group=Slot1
+
+[Slot1StringValue]
+Text=UNDEFINED
+Meter=String
+SolidColor=#SettingInputFieldBackgroundColor#
+X=([Slot1Title:X])
+Y=([Slot1Title:Y] + [Slot1Title:H] + ([Slot1BoundingBox:H] - [Slot1Title:H]) / 2)
+W=([Slot1Title:W])
+H=#ButtonHeight#
+StringAlign=LeftCenter
+StringStyle=Bold
+FontSize=16
+AntiAlias=1
+DynamicVariables=1
+LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(1)"]
+Group=Slot1|Slot1Settings|Slot1SettingString
 
 [Slot1Action]
 Text=UNDEFINED
@@ -391,6 +425,22 @@ ClipString=1
 DynamicVariables=1
 Group=Slot2
 
+[Slot2StringValue]
+Text=UNDEFINED
+Meter=String
+SolidColor=#SettingInputFieldBackgroundColor#
+X=([Slot2Title:X])
+Y=([Slot2Title:Y] + [Slot2Title:H] + ([Slot2BoundingBox:H] - [Slot2Title:H]) / 2)
+W=([Slot2Title:W])
+H=#ButtonHeight#
+StringAlign=LeftCenter
+StringStyle=Bold
+FontSize=16
+AntiAlias=1
+DynamicVariables=1
+LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(2)"]
+Group=Slot2|Slot2Settings|Slot2SettingString
+
 [Slot2Action]
 Text=UNDEFINED
 Meter=String
@@ -663,6 +713,22 @@ ClipString=1
 DynamicVariables=1
 Group=Slot3
 
+[Slot3StringValue]
+Text=UNDEFINED
+Meter=String
+SolidColor=#SettingInputFieldBackgroundColor#
+X=([Slot3Title:X])
+Y=([Slot3Title:Y] + [Slot3Title:H] + ([Slot3BoundingBox:H] - [Slot3Title:H]) / 2)
+W=([Slot3Title:W])
+H=#ButtonHeight#
+StringAlign=LeftCenter
+StringStyle=Bold
+FontSize=16
+AntiAlias=1
+DynamicVariables=1
+LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(3)"]
+Group=Slot3|Slot3Settings|Slot3SettingString
+
 [Slot3Action]
 Text=UNDEFINED
 Meter=String
@@ -934,6 +1000,22 @@ H=32
 ClipString=1
 DynamicVariables=1
 Group=Slot4
+
+[Slot4StringValue]
+Text=UNDEFINED
+Meter=String
+SolidColor=#SettingInputFieldBackgroundColor#
+X=([Slot4Title:X])
+Y=([Slot4Title:Y] + [Slot4Title:H] + ([Slot4BoundingBox:H] - [Slot4Title:H]) / 2)
+W=([Slot4Title:W])
+H=#ButtonHeight#
+StringAlign=LeftCenter
+StringStyle=Bold
+FontSize=16
+AntiAlias=1
+DynamicVariables=1
+LeftMouseUpAction=[!CommandMeasure "Script" "StartEditingString(4)"]
+Group=Slot4|Slot4Settings|Slot4SettingString
 
 [Slot4Action]
 Text=UNDEFINED

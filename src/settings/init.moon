@@ -26,7 +26,7 @@ export COMPONENTS = {
 	PAGES: nil
 }
 
-export log = (...) -> print(...) if STATE.LOGGING == true
+export HideStatus = () -> COMPONENTS.STATUS\hide()
 
 export RebuildSettingsSlots = () -> -- For development only
 	return unless STATE.INITIALIZED
@@ -60,7 +60,8 @@ additionalEnums = () ->
 		SPINNER: 4
 		INTEGER: 5
 		FOLDER_PATH_SPINNER: 6
-		MAX: 7
+		STRING: 7
+		MAX: 8
 	}
 
 export Initialize = () ->
@@ -76,6 +77,7 @@ export Initialize = () ->
 			utility = require('shared.utility')
 			utility.createJSONHelpers()
 			COMPONENTS.SETTINGS = require('shared.settings')()
+			export log = if COMPONENTS.SETTINGS\getLogging() == true then (...) -> print(...) else () -> return
 			COMPONENTS.OLD_SETTINGS = require('shared.settings')()
 			export LOCALIZATION = require('shared.localization')(COMPONENTS.SETTINGS)
 			COMPONENTS.STATUS\show(LOCALIZATION\get('status_initializing', 'Initializing'))
@@ -168,9 +170,10 @@ export Close = () ->
 				if requiresRebuilding()
 					RebuildMainSlots()
 				if requiresGameDetection()
-					games = io.readJSON(STATE.PATHS.GAMES)
-					games.updated = nil
-					io.writeJSON(STATE.PATHS.GAMES, games)
+					if io.fileExists(STATE.PATHS.GAMES)
+						games = io.readJSON(STATE.PATHS.GAMES)
+						games.updated = nil
+						io.writeJSON(STATE.PATHS.GAMES, games)
 				mainConfig = utility.getConfig(SKIN\GetVariable('ROOTCONFIG'))
 				if mainConfig ~= nil and mainConfig\isActive()
 					SKIN\Bang('[!Refresh "#ROOTCONFIG#]')
@@ -236,6 +239,21 @@ export EditFolderPath = (index, path) ->
 	path = path\sub(1, -2) if path\endsWith(';')
 	COMPONENTS.SLOTS\editFolderPath(index, path)
 
+export StartEditingString = (index) ->
+	valueMeter = SKIN\GetMeter(('Slot%dStringValue')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "DefaultValue" "%s"]')\format(valueMeter\GetOption('Text')))
+	SKIN\Bang(('[!SetOption "StringInput" "X" "([Slot%dStringValue:X])"]')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "Y" "([Slot%dStringValue:Y] + 18)"]')\format(index))
+	SKIN\Bang(('[!SetOption "StringInput" "W" "([Slot%dStringValue:W])"]')\format(index))
+	SKIN\Bang('[!SetOption "StringInput" "H" "32"]')
+	SKIN\Bang(('[!SetOption "StringInput" "SolidColor" "%s"]')\format(valueMeter\GetOption('SolidColor')))
+	SKIN\Bang(('[!CommandMeasure "StringInput" "ExecuteBatch %d"]')\format(index))
+	return log('StartEditingString ' .. index)
+
+export EditString = (index, value) ->
+	value = value\sub(1, -2) if value\endsWith(';')
+	COMPONENTS.SLOTS\editString(index, value)
+
 export OnLanguagesListed = () ->
 	unless io.fileExists('cache\\languages.txt')
 		return utility.runLastCommand()
@@ -272,45 +290,55 @@ export EditInteger = (index, value) ->
 	return if type(value) ~= 'number' or value % 1 ~= 0
 	COMPONENTS.SLOTS\setInteger(index, value)
 
+readBangs = () -> return io.readFile('cache\\bangs.txt')
+
 export OnEditedGlobalStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGlobalStartingBangs(bangs\splitIntoLines())
 
 export OnEditedGlobalStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGlobalStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedShortcutsStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setShortcutsStartingBangs(bangs\splitIntoLines())
 
 export OnEditedShortcutsStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setShortcutsStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedSteamStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setSteamStartingBangs(bangs\splitIntoLines())
 
 export OnEditedSteamStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setSteamStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedBattlenetStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setBattlenetStartingBangs(bangs\splitIntoLines())
 
 export OnEditedBattlenetStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setBattlenetStoppingBangs(bangs\splitIntoLines())
 
 export OnEditedGOGGalaxyStartingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGOGGalaxyStartingBangs(bangs\splitIntoLines())
 
 export OnEditedGOGGalaxyStoppingBangs = () ->
-	bangs = io.readFile('cache\\bangs.txt')
+	bangs = readBangs()
 	COMPONENTS.SETTINGS\setGOGGalaxyStoppingBangs(bangs\splitIntoLines())
+
+export OnEditedCustomStartingBangs = () ->
+	bangs = readBangs()
+	COMPONENTS.SETTINGS\setCustomStartingBangs(bangs\splitIntoLines())
+
+export OnEditedCustomStoppingBangs = () ->
+	bangs = readBangs()
+	COMPONENTS.SETTINGS\setCustomStoppingBangs(bangs\splitIntoLines())
 
 export CycleFolderPathSpinner = (index, direction) -> COMPONENTS.SLOTS\cycleFolderPathSpinner(index, direction)
 

@@ -5,31 +5,41 @@ button_label_browse	Browse
 button_label_cancel	Cancel
 button_label_client_path	Client path
 button_label_close	Close
+button_label_detect_download	Detect/download
 button_label_disabled	Disabled
 button_label_edit	Edit
 button_label_enabled	Enabled
 button_label_hours_played	Hours played
+button_label_next	Next
 button_label_no	No
 button_label_open	Open
 button_label_open_store_page	Open store page
 button_label_platform_not_supported	Platform not supported
 button_label_platform_supported	Platform supported
-button_label_reacquire_banner	Reacquire banner
 button_label_save	Save
 button_label_starting_bangs	Starting bangs
 button_label_stopping_bangs	Stopping bangs
+button_label_update_banner	Update banner
 button_label_yes	Yes
 filter_back_button_title	Back
 filter_clear_filters	Clear filters
-filter_from_platform	Is on platform
+filter_from_platform	Is on platform X
+filter_from_platform_inverse	Is not on platform X
 filter_has_no_tags	Has no tags
+filter_has_no_tags_inverse	Has one or more tags
 filter_has_notes	Has notes
-filter_has_tag	Has tag
+filter_has_notes_inverse	Does not have notes
+filter_has_tag	Has tag X
+filter_has_tag_inverse	Does not have tag X
+filter_invert_filters	Invert filters
 filter_is_hidden	Is hidden
+filter_is_hidden_inverse	Is not hidden
 filter_is_uninstalled	Is not installed
-filter_lacks_tag	Lacks tag
+filter_is_uninstalled_inverse	Is installed
 filter_never_played	Has never been played
-filter_random	Random game
+filter_never_played_inverse	Has been played
+filter_random	Pick a random game
+filter_random_inverse	Remove a random game
 filter_window_all_title	Filter
 filter_window_current_title	Filter (current games)
 game_ignores_other_bangs	Ignores other bangs
@@ -47,7 +57,9 @@ game_process_none	None
 game_tag_create	Create a new tag
 game_tags	Tags
 game_tags_none	None
+game_title	Title
 game_visible	Visible
+main_context_title_add_game	Add a game
 main_context_title_detect_games	Detect games
 main_context_title_execute_stopping_bangs	Execute stopping bangs
 main_context_title_open_shortcuts_folder	Open shortcuts folder
@@ -63,6 +75,10 @@ main_status_detecting_games	Detecting games
 main_status_detecting_platform_games	Detecting %s games
 main_status_detecting_platforms	Detecting platforms
 main_status_n_banners_to_download	%d banners left to download
+newgame_game_with_same_title_exists	A game with that title already exists!#CRLF##CRLF#Click to close.
+newgame_missing_path	A path has not been defined!#CRLF##CRLF#Click to close.
+newgame_missing_title	A title has not been defined!#CRLF##CRLF#Click to close.
+newgame_window_title	New game
 overlay_already_hidden	Already hidden
 overlay_already_visible	Already visible
 overlay_hide	Hide
@@ -79,6 +95,7 @@ overlay_single_hour_single_minute_played	%.0f hour %.0f minute played
 overlay_single_minute_played	%.0f minute played
 overlay_unhide	Unhide
 overlay_uninstalled	Uninstalled
+platform_name_custom	Custom
 platform_name_windows_shortcut	Windows shortcut
 search_window_all_title	Search
 search_window_current_title	Search (current games)
@@ -97,17 +114,24 @@ setting_bangs_enabled_title	Execute bangs
 setting_bangs_starting_description	These Rainmeter bangs are executed just before any game launches.
 setting_bangs_stopping_description	These Rainmeter bangs are executed just after any game terminates.
 setting_battlenet_add_path	Add path...
+setting_battlenet_client_path_description	The folder that contains the Blizzard Battle.net client executable.
 setting_battlenet_enabled_description	If enabled, then games installed via the Blizzard Battle.net client will be included.
 setting_battlenet_paths_description	""Define the absolute paths to folders, which contain Blizzard Battle.net games in their own subfolders:\nIf e.g. Hearthstone is installed in "D:\\Blizzard games\\Hearthstone", then the path that you give should be "D:\\Blizzard games".\nEdit a path and input an empty string to remove that path.""
 setting_battlenet_paths_title	Paths
 setting_battlenet_starting_bangs_description	These Rainmeter bangs are executed just before any Blizzard Battle.net game launches.
 setting_battlenet_stopping_bangs_description	These Rainmeter bangs are executed just after any Blizzard Battle.net game terminates.
+setting_custom_starting_bangs_description	These Rainmeter bangs are executed just before any Custom game launches.
+setting_custom_stopping_bangs_description	These Rainmeter bangs are executed just after any Custom game terminates.
 setting_game_detection_frequency_always	Always
 setting_game_detection_frequency_description	How often the skin should attempt to detect games when the skin is loaded. Game detection can also be triggered manually via the context menu.
 setting_game_detection_frequency_never	Never
 setting_game_detection_frequency_once_per_day	Once per day
 setting_game_detection_frequency_title	Game detection frequency
 setting_gog_galaxy_client_path_description	The folder that contains the GOG Galaxy client executable.
+setting_gog_galaxy_community_profile_description	If enabled, then the GOG community profile will be downloaded and parsed to get all games associated with the chosen account even if not installed at the moment.\n\nRequires that the profile is set as public.
+setting_gog_galaxy_community_profile_name_description	The name of the GOG profile to download and parse.
+setting_gog_galaxy_community_profile_name_title	Community profile name
+setting_gog_galaxy_community_profile_title	Parse community profile
 setting_gog_galaxy_enabled_description	If enabled, then games installed via the GOG Galaxy client will be included.
 setting_gog_galaxy_indirect_launch_description	If enabled, then games will be launched via the GOG Galaxy client.\nLaunching via the client allows the client's overlay to be used and for the client to track the amount of time played.
 setting_gog_galaxy_indirect_launch_title	Launch via client
@@ -121,6 +145,10 @@ setting_logging_description	If enabled, then a bunch of messages are printed to 
 setting_logging_title	Log
 setting_number_of_backups_description	The number of daily backups to keep of the list of games.
 setting_number_of_backups_title	Number of backups
+setting_search_hidden_games_enabled_description	If enabled, then hidden games are included in the results when searching by name among all games.
+setting_search_hidden_games_enabled_title	Include hidden games in search results
+setting_search_uninstalled_games_enabled_description	If enabled, then uninstalled games are included in the results when searching by name among all games.
+setting_search_uninstalled_games_enabled_title	Include uninstalled games in search results
 setting_shortcuts_enabled_description	If enabled, then Windows shortcuts placed in the designated folder will be included.
 setting_shortcuts_open_folder_description	Shortcuts and their banners should be placed in this folder. The banners should be named after their corresponding shortcut.
 setting_shortcuts_open_folder_title	Folder
@@ -135,6 +163,8 @@ setting_skin_revealing_delay_description	The duration (in milliseconds) before t
 setting_skin_revealing_delay_title	Revealing delay
 setting_skin_scroll_step_description	The number of games that are scrolled at each scroll event.
 setting_skin_scroll_step_title	Scroll step
+setting_skin_show_session_description	If enabled, then a small skin that shows the current system time and session duration in HH:MM format is loaded for the duration of the game.
+setting_skin_show_session_title	Show session skin
 setting_skin_title	Skin
 setting_slots_center_on_monitor_description	If enabled, then some windows (e.g. sort, filter) are centered on the monitor that the main window of this skin is on.
 setting_slots_center_on_monitor_title	Center windows on the current monitor

@@ -1,5 +1,4 @@
 local utility = require('shared.utility')
-local Game = require('main.game')
 local Platform
 do
   local _class_0
@@ -42,6 +41,15 @@ do
     end,
     getBannerExtensions = function(self)
       return self.bannerExtensions
+    end,
+    getCachePath = function(self)
+      return self.cachePath
+    end,
+    getStorePageURL = function(self, game)
+      return nil
+    end,
+    getBannerURL = function(self, game)
+      return nil
     end
   }
   _base_0.__index = _base_0
