@@ -657,6 +657,7 @@ Sort = function(sortingType)
   end
   local success, err = pcall(function()
     COMPONENTS.SETTINGS:setSorting(sortingType)
+    COMPONENTS.SETTINGS:save()
     COMPONENTS.LIBRARY:sort(sortingType, STATE.GAMES)
     STATE.SCROLL_INDEX = 1
     return updateSlots()
