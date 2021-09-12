@@ -30,7 +30,7 @@ class Steam extends Platform
 		@name = "Steam"
 		@platform = 'steam'
 		@platformID = ENUMS.PLATFORM_IDS.STEAM
-		@platformProcess = 'Steam.exe'
+		@platformProcess = 'steam.exe'
 		@cachePath = 'cache\\steam\\'
 		@enabled = settings\getSteamEnabled()
 		@steamPath = settings\getSteamPath()

@@ -584,7 +584,7 @@ do
       self.name = "Steam"
       self.platform = 'steam'
       self.platformID = ENUMS.PLATFORM_IDS.STEAM
-      self.platformProcess = 'Steam.exe'
+      self.platformProcess = 'steam.exe'
       self.cachePath = 'cache\\steam\\'
       self.enabled = settings:getSteamEnabled()
       self.steamPath = settings:getSteamPath()
