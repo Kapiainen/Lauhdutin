@@ -155,8 +155,13 @@ class Steam extends Platform
 			if type(vdf.libraryfolders) == 'table'
 				for key, value in pairs(vdf.libraryfolders)
 					if tonumber(key) ~= nil
-						value ..= '\\' if value\endsWith('\\')
-						table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
+						if type(value) == 'table'
+							if value.path
+								value.path ..= '\\' if value.path\endsWith('\\')
+								table.insert(libraries, io.joinPaths((value.path\gsub('\\\\', '\\')), 'steamapps\\'))
+						else
+							value ..= '\\' if value\endsWith('\\')
+							table.insert(libraries, io.joinPaths((value\gsub('\\\\', '\\')), 'steamapps\\'))
 			else
 				log('\\Steam\\steamapps\\libraryfolders.vdf does not contain a table called "libraryfolders".')
 		else
@@ -434,7 +439,7 @@ if RUN_TESTS
 
 	assert(steam\generateAppID('Whatevs', '"Y:\\Program Files (32)\\SomeGame\\game.exe"') == '17882896429207257088', assertionMessage)
 	assert(steam\generateAppID('Spelunky Classic', '"D:\\Games\\GOG\\Spelunky Classic\\Spelunky.exe"') == '15292025676400427008', assertionMessage)
-	
+
 	profile = 'Some kind of header or other junk that we are not interested in...
 <game>
 	<appID>40400</appID>

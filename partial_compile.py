@@ -31,7 +31,7 @@ def main(source, target, cwd = os.getcwd()):
 			return
 
 try:
-	current_working_directory = None
+	current_working_directory = os.getcwd()
 	if len(sys.argv) > 1:
 		current_working_directory = sys.argv[1]
 	source = os.path.join(current_working_directory, "src")
