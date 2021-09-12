@@ -185,10 +185,19 @@ do
         if type(vdf.libraryfolders) == 'table' then
           for key, value in pairs(vdf.libraryfolders) do
             if tonumber(key) ~= nil then
-              if value:endsWith('\\') then
-                value = value .. '\\'
+              if type(value) == 'table' then
+                if value.path then
+                  if value.path:endsWith('\\') then
+                    value.path = value.path .. '\\'
+                  end
+                  table.insert(libraries, io.joinPaths((value.path:gsub('\\\\', '\\')), 'steamapps\\'))
+                end
+              else
+                if value:endsWith('\\') then
+                  value = value .. '\\'
+                end
+                table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
               end
-              table.insert(libraries, io.joinPaths((value:gsub('\\\\', '\\')), 'steamapps\\'))
             end
           end
         else
@@ -575,7 +584,7 @@ do
       self.name = "Steam"
       self.platform = 'steam'
       self.platformID = ENUMS.PLATFORM_IDS.STEAM
-      self.platformProcess = 'Steam.exe'
+      self.platformProcess = 'steam.exe'
       self.cachePath = 'cache\\steam\\'
       self.enabled = settings:getSteamEnabled()
       self.steamPath = settings:getSteamPath()

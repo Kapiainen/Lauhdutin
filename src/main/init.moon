@@ -491,6 +491,7 @@ export Sort = (sortingType) ->
 	success, err = pcall(
 		() ->
 			COMPONENTS.SETTINGS\setSorting(sortingType)
+			COMPONENTS.SETTINGS\save()
 			COMPONENTS.LIBRARY\sort(sortingType, STATE.GAMES)
 			STATE.SCROLL_INDEX = 1
 			updateSlots()
